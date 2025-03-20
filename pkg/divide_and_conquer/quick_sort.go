@@ -1,7 +1,9 @@
 package divide_and_conquer
 
+import . "gocode/types"
+
 /*
- * Quick Sort,
+ * Quick Sort
  * T: O(n*log(n)) on average. O(n^2) worst.
  *
  * [less than pivot... ] pivot [greater than pivot... ]
@@ -54,4 +56,10 @@ func partition_dec(arr []int, low, high int) int {
 
 	arr[low], arr[i-1] = arr[i-1], arr[low]
 	return i - 1
+}
+
+// Quick Sort linked list
+func sortList(head *ListNode) *ListNode {
+
+	return nil
 }

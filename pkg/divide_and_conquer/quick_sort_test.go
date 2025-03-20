@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_pquick_sort(t *testing.T) {
+func Test_quick_sort(t *testing.T) {
 	array := []int{5, 6, 7, 2, 1, 0}
 
 	expected := []int{0, 1, 2, 5, 6, 7}
