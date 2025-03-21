@@ -2,7 +2,7 @@ package divide_and_conquer
 
 import . "gocode/types"
 
-/*
+/**
  * Quick Sort
  * T: O(n*log(n)) on average. O(n^2) worst.
  *
@@ -16,9 +16,8 @@ func quick_sort(arr []int, start, end int) {
 	}
 }
 
-// pivot := arr[high]
 func partition(arr []int, low, high int) int {
-	var i = low
+	var i = low // pivot := arr[high]
 	for j := i; j < high; j++ {
 		if arr[j] < arr[high] { // if arr[j] <= arr[high]
 			arr[i], arr[j] = arr[j], arr[i]
@@ -30,9 +29,8 @@ func partition(arr []int, low, high int) int {
 	return i
 }
 
-// pivot := arr[low]
 func partition_asc(arr []int, low, high int) int {
-	i := low + 1
+	i := low + 1 // pivot := arr[low]
 	for j := i; j <= high; j++ {
 		if arr[j] <= arr[low] {
 			arr[i], arr[j] = arr[j], arr[i]
@@ -44,9 +42,8 @@ func partition_asc(arr []int, low, high int) int {
 	return i - 1
 }
 
-// pivot := arr[low]
 func partition_dec(arr []int, low, high int) int {
-	i := low + 1
+	i := low + 1 // pivot := arr[low]
 	for j := i; j <= high; j++ {
 		if arr[j] > arr[low] {
 			arr[i], arr[j] = arr[j], arr[i]

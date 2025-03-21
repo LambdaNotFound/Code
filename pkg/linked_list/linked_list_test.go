@@ -45,3 +45,13 @@ func Test_mergeTwoLists(t *testing.T) {
 
 	assert.Equal(t, true, equal)
 }
+
+func Test_swapPairs(t *testing.T) {
+	list1 := createLinkedList([]int{1, 2, 3, 4})
+
+	want := createLinkedList([]int{2, 1, 4, 3})
+	got := swapPairs(list1)
+	equal := verifyLinkedLists(want, got)
+
+	assert.Equal(t, true, equal)
+}
