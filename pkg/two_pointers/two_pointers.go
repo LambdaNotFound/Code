@@ -1,5 +1,9 @@
 package two_pointers
 
+/**
+ * 167. Two Sum II - Input Array Is Sorted
+ * T: O(n)
+ */
 func twoSum(numbers []int, target int) []int {
     left := 0
     right := len(numbers) - 1

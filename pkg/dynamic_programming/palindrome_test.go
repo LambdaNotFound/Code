@@ -1,12 +1,28 @@
 package palindrome
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func Test_longestPalindrome(t *testing.T) {
-    input := "babad"
-    expect := "bab"
+    testCases := []struct {
+        name     string
+        input    string
+        expected string
+    }{
+        {
+            "case 1",
+            "babad",
+            "bab",
+        },
+    }
 
-    if result := longestPalindrome(input); result != expect {
-        t.Errorf("result = %v, expect = %v", result, expect)
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := longestPalindrome(tc.input)
+            assert.Equal(t, tc.expected, result)
+        })
     }
 }
