@@ -2,7 +2,7 @@
  * Definition for singly-linked list.
  */
 
-package list
+package types
 
 type ListNode struct {
     Val  int

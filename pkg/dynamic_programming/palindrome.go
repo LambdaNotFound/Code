@@ -1,5 +1,14 @@
 package palindrome
 
+/**
+ * 5. Longest Palindromic Substring
+ *
+ * Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+ *
+ * i. DynamicProgramming <= Time: O(n^2), Space: O(n^2) -> O(n)
+ *    dp[i][j] marks if string from i to j is palindrome
+ *    dp[i][j] == true if (s[i] == s[j] && (j - i < 2 || table[i + 1][j - 1))
+ */
 func longestPalindrome(s string) string {
     start, length, size := 0, 1, len(s)
     dp := make([][]bool, size)
