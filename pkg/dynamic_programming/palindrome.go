@@ -31,7 +31,7 @@ func longestPalindrome(s string) string {
 }
 
 /**
- * Space optimize to O(n)
+ * optimize space complexity to O(n)
  *    ->
  *  |           [ i ][ j ]
  *  v [i+1][j-1]
