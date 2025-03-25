@@ -55,8 +55,37 @@ func partition_dec(arr []int, low, high int) int {
     return i - 1
 }
 
-// Quick Sort linked list
+/**
+ * Quick Sort linked list
+ *
+ * 86. Partition List
+ */
 func sortList(head *ListNode) *ListNode {
 
     return nil
+}
+
+func partitionList(head *ListNode, x int) *ListNode {
+    if head == nil {
+        return head
+    }
+
+    dummy1, dummy2 := ListNode{}, ListNode{}
+    dummy1.Next = head
+    p1, p2 := &dummy1, &dummy2
+    for p1.Next != nil {
+        curr := p1.Next
+        if curr.Val < x {
+            p2.Next = curr
+            p2 = p2.Next
+
+            p1.Next = curr.Next
+            curr.Next = nil
+        } else {
+            p1 = p1.Next
+        }
+    }
+
+    p2.Next = dummy1.Next
+    return dummy2.Next
 }
