@@ -29,7 +29,7 @@ func Test_longestPalindrome(t *testing.T) {
             result := longestPalindrome(tc.input)
             assert.Equal(t, tc.expected, result)
 
-            result = longestPalindrome_opt_space(tc.input)
+            result = longestPalindrome_optimized(tc.input)
             assert.Equal(t, tc.expected, result)
         })
     }

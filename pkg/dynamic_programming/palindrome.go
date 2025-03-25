@@ -36,7 +36,7 @@ func longestPalindrome(s string) string {
  *  |           [ i ][ j ]
  *  v [i+1][j-1]
  */
-func longestPalindrome_opt_space(s string) string {
+func longestPalindrome_optimized(s string) string {
     start, length, size := 0, 1, len(s)
     dp := make([]bool, size)
 
