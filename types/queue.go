@@ -15,9 +15,8 @@ func (q *Queue[T]) Dequeue() (T, bool) {
         var empty T
         return empty, false
     } else {
-        index := len(*q) - 1
         item := (*q)[0]
-        *q = (*q)[index:]
+        *q = (*q)[1:]
         return item, true
     }
 }

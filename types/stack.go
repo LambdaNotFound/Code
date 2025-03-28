@@ -15,9 +15,9 @@ func (s *Stack[T]) Pop() (T, bool) {
         var empty T
         return empty, false
     } else {
-        index := len(*s) - 1
-        item := (*s)[index]
-        *s = (*s)[:index]
+        idx := len(*s) - 1
+        item := (*s)[idx]
+        *s = (*s)[:idx]
         return item, true
     }
 }
