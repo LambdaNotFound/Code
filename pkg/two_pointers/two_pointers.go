@@ -1,6 +1,29 @@
 package two_pointers
 
 /**
+ * 11. Container With Most Water
+ *
+ * always move the shorter side
+ */
+func maxArea(height []int) int {
+    res := 0
+    for i, j := 0, len(height)-1; i < j; {
+        area := 0
+        if height[i] <= height[j] {
+            area = height[i] * (j - i)
+            i += 1
+        } else {
+            area = height[j] * (j - i)
+            j -= 1
+        }
+        if res < area {
+            res = area
+        }
+    }
+    return res
+}
+
+/**
  * 167. Two Sum II - Input Array Is Sorted
  * T: O(n)
  */
