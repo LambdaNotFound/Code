@@ -21,8 +21,8 @@ func myAtoi(s string) int {
     } else if s[0] == '+' {
         s = s[1:]
     }
-    res := 0
 
+    res := 0
     for _, r := range s {
         if !unicode.IsDigit(r) {
             break
