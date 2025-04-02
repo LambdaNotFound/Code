@@ -1,4 +1,4 @@
-package palindrome
+package dynamic_programming
 
 import (
 	"testing"
