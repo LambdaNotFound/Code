@@ -40,3 +40,38 @@ func Test_wordBreak(t *testing.T) {
         })
     }
 }
+
+func Test_wordBreak2(t *testing.T) {
+    testCases := []struct {
+        name           string
+        input_string   string
+        input_wordDict []string
+        expected       []string
+    }{
+        {
+            "case 1",
+            "catsanddog",
+            []string{"cat", "cats", "and", "sand", "dog"},
+            []string{"cat sand dog", "cats and dog"},
+        },
+        {
+            "case 2",
+            "pineapplepenapple",
+            []string{"apple","pen","applepen","pine","pineapple"},
+            []string{"pine apple pen apple","pineapple pen apple","pine applepen apple"},
+        },
+        {
+            "case 3",
+            "catsandog",
+            []string{"cats","dog","sand","and","cat"},
+            []string{},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := wordBreak2(tc.input_string, tc.input_wordDict)
+            assert.ElementsMatch(t, tc.expected, result)
+        })
+    }
+}
