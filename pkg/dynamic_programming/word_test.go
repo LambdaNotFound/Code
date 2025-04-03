@@ -57,13 +57,13 @@ func Test_wordBreak2(t *testing.T) {
         {
             "case 2",
             "pineapplepenapple",
-            []string{"apple","pen","applepen","pine","pineapple"},
-            []string{"pine apple pen apple","pineapple pen apple","pine applepen apple"},
+            []string{"apple", "pen", "applepen", "pine", "pineapple"},
+            []string{"pine apple pen apple", "pineapple pen apple", "pine applepen apple"},
         },
         {
             "case 3",
             "catsandog",
-            []string{"cats","dog","sand","and","cat"},
+            []string{"cats", "dog", "sand", "and", "cat"},
             []string{},
         },
     }
