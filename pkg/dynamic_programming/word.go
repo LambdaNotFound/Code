@@ -18,13 +18,13 @@ func wordBreak(s string, wordDict []string) bool {
     }
 
     n := len(s)
-    dp := make([]bool, n + 1)
+    dp := make([]bool, n+1)
     for i := 1; i <= n; i += 1 {
         substr := s[0:i]
         if _, exist := wordMap[substr]; exist {
             dp[i] = true
         } else {
-            for j := 0; j < i ; j += 1 {
+            for j := 0; j < i; j += 1 {
                 substr = s[j:i]
                 if _, exist := wordMap[substr]; exist && dp[j] {
                     dp[i] = true
@@ -39,3 +39,33 @@ func wordBreak(s string, wordDict []string) bool {
  * 140. Word Break II
  *
  */
+func wordBreak2(s string, wordDict []string) []string {
+    wordMap := make(map[string]bool)
+    for _, word := range wordDict {
+        wordMap[word] = true
+    }
+
+    n := len(s)
+    dp := make([]bool, n+1)
+    table := make([][]string, n+1)
+    for i := 1; i <= n; i += 1 {
+        substr := s[0:i]
+        if _, exist := wordMap[substr]; exist {
+            dp[i] = true
+
+            table[i] = append(table[i], substr)
+        } else {
+            for j := 0; j < i; j += 1 {
+                substr = s[j:i]
+                if _, exist := wordMap[substr]; exist && dp[j] {
+                    dp[i] = true
+
+                    for _, str := range table[j] {
+                        table[i] = append(table[i], str+" "+substr)
+                    }
+                }
+            }
+        }
+    }
+    return table[n]
+}
