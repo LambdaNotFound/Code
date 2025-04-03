@@ -54,15 +54,15 @@ func wordBreak2(s string, wordDict []string) []string {
             dp[i] = true
 
             table[i] = append(table[i], substr)
-        } else {
-            for j := 0; j < i; j += 1 {
-                substr = s[j:i]
-                if _, exist := wordMap[substr]; exist && dp[j] {
-                    dp[i] = true
+        }
 
-                    for _, str := range table[j] {
-                        table[i] = append(table[i], str+" "+substr)
-                    }
+        for j := 0; j < i; j += 1 {
+            substr = s[j:i]
+            if _, exist := wordMap[substr]; exist && dp[j] {
+                dp[i] = true
+
+                for _, str := range table[j] {
+                    table[i] = append(table[i], str+" "+substr)
                 }
             }
         }
