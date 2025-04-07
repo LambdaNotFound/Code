@@ -23,6 +23,9 @@ func Test_trap(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := trap(tc.height)
             assert.Equal(t, tc.expected, result)
+
+            result = trap_slice(tc.height)
+            assert.Equal(t, tc.expected, result)
         })
     }
 }

@@ -1,5 +1,7 @@
 package monotone
 
+import . "gocode/types"
+
 /**
  * 42. Trapping Rain Water
  *
@@ -17,16 +19,40 @@ package monotone
  *   X X X X X #
  *   -----------
  *         t b i
- *
- *   X
+ *                  stack stores left side index such that
+ *   X                  height[stack.Top()] >= right
+ *   X X . . . #    otherwise, keep popping and adding water
  *   X X . . . #
- *   X X . . . #
- *   X X X X * #
+ *   X X X X * #    monotonic stack, elements < right will be popped
  *   X X X X X #
  *   -----------
  *     t b     i
  */
 func trap(height []int) int {
+    stack := Stack[int]{}
+    res := 0
+    for i := 0; i < len(height); i += 1 {
+        right := height[i]
+        for !stack.IsEmpty() && height[stack.Top()] < right {
+            bottom := height[stack.Top()]
+            stack.Pop()
+            if stack.IsEmpty() {
+                break
+            }
+            left := height[stack.Top()]
+            length := i - 1 - stack.Top()
+            if left > right {
+                res += (right - bottom) * length
+            } else {
+                res += (left - bottom) * length
+            }
+        }
+        stack = append(stack, i)
+    }
+    return res
+}
+
+func trap_slice(height []int) int {
     stack := []int{}
     res := 0
     for i := 0; i < len(height); i += 1 {
@@ -47,5 +73,16 @@ func trap(height []int) int {
         }
         stack = append(stack, i)
     }
+    return res
+}
+
+/**
+ * 84. Largest Rectangle in Histogram
+ *
+ *
+ */
+func largestRectangleArea(heights []int) int {
+    res := 0
+
     return res
 }

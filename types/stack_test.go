@@ -21,6 +21,9 @@ func Test_Stack(t *testing.T) {
     assert.Equal(t, 3, value)
     assert.Equal(t, true, ok)
 
+    value = stack.Top()
+    assert.Equal(t, 2, value)
+
     stack.Pop()
     value, ok = stack.Pop()
     assert.Equal(t, 1, value)
