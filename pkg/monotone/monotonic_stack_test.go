@@ -29,3 +29,32 @@ func Test_trap(t *testing.T) {
         })
     }
 }
+
+func Test_largestRectangleArea(t *testing.T) {
+    testCases := []struct {
+        name     string
+        height   []int
+        expected int
+    }{
+        {
+            "case 1",
+            []int{2,1,5,6,2,3},
+            10,
+        },
+        {
+            "case 2",
+            []int{2,4},
+            4,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := largestRectangleArea(tc.height)
+            assert.Equal(t, tc.expected, result)
+
+            result = largestRectangleArea_slice(tc.height)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
