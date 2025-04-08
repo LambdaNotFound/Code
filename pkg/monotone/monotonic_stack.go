@@ -5,7 +5,8 @@ import . "gocode/types"
 /**
  * 42. Trapping Rain Water
  *
- * Monotonic descending stack, storing the index
+ * Monotonic descending stack storing the index
+ * processing all the heights on stack less eq to right height
  *
  *    S = height * length
  *      = (shorter of (left, right) - bottom) * length
