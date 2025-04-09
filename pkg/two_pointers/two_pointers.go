@@ -97,3 +97,10 @@ func twoSum(numbers []int, target int) []int {
 
     return nil
 }
+
+/**
+ * 1249. Minimum Remove to Make Valid Parentheses
+ */
+func minRemoveToMakeValid(s string) string {
+    return ""
+}
