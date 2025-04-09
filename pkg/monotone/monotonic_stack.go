@@ -3,6 +3,19 @@ package monotone
 import . "gocode/types"
 
 /**
+ * Monotonic stack template:
+ *
+ *    for loop over items {
+ *        while !stack.empty() && stack.top() <> item{
+ *            stack.pop()
+ *            processing
+ *        }
+ *
+ *        stack.push(item)
+ *    }
+ */
+
+/**
  * 42. Trapping Rain Water <- Monotonic Descending Stack
  *
  * Monotonic descending stack storing the index

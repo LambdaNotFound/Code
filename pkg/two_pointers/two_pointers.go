@@ -1,5 +1,7 @@
 package two_pointers
 
+import "sort"
+
 /**
  * 11. Container With Most Water
  *
@@ -20,6 +22,56 @@ func maxArea(height []int) int {
             res = area
         }
     }
+    return res
+}
+
+/**
+ * 15. 3Sum
+ * Given an array nums of n integers, are there elements a, b, c in nums
+ * such that a + b + c = 0?
+ * Find all unique triplets in the array which gives the sum of zero.
+ *
+ */
+func threeSum(nums []int) [][]int {
+    var res [][]int
+    if len(nums) < 3 {
+        return res
+    }
+
+    sort.Ints(nums)
+    for i := 0; i < len(nums)-2; i += 1 {
+        if nums[i] > 0 {
+            break
+        }
+        if i > 0 && nums[i] == nums[i-1] {
+            continue
+        }
+
+        target, j, k := 0-nums[i], i+1, len(nums)-1
+        for j < k {
+            if nums[j]+nums[k] == target {
+                res = append(res, []int{nums[i], nums[j], nums[k]})
+
+                for {
+                    j += 1
+                    if !(j < k && nums[j] == nums[j-1]) {
+                        break
+                    }
+                }
+                for {
+                    k -= 1
+                    if !(j < k && nums[k] == nums[k+1]) {
+                        break
+                    }
+                }
+            } else if nums[j]+nums[k] < target {
+                j += 1
+            } else {
+                k -= 1
+            }
+        }
+    }
+
     return res
 }
 
