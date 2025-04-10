@@ -100,6 +100,14 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
 
 /**
  * 141. Linked List Cycle
+ * 
+ * if there is a loop and the faster pointer is approaching the 
+ * slow pointer, there can only be 2 cases:
+ *     1. the faster pointer is 1 step behind the slow pointer
+ *     2. the faster pointer is 2 step behind the slow pointer
+ * 
+ * in case 1, fater pointer will meet slow pointer in next step
+ * in case 2, it will reduces to case 1 in next step
  */
 func hasCycle(head *ListNode) bool {
     fast, slow := head, head
@@ -111,4 +119,17 @@ func hasCycle(head *ListNode) bool {
         }
     }
     return false
+}
+
+/**
+ * 876. Middle of the Linked List
+ */
+func middleNode(head *ListNode) *ListNode {
+    fast, slow := head, head
+    for fast != nil && fast.Next != nil {
+        fast = fast.Next.Next
+        slow = slow.Next
+    }
+
+    return slow
 }
