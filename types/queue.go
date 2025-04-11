@@ -6,6 +6,10 @@ func (q *Queue[T]) IsEmpty() bool {
     return len(*q) == 0
 }
 
+func (q *Queue[T]) Size() int {
+    return len(*q)
+}
+
 func (q *Queue[T]) Enqueue(item T) {
     *q = append(*q, item)
 }
