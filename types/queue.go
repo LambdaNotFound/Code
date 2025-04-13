@@ -30,7 +30,6 @@ func (q *Queue[T]) Peek() (T, bool) {
         var empty T
         return empty, false
     } else {
-        index := len(*q) - 1
-        return (*q)[index], true
+        return (*q)[0], true
     }
 }

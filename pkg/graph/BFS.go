@@ -20,7 +20,7 @@ func orangesRotting(grid [][]int) int {
 
     minutes := 0
     for !queue.IsEmpty() {
-        for i := queue.Size(); i > 0; i -= 1 {
+        for i := 0; i < queue.Size(); i++ {
             orange, _ := queue.Peek()
             queue.Dequeue()
             for _, dir := range directions {

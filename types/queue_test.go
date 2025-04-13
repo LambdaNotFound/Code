@@ -14,6 +14,8 @@ func Test_Queue(t *testing.T) {
     queue.Enqueue(1)
     isEmpty = queue.IsEmpty()
     assert.Equal(t, false, isEmpty)
+    size := queue.Size()
+    assert.Equal(t, 1, size)
 
     queue.Enqueue(2)
     queue.Enqueue(3)
