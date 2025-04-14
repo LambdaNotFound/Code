@@ -22,12 +22,17 @@ func Test_Queue(t *testing.T) {
     value, ok := queue.Dequeue()
     assert.Equal(t, 1, value)
     assert.Equal(t, true, ok)
+    size = queue.Size()
+    assert.Equal(t, 2, size)
 
     queue.Dequeue()
+    front := queue.Front()
+    assert.Equal(t, 3, front)
     value, ok = queue.Dequeue()
     assert.Equal(t, 3, value)
     assert.Equal(t, true, ok)
 
+    
     value, ok = queue.Dequeue()
     assert.Equal(t, 0, value)
     assert.Equal(t, false, ok)

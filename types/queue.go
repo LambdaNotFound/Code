@@ -33,3 +33,7 @@ func (q *Queue[T]) Peek() (T, bool) {
         return (*q)[0], true
     }
 }
+
+func (q *Queue[T]) Front() T {
+    return (*q)[0]
+}

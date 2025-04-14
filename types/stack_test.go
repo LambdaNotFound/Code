@@ -17,6 +17,9 @@ func Test_Stack(t *testing.T) {
 
     stack.Push(2)
     stack.Push(3)
+    top := stack.Top()
+    assert.Equal(t, 3, top)
+
     value, ok := stack.Pop()
     assert.Equal(t, 3, value)
     assert.Equal(t, true, ok)

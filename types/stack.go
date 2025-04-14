@@ -33,11 +33,6 @@ func (s *Stack[T]) Peek() (T, bool) {
 }
 
 func (s *Stack[T]) Top() T {
-    if s.IsEmpty() {
-        var empty T
-        return empty
-    } else {
-        index := len(*s) - 1
-        return (*s)[index]
-    }
+    index := len(*s) - 1
+    return (*s)[index]
 }
