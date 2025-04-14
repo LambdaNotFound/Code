@@ -4,6 +4,11 @@ import . "gocode/types"
 
 /**
  * 994. Rotting Oranges
+ *
+ * 0 representing an empty cell,
+ * 1 representing a fresh orange, or
+ * 2 representing a rotten orange.
+ *
  */
 func orangesRotting(grid [][]int) int {
     m, n := len(grid), len(grid[0])
