@@ -20,6 +20,7 @@ func letterCombinations(digits string) []string {
 
 // in C++
 // void letterCombinationsHelper(string digits, string& out, vector<string>& result, vector<string>& mapping) {
+// golang pass by value
 func letterCombinationsHelper(digits string, out string, res *[]string, dict []string) {
     if len(digits) == 0 {
         *res = append(*res, out)
