@@ -112,8 +112,7 @@ func (l *LRUCacheWithList[K]) Put(key K, value any) {
         if l.list.Len() > l.capacity {
             back := l.list.Back()
             l.list.Remove(back)
-            key, _ := back.Value.(K)
-            delete(l.hashmap, key)
+            delete(l.hashmap, back.Value.(K))
         }
     }
 }
