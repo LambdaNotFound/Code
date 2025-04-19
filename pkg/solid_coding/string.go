@@ -8,6 +8,14 @@ import (
 )
 
 /**
+ *    for i, rune := range string {
+ *
+ *    for i := 0; i < len(string); i++ {
+ *        byte := string[i]
+ *
+ */
+
+/**
  * 8. String to Integer (atoi)
  */
 func myAtoi(s string) int {
