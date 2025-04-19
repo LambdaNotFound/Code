@@ -9,7 +9,7 @@ import (
 func Test_myAtoi(t *testing.T) {
     testCases := []struct {
         name     string
-        s   string
+        s        string
         expected int
     }{
         {
@@ -33,7 +33,7 @@ func Test_myAtoi(t *testing.T) {
             0,
         },
         {
-            "case 4",
+            "case 5",
             "words and 987",
             0,
         },
@@ -42,6 +42,45 @@ func Test_myAtoi(t *testing.T) {
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
             result := myAtoi(tc.s)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
+func Test_isValid(t *testing.T) {
+    testCases := []struct {
+        name     string
+        s        string
+        expected bool
+    }{
+        {
+            "case 1",
+            "()",
+            true,
+        },
+        {
+            "case 2",
+            "()[]{}",
+            true,
+        },
+        {
+            "case 3",
+            "(]",
+            false,
+        },
+        {
+            "case 4",
+            "([])",
+            true,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := isValid(tc.s)
+            assert.Equal(t, tc.expected, result)
+
+            result = isValid_lookup(tc.s)
             assert.Equal(t, tc.expected, result)
         })
     }
