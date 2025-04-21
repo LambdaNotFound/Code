@@ -1,6 +1,8 @@
 package linked_list
 
-import . "gocode/types"
+import (
+	. "gocode/types"
+)
 
 /**
  * 206. Reverse Linked List

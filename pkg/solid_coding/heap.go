@@ -10,19 +10,18 @@ type MinHeap []*ListNode
 
 // Implement heap.Interface methods
 func (h MinHeap) Len() int           { return len(h) }
-func (h MinHeap) Less(i, j int) bool { return h[i].Val < h[j].Val } // Min Heap
+func (h MinHeap) Less(i, j int) bool { return h[i].Val < h[j].Val } // if true, move to last
 func (h MinHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 
 func (h *MinHeap) Push(x interface{}) {
-    *h = append(*h, x.(*ListNode)) // Append dynamically
+    *h = append(*h, x.(*ListNode)) // func (h *MinHeap), passing pointer
 }
 
 func (h *MinHeap) Pop() interface{} {
-    old := *h
-    n := len(old)
-    x := old[n-1] // Remove last element
-    *h = old[:n-1]
-    return x
+    n := len(*h)
+    top := (*h)[n-1] // Remove last element
+    *h = (*h)[:n-1]
+    return top
 }
 
 /**
