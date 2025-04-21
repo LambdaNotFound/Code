@@ -8,14 +8,14 @@ import (
 )
 
 func Test_MinHeap(t *testing.T) {
-	minHeap := &Heap[int]{
-		less: func(a, b int) bool { return a < b },
-	}
-	heap.Init(minHeap)
+    minHeap := &Heap[int]{
+        less: func(a, b int) bool { return a < b },
+    }
+    heap.Init(minHeap)
 
-	minHeap.PushItem(5)
-	minHeap.PushItem(3)
-	minHeap.PushItem(8)
+    minHeap.PushItem(5)
+    minHeap.PushItem(3)
+    minHeap.PushItem(8)
     value := minHeap.Peek()
     assert.Equal(t, 3, value)
 
@@ -27,14 +27,14 @@ func Test_MinHeap(t *testing.T) {
 }
 
 func Test_MaxHeap(t *testing.T) {
-	minHeap := &Heap[string]{
-		less: func(a, b string) bool { return a > b },
-	}
-	heap.Init(minHeap)
+    minHeap := &Heap[string]{
+        less: func(a, b string) bool { return a > b },
+    }
+    heap.Init(minHeap)
 
-	minHeap.PushItem("2025/04/20")
-	minHeap.PushItem("2025/04/21")
-	minHeap.PushItem("2025/04/22")
+    minHeap.PushItem("2025/04/20")
+    minHeap.PushItem("2025/04/21")
+    minHeap.PushItem("2025/04/22")
     value := minHeap.Peek()
     assert.Equal(t, "2025/04/22", value)
 
