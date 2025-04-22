@@ -1,6 +1,6 @@
 package monotone
 
-import . "gocode/types"
+import . "gocode/containers"
 
 /**
  * Monotonic stack template:
