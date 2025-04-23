@@ -7,7 +7,7 @@ import (
 )
 
 func Test_LRUCache(t *testing.T) {
-    cache := Constructor(3)
+    cache := ConstructorLRUCache(3)
 
     cache.Put(1, 1)
     cache.Put(2, 2)
@@ -29,7 +29,7 @@ func Test_LRUCache(t *testing.T) {
 }
 
 func Test_LRUCacheWithList(t *testing.T) {
-    cache := ConstructorWithList[int](3)
+    cache := ConstructorLRUCacheWithList[int](3)
 
     cache.Put(1, 1)
     cache.Put(2, 2)

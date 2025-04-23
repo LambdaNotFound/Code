@@ -21,7 +21,7 @@ type LRUCache struct {
     cache    map[int]*DoublyLinkedList
 }
 
-func Constructor(capacity int) LRUCache {
+func ConstructorLRUCache(capacity int) LRUCache {
     head := &DoublyLinkedList{key: 0, val: 0}
     tail := &DoublyLinkedList{key: 0, val: 0}
     head.next = tail
@@ -84,7 +84,7 @@ type LRUCacheWithList[K comparable] struct {
     hashmap  map[K]*list.Element
 }
 
-func ConstructorWithList[K comparable](capacity int) LRUCacheWithList[K] {
+func ConstructorLRUCacheWithList[K comparable](capacity int) LRUCacheWithList[K] {
     return LRUCacheWithList[K]{
         capacity: capacity,
         list:     list.New(),
