@@ -1,5 +1,40 @@
 package binarysearch
 
+/*
+ * 34. Find First and Last Position of Element in Sorted Array
+ */
+func searchRange(nums []int, target int) []int {
+    var left, right = 0, len(nums) // [0, len)
+    var first, last = -1, -1
+
+    for left < right {
+        mid := left + (right-left)/2
+        if target > nums[mid] { // lower_bound(), left is the first element <= target
+            left = mid + 1
+        } else {
+            right = mid
+        }
+    }
+    if left < len(nums) && nums[left] == target {
+        first = left
+    }
+
+    left, right = 0, len(nums)
+    for left < right {
+        mid := left + (right-left)/2
+        if target >= nums[mid] { // upper_bound(), left is the first element > target
+            left = mid + 1
+        } else {
+            right = mid
+        }
+    }
+    if left > 0 && nums[left-1] == target {
+        last = left - 1
+    }
+
+    return []int{first, last}
+}
+
 /**
  * 278. First Bad Version
  */
