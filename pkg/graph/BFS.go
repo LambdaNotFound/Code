@@ -1,6 +1,8 @@
 package graph
 
-import . "gocode/containers"
+import (
+	. "gocode/containers"
+)
 
 /**
  * 994. Rotting Oranges
