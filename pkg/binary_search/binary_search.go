@@ -3,7 +3,7 @@ package binarysearch
 /**
  * 33. Search in Rotated Sorted Array
  */
-func search(nums []int, target int) int {
+func searchRotatedSortedArray(nums []int, target int) int {
     left, right := 0, len(nums)-1
     for left <= right {
         mid := left + (right-left)/2
