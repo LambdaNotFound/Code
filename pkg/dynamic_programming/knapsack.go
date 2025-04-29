@@ -14,6 +14,7 @@ package dynamic_programming
 func canPartition(nums []int) bool {
     totalSum := 0
     for _, num := range nums {
+        totalSum += num
     }
 
     // If total sum is odd, can't partition into equal subsets
