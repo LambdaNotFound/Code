@@ -34,3 +34,29 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
         }
     }
 }
+
+/**
+ * 39. Combination Sum
+ */
+func combinationSum(candidates []int, target int) [][]int {
+    var result [][]int
+    var backtrack func([]int, int, []int)
+
+    backtrack = func(candidates []int, target int, selected []int) {
+        if target == 0 {
+            result = append(result, append([]int{}, selected...))
+            return
+        }
+        for i, val := range candidates {
+            if val <= target {
+                newTarget := target - val
+                selected := append([]int{}, selected...)
+                selected = append(selected, val)
+                newCandidates := append([]int{}, candidates[i:]...)
+                backtrack(newCandidates, newTarget, selected)
+            }
+        }
+    }
+    backtrack(candidates, target, []int{})
+    return result
+}
