@@ -28,6 +28,9 @@ func Test_letterCombinations(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := letterCombinations(tc.digits)
             assert.Equal(t, tc.expected, result)
+
+            result = letterCombinationsBacktrack(tc.digits)
+            assert.Equal(t, tc.expected, result)
         })
     }
 }
