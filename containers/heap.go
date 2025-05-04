@@ -27,7 +27,7 @@ func (h *Heap[T]) Pop() interface{} {
     return x
 }
 
-// Public API
+// Public API, via heap
 func (h *Heap[T]) PushItem(x T) {
     heap.Push(h, x)
 }
