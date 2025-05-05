@@ -29,7 +29,10 @@ func Test_findMedianSortedArrays(t *testing.T) {
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := findMedianSortedArrays_TwoPointersMerging(tc.nums1, tc.nums2)
+            result := findMedianSortedArrays(tc.nums1, tc.nums2)
+            assert.Equal(t, tc.expected, result)
+
+            result = findMedianSortedArrays_TwoPointersMerging(tc.nums1, tc.nums2)
             assert.Equal(t, tc.expected, result)
         })
     }
