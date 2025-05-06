@@ -1,6 +1,9 @@
 package binarysearch
 
-import "math"
+import (
+	. "gocode/utils"
+	"math"
+)
 
 /**
  * 4. Median of Two Sorted Arrays
@@ -21,7 +24,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
     m, n := len(nums1), len(nums2)
     low, high := 0, m
     for low <= high {
-        pivotIdxNums1 := low + (high - low) / 2
+        pivotIdxNums1 := low + (high-low)/2
         pivotIdxNums2 := (m+n+1)/2 - pivotIdxNums1 // x + y = (m + n + 1) / 2
 
         leftToPivotNums1 := math.MinInt64
@@ -46,9 +49,9 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 
         if leftToPivotNums1 <= pivotNums2 && leftToPivotNums2 <= pivotNums1 {
             if (m+n)%2 == 0 {
-                return (float64(max(leftToPivotNums1, leftToPivotNums2)) + float64(min(pivotNums1, pivotNums2))) / 2.0
+                return (float64(Max(leftToPivotNums1, leftToPivotNums2)) + float64(Min(pivotNums1, pivotNums2))) / 2.0
             }
-            return float64(max(leftToPivotNums1, leftToPivotNums2))
+            return float64(Max(leftToPivotNums1, leftToPivotNums2))
         } else if leftToPivotNums1 > pivotNums2 {
             high = pivotIdxNums1 - 1
         } else {
@@ -57,20 +60,6 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
     }
 
     return 0.0
-}
-
-func max(a, b int) int {
-    if a > b {
-        return a
-    }
-    return b
-}
-
-func min(a, b int) int {
-    if a < b {
-        return a
-    }
-    return b
 }
 
 func findMedianSortedArrays_TwoPointersMerging(nums1 []int, nums2 []int) float64 {
