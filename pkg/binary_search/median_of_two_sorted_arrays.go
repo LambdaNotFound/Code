@@ -20,40 +20,39 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 
     m, n := len(nums1), len(nums2)
     low, high := 0, m
-
     for low <= high {
-        partitionX := (low + high) / 2
-        partitionY := (m+n+1)/2 - partitionX
+        pivotIdxNums1 := low + (high - low) / 2
+        pivotIdxNums2 := (m+n+1)/2 - pivotIdxNums1 // x + y = (m + n + 1) / 2
 
-        maxX := math.MinInt64
-        if partitionX > 0 {
-            maxX = nums1[partitionX-1]
+        leftToPivotNums1 := math.MinInt64
+        if pivotIdxNums1 > 0 {
+            leftToPivotNums1 = nums1[pivotIdxNums1-1]
         }
 
-        minX := math.MaxInt64
-        if partitionX < m {
-            minX = nums1[partitionX]
+        pivotNums1 := math.MaxInt64
+        if pivotIdxNums1 < m {
+            pivotNums1 = nums1[pivotIdxNums1]
         }
 
-        maxY := math.MinInt64
-        if partitionY > 0 {
-            maxY = nums2[partitionY-1]
+        leftToPivotNums2 := math.MinInt64
+        if pivotIdxNums2 > 0 {
+            leftToPivotNums2 = nums2[pivotIdxNums2-1]
         }
 
-        minY := math.MaxInt64
-        if partitionY < n {
-            minY = nums2[partitionY]
+        pivotNums2 := math.MaxInt64
+        if pivotIdxNums2 < n {
+            pivotNums2 = nums2[pivotIdxNums2]
         }
 
-        if maxX <= minY && maxY <= minX {
+        if leftToPivotNums1 <= pivotNums2 && leftToPivotNums2 <= pivotNums1 {
             if (m+n)%2 == 0 {
-                return (float64(max(maxX, maxY)) + float64(min(minX, minY))) / 2.0
+                return (float64(max(leftToPivotNums1, leftToPivotNums2)) + float64(min(pivotNums1, pivotNums2))) / 2.0
             }
-            return float64(max(maxX, maxY))
-        } else if maxX > minY {
-            high = partitionX - 1
+            return float64(max(leftToPivotNums1, leftToPivotNums2))
+        } else if leftToPivotNums1 > pivotNums2 {
+            high = pivotIdxNums1 - 1
         } else {
-            low = partitionX + 1
+            low = pivotIdxNums1 + 1
         }
     }
 
