@@ -16,7 +16,7 @@ func diameterOfBinaryTree(root *TreeNode) int {
         return b
     }
 
-    var dfs func(node *TreeNode) int
+    var dfs func(*TreeNode) int
     dfs = func(node *TreeNode) int {
         if node == nil {
             return 0

@@ -64,7 +64,7 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
 /**
  * 39. Combination Sum
  *
- * Given an array of distinct integers candidates and a target integer target, 
+ * Given an array of distinct integers candidates and a target integer target,
  * return a list of all unique combinations of candidates where the chosen numbers sum to target.
  *
  */
@@ -72,7 +72,7 @@ func combinationSum(candidates []int, target int) [][]int {
     var result [][]int
     var backtrack func(int, []int, []int)
 
-    backtrack = func(target int, candidates []int, selected []int) {
+    backtrack = func(target int, candidates, selected []int) {
         if target == 0 {
             result = append(result, append([]int{}, selected...))
             return
@@ -88,5 +88,32 @@ func combinationSum(candidates []int, target int) [][]int {
         }
     }
     backtrack(target, candidates, []int{})
+    return result
+}
+
+/**
+ * 46. Permutations
+ */
+func permute(nums []int) [][]int {
+    var result [][]int
+    var backtrack func([]int, []int)
+
+    backtrack = func(candidates, selected []int) {
+        if len(candidates) == 0 {
+            result = append(result, append([]int{}, selected...))
+            return
+        }
+        for i, val := range candidates {
+            sliceBefore := candidates[:i]
+            sliceAfter := candidates[i+1:]
+            newCandidates := append([]int{}, sliceBefore...)
+            newCandidates = append(newCandidates, sliceAfter...)
+
+            selected := append([]int{}, selected...)
+            selected = append(selected, val)
+            backtrack(newCandidates, selected)
+        }
+    }
+    backtrack(nums, []int{})
     return result
 }
