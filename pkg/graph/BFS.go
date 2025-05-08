@@ -103,7 +103,7 @@ func orangesRotting_slice(grid [][]int) int {
 
 /**
  * 542. 01 Matrix
- * Multi-source BFS
+ * a multi-source BFS approach
  */
 func updateMatrix(mat [][]int) [][]int {
     if mat == nil || len(mat) == 0 || len(mat[0]) == 0 {
@@ -130,7 +130,7 @@ func updateMatrix(mat [][]int) [][]int {
         cell := queue[0]
         queue = queue[1:]
         for _, dir := range directions {
-            r, c := cell[0]+dir[0], cell[1]+dir[1]
+            r, c := cell[0]+dir[0], cell[1]+dir[1] // check if there's a shorter path
             if r >= 0 && r < m && c >= 0 && c < n && mat[r][c] > mat[cell[0]][cell[1]]+1 {
                 queue = append(queue, []int{r, c})
                 mat[r][c] = mat[cell[0]][cell[1]] + 1
