@@ -1,6 +1,28 @@
 package dynamic_programming
 
 /**
+ * 53. Maximum Subarray
+ *
+ * Given an integer array nums, find the subarray with the largest sum, and return its sum.
+ *
+ * Kadane's algorithm
+ */
+func maxSubArray(nums []int) int {
+    globalMax, curSum := nums[0], 0
+
+    for _, num := range nums {
+        curSum += num
+        if curSum > globalMax {
+            globalMax = curSum
+        }
+        if curSum < 0 {
+            curSum = 0
+        }
+    }
+    return globalMax
+}
+
+/**
  * 416. Partition Equal Subset Sum
  *
  * Given an integer array nums, return true if you can partition the
