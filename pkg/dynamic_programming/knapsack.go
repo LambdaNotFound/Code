@@ -6,17 +6,21 @@ package dynamic_programming
  * Given an integer array nums, find the subarray with the largest sum, and return its sum.
  *
  * Kadane's algorithm
+ *
+ * DynamicProgramming, Time: O(n * sum), Space: O(n)
+ *     dp[i] stores the maximum subarry ending at i
+ *     if dp[i - 1] > 0 dp[i] = dp[i - 1] + nums[i]
+ *     else dp[i] = nums[i]
  */
 func maxSubArray(nums []int) int {
     globalMax, curSum := nums[0], 0
-
     for _, num := range nums {
+        if curSum < 0 {
+            curSum = 0
+        }
         curSum += num
         if curSum > globalMax {
             globalMax = curSum
-        }
-        if curSum < 0 {
-            curSum = 0
         }
     }
     return globalMax
