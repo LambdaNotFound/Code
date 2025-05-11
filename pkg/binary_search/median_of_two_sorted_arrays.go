@@ -52,7 +52,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
                 return (float64(Max(leftToPivotNums1, leftToPivotNums2)) + float64(Min(pivotNums1, pivotNums2))) / 2.0
             }
             return float64(Max(leftToPivotNums1, leftToPivotNums2))
-        } else if leftToPivotNums1 > pivotNums2 {
+        } else if leftToPivotNums1 > pivotNums2 { // pivot too big, search on left
             high = pivotIdxNums1 - 1
         } else {
             low = pivotIdxNums1 + 1
