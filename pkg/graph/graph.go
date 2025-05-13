@@ -37,6 +37,8 @@ func cloneGraph(node *Node) *Node {
  * 310. Minimum Height Trees
  *
  * The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf,
+ *
+ * Adjacency List
  */
 func findMinHeightTrees(n int, edges [][]int) []int {
     if n == 1 {
@@ -63,9 +65,7 @@ func findMinHeightTrees(n int, edges [][]int) []int {
         new_leaves := []int{}
 
         for _, leaf := range leaves {
-            node := graph[leaf][0]
-
-            // Remove leaf from node
+            node := graph[leaf][0] // remove leaf from node
             for i := 0; i < len(graph[node]); i++ {
                 if graph[node][i] == leaf {
                     graph[node][i] = graph[node][len(graph[node])-1] // copy/move to truncate
