@@ -1,5 +1,7 @@
 package solid_coding
 
+import "sort"
+
 /**
  * 54. Spiral Matrix
  */
@@ -43,4 +45,30 @@ func spiralOrder(matrix [][]int) []int {
     }
 
     return res
+}
+
+/*
+ * 56. Merge Intervals
+ *
+ * [[1,4],[2,3]] => [[1,4]]
+ */
+func merge(intervals [][]int) [][]int {
+    sort.Slice(intervals, func(i, j int) bool {
+        return intervals[i][0] < intervals[j][0]
+    })
+
+    result := [][]int{}
+    result = append(result, intervals[0])
+    for _, interval := range intervals {
+        current := result[len(result)-1]
+        if current[1] < interval[0] {
+            result = append(result, interval)
+        } else {
+            if current[1] < interval[1] {
+                current[1] = interval[1]
+            }
+        }
+    }
+
+    return result
 }
