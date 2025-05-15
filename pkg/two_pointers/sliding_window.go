@@ -58,3 +58,40 @@ func lengthOfLongestSubstring_optimized(s string) int {
 
     return res
 }
+
+/**
+ * 438. Find All Anagrams in a String
+ */
+func findAnagrams(s string, p string) []int {
+    var res []int
+    charToCnt := make(map[rune]int)
+    for _, ch := range p {
+        charToCnt[ch] += 1
+    }
+    i := 0
+    j := 0
+    for j < len(s) {
+        ch := rune(s[j])
+        charCnt, ok := charToCnt[ch]
+        if !ok {
+            for i < j {
+                ch := rune(s[i])
+                charToCnt[ch] += 1
+                i += 1
+            }
+            i += 1
+            j += 1
+        } else if charCnt == 0 {
+            ch = rune(s[i])
+            charToCnt[ch] += 1
+            i += 1
+        } else {
+            charToCnt[ch] -= 1
+            if charToCnt[ch] == 0 && (j-i+1) == len(p) {
+                res = append(res, i)
+            }
+            j += 1
+        }
+    }
+    return res
+}
