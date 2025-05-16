@@ -99,6 +99,31 @@ func twoSum(numbers []int, target int) []int {
 }
 
 /**
+ * 75. Sort Colors
+ *
+ * Given an array nums with n objects colored red, white, or blue,
+ * sort them in-place so that objects of the same color are adjacent,
+ * with the colors in the order red, white, and blue.
+ *                              0,   1,         2
+ *  [0, red,...  i,... blue] red <= i,
+ */
+func sortColors(nums []int) {
+    n := len(nums)
+    for red, blue, i := 0, n-1, 0; i <= blue; {
+        if nums[i] == 0 {
+            nums[i], nums[red] = nums[red], nums[i]
+            red += 1
+            i += 1 // advance i, so that only 0, 1 on the left of i
+        } else if nums[i] == 2 {
+            nums[i], nums[blue] = nums[blue], nums[i]
+            blue -= 1
+        } else {
+            i += 1
+        }
+    }
+}
+
+/**
  * 1249. Minimum Remove to Make Valid Parentheses
  */
 func minRemoveToMakeValid(s string) string {

@@ -89,3 +89,29 @@ func Test_threeSum(t *testing.T) {
         })
     }
 }
+
+func Test_sortColors(t *testing.T) {
+    testCases := []struct {
+        name     string
+        numbers  []int
+        expected []int
+    }{
+        {
+            "case 1",
+            []int{2, 0, 2, 1, 1, 0},
+            []int{0, 0, 1, 1, 2, 2},
+        },
+        {
+            "case 2",
+            []int{2, 0, 1},
+            []int{0, 1, 2},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            sortColors(tc.numbers)
+            assert.Equal(t, tc.expected, tc.numbers)
+        })
+    }
+}
