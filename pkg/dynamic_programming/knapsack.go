@@ -9,8 +9,8 @@ package dynamic_programming
  *
  * DynamicProgramming, Time: O(n * sum), Space: O(n)
  *     dp[i] stores the maximum subarry ending at i
- *     if dp[i - 1] > 0 dp[i] = dp[i - 1] + nums[i]
- *     else dp[i] = nums[i]
+ *     dp[i] = dp[i - 1] + nums[i] if dp[i - 1] > 0
+ *                                 else dp[i] = nums[i]
  */
 func maxSubArray(nums []int) int {
     globalMax, curSum := nums[0], 0

@@ -11,10 +11,12 @@ import (
  *
  * You may assume that you have an infinite number of each kind of coin.
  *
- *    dp[i] stores the minimum number of coins used at amount i:
+ * DynamicProgramming, Time: O(n), Space: O(n)
+ *     dp[i] stores the minimum number of coins used for amount i:
+ *     coins[j] is the jth coin
+ *     dp[i] = min(dp[i], dp[i - coins[j]] + 1) if (i - coins[j] >= 0)
  *
- *    dp[0] = 0
- *    dp[i] = min(dp[i], dp[i - coins[j]] + 1) if (i - coins[j] >= 0)
+ *     dp[0] = 0
  */
 func coinChange(coins []int, amount int) int {
     dp := make([]int, amount+1)
