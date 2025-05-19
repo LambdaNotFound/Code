@@ -101,3 +101,44 @@ func isValid_lookup(s string) bool {
     }
     return len(stack) == 0 // Valid if stack is empty
 }
+
+/**
+ * 67. Add Binary
+ */
+func addBinary(a string, b string) string {
+    finalstr := ""
+    v1, v2, rem := 0, 0, 0
+
+    for l1, l2 := len(a)-1, len(b)-1; l1 >= 0 || l2 >= 0 || rem != 0; {
+        if l1 >= 0 {
+            v1, _ = strconv.Atoi(string(a[l1]))
+        }
+        if l2 >= 0 {
+            v2, _ = strconv.Atoi(string(b[l2]))
+        }
+
+        sum := v1 + v2 + rem
+
+        // according to sum append appropriate character in finalstr
+        switch sum {
+        case 3:
+            finalstr = "1" + finalstr
+            rem = 1
+        case 2:
+            finalstr = "0" + finalstr
+            rem = 1
+        case 1:
+            finalstr = "1" + finalstr
+            rem = 0
+        case 0:
+            finalstr = "0" + finalstr
+            rem = 0
+        }
+
+        v1, v2 = 0, 0
+        l1 -= 1
+        l2 -= 1
+    }
+
+    return finalstr
+}
