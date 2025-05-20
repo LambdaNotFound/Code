@@ -14,6 +14,7 @@ import (
  * DynamicProgramming, Time: O(n), Space: O(n)
  *     dp[i] stores the minimum number of coins used for amount i:
  *     coins[j] is the jth coin
+ *
  *     dp[i] = min(dp[i], dp[i - coins[j]] + 1) if (i - coins[j] >= 0)
  *
  *     dp[0] = 0
@@ -25,7 +26,7 @@ func coinChange(coins []int, amount int) int {
     }
     dp[0] = 0
     for i := 1; i <= amount; i++ {
-        for _, coin := range coins {
+        for _, coin := range coins { // reuse coins of same value
             if coin <= i {
                 dp[i] = Min(dp[i], dp[i-coin]+1)
             }
