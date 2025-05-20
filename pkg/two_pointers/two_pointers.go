@@ -113,7 +113,7 @@ func sortColors(nums []int) {
         if nums[i] == 0 {
             nums[i], nums[red] = nums[red], nums[i]
             red += 1
-            i += 1 // advance i, so that only 0, 1 on the left of i
+            i += 1 // advance both of the pointers
         } else if nums[i] == 2 {
             nums[i], nums[blue] = nums[blue], nums[i]
             blue -= 1

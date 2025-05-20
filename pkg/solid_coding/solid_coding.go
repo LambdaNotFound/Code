@@ -87,6 +87,7 @@ func insert(intervals [][]int, newInterval []int) [][]int {
 		res = append(res, intervals[i])
 	}
 	for ; i < len(intervals) && intervals[i][0] <= newInterval[1]; i++ {
+        // only update the newInterval[min, max]
 		newInterval[0] = Min(intervals[i][0], newInterval[0])
 		newInterval[1] = Max(intervals[i][1], newInterval[1])
 	}
