@@ -2,6 +2,7 @@ package graph
 
 import (
 	. "gocode/containers"
+	. "gocode/types"
 )
 
 /**
@@ -139,4 +140,35 @@ func updateMatrix(mat [][]int) [][]int {
     }
 
     return mat
+}
+
+/**
+ * 199. Binary Tree Right Side View
+ */
+func rightSideView(root *TreeNode) []int {
+    res := []int{}
+    if root == nil {
+        return res
+    }
+
+    queue := []*TreeNode{root}
+    for len(queue) > 0 {
+        levelSize := len(queue)
+        for i := 0; i < levelSize; i++ {
+            cur := queue[0]
+            queue = queue[1:]
+
+            if cur.Left != nil {
+                queue = append(queue, cur.Left)
+            }
+            if cur.Right != nil {
+                queue = append(queue, cur.Right)
+            }
+
+            if i == levelSize-1 {
+                res = append(res, cur.Val)
+            }
+        }
+    }
+    return res
 }
