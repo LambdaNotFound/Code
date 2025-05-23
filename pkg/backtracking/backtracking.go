@@ -117,3 +117,30 @@ func permute(nums []int) [][]int {
     backtrack(nums, []int{})
     return result
 }
+
+/**
+ * 78. Subsets
+ */
+func subsets(nums []int) [][]int {
+    var result [][]int
+    var curr []int
+
+    var search func(int)
+    search = func(index int) {
+        if index == len(nums) {
+            subset := make([]int, len(curr))
+            copy(subset, curr)
+            result = append(result, subset)
+            return
+        }
+
+        curr = append(curr, nums[index])
+        search(index + 1)
+
+        curr = curr[:len(curr)-1]
+        search(index + 1)
+    }
+
+    search(0)
+    return result
+}
