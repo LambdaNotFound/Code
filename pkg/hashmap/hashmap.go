@@ -44,7 +44,6 @@ func canConstruct(ransomNote string, magazine string) bool {
  */
 func isAnagram(s string, t string) bool {
     chars := make(map[rune]int)
-
     for _, v := range s {
         chars[v]++
     }
