@@ -1,9 +1,5 @@
 package dynamic_programming
 
-import (
-	. "gocode/utils"
-)
-
 /**
  * 62. Unique Paths
  *
