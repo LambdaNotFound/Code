@@ -11,9 +11,44 @@ import "sort"
  * You're given the startTime, endTime and profit arrays, return the maximum profit you can take
  * such that there are no two jobs in the subset with overlapping time range.
  *
- * 1. DFS w/ memo
- *
+ * 1. DFS w/ memo, top-down approach
+ * 2. DP, bottom-up approach
  */
+func jobScheduling(startTime []int, endTime []int, profit []int) int {
+    // initialize jobs array & sort it by start time
+    type Job struct {
+        start, end, profit int
+    }
+    jobs := make([]Job, len(startTime))
+    for i := 0; i < len(startTime); i++ {
+        jobs[i] = Job{startTime[i], endTime[i], profit[i]}
+    }
+    sort.Slice(jobs, func(i, j int) bool { return jobs[i].start < jobs[j].start })
+
+    // binary search to find the next non-conflicting job
+    searchNextJob := func(i int) int {
+        left, right := i+1, len(jobs)-1
+        for left <= right {
+            mid := (left + right) / 2
+            if jobs[mid].start >= jobs[i].end {
+                left, right = left, mid-1
+            } else {
+                left, right = mid+1, right
+            }
+        }
+        return left
+    }
+
+    dp := make([]int, len(startTime)+1)
+    for i := len(startTime) - 1; i >= 0; i-- {
+        dp[i] = jobs[i].profit
+        idx := searchNextJob(i)
+        dp[i] += dp[idx]
+        dp[i] = max(dp[i], dp[i+1])
+    }
+    return dp[0]
+}
+
 func jobScheduling_dfs(startTime []int, endTime []int, profit []int) int {
     // initialize jobs array & sort it by start time
     type Job struct {
