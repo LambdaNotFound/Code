@@ -39,7 +39,10 @@ func Test_jobScheduling(t *testing.T) {
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := jobScheduling_dfs(tc.startTime, tc.endTime, tc.profit)
+            result := jobScheduling(tc.startTime, tc.endTime, tc.profit)
+            assert.Equal(t, tc.expected, result)
+
+            result = jobScheduling_dfs(tc.startTime, tc.endTime, tc.profit)
             assert.Equal(t, tc.expected, result)
         })
     }
