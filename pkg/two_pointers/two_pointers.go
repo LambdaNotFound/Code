@@ -1,6 +1,9 @@
 package two_pointers
 
-import "sort"
+import (
+	"sort"
+	"strings"
+)
 
 /**
  * 11. Container With Most Water
@@ -128,4 +131,30 @@ func sortColors(nums []int) {
  */
 func minRemoveToMakeValid(s string) string {
     return ""
+}
+
+/**
+ * 125. Valid Palindrome
+ */
+ func isPalindrome(s string) bool {
+    var isValidChar = func(s1 string) bool {
+        if (s1 >= "A" && s1 <= "Z") || (s1 >= "a" && s1 <= "z") || (s1 >= "0" && s1 <= "9") {
+            return true
+        }
+        return false
+    }
+    for idx, jdx := 0, len(s)-1; idx <= jdx; {
+        if isValidChar(string(s[idx])) && isValidChar(string(s[jdx])) {
+            if strings.ToLower(string(s[idx])) != strings.ToLower(string(s[jdx])) {
+                return false
+            }
+            idx++
+            jdx--
+        } else if !isValidChar(string(s[idx])) {
+            idx++
+        } else if !isValidChar(string(s[jdx])) {
+            jdx--
+        }
+    }
+    return true
 }

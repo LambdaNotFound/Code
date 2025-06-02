@@ -115,3 +115,34 @@ func Test_sortColors(t *testing.T) {
         })
     }
 }
+
+func Test_isPalindrome(t *testing.T) {
+    testCases := []struct {
+        name     string
+        input    string
+        expected bool
+    }{
+        {
+            "case 1",
+            "A man, a plan, a canal: Panama",
+            true,
+        },
+        {
+            "case 2",
+            "race a car",
+            false,
+        },
+        {
+            "case 3",
+            " ",
+            true,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            isPalindrome(tc.input)
+            assert.Equal(t, tc.expected, tc.expected)
+        })
+    }
+}
