@@ -65,3 +65,36 @@ func inorderTraversal(root *TreeNode) []int {
     }
     return res
 }
+
+/**
+ * 226. Invert Binary Tree
+ *
+ * 1. Recurisve approach: Time complexity: O(n), Space complexity: O(n)
+ * 2. Iterative approach: Time complexity: O(n), Space complexity: O(n)
+ */
+func invertTree(root *TreeNode) *TreeNode {
+    if root != nil {
+        root.Left, root.Right = invertTree(root.Right), invertTree(root.Left)
+    }
+    return root
+}
+
+func invertTreeIterative(root *TreeNode) *TreeNode {
+    if root == nil {
+        return nil
+    }
+    arr := []*TreeNode{root} // BFS
+
+    for len(arr) != 0 {
+        top := arr[len(arr)-1]
+        arr = arr[:len(arr)-1]
+        top.Left, top.Right = top.Right, top.Left
+        if top.Left != nil {
+            arr = append(arr, top.Left)
+        }
+        if top.Right != nil {
+            arr = append(arr, top.Right)
+        }
+    }
+    return root
+}
