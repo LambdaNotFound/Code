@@ -47,3 +47,29 @@ func kthSmallest(root *TreeNode, k int) int {
     }
     return -1
 }
+
+/**
+ * 235. Lowest Common Ancestor of a Binary Search Tree
+ */
+func lowestCommonAncestorRecursive(root, p, q *TreeNode) *TreeNode {
+    if p.Val < root.Val && q.Val < root.Val {
+        return lowestCommonAncestorRecursive(root.Left, p, q)
+    }
+    if p.Val > root.Val && q.Val > root.Val {
+        return lowestCommonAncestorRecursive(root.Right, p, q)
+    }
+    return root
+}
+
+func lowestCommonAncestorIterative(root, p, q *TreeNode) *TreeNode {
+    for root != nil {
+        if p.Val < root.Val && q.Val < root.Val {
+            root = root.Left
+        } else if p.Val > root.Val && q.Val > root.Val {
+            root = root.Right
+        } else {
+            return root
+        }
+    }
+    return nil
+}
