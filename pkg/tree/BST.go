@@ -73,3 +73,26 @@ func lowestCommonAncestorIterative(root, p, q *TreeNode) *TreeNode {
     }
     return nil
 }
+
+/**
+ * 236. Lowest Common Ancestor of a Binary Tree
+ */
+func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+    if root == nil || root == p || root == q {
+        return root
+    }
+
+    // Process left and then right nodes
+    left := lowestCommonAncestor(root.Left, p, q)
+    right := lowestCommonAncestor(root.Right, p, q)
+
+    // if both left and right aren't null, that means we found the targets on both sides of trees, means we need to return root
+    if left != nil && right != nil {
+        return root
+    }
+    // if we find in left, return left
+    if left != nil {
+        return left
+    }
+    return right
+}
