@@ -2,6 +2,7 @@ package apidesign
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -77,26 +78,20 @@ func (this *Codec) deserialize(data string) *TreeNode {
  * 105. Construct Binary Tree from Preorder and Inorder Traversal
  *
  * 1. Recursive Approach
+ *    
  */
 func buildTree(preorder []int, inorder []int) *TreeNode {
     if len(preorder) == 0 {
         return nil
     }
 
-    var indexOf func([]int, int) int
-    indexOf = func(nums []int, target int) int {
-        for i, num := range nums {
-            if num == target {
-                return i
-            }
-        }
-        return -1
-    }
+    i := slices.Index(inorder, preorder[0])
+    lpre, rpre := preorder[1:i+1], preorder[i+1:]
+    lin, rin := inorder[:i], inorder[i+1:]
 
-    idx := indexOf(inorder, preorder[0])
     return &TreeNode{
         Val:   preorder[0],
-        Left:  buildTree(preorder[1:idx+1], inorder[:idx]),
-        Right: buildTree(preorder[idx+1:], inorder[idx+1:]),
+        Left:  buildTree(lpre, lin),
+        Right: buildTree(rpre, rin),
     }
 }
