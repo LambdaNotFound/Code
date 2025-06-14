@@ -1,4 +1,4 @@
-package solid_coding
+package heap
 
 import (
 	"container/heap"
