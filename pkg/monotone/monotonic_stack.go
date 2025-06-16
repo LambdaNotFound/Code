@@ -94,6 +94,9 @@ func trap_slice(height []int) int {
 /**
  * 84. Largest Rectangle in Histogram <- Monotonic Ascending Stack
  *
+ * Given an array of integers heights representing the histogram's bar height
+ * where the width of each bar is 1, return the area of the largest rectangle in the histogram. 
+ *
  * Monotonic ascending stack storing the index
  * popping all the heights on stack
  * when hitting a right height < stack.top()
