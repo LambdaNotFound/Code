@@ -1,4 +1,4 @@
-package solid_coding
+package stack
 
 import "strconv"
 

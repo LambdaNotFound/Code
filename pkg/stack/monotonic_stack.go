@@ -1,4 +1,4 @@
-package monotone
+package stack
 
 import . "gocode/containers"
 
