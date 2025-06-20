@@ -34,6 +34,9 @@ func Test_ladderLength(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := ladderLength(tc.beginWord, tc.endWord, tc.wordList)
             assert.Equal(t, tc.expected, result)
+
+            result = ladderLengthBiDirectionalBFS(tc.beginWord, tc.endWord, tc.wordList)
+            assert.Equal(t, tc.expected, result)
         })
     }
 }
