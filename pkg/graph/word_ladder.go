@@ -15,12 +15,16 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
         dict[word] = true
     }
 
+    type Item struct {
+        Word string
+        Step int
+    }
     queue := list.New()
-    queue.PushBack([2]interface{}{beginWord, 1})
+    queue.PushBack(Item{beginWord, 1})
 
     for queue.Len() > 0 {
-        front := queue.Remove(queue.Front()).([2]interface{})
-        word, length := front[0].(string), front[1].(int)
+        front := queue.Remove(queue.Front()).(Item)
+        word, length := front.Word, front.Step
 
         if word == endWord {
             return length
@@ -33,8 +37,8 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
                 wordArr[i] = ch
                 newWord := string(wordArr)
                 if dict[newWord] {
-                    queue.PushBack([2]interface{}{newWord, length + 1})
-                    delete(dict, newWord)
+                    queue.PushBack(Item{newWord, length + 1})
+                    delete(dict, newWord) // remove otherwise loop in the BFS
                 }
             }
             wordArr[i] = original
