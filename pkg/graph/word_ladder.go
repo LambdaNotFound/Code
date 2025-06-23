@@ -32,7 +32,6 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
 
         wordArr := []rune(word)
         for i := 0; i < len(wordArr); i++ {
-            original := wordArr[i]
             for ch := 'a'; ch <= 'z'; ch++ {
                 if ch  == rune(wordArr[i]) {
                     continue
@@ -44,7 +43,7 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
                     delete(dict, newWord) // remove otherwise loop in the BFS
                 }
             }
-            wordArr[i] = original
+            wordArr = []rune(word)
         }
     }
     return 0
@@ -65,10 +64,11 @@ func ladderLengthBiDirectionalBFS(beginWord string, endWord string, wordList []s
     visitedFromEnd[endWord] = true
     level := 1
     for len(queueFromStart) > 0 && len(queueFromEnd) > 0 {
-        if len(queueFromStart) > len(queueFromEnd) {
+        if len(queueFromStart) > len(queueFromEnd) { // swap
             queueFromStart, queueFromEnd = queueFromEnd, queueFromStart
             visitedFromStart, visitedFromEnd = visitedFromEnd, visitedFromStart
         }
+
         size := len(queueFromStart)
         for i := 0; i < size; i++ {
             currentWord := queueFromStart[0]
@@ -78,11 +78,13 @@ func ladderLengthBiDirectionalBFS(beginWord string, endWord string, wordList []s
                     if rune(currentWord[j]) == k {
                         continue
                     }
+
                     nextWord := currentWord[:j] + string(k) + currentWord[j+1:]
                     if _, ok := wordSet[nextWord]; ok && !visitedFromStart[nextWord] {
-                        if visitedFromEnd[nextWord] {
+                        if visitedFromEnd[nextWord] { // find a path
                             return level + 1
                         }
+
                         visitedFromStart[nextWord] = true
                         queueFromStart = append(queueFromStart, nextWord)
                     }
