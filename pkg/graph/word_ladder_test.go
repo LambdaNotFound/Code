@@ -22,7 +22,7 @@ func Test_ladderLength(t *testing.T) {
             5,
         },
         {
-            "case 1",
+            "case 2",
             "hit",
             "cog",
             []string{"hot","dot","dog","lot","log"},
