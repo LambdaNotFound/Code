@@ -8,25 +8,32 @@ import (
 
 func Test_ladderLength(t *testing.T) {
     testCases := []struct {
-        name     string
+        name      string
         beginWord string
-        endWord string
-        wordList    []string
-        expected int
+        endWord   string
+        wordList  []string
+        expected  int
     }{
         {
             "case 1",
             "hit",
             "cog",
-            []string{"hot","dot","dog","lot","log","cog"},
+            []string{"hot", "dot", "dog", "lot", "log", "cog"},
             5,
         },
         {
             "case 2",
             "hit",
             "cog",
-            []string{"hot","dot","dog","lot","log"},
+            []string{"hot", "dot", "dog", "lot", "log"},
             0,
+        },
+        {
+            "case 3",
+            "ymain",
+            "oecij",
+            []string{"ymann", "yycrj", "oecij", "ymcnj", "yzcrj", "yycij", "xecij", "yecij", "ymanj", "yzcnj", "ymain"},
+            10,
         },
     }
 
@@ -35,7 +42,7 @@ func Test_ladderLength(t *testing.T) {
             result := ladderLength(tc.beginWord, tc.endWord, tc.wordList)
             assert.Equal(t, tc.expected, result)
 
-            result = ladderLengthBiDirectionalBFS(tc.beginWord, tc.endWord, tc.wordList)
+            result = ladderLengthBidirectionalBFS(tc.beginWord, tc.endWord, tc.wordList)
             assert.Equal(t, tc.expected, result)
         })
     }
