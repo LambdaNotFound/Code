@@ -61,21 +61,25 @@ func partition_dec(arr []int, low, high int) int {
  * 86. Partition List
  */
 func sortList(head *ListNode) *ListNode {
+    if head == nil {
+        return nil
+    }
 
     return nil
 }
 
-func partitionList(head *ListNode, x int) *ListNode {
+func partitionList(head *ListNode) *ListNode {
     if head == nil {
-        return head
+        return nil
     }
 
+    pivot := head.Val
     dummy1, dummy2 := ListNode{}, ListNode{}
     dummy1.Next = head
     p1, p2 := &dummy1, &dummy2
     for p1.Next != nil {
         curr := p1.Next
-        if curr.Val < x {
+        if curr.Val >= pivot {
             p2.Next = curr
             p2 = p2.Next
 
@@ -86,6 +90,6 @@ func partitionList(head *ListNode, x int) *ListNode {
         }
     }
 
-    p2.Next = dummy1.Next
-    return dummy2.Next
+    p1.Next = dummy2.Next
+    return dummy1.Next
 }
