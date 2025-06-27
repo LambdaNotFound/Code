@@ -68,28 +68,21 @@ func sortList(head *ListNode) *ListNode {
     return nil
 }
 
-func partitionList(head *ListNode) *ListNode {
-    if head == nil {
+func partitionList(head *ListNode, tail *ListNode) *ListNode {
+    if head == nil || tail == nil {
         return nil
     }
 
-    pivot := head.Val
-    dummy1, dummy2 := ListNode{}, ListNode{}
-    dummy1.Next = head
-    p1, p2 := &dummy1, &dummy2
-    for p1.Next != nil {
-        curr := p1.Next
-        if curr.Val >= pivot {
-            p2.Next = curr
-            p2 = p2.Next
+    pivot, pre, curr := head, head, head
 
-            p1.Next = curr.Next
-            curr.Next = nil
-        } else {
-            p1 = p1.Next
+    for curr != tail.Next {
+        if curr.Val < pivot.Val {
+            curr.Val, pre.Next.Val = pre.Next.Val, curr.Val
+            pre = pre.Next
         }
+
+        curr = curr.Next
     }
 
-    p1.Next = dummy2.Next
-    return dummy1.Next
+    return pre
 }
