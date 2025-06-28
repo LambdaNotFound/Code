@@ -73,10 +73,10 @@ func partitionList(head *ListNode, tail *ListNode) *ListNode {
         return nil
     }
 
-    pivot, pre, curr := head, head, head
-
+    pivot := head.Val
+    pre, curr := head, head
     for curr != tail.Next {
-        if curr.Val < pivot.Val {
+        if curr.Val < pivot {
             curr.Val, pre.Next.Val = pre.Next.Val, curr.Val
             pre = pre.Next
         }
