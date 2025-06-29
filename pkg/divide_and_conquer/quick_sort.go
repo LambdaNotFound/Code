@@ -65,7 +65,14 @@ func sortList(head *ListNode) *ListNode {
         return nil
     }
 
-    return nil
+    tail := head
+    for tail.Next != nil {
+        tail = tail.Next
+    }
+
+    quickSortHelper(head, tail)
+
+    return head
 }
 
 func quickSortHelper(head *ListNode, tail *ListNode) {
@@ -85,16 +92,18 @@ func partitionList(head *ListNode, tail *ListNode) *ListNode {
         return nil
     }
 
-    pivot := head.Val
+    pivot := head
     pre, curr := head, head
     for curr != tail.Next {
-        if curr.Val < pivot {
+        if curr.Val < pivot.Val {
             curr.Val, pre.Next.Val = pre.Next.Val, curr.Val
             pre = pre.Next
         }
 
         curr = curr.Next
     }
+
+    pre.Val, pivot.Val = pivot.Val, pre.Val
 
     return pre
 }
