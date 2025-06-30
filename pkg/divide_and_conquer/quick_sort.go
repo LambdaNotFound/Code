@@ -87,7 +87,7 @@ func quickSortHelper(head *ListNode, tail *ListNode) {
     quickSortHelper(pivot.Next, tail)
 }
 
-func partitionList(head *ListNode, tail *ListNode) *ListNode {
+func partitionListSwap(head *ListNode, tail *ListNode) *ListNode {
     if head == nil || tail == nil {
         return nil
     }
@@ -106,4 +106,29 @@ func partitionList(head *ListNode, tail *ListNode) *ListNode {
     pre.Val, pivot.Val = pivot.Val, pre.Val
 
     return pre
+}
+
+func partitionList(head *ListNode, tail *ListNode) *ListNode {
+    before := &ListNode{}
+    after := &ListNode{}
+    before_curr := before
+    after_curr := after
+
+    pivot := head.Val
+    
+    for head != nil && head != tail.Next {
+        if head.Val < pivot {
+            before_curr.Next = head
+            before_curr = before_curr.Next
+        } else {
+            after_curr.Next = head
+            after_curr = after_curr.Next
+        }
+        head = head.Next
+    }
+    
+    after_curr.Next = nil
+    before_curr.Next = after.Next
+    
+    return before.Next
 }
