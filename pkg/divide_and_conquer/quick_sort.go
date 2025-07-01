@@ -6,7 +6,11 @@ import . "gocode/types"
  * Quick Sort
  * T: O(n*log(n)) on average. O(n^2) worst.
  *
- * [less than pivot... ] pivot [greater than pivot... ]
+ *               partition(start, end)
+ *               /          |         \
+ * [less than pivot... ], pivot, [greater than pivot... ]
+ *
+ * recursive structure
  */
 func quick_sort(arr []int, start, end int) {
     if start < end {
@@ -17,7 +21,7 @@ func quick_sort(arr []int, start, end int) {
 }
 
 func partition(arr []int, low, high int) int {
-    var i = low // pivot := arr[high]
+    var i = low // pivot is arr[high]
     for j := i; j < high; j++ {
         if arr[j] < arr[high] { // if arr[j] <= arr[high]
             arr[i], arr[j] = arr[j], arr[i]
@@ -30,7 +34,7 @@ func partition(arr []int, low, high int) int {
 }
 
 func partition_asc(arr []int, low, high int) int {
-    i := low + 1 // pivot := arr[low]
+    i := low + 1 // pivot is arr[low]
     for j := i; j <= high; j++ {
         if arr[j] <= arr[low] {
             arr[i], arr[j] = arr[j], arr[i]
@@ -43,7 +47,7 @@ func partition_asc(arr []int, low, high int) int {
 }
 
 func partition_dec(arr []int, low, high int) int {
-    i := low + 1 // pivot := arr[low]
+    i := low + 1 // pivot is arr[low]
     for j := i; j <= high; j++ {
         if arr[j] > arr[low] {
             arr[i], arr[j] = arr[j], arr[i]
@@ -60,6 +64,46 @@ func partition_dec(arr []int, low, high int) int {
  *
  * 86. Partition List
  */
+
+ func sortListWithPartition(head *ListNode) *ListNode {
+    if head == nil || head.Next == nil {
+        return head
+    }
+
+    cur := head.Next
+    dummySmaller, dummyGreater := ListNode{}, ListNode{}
+    curSmaller, curGreater := &dummySmaller, &dummyGreater
+
+    for cur != nil {
+        if cur.Val < head.Val {
+            curSmaller.Next = cur
+            curSmaller = curSmaller.Next
+        } else {
+            curGreater.Next = cur
+            curGreater = curGreater.Next
+        }
+        cur = cur.Next
+    }
+    curSmaller.Next = nil
+    curGreater.Next = nil
+
+    dummySmaller.Next = sortListWithPartition(dummySmaller.Next)
+    dummyGreater.Next = sortListWithPartition(dummyGreater.Next)
+    
+    cur = dummySmaller.Next
+    if cur != nil {
+        for cur.Next != nil {
+            cur = cur.Next
+        }
+        cur.Next = head
+        head.Next = dummyGreater.Next
+        return dummySmaller.Next
+    } else {
+        head.Next = dummyGreater.Next
+        return head
+    }
+}
+
 func sortList(head *ListNode) *ListNode {
     if head == nil {
         return nil
@@ -106,44 +150,4 @@ func partitionListSwap(head *ListNode, tail *ListNode) *ListNode {
     pre.Val, pivot.Val = pivot.Val, pre.Val
 
     return pre
-}
-
-// Recursive approach
-func sortListPartitionList(head *ListNode) *ListNode {
-    if head == nil || head.Next == nil {
-        return head
-    }
-
-    cur := head.Next
-    dummySmaller, dummyGreater := ListNode{}, ListNode{}
-    curSmaller, curGreater := &dummySmaller, &dummyGreater
-
-    for cur != nil {
-        if cur.Val < head.Val {
-            curSmaller.Next = cur
-            curSmaller = curSmaller.Next
-        } else {
-            curGreater.Next = cur
-            curGreater = curGreater.Next
-        }
-        cur = cur.Next
-    }
-    curSmaller.Next = nil
-    curGreater.Next = nil
-
-    dummySmaller.Next = sortListPartitionList(dummySmaller.Next)
-    dummyGreater.Next = sortListPartitionList(dummyGreater.Next)
-    
-    cur = dummySmaller.Next
-    if cur != nil {
-        for cur.Next != nil {
-            cur = cur.Next
-        }
-        cur.Next = head
-        head.Next = dummyGreater.Next
-        return dummySmaller.Next
-    } else {
-        head.Next = dummyGreater.Next
-        return head
-    }
 }
