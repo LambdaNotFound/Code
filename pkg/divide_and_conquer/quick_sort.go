@@ -80,7 +80,7 @@ func quickSortHelper(head *ListNode, tail *ListNode) {
         return
     }
 
-    pivot := partitionList(head, tail)
+    pivot := partitionListSwap(head, tail)
 
     quickSortHelper(head, pivot)
 
@@ -108,27 +108,42 @@ func partitionListSwap(head *ListNode, tail *ListNode) *ListNode {
     return pre
 }
 
-func partitionList(head *ListNode, tail *ListNode) *ListNode {
-    before := &ListNode{}
-    after := &ListNode{}
-    before_curr := before
-    after_curr := after
-
-    pivot := head.Val
-    
-    for head != nil && head != tail.Next {
-        if head.Val < pivot {
-            before_curr.Next = head
-            before_curr = before_curr.Next
-        } else {
-            after_curr.Next = head
-            after_curr = after_curr.Next
-        }
-        head = head.Next
+// Recursive approach
+func sortListPartitionList(head *ListNode) *ListNode {
+    if head == nil || head.Next == nil {
+        return head
     }
+
+    cur := head.Next
+    dummySmaller, dummyGreater := ListNode{}, ListNode{}
+    curSmaller, curGreater := &dummySmaller, &dummyGreater
+
+    for cur != nil {
+        if cur.Val < head.Val {
+            curSmaller.Next = cur
+            curSmaller = curSmaller.Next
+        } else {
+            curGreater.Next = cur
+            curGreater = curGreater.Next
+        }
+        cur = cur.Next
+    }
+    curSmaller.Next = nil
+    curGreater.Next = nil
+
+    dummySmaller.Next = sortListPartitionList(dummySmaller.Next)
+    dummyGreater.Next = sortListPartitionList(dummyGreater.Next)
     
-    after_curr.Next = nil
-    before_curr.Next = after.Next
-    
-    return before.Next
+    cur = dummySmaller.Next
+    if cur != nil {
+        for cur.Next != nil {
+            cur = cur.Next
+        }
+        cur.Next = head
+        head.Next = dummyGreater.Next
+        return dummySmaller.Next
+    } else {
+        head.Next = dummyGreater.Next
+        return head
+    }
 }
