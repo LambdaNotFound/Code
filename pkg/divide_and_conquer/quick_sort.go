@@ -124,9 +124,7 @@ func quickSortHelper(head *ListNode, tail *ListNode) {
     }
 
     pivot := partitionListSwap(head, tail)
-
     quickSortHelper(head, pivot)
-
     quickSortHelper(pivot.Next, tail)
 }
 
