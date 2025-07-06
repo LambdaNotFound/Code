@@ -49,4 +49,13 @@ func Test_partition_dec(t *testing.T) {
 
     assert.Equal(t, want, got)
     assert.Equal(t, expected, array)
+
+    array = []int{7, 3, 4, 6, 5, 5}
+    want = 2
+    expected = []int{7, 6, 5, 3, 5, 4}
+
+    got = partition_decending(array, 0, len(array)-1)
+    
+    assert.Equal(t, want, got)
+    assert.Equal(t, expected, array)
 }

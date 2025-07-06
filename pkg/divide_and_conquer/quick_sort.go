@@ -32,6 +32,7 @@ func partition(arr []int, low, high int) int {
     arr[i], arr[high] = arr[high], arr[i]
     return i
 }
+
 func partition_decending(arr []int, low, high int) int {
     var i = low // pivot is arr[high]
     for j := i; j < high; j++ {
