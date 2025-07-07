@@ -14,13 +14,13 @@ import . "gocode/types"
  */
 func quick_sort(arr []int, start, end int) {
     if start < end {
-        pivot_idx := partition(arr, start, end)
+        pivot_idx := partition_ascending(arr, start, end)
         quick_sort(arr, start, pivot_idx-1)
         quick_sort(arr, pivot_idx+1, end)
     }
 }
 
-func partition(arr []int, low, high int) int {
+func partition_ascending(arr []int, low, high int) int {
     var i = low // pivot is arr[high]
     for j := i; j < high; j++ {
         if arr[j] < arr[high] { // if arr[j] <= arr[high]

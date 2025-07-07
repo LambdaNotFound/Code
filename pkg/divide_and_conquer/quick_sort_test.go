@@ -15,14 +15,32 @@ func Test_quick_sort(t *testing.T) {
     assert.Equal(t, expected, array)
 }
 
-func Test_partition(t *testing.T) {
+func Test_partition_ascending(t *testing.T) {
     array := []int{7, 3, 4, 6, 5, 5}
+    // 3, 7, 4, 6, 5, 5
+    //                pivot
+    // 3, 4, 7, 6, 5, 5
+    // 3, 4, 5, 6, 5, 7
 
     want := 2
     expected := []int{3, 4, 5, 6, 5, 7}
+    got := partition_ascending(array, 0, len(array)-1)
 
-    got := partition(array, 0, len(array)-1)
+    assert.Equal(t, want, got)
+    assert.Equal(t, expected, array)
+}
 
+func Test_partition_decending(t *testing.T) {
+    array := []int{7, 3, 4, 6, 5, 5}
+    // 7, 6, 4, 3, 5, 5
+    //                pivot
+    // 7, 6, 4, 3, 5, 5
+    // 7, 6, 5, 3, 5, 4
+    
+    want := 2
+    expected := []int{7, 6, 5, 3, 5, 4}
+    got := partition_decending(array, 0, len(array)-1)
+    
     assert.Equal(t, want, got)
     assert.Equal(t, expected, array)
 }
@@ -35,17 +53,6 @@ func Test_partition_asc(t *testing.T) {
 
     got := partition_asc(array, 0, len(array)-1)
 
-    assert.Equal(t, want, got)
-    assert.Equal(t, expected, array)
-}
-
-func Test_partition_decending(t *testing.T) {
-    array := []int{7, 3, 4, 6, 5, 5}
-    want := 2
-    expected := []int{7, 6, 5, 3, 5, 4}
-
-    got := partition_decending(array, 0, len(array)-1)
-    
     assert.Equal(t, want, got)
     assert.Equal(t, expected, array)
 }
