@@ -3,14 +3,15 @@ package divide_and_conquer
 import . "gocode/types"
 
 /**
- * Quick Sort
+ * Quick Sort (recursive structure)
  * T: O(n*log(n)) on average. O(n^2) worst.
  *
  *               partition(start, end)
  *               /          |         \
  * [less than pivot... ], pivot, [greater than pivot... ]
  *
- * recursive structure
+ * Two Pointers, then swap array[i] with pivot
+ *
  */
 func quick_sort(arr []int, start, end int) {
     if start < end {

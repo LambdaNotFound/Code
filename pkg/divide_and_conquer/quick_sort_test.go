@@ -18,7 +18,7 @@ func Test_quick_sort(t *testing.T) {
 func Test_partition_ascending(t *testing.T) {
     array := []int{7, 3, 4, 6, 5, 5}
     // 3, 7, 4, 6, 5, 5
-    //                pivot
+    //                ^pivot
     // 3, 4, 7, 6, 5, 5
     // 3, 4, 5, 6, 5, 7
 
@@ -33,20 +33,23 @@ func Test_partition_ascending(t *testing.T) {
 func Test_partition_decending(t *testing.T) {
     array := []int{7, 3, 4, 6, 5, 5}
     // 7, 6, 4, 3, 5, 5
-    //                pivot
+    //                ^pivot
     // 7, 6, 4, 3, 5, 5
     // 7, 6, 5, 3, 5, 4
-    
+
     want := 2
     expected := []int{7, 6, 5, 3, 5, 4}
     got := partition_decending(array, 0, len(array)-1)
-    
+
     assert.Equal(t, want, got)
     assert.Equal(t, expected, array)
 }
 
 func Test_partition_asc(t *testing.T) {
     array := []int{7, 3, 4, 6, 5, 5}
+    // 7, 3, 4, 6, 5, 5
+    // ^pivot
+    // 5, 3, 4, 6, 5, 7
 
     want := 5
     expected := []int{5, 3, 4, 6, 5, 7}
@@ -59,6 +62,9 @@ func Test_partition_asc(t *testing.T) {
 
 func Test_partition_dec(t *testing.T) {
     array := []int{7, 3, 4, 6, 5, 5}
+    // 7, 6, 4, 3, 5, 5
+    // ^pivot
+    // 7, 6, 4, 3, 5, 5
 
     want := 0
     expected := []int{7, 3, 4, 6, 5, 5}
