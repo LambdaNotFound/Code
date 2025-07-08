@@ -78,7 +78,7 @@ func partition_dec(arr []int, low, high int) int {
  *
  * 86. Partition List
  */
-func sortListWithPartition(head *ListNode) *ListNode {
+func sortListQuickSort(head *ListNode) *ListNode {
     if head == nil || head.Next == nil {
         return head
     }
@@ -100,8 +100,8 @@ func sortListWithPartition(head *ListNode) *ListNode {
     curSmaller.Next = nil
     curGreater.Next = nil
 
-    dummySmaller.Next = sortListWithPartition(dummySmaller.Next)
-    dummyGreater.Next = sortListWithPartition(dummyGreater.Next)
+    dummySmaller.Next = sortListQuickSort(dummySmaller.Next)
+    dummyGreater.Next = sortListQuickSort(dummyGreater.Next)
 
     cur = dummySmaller.Next
     if cur != nil {
@@ -117,7 +117,7 @@ func sortListWithPartition(head *ListNode) *ListNode {
     }
 }
 
-func sortList(head *ListNode) *ListNode {
+func sortListWithNodeCopy(head *ListNode) *ListNode {
     if head == nil {
         return nil
     }
