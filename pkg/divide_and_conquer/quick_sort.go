@@ -88,7 +88,7 @@ func sortListQuickSort(head *ListNode) *ListNode {
     curSmaller, curGreater := &dummySmaller, &dummyGreater
 
     for cur != nil {
-        if cur.Val < head.Val {
+        if cur.Val < head.Val { // head node is the pivot
             curSmaller.Next = cur
             curSmaller = curSmaller.Next
         } else {
@@ -103,6 +103,7 @@ func sortListQuickSort(head *ListNode) *ListNode {
     dummySmaller.Next = sortListQuickSort(dummySmaller.Next)
     dummyGreater.Next = sortListQuickSort(dummyGreater.Next)
 
+    // connect [less than pivot... ], pivot, [greater than pivot... ]
     cur = dummySmaller.Next
     if cur != nil {
         for cur.Next != nil {
@@ -117,7 +118,7 @@ func sortListQuickSort(head *ListNode) *ListNode {
     }
 }
 
-func sortListWithNodeCopy(head *ListNode) *ListNode {
+func sortListWithCopy(head *ListNode) *ListNode {
     if head == nil {
         return nil
     }
@@ -157,7 +158,6 @@ func partitionListSwap(head *ListNode, tail *ListNode) *ListNode {
 
         curr = curr.Next
     }
-
     pre.Val, pivot.Val = pivot.Val, pre.Val
 
     return pre
