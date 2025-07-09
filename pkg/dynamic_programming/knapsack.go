@@ -8,12 +8,12 @@ package dynamic_programming
  * Kadane's algorithm
  *
  * DynamicProgramming, Time: O(n * sum), Space: O(n)
- *     dp[i] stores the maximum subarry ending at i
+ *     dp[i] stores the maximum subarray ending at i
  *     dp[i] = dp[i - 1] + nums[i] if dp[i - 1] > 0
  *                                 else dp[i] = nums[i]
  */
 func maxSubArray(nums []int) int {
-    globalMax, curSum := nums[0], 0
+    globalMax, curSum := nums[0], 0 // opt space, replace dp[i] w/ a var
     for _, num := range nums {
         if curSum < 0 {
             curSum = 0

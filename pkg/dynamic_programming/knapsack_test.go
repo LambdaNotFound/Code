@@ -6,6 +6,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_maxSubArray(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums     []int
+        expected int
+    }{
+        {
+            "case 1",
+            []int{-2, 1, -3, 4, -1, 2, 1, -5, 4},
+            6,
+        },
+        {
+            "case 2",
+            []int{1},
+            1,
+        },
+        {
+            "case 3",
+            []int{5, 4, -1, 7, 8},
+            23,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := maxSubArray(tc.nums)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
 func Test_canPartition(t *testing.T) {
     testCases := []struct {
         name     string
