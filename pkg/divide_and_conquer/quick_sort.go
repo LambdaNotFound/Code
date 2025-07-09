@@ -74,9 +74,9 @@ func partition_dec(arr []int, low, high int) int {
 }
 
 /**
- * Quick Sort linked list
+ * Quick Sort Linked List (recursive structure)
  *
- * 86. Partition List
+ * 148. Sort List
  */
 func sortListQuickSort(head *ListNode) *ListNode {
     if head == nil || head.Next == nil {
