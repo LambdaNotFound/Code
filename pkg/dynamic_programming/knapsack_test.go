@@ -53,6 +53,11 @@ func Test_canPartition(t *testing.T) {
             []int{1, 2, 3, 5},
             false,
         },
+        {
+            "case 3",
+            []int{1, 2, 5},
+            false,
+        },
     }
 
     for _, tc := range testCases {

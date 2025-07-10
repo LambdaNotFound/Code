@@ -34,7 +34,10 @@ func maxSubArray(nums []int) int {
  *
  * DynamicProgramming, Time: O(n * sum), Space: O(n)
  *     dp[i] stores if sum i can be partitioned to 2 equal subsets
- *     target is the sum of the nums in the array
+ *     target = sum of the nums in the array / 2
+ *
+ *     Sum1 [a, b, c...], Sum2 [x] => Sum1 == Sum2
+ *
  *     dp[i] == true if dp[target - i] is true
  */
 func canPartition(nums []int) bool {
@@ -54,11 +57,10 @@ func canPartition(nums []int) bool {
     for _, num := range nums {
         // iterate backwards to avoid overwriting values we need to check
         for j := target; j >= num; j-- {
-            if dp[j-num] {
+            if dp[j-num] { // dp[target-num] + num == dp[target]
                 dp[j] = true
             }
         }
     }
-
     return dp[target]
 }
