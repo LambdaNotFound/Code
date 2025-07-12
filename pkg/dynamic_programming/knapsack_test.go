@@ -37,6 +37,41 @@ func Test_maxSubArray(t *testing.T) {
     }
 }
 
+func Test_coinChange(t *testing.T) {
+    testCases := []struct {
+        name     string
+        coins    []int
+        amount   int
+        expected int
+    }{
+        {
+            "case 1",
+            []int{1, 2, 5},
+            11,
+            3,
+        },
+        {
+            "case 2",
+            []int{2},
+            3,
+            -1,
+        },
+        {
+            "case 3",
+            []int{1},
+            0,
+            0,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := coinChange(tc.coins, tc.amount)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
 func Test_canPartition(t *testing.T) {
     testCases := []struct {
         name     string

@@ -41,7 +41,7 @@ func maxSubArray(nums []int) int {
  *
  *     dp[0] = 0
  */
- func coinChange(coins []int, amount int) int {
+func coinChange(coins []int, amount int) int {
     dp := make([]int, amount+1)
     for i := range dp {
         dp[i] = amount + 1
@@ -75,8 +75,7 @@ func maxSubArray(nums []int) int {
  *     dp[i] == true if dp[target - i] is true
  */
 func canPartition(nums []int) bool {
-    // if total sum is odd, can't partition into equal subsets
-    totalSum := 0
+    totalSum := 0 // if total sum is odd, can't partition into equal subsets
     for _, num := range nums {
         totalSum += num
     }
@@ -91,7 +90,7 @@ func canPartition(nums []int) bool {
     for _, num := range nums {
         // iterate backwards to ensure each number is only considered once
         for j := target; j >= num; j-- { // [num, ..., target]
-            dp[j] = dp[j] || dp[j-num]  // if Sum == j-num then theres Sum == j
+            dp[j] = dp[j] || dp[j-num] // if Sum == j-num then theres Sum == j
         }
     }
     return dp[target]
