@@ -1,6 +1,15 @@
 package dynamic_programming
 
 /**
+ * 0/1 Knapsack
+ *
+ * Loop Direction	Behavior
+ * Forward (i++)	Reuses numbers (like "unlimited" items, a.k.a. unbounded knapsack)
+ * Backward (i--)	Uses each number once, which is what we want for 0/1 knapsack
+ *
+ */
+
+/**
  * 53. Maximum Subarray
  *
  * Given an integer array nums, find the subarray with the largest sum, and return its sum.
@@ -88,7 +97,8 @@ func canPartition(nums []int) bool {
     dp[0] = true // base case: sum 0 can always be achieved
 
     for _, num := range nums {
-        // iterate backwards to ensure each number is only considered once
+        // iterate backwards to ensure each number is only used once
+        // same number used more than once violates the rules of 0/1 knapsack
         for j := target; j >= num; j-- { // [num, ..., target]
             dp[j] = dp[j] || dp[j-num] // if Sum == j-num then theres Sum == j
         }
