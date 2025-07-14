@@ -106,6 +106,7 @@ func Test_canPartition(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := canPartition(tc.nums)
             assert.Equal(t, tc.expected, result)
+
             result = canPartitionMemoization(tc.nums)
             assert.Equal(t, tc.expected, result)
         })

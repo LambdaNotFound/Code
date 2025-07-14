@@ -42,7 +42,7 @@ func Test_jobScheduling(t *testing.T) {
             result := jobScheduling(tc.startTime, tc.endTime, tc.profit)
             assert.Equal(t, tc.expected, result)
 
-            result = jobScheduling_dfs(tc.startTime, tc.endTime, tc.profit)
+            result = jobSchedulingMemoization(tc.startTime, tc.endTime, tc.profit)
             assert.Equal(t, tc.expected, result)
         })
     }

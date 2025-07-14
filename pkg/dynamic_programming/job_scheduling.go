@@ -15,11 +15,10 @@ import "sort"
  * 2. DP, bottom-up approach
  */
 func jobScheduling(startTime []int, endTime []int, profit []int) int {
-    // initialize jobs array & sort it by start time
     type Job struct {
         start, end, profit int
     }
-    jobs := make([]Job, len(startTime))
+    jobs := make([]Job, len(startTime)) // initialize jobs array & sort it by start time
     for i := 0; i < len(startTime); i++ {
         jobs[i] = Job{startTime[i], endTime[i], profit[i]}
     }
@@ -29,11 +28,11 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
     searchNextJob := func(i int) int {
         left, right := i+1, len(jobs)-1
         for left <= right {
-            mid := (left + right) / 2
+            mid := left + (right-left)/2
             if jobs[mid].start >= jobs[i].end {
-                left, right = left, mid-1
+                right = mid-1
             } else {
-                left, right = mid+1, right
+                left = mid+1
             }
         }
         return left
@@ -49,12 +48,11 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
     return dp[0]
 }
 
-func jobScheduling_dfs(startTime []int, endTime []int, profit []int) int {
-    // initialize jobs array & sort it by start time
+func jobSchedulingMemoization(startTime []int, endTime []int, profit []int) int {
     type Job struct {
         start, end, profit int
     }
-    jobs := make([]Job, len(startTime))
+    jobs := make([]Job, len(startTime)) // initialize jobs array & sort it by start time
     for i := 0; i < len(startTime); i++ {
         jobs[i] = Job{startTime[i], endTime[i], profit[i]}
     }
@@ -64,11 +62,11 @@ func jobScheduling_dfs(startTime []int, endTime []int, profit []int) int {
     searchNextJob := func(i int) int {
         left, right := i+1, len(jobs)-1
         for left <= right {
-            mid := (left + right) / 2
+            mid := left + (right-left)/2
             if jobs[mid].start >= jobs[i].end {
-                left, right = left, mid-1
+                right = mid-1
             } else {
-                left, right = mid+1, right
+                left = mid+1
             }
         }
         return left
