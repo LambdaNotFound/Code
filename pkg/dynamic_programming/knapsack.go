@@ -1,7 +1,7 @@
 package dynamic_programming
 
 /**
- * 0/1 Knapsack
+ * 0/1 Knapsack, Unbounded Knapsack
  *
  * Loop Direction	Behavior
  * Forward (i++)	Reuses numbers (like "unlimited" items, a.k.a. unbounded knapsack)
@@ -47,8 +47,7 @@ func maxSubArray(nums []int) int {
  *     coins[j] is the jth coin
  *
  *     dp[i] = min(dp[i], dp[i - coins[j]] + 1) if (i - coins[j] >= 0)
- *
- *     dp[0] = 0
+ *         base case: dp[0] = 0
  */
 func coinChange(coins []int, amount int) int {
     dp := make([]int, amount+1)
@@ -82,6 +81,7 @@ func coinChange(coins []int, amount int) int {
  *     Sum1 [a, b, c...], Sum2 [x] => Sum1 == Sum2
  *
  *     dp[i] == true if dp[target - i] is true
+ *         base case: dp[0] = 0
  */
 func canPartition(nums []int) bool {
     totalSum := 0 // if total sum is odd, can't partition into equal subsets
