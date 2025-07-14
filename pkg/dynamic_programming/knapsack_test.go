@@ -93,18 +93,20 @@ func Test_canPartition(t *testing.T) {
             []int{1, 2, 5},
             false,
         },
-        /*
-           {
-               "case 4",
-               []int{1, -2, -2, 1},
-               true,
-           },
-        */
+        /* how to handle negative number?
+        {
+            "case 4",
+            []int{1, -2, -2, 1},
+            true,
+        },
+         */
     }
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
             result := canPartition(tc.nums)
+            assert.Equal(t, tc.expected, result)
+            result = canPartitionMemoization(tc.nums)
             assert.Equal(t, tc.expected, result)
         })
     }

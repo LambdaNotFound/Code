@@ -1,5 +1,7 @@
 package dynamic_programming
 
+import "strconv"
+
 /**
  * 0/1 Knapsack, Unbounded Knapsack
  *
@@ -104,4 +106,36 @@ func canPartition(nums []int) bool {
         }
     }
     return dp[target]
+}
+
+func canPartitionMemoization(nums []int) bool {
+    sum := 0
+    for _, num := range nums {
+        sum += num
+    }
+    if sum%2 == 1 {
+        return false
+    }
+
+    cache := make(map[string]bool)
+    var validPartition func(int, int) bool
+    validPartition = func(target, idx int) bool {
+        if idx == len(nums) || target < 0 {
+            return false
+        }
+        if target-nums[idx] == 0 {
+            return true
+        }
+
+        key := strconv.Itoa(target) + "-" + strconv.Itoa(idx)
+        if value, ok := cache[key]; ok {
+            return value
+        }
+
+        cache[key] = validPartition(target, idx+1) || validPartition(target-nums[idx], idx+1)
+
+        return cache[key]
+    }
+
+    return validPartition(sum/2, 0)
 }
