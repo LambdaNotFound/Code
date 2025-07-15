@@ -85,3 +85,29 @@ func Test_isValid(t *testing.T) {
         })
     }
 }
+
+func Test_longestPalindromeLength(t *testing.T) {
+    testCases := []struct {
+        name     string
+        input    string
+        expected int
+    }{
+        {
+            "case 1",
+            "abccccdd",
+            7,
+        },
+        {
+            "case 2",
+            "a",
+            1,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := longestPalindromeLength(tc.input)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}

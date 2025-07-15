@@ -54,26 +54,3 @@ func longestPalindrome_optimized(s string) string {
 
     return s[start : start+length]
 }
-
-/**
- * 409. Longest Palindrome
- *
- * return the length of the longest palindrome that can be built with those letters
- */
-func longestPalindromeLength(s string) int {
-    res := 0
-    charMap := make(map[rune]int)
-    for _, val := range s {
-        charMap[val] += 1
-        count := charMap[val]
-        if count == 2 {
-            res += 2
-            delete(charMap, val)
-        }
-    }
-
-    if len(charMap) != 0 {
-        res += 1
-    }
-    return res
-}

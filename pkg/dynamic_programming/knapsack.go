@@ -146,6 +146,7 @@ func canPartitionMemoization(nums []int) bool {
  * Given an array of integers nums and an integer target,
  * return the number of ways to assign + and - signs to make the sum equal to target.
  *
+ *     dp[index][value] stores num of ways to make the sum equal to value
  */
 func findTargetSumWays(nums []int, target int) int {
     total := 0
@@ -163,6 +164,9 @@ func findTargetSumWays(nums []int, target int) int {
     }
 
     dp[0][offset] = 1 // base case: 0 sum before starting
+    // dp[0][0]         -total
+    // dp[0][offset]    0
+    // dp[0][2*offset]  total
 
     for i := 0; i < len(nums); i++ {
         for sum := -total; sum <= total; sum++ {
