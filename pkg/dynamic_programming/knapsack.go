@@ -139,3 +139,67 @@ func canPartitionMemoization(nums []int) bool {
 
     return validPartition(sum/2, 0)
 }
+
+/**
+ * 494. Target Sum
+ *
+ * Given an array of integers nums and an integer target,
+ * return the number of ways to assign + and - signs to make the sum equal to target.
+ *
+ */
+func findTargetSumWays(nums []int, target int) int {
+    total := 0
+    for _, num := range nums {
+        total += num
+    }
+    if target > total || target < -total {
+        return 0 // Out of possible range
+    }
+
+    offset := total // sum values can go negative, use an offset shift
+    dp := make([][]int, len(nums)+1)
+    for i := range dp {
+        dp[i] = make([]int, 2*total+1) // range from -total to +total
+    }
+
+    dp[0][offset] = 1 // base case: 0 sum before starting
+
+    for i := 0; i < len(nums); i++ {
+        for sum := -total; sum <= total; sum++ {
+            curr := dp[i][sum+offset]
+            if curr > 0 {
+                dp[i+1][sum+nums[i]+offset] += curr
+                dp[i+1][sum-nums[i]+offset] += curr
+            }
+        }
+    }
+
+    return dp[len(nums)][target+offset]
+}
+
+func findTargetSumWaysMemoization(nums []int, target int) int {
+    memo := map[[2]int]int{}
+
+    var dfs func(int, int) int
+    dfs = func(idx int, sum int) int {
+        if idx == len(nums) {
+            if sum == target {
+                return 1
+            }
+            return 0
+        }
+
+        key := [2]int{idx, sum}
+        if val, ok := memo[key]; ok {
+            return val
+        }
+
+        add := dfs(idx+1, sum+nums[idx])
+        subtract := dfs(idx+1, sum-nums[idx])
+
+        memo[key] = add + subtract
+        return memo[key]
+    }
+
+    return dfs(0, 0)
+}

@@ -94,12 +94,12 @@ func Test_canPartition(t *testing.T) {
             false,
         },
         /* how to handle negative number?
-        {
-            "case 4",
-            []int{1, -2, -2, 1},
-            true,
-        },
-         */
+           {
+               "case 4",
+               []int{1, -2, -2, 1},
+               true,
+           },
+        */
     }
 
     for _, tc := range testCases {
@@ -108,6 +108,38 @@ func Test_canPartition(t *testing.T) {
             assert.Equal(t, tc.expected, result)
 
             result = canPartitionMemoization(tc.nums)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
+func Test_findTargetSumWays(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums     []int
+        target   int
+        expected int
+    }{
+        {
+            "case 1",
+            []int{1, 1, 1, 1, 1},
+            3,
+            5,
+        },
+        {
+            "case 2",
+            []int{1},
+            1,
+            1,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := findTargetSumWays(tc.nums, tc.target)
+            assert.Equal(t, tc.expected, result)
+
+            result = findTargetSumWaysMemoization(tc.nums, tc.target)
             assert.Equal(t, tc.expected, result)
         })
     }

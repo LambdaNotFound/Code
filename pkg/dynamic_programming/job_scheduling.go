@@ -39,6 +39,7 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
     }
 
     dp := make([]int, len(startTime)+1)
+    // iterate backwards to ensure each number is only used once
     for i := len(startTime) - 1; i >= 0; i-- {
         dp[i] = jobs[i].profit
         idx := searchNextJob(i)
@@ -79,7 +80,7 @@ func jobSchedulingMemoization(startTime []int, endTime []int, profit []int) int 
             return 0
         }
 
-        if ans, ok := memo[pos]; ok { // memoized branch
+        if ans, ok := memo[pos]; ok { // memoization
             return ans
         }
 
