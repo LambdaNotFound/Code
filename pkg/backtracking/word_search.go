@@ -9,21 +9,23 @@ package backtracking
  */
 func exist(board [][]byte, word string) bool {
     var dfs func(int, int, int) bool
-    dfs = func(i, j, idx int) bool {
-        if idx == len(word) {
+    dfs = func(i, j, wordIdx int) bool {
+        if wordIdx == len(word) {
             return true
         }
 
-        if i < 0 || i >= len(board) || j < 0 || j >= len(board[0]) || board[i][j] != word[idx] {
+        if i < 0 || i >= len(board) || 
+           j < 0 || j >= len(board[0]) || 
+           board[i][j] != word[wordIdx] {
             return false
         }
 
         temp := board[i][j]
         board[i][j] = '*'
-        found := dfs(i+1, j, idx+1) ||
-            dfs(i-1, j, idx+1) ||
-            dfs(i, j+1, idx+1) ||
-            dfs(i, j-1, idx+1)
+        found := dfs(i+1, j, wordIdx+1) ||
+                 dfs(i-1, j, wordIdx+1) ||
+                 dfs(i, j+1, wordIdx+1) ||
+                 dfs(i, j-1, wordIdx+1)
         board[i][j] = temp
         return found
     }
