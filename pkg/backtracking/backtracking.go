@@ -15,12 +15,12 @@ func letterCombinations(digits string) []string {
     res := []string{}
 
     var backtrack func(string, string)
-    backtrack = func(target string, out string) {
-        if len(target) == 0 {
+    backtrack = func(str string, out string) {
+        if len(str) == 0 {
             res = append(res, out)
         } else {
-            keys := dict[target[0]-'0']
-            next := target[1:]
+            keys := dict[str[0]-'0']
+            next := str[1:]
             for i := 0; i < len(keys); i++ {
                 out = out + string(keys[i])
                 backtrack(next, out)
