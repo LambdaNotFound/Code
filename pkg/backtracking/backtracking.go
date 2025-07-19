@@ -1,6 +1,90 @@
 package backtracking
 
 /**
+ * Backtracking (Recursive approach, DFS to try all possibilities)
+ *
+ *    for choice in choices {
+ *        if notAllowed(choice): continue
+ *
+ *        makeChoice(choice)
+ *        backtrack(path + choice, updatedChoices)
+ *        undoChoice(choice) // backtrack
+ *    }
+ *
+ * | Component              | Purpose                                       |
+ * | ---------------------- | --------------------------------------------- |
+ * | **Recursive function** | DFS-style traversal of the solution space     |
+ * | **Base case**          | When a full solution is found, save it        |
+ * | **Choices**            | The candidates to try at each step            |
+ * | **Constraints check**  | Skip invalid paths early (pruning)            |
+ * | **Backtrack (undo)**   | Remove the last choice before trying the next |
+ *
+ */
+
+/**
+ * 46. Permutations
+ *
+ */
+/**
+ * 46. Permutations
+ */
+func permute(nums []int) [][]int {
+    var result [][]int
+    var backtrack func([]int, []int)
+
+    backtrack = func(candidates, selected []int) {
+        if len(candidates) == 0 {
+            result = append(result, append([]int{}, selected...))
+            return
+        }
+        for i, val := range candidates {
+            sliceBefore := candidates[:i]
+            sliceAfter := candidates[i+1:]
+            newCandidates := append([]int{}, sliceBefore...)
+            newCandidates = append(newCandidates, sliceAfter...)
+
+            selected := append([]int{}, selected...)
+            selected = append(selected, val)
+            backtrack(newCandidates, selected)
+        }
+    }
+    backtrack(nums, []int{})
+    return result
+}
+
+ func permuteWithVisited(nums []int) [][]int {
+    var res [][]int
+
+    permutation := make([]int, len(nums))
+    visit := make([]bool, len(nums))
+
+    var backtrack func(int)
+    backtrack = func(index int) {
+        if index == len(nums) {
+            copiedPermutation := make([]int, len(nums))
+            copy(copiedPermutation, permutation)
+
+            res = append(res, copiedPermutation)
+
+            return
+        }
+
+        for i := 0; i < len(nums); i++ {
+            if visit[i] == false {
+                visit[i] = true
+                permutation[index] = nums[i]
+                backtrack(index + 1)
+                visit[i] = false
+            }
+        }
+    }
+
+    backtrack(0)
+
+    return res
+}
+
+/**
  * 17. Letter Combinations of a Phone Number
  */
 func letterCombinations(digits string) []string {
@@ -88,33 +172,6 @@ func combinationSum(candidates []int, target int) [][]int {
         }
     }
     backtrack(target, candidates, []int{})
-    return result
-}
-
-/**
- * 46. Permutations
- */
-func permute(nums []int) [][]int {
-    var result [][]int
-    var backtrack func([]int, []int)
-
-    backtrack = func(candidates, selected []int) {
-        if len(candidates) == 0 {
-            result = append(result, append([]int{}, selected...))
-            return
-        }
-        for i, val := range candidates {
-            sliceBefore := candidates[:i]
-            sliceAfter := candidates[i+1:]
-            newCandidates := append([]int{}, sliceBefore...)
-            newCandidates = append(newCandidates, sliceAfter...)
-
-            selected := append([]int{}, selected...)
-            selected = append(selected, val)
-            backtrack(newCandidates, selected)
-        }
-    }
-    backtrack(nums, []int{})
     return result
 }
 
