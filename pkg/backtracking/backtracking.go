@@ -97,7 +97,7 @@ func combine(n int, k int) [][]int {
 
         for i := num; i <= n; i++ {
             combination[index] = i
-            backtrack(index + 1, i + 1)
+            backtrack(index+1, i+1)
         }
     }
 
