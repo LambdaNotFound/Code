@@ -79,6 +79,33 @@ func permuteWithVisited(nums []int) [][]int {
 }
 
 /**
+ * 77. Combinations
+ */
+func combine(n int, k int) [][]int {
+    var res [][]int
+    combination := make([]int, k)
+
+    var backtrack func(int, int)
+    backtrack = func(index int, num int) {
+        if index == k {
+            copiedCombination := make([]int, k)
+            copy(copiedCombination, combination)
+
+            res = append(res, copiedCombination)
+            return
+        }
+
+        for i := num; i <= n; i++ {
+            combination[index] = i
+            backtrack(index + 1, i + 1)
+        }
+    }
+
+    backtrack(0, 1)
+    return res
+}
+
+/**
  * 17. Letter Combinations of a Phone Number
  */
 func letterCombinations(digits string) []string {
