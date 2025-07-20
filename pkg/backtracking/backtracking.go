@@ -23,15 +23,11 @@ package backtracking
 
 /**
  * 46. Permutations
- *
- */
-/**
- * 46. Permutations
  */
 func permute(nums []int) [][]int {
     var result [][]int
-    var backtrack func([]int, []int)
 
+    var backtrack func([]int, []int)
     backtrack = func(candidates, selected []int) {
         if len(candidates) == 0 {
             result = append(result, append([]int{}, selected...))
@@ -52,7 +48,7 @@ func permute(nums []int) [][]int {
     return result
 }
 
- func permuteWithVisited(nums []int) [][]int {
+func permuteWithVisited(nums []int) [][]int {
     var res [][]int
 
     permutation := make([]int, len(nums))

@@ -7,6 +7,52 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_permute(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums     []int
+        expected [][]int
+    }{
+        {
+            "case 1",
+            []int{1, 2, 3},
+            [][]int{
+                {1, 2, 3},
+                {1, 3, 2},
+                {2, 1, 3},
+                {2, 3, 1},
+                {3, 1, 2},
+                {3, 2, 1},
+            },
+        },
+        {
+            "case 2",
+            []int{0, 1},
+            [][]int{
+                {0, 1},
+                {1, 0},
+            },
+        },
+        {
+            "case 3",
+            []int{1},
+            [][]int{
+                {1},
+            },
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := permute(tc.nums)
+            assert.ElementsMatch(t, tc.expected, result)
+            
+            result = permuteWithVisited(tc.nums)
+            assert.ElementsMatch(t, tc.expected, result)
+        })
+    }
+}
+
 func Test_letterCombinations(t *testing.T) {
     testCases := []struct {
         name     string
