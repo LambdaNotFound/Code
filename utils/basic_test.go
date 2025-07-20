@@ -17,7 +17,7 @@ func Test_slice_nil(t *testing.T) {
     assert.ElementsMatch(t, nilSlice, emptySlice)
 }
 
-func Test_slice_range_operator(t *testing.T) {
+func Test_slice_range(t *testing.T) {
     slice := []int{ 1, 2, 3 }
     count := 0
 
@@ -28,6 +28,14 @@ func Test_slice_range_operator(t *testing.T) {
     }
 
     assert.Equal(t, 3, count)
+
+    sliceIndexed := slice[len(slice)+1:]
+    assert.Equal(t, 0, len(sliceIndexed))
+    assert.Equal(t, []int{}, sliceIndexed)
+
+    sliceIndexed = slice[:0]
+    assert.Equal(t, 0, len(sliceIndexed))
+    assert.Equal(t, []int{}, sliceIndexed)
 }
 
 func Test_slice_remove_item(t *testing.T) {
@@ -44,4 +52,12 @@ func Test_slice_remove_item(t *testing.T) {
     slice = slice[:len(slice)-1]
 
     assert.Equal(t, slice, expected)
+}
+
+func Test_slice_spread(t *testing.T) {
+    slice := []int{ 3, 2, 1, 0 }
+    expected := []int{ 3, 2, 1, 0 }
+
+    sliceNew := append([]int{}, slice...)
+    assert.Equal(t, expected, sliceNew)
 }

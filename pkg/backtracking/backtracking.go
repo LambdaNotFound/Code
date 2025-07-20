@@ -35,8 +35,8 @@ func permute(nums []int) [][]int {
         }
         for i, val := range candidates {
             sliceBefore := candidates[:i]
-            sliceAfter := candidates[i+1:]
             newCandidates := append([]int{}, sliceBefore...)
+            sliceAfter := candidates[i+1:]
             newCandidates = append(newCandidates, sliceAfter...)
 
             selected := append([]int{}, selected...)
