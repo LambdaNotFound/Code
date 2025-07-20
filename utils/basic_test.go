@@ -18,7 +18,7 @@ func Test_slice_nil(t *testing.T) {
 }
 
 func Test_slice_range(t *testing.T) {
-    slice := []int{ 1, 2, 3 }
+    slice := []int{1, 2, 3}
     count := 0
 
     for _, val := range slice { // i < len(slice) leads to infinite loop
@@ -39,13 +39,13 @@ func Test_slice_range(t *testing.T) {
 }
 
 func Test_slice_remove_item(t *testing.T) {
-    slice := []int{ 1, 2, 3 }
+    slice := []int{1, 2, 3}
     target := 2
-    expected := []int{ 1, 3 }
+    expected := []int{1, 3}
 
     for i, _ := range slice { // remove item from a slice
         if slice[i] == target {
-            slice[i] = slice[len(slice) - 1]
+            slice[i] = slice[len(slice)-1]
             break
         }
     }
@@ -55,8 +55,8 @@ func Test_slice_remove_item(t *testing.T) {
 }
 
 func Test_slice_spread(t *testing.T) {
-    slice := []int{ 3, 2, 1, 0 }
-    expected := []int{ 3, 2, 1, 0 }
+    slice := []int{3, 2, 1, 0}
+    expected := []int{3, 2, 1, 0}
 
     sliceNew := append([]int{}, slice...)
     assert.Equal(t, expected, sliceNew)

@@ -52,7 +52,7 @@ func permuteWithVisited(nums []int) [][]int {
     var res [][]int
 
     permutation := make([]int, len(nums))
-    visit := make([]bool, len(nums))
+    visited := make([]bool, len(nums))
 
     var backtrack func(int)
     backtrack = func(index int) {
@@ -61,22 +61,20 @@ func permuteWithVisited(nums []int) [][]int {
             copy(copiedPermutation, permutation)
 
             res = append(res, copiedPermutation)
-
             return
         }
 
         for i := 0; i < len(nums); i++ {
-            if visit[i] == false {
-                visit[i] = true
+            if visited[i] == false {
+                visited[i] = true
                 permutation[index] = nums[i]
                 backtrack(index + 1)
-                visit[i] = false
+                visited[i] = false
             }
         }
     }
 
     backtrack(0)
-
     return res
 }
 
