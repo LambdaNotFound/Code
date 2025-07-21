@@ -1,5 +1,7 @@
 package backtracking
 
+import "strings"
+
 /**
  * 79. Word Search
  *
@@ -42,7 +44,6 @@ func exist(board [][]byte, word string) bool {
 
 /**
  * 37. Sudoku Solver
- *
  */
 func solveSudoku(board [][]byte) {
     var isValid func(int, int, byte) bool
@@ -85,4 +86,66 @@ func solveSudoku(board [][]byte) {
         return true
     }
     dfs()
+}
+
+/**
+ * 51. N-Queens
+ * 52. N-Queens II
+ */
+func solveNQueens(n int) [][]string {
+    var result [][]string
+
+    board := make([]string, n)
+    for i := range board {
+        board[i] = strings.Repeat(".", n)
+    }
+
+    var isValid func(int, int) bool
+    isValid = func(row, col int) bool {
+        // check all rows above
+        for i := 0; i < row; i++ {
+            if board[i][col] == 'Q' {
+                return false
+            }
+        }
+        // upper-left diagonal
+        for i, j := row-1, col-1; i >= 0 && j >= 0; i, j = i-1, j-1 {
+            if board[i][j] == 'Q' {
+                return false
+            }
+        }
+        // upper-right diagonal
+        for i, j := row-1, col+1; i >= 0 && j < n; i, j = i-1, j+1 {
+            if board[i][j] == 'Q' {
+                return false
+            }
+        }
+        return true
+    }
+
+    var dfs func(int)
+    dfs = func(row int) {
+        if row == n {
+            temp := make([]string, n)
+            copy(temp, board) // deep copy
+            result = append(result, temp)
+            return
+        }
+
+        for col := 0; col < n; col++ {
+            if isValid(row, col) {
+                newRow := []byte(board[row]) // []byte <> string
+                newRow[col] = 'Q'
+                board[row] = string(newRow)
+
+                dfs(row + 1)
+
+                newRow[col] = '.'
+                board[row] = string(newRow)
+            }
+        }
+    }
+
+    dfs(0)
+    return result
 }
