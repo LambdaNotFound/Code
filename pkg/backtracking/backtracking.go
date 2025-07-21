@@ -22,9 +22,39 @@ package backtracking
  */
 
 /**
- * 46. Permutations
+ * 46. Permutations (ordered)
  */
 func permute(nums []int) [][]int {
+    var res [][]int
+
+    permutation := make([]int, len(nums))
+    visited := make([]bool, len(nums))
+
+    var backtrack func(int)
+    backtrack = func(index int) {
+        if index == len(nums) {
+            copiedPermutation := make([]int, len(nums))
+            copy(copiedPermutation, permutation)
+
+            res = append(res, copiedPermutation)
+            return
+        }
+
+        for i := 0; i < len(nums); i++ { // num[0] to num[i]
+            if visited[i] == false {
+                visited[i] = true
+                permutation[index] = nums[i]
+                backtrack(index + 1)
+                visited[i] = false
+            }
+        }
+    }
+
+    backtrack(0)
+    return res
+}
+
+func permuteWithSliceSpread(nums []int) [][]int {
     var result [][]int
 
     var backtrack func([]int, []int)
@@ -48,41 +78,12 @@ func permute(nums []int) [][]int {
     return result
 }
 
-func permuteWithVisited(nums []int) [][]int {
-    var res [][]int
-
-    permutation := make([]int, len(nums))
-    visited := make([]bool, len(nums))
-
-    var backtrack func(int)
-    backtrack = func(index int) {
-        if index == len(nums) {
-            copiedPermutation := make([]int, len(nums))
-            copy(copiedPermutation, permutation)
-
-            res = append(res, copiedPermutation)
-            return
-        }
-
-        for i := 0; i < len(nums); i++ {
-            if visited[i] == false {
-                visited[i] = true
-                permutation[index] = nums[i]
-                backtrack(index + 1)
-                visited[i] = false
-            }
-        }
-    }
-
-    backtrack(0)
-    return res
-}
-
 /**
- * 77. Combinations
+ * 77. Combinations (not ordered)
  */
 func combine(n int, k int) [][]int {
     var res [][]int
+
     combination := make([]int, k)
 
     var backtrack func(int, int)
@@ -103,6 +104,64 @@ func combine(n int, k int) [][]int {
 
     backtrack(0, 1)
     return res
+}
+
+/**
+ * 39. Combination Sum
+ *
+ * Given an array of distinct integers candidates and a target integer target,
+ * return a list of all unique combinations of candidates where the chosen numbers sum to target.
+ *
+ */
+func combinationSum(candidates []int, target int) [][]int {
+    var result [][]int
+
+    var backtrack func(int, []int, []int)
+    backtrack = func(target int, candidates, selected []int) {
+        if target == 0 {
+            result = append(result, append([]int{}, selected...))
+            return
+        }
+        for i, val := range candidates {
+            if val <= target {
+                newTarget := target - val
+                newCandidates := append([]int{}, candidates[i:]...)
+                selected := append([]int{}, selected...)
+                selected = append(selected, val)
+                backtrack(newTarget, newCandidates, selected)
+            }
+        }
+    }
+    backtrack(target, candidates, []int{})
+    return result
+}
+
+/**
+ * 78. Subsets
+ */
+func subsets(nums []int) [][]int {
+    var result [][]int
+
+    var subset []int
+
+    var search func(int)
+    search = func(index int) {
+        if index == len(nums) {
+            copiedSubset := make([]int, len(subset))
+            copy(copiedSubset, subset)
+            result = append(result, copiedSubset)
+            return
+        }
+
+        subset = append(subset, nums[index])
+        search(index + 1)
+
+        subset = subset[:len(subset)-1]
+        search(index + 1)
+    }
+
+    search(0)
+    return result
 }
 
 /**
@@ -164,61 +223,4 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
             out = out[:len(out)-1]
         }
     }
-}
-
-/**
- * 39. Combination Sum
- *
- * Given an array of distinct integers candidates and a target integer target,
- * return a list of all unique combinations of candidates where the chosen numbers sum to target.
- *
- */
-func combinationSum(candidates []int, target int) [][]int {
-    var result [][]int
-    var backtrack func(int, []int, []int)
-
-    backtrack = func(target int, candidates, selected []int) {
-        if target == 0 {
-            result = append(result, append([]int{}, selected...))
-            return
-        }
-        for i, val := range candidates {
-            if val <= target {
-                newTarget := target - val
-                newCandidates := append([]int{}, candidates[i:]...)
-                selected := append([]int{}, selected...)
-                selected = append(selected, val)
-                backtrack(newTarget, newCandidates, selected)
-            }
-        }
-    }
-    backtrack(target, candidates, []int{})
-    return result
-}
-
-/**
- * 78. Subsets
- */
-func subsets(nums []int) [][]int {
-    var result [][]int
-    var curr []int
-
-    var search func(int)
-    search = func(index int) {
-        if index == len(nums) {
-            subset := make([]int, len(curr))
-            copy(subset, curr)
-            result = append(result, subset)
-            return
-        }
-
-        curr = append(curr, nums[index])
-        search(index + 1)
-
-        curr = curr[:len(curr)-1]
-        search(index + 1)
-    }
-
-    search(0)
-    return result
 }

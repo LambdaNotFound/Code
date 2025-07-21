@@ -46,38 +46,47 @@ func Test_permute(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := permute(tc.nums)
             assert.ElementsMatch(t, tc.expected, result)
-            
-            result = permuteWithVisited(tc.nums)
+
+            result = permuteWithSliceSpread(tc.nums)
             assert.ElementsMatch(t, tc.expected, result)
         })
     }
 }
 
-func Test_letterCombinations(t *testing.T) {
+func Test_combine(t *testing.T) {
     testCases := []struct {
         name     string
-        digits   string
-        expected []string
+        n        int
+        k        int
+        expected [][]int
     }{
         {
             "case 1",
-            "23",
-            []string{"ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"},
+            4,
+            2,
+            [][]int{
+                {1, 2},
+                {1, 3},
+                {1, 4},
+                {2, 3},
+                {2, 4},
+                {3, 4},
+            },
         },
         {
             "case 2",
-            "2",
-            []string{"a", "b", "c"},
+            1,
+            1,
+            [][]int{
+                {1},
+            },
         },
     }
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := letterCombinations(tc.digits)
-            assert.Equal(t, tc.expected, result)
-
-            result = letterCombinationsBacktrack(tc.digits)
-            assert.Equal(t, tc.expected, result)
+            result := combine(tc.n, tc.k)
+            assert.ElementsMatch(t, tc.expected, result)
         })
     }
 }
@@ -120,6 +129,73 @@ func Test_combinationSum(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := combinationSum(tc.candidates, tc.target)
             reflect.DeepEqual(tc.expected, result)
+        })
+    }
+}
+
+func Test_subsets(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums     []int
+        expected [][]int
+    }{
+        {
+            "case 1",
+            []int{1, 2, 3},
+            [][]int{
+                {1, 2, 3},
+                {1, 2},
+                {1, 3},
+                {1},
+                {2, 3},
+                {2},
+                {3},
+                {},
+            },
+        },
+        {
+            "case 2",
+            []int{0},
+            [][]int{
+                {0},
+                {},
+            },
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := subsets(tc.nums)
+            assert.ElementsMatch(t, tc.expected, result)
+        })
+    }
+}
+
+func Test_letterCombinations(t *testing.T) {
+    testCases := []struct {
+        name     string
+        digits   string
+        expected []string
+    }{
+        {
+            "case 1",
+            "23",
+            []string{"ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"},
+        },
+        {
+            "case 2",
+            "2",
+            []string{"a", "b", "c"},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := letterCombinations(tc.digits)
+            assert.Equal(t, tc.expected, result)
+
+            result = letterCombinationsBacktrack(tc.digits)
+            assert.Equal(t, tc.expected, result)
         })
     }
 }
