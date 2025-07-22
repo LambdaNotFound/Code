@@ -127,13 +127,6 @@ func sortColors(nums []int) {
 }
 
 /**
- * 1249. Minimum Remove to Make Valid Parentheses
- */
-func minRemoveToMakeValid(s string) string {
-    return ""
-}
-
-/**
  * 125. Valid Palindrome
  */
  func isPalindrome(s string) bool {

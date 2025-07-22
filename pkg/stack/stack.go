@@ -77,3 +77,38 @@ func calculate(s string) int {
     result += sign * num
     return result
 }
+
+/**
+ * 1249. Minimum Remove to Make Valid Parentheses
+ */
+func minRemoveToMakeValid(s string) string {
+    var stack []int
+    chars := []rune(s)
+
+    // first pass: track indices of '(' and mark ')' for removal
+    for i, char := range chars {
+        if char == '(' {
+            stack = append(stack, i)
+        } else if char == ')' {
+            if len(stack) > 0 {
+                stack = stack[:len(stack)-1]
+            } else {
+                chars[i] = '*' // mark ')' for removal
+            }
+        }
+    }
+
+    // mark remaining '(' for removal
+    for _, index := range stack {
+        chars[index] = '*' // mark '(' for removal
+    }
+
+    result := make([]rune, 0, len(chars))
+    for _, char := range chars {
+        if char != '*' {
+            result = append(result, char)
+        }
+    }
+
+    return string(result)
+}
