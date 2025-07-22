@@ -18,31 +18,31 @@ func spiralOrder(matrix [][]int) []int {
 
 	m, n := len(matrix), len(matrix[0])
 	res := []int{}
-	rtop, rbottom := 0, m-1
-	cleft, cright := 0, n-1
+	rowTop, rowBottom := 0, m-1
+	colLeft, colRight := 0, n-1
 	direction := "top"
 
 	for len(res) != m*n {
 		if direction == "top" {
-			for j := cleft; j <= cright; j++ {
-				res = append(res, matrix[rtop][j])
+			for j := colLeft; j <= colRight; j++ {
+				res = append(res, matrix[rowTop][j])
 			}
-			rtop++
+			rowTop++
 		} else if direction == "right" {
-			for i := rtop; i <= rbottom; i++ {
-				res = append(res, matrix[i][cright])
+			for i := rowTop; i <= rowBottom; i++ {
+				res = append(res, matrix[i][colRight])
 			}
-			cright--
+			colRight--
 		} else if direction == "bottom" {
-			for j := cright; j >= cleft; j-- {
-				res = append(res, matrix[rbottom][j])
+			for j := colRight; j >= colLeft; j-- {
+				res = append(res, matrix[rowBottom][j])
 			}
-			rbottom--
+			rowBottom--
 		} else if direction == "left" {
-			for i := rbottom; i >= rtop; i-- {
-				res = append(res, matrix[i][cleft])
+			for i := rowBottom; i >= rowTop; i-- {
+				res = append(res, matrix[i][colLeft])
 			}
-			cleft++
+			colLeft++
 		}
 		direction = nextDirection[direction]
 	}
