@@ -199,3 +199,37 @@ func Test_letterCombinations(t *testing.T) {
         })
     }
 }
+
+func Test_generateParenthesis(t *testing.T) {
+    testCases := []struct {
+        name     string
+        n        int
+        expected []string
+    }{
+        {
+            "case 1",
+            3,
+            []string{
+                "((()))",
+                "(()())",
+                "(())()",
+                "()(())",
+                "()()()",
+            },
+        },
+        {
+            "case 2",
+            1,
+            []string{
+                "()",
+            },
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := generateParenthesis(tc.n)
+            assert.ElementsMatch(t, tc.expected, result)
+        })
+    }
+}

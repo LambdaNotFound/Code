@@ -7,7 +7,7 @@ import "strings"
  *
  * Given an m x n grid of characters board and a string word, return true if word exists in the grid.
  *
- * Time: O(mn x 4^len) Space: O(L)
+ * Time: O(m * n * 3^len) Space: O(L) callstack
  */
 func exist(board [][]byte, word string) bool {
     var dfs func(int, int, int) bool
@@ -23,7 +23,7 @@ func exist(board [][]byte, word string) bool {
         }
 
         temp := board[i][j]
-        board[i][j] = '*'
+        board[i][j] = '*' // alternative: use a visited matrix
         found := dfs(i+1, j, wordIdx+1) ||
             dfs(i-1, j, wordIdx+1) ||
             dfs(i, j+1, wordIdx+1) ||

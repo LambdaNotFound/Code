@@ -19,6 +19,8 @@ package backtracking
  * | **Constraints check**  | Skip invalid paths early (pruning)            |
  * | **Backtrack (undo)**   | Remove the last choice before trying the next |
  *
+ *
+ * Pruning
  */
 
 /**
@@ -223,4 +225,35 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
             out = out[:len(out)-1]
         }
     }
+}
+
+/**
+ * 22. Generate Parentheses
+ *
+ * Given n pairs of parentheses, write a function to generate
+ * all combinations of well-formed parentheses.
+ */
+func generateParenthesis(n int) []string {
+    var result []string
+
+    str := make([]byte, n*2)
+    var dfs func(int, int)
+    dfs = func(left, right int) {
+        if left+right == n*2 {
+            result = append(result, string(str[:n*2]))
+        }
+
+        if left < n {
+            str[left+right] = '('
+            dfs(left+1, right)
+        }
+
+        if right < left {
+            str[left+right] = ')'
+            dfs(left, right+1)
+        }
+    }
+
+    dfs(0, 0)
+    return result
 }
