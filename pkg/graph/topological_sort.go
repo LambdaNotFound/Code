@@ -74,7 +74,7 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
  * The height of a rooted tree is the number of edges on the
  * longest downward path between the root and a leaf.
  *
- * Adjacency List
+ * Adjacency List + Topological Sort
  */
 func findMinHeightTrees(n int, edges [][]int) []int {
     if n == 1 {
@@ -82,10 +82,10 @@ func findMinHeightTrees(n int, edges [][]int) []int {
     }
 
     graph := map[int][]int{}
-
     for _, edge := range edges {
-        graph[edge[0]] = append(graph[edge[0]], edge[1])
-        graph[edge[1]] = append(graph[edge[1]], edge[0])
+        src, dst := edge[0], edge[1]
+        graph[src] = append(graph[src], dst)
+        graph[dst] = append(graph[dst], src)
     }
 
     leaves := []int{}
@@ -99,7 +99,6 @@ func findMinHeightTrees(n int, edges [][]int) []int {
         n -= len(leaves)
 
         new_leaves := []int{}
-
         for _, leaf := range leaves {
             node := graph[leaf][0] // remove leaf from node
             for i := 0; i < len(graph[node]); i++ {
