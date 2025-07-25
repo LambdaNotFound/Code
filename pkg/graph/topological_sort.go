@@ -100,17 +100,16 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 
         new_leaves := []int{}
         for _, leaf := range leaves {
-            node := graph[leaf][0] // remove leaf from node
-            for i := 0; i < len(graph[node]); i++ {
-                if graph[node][i] == leaf {
-                    graph[node][i] = graph[node][len(graph[node])-1] // copy/move to truncate
+            vertex := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
+            for i := 0; i < len(graph[vertex]); i++ {
+                if graph[vertex][i] == leaf {
+                    graph[vertex] = append(graph[vertex][:i], graph[vertex][i+1:]...) // remove
                     break
                 }
             }
-            graph[node] = graph[node][:len(graph[node])-1]
 
-            if len(graph[node]) == 1 {
-                new_leaves = append(new_leaves, node)
+            if len(graph[vertex]) == 1 {
+                new_leaves = append(new_leaves, vertex)
             }
         }
 
