@@ -1,7 +1,7 @@
 package graph
 
 /**
- * Topological Sort
+ * Adjacency List + Topological Sort
  *
  * in-degree map + adjacent map + BFS search
  *
@@ -69,18 +69,19 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
 /**
  * 310. Minimum Height Trees
  *
+ * Given a tree of n nodes labelled from 0 to n - 1, 
  * Return a list of all MHTs' root labels.
  *
  * The height of a rooted tree is the number of edges on the
  * longest downward path between the root and a leaf.
  *
- * Adjacency List + Topological Sort
  */
 func findMinHeightTrees(n int, edges [][]int) []int {
     if n == 1 {
         return []int{0}
     }
 
+    // build the graph: adjacency list + degree count
     graph := map[int][]int{}
     for _, edge := range edges {
         src, dst := edge[0], edge[1]
@@ -88,6 +89,7 @@ func findMinHeightTrees(n int, edges [][]int) []int {
         graph[dst] = append(graph[dst], src)
     }
 
+    // find all leaves (degree == 1)
     leaves := []int{}
     for k, v := range graph {
         if len(v) == 1 {
@@ -100,16 +102,16 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 
         new_leaves := []int{}
         for _, leaf := range leaves {
-            vertex := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
-            for i := 0; i < len(graph[vertex]); i++ {
-                if graph[vertex][i] == leaf {
-                    graph[vertex] = append(graph[vertex][:i], graph[vertex][i+1:]...) // remove
+            currentLeaf := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
+            for i := 0; i < len(graph[currentLeaf]); i++ {
+                if graph[currentLeaf][i] == leaf {
+                    graph[currentLeaf] = append(graph[currentLeaf][:i], graph[currentLeaf][i+1:]...) // remove
                     break
                 }
             }
 
-            if len(graph[vertex]) == 1 {
-                new_leaves = append(new_leaves, vertex)
+            if len(graph[currentLeaf]) == 1 { // add new leaf
+                new_leaves = append(new_leaves, currentLeaf)
             }
         }
 
