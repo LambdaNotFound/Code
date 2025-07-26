@@ -5,17 +5,20 @@ package graph
  *
  * in-degree map + adjacent map + BFS search
  *
- *  indegree := make(map[int][]int)
- *  adjacent := make(map[int][]int)
- *  count := 0
+ *    indegree := make(map[int][]int)
+ *    adjacent := make(map[int][]int)
+ *    count := 0
  *
- *  for _,  prerequisite := range  prerequisites {
- *      src :=  prerequisite[1]
- *      dst :=  prerequisite[0]
+ *    for _,  prerequisite := range  prerequisites {
+ *        src, dst :=  prerequisite[1], prerequisite[0]
  *
- *      indegree[dst] = append(indegree[dst], src)
- *      adjacent[src] = append(adjacent[src], dst)
- *  }
+ *        indegree[dst] = append(indegree[dst], src)
+ *        adjacent[src] = append(adjacent[src], dst)
+ *    }
+ *
+ * Time Complexity: O(n)
+ * Space Complexity: O(n)
+ *
  */
 
 /**
@@ -39,15 +42,14 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
     }
 
     // These are the number of courses that can be completed
-    canFinishCount := len(queue)
+    completeCount := len(queue)
     for len(queue) != 0 {
-        // This course is completed
-        course := queue[0]
+        leaf := queue[0]
         queue = queue[1:]
 
         for _, pre := range prerequisites {
             // If course is the prerequite of any other course?
-            if course == pre[1] {
+            if leaf == pre[1] {
                 // If yes, then reduce the indegree of that course
                 indegree[pre[0]]--
                 // Is there a cycle?
@@ -56,20 +58,72 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
                 }
                 // Can this course be completed now?
                 if indegree[pre[0]] == 0 {
-                    canFinishCount++
                     queue = append(queue, pre[0])
+                    completeCount++
                 }
             }
         }
     }
 
-    return canFinishCount == numCourses
+    return completeCount == numCourses
+}
+
+/**
+ * 210. Course Schedule II
+ *
+ * Return the topological ordering
+ */
+func findOrder(numCourses int, prerequisites [][]int) []int {
+    // Store the indegree of each course
+    indegree := make([]int, numCourses)
+    for _, pre := range prerequisites {
+        indegree[pre[0]]++
+    }
+
+    // Store the courses that can be completed (indegree == 0) in queue
+    var queue []int
+    for course, degree := range indegree {
+        if degree == 0 {
+            queue = append(queue, course)
+        }
+    }
+
+    // These are the number of courses that can be completed
+    completeCount := len(queue)
+    res := []int{}
+    for len(queue) != 0 {
+        leaf := queue[0]
+        queue = queue[1:]
+        res = append(res, leaf)
+        
+        for _, pre := range prerequisites {
+            // If course is the prerequite of any other course?
+            if leaf == pre[1] {
+                // If yes, then reduce the indegree of that course
+                indegree[pre[0]]--
+                // Is there a cycle?
+                if indegree[pre[0]] < 0 {
+                    return []int{}
+                }
+                // Can this course be completed now?
+                if indegree[pre[0]] == 0 {
+                    queue = append(queue, pre[0])
+                    completeCount++
+                }
+            }
+        }
+    }
+
+    if completeCount == numCourses {
+        return res
+    }
+    return []int{}
 }
 
 /**
  * 310. Minimum Height Trees
  *
- * Given a tree of n nodes labelled from 0 to n - 1, 
+ * Given a tree of n nodes labelled from 0 to n - 1,
  * Return a list of all MHTs' root labels.
  *
  * The height of a rooted tree is the number of edges on the
