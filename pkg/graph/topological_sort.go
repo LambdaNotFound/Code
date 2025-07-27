@@ -95,7 +95,7 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
         leaf := queue[0]
         queue = queue[1:]
         res = append(res, leaf)
-        
+
         for _, pre := range prerequisites {
             // If course is the prerequite of any other course?
             if leaf == pre[1] {
@@ -118,6 +118,17 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
         return res
     }
     return []int{}
+}
+
+/**
+ * 630. Course Schedule III
+ *
+ * You are given an array courses where courses[i] = [durationi, lastDayi]
+ * indicate that the ith course should be taken continuously for durationi
+ * days and must be finished before or on lastDayi
+ */
+func scheduleCourse(courses [][]int) int {
+    return 0
 }
 
 /**
@@ -173,4 +184,63 @@ func findMinHeightTrees(n int, edges [][]int) []int {
     }
 
     return leaves
+}
+
+/**
+ * 329. Longest Increasing Path in a Matrix
+ */
+func longestIncreasingPath(matrix [][]int) int {
+    m := len(matrix)
+    n := len(matrix[0])
+
+    inDegree := make([][]int, m)
+    for i := 0; i < m; i++ {
+        inDegree[i] = make([]int, n)
+    }
+
+    for r := 0; r < m; r++ {
+        for c := 0; c < n; c++ {
+            for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+                nr := r + dir[0]
+                nc := c + dir[1]
+                if nr < 0 || nc < 0 || nr == m || nc == n || matrix[nr][nc] <= matrix[r][c] {
+                    continue
+                }
+                inDegree[r][c]++
+            }
+        }
+    }
+
+    queue := [][]int{}
+    for r := 0; r < m; r++ {
+        for c := 0; c < n; c++ {
+            if inDegree[r][c] == 0 {
+                queue = append(queue, []int{r, c})
+            }
+        }
+    }
+
+    steps := 0
+    for len(queue) > 0 {
+        l := len(queue)
+        for i := 0; i < l; i++ {
+            r, c := queue[0][0], queue[0][1]
+            queue = queue[1:]
+
+            for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+                nr := r + dir[0]
+                nc := c + dir[1]
+                if nr < 0 || nc < 0 || nr == m || nc == n || matrix[nr][nc] >= matrix[r][c] {
+                    continue
+                }
+                inDegree[nr][nc]--
+                if inDegree[nr][nc] == 0 {
+                    queue = append(queue, []int{nr, nc})
+                }
+            }
+        }
+        steps++
+    }
+
+    return steps
 }
