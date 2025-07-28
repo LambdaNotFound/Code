@@ -193,20 +193,21 @@ func longestIncreasingPath(matrix [][]int) int {
     m := len(matrix)
     n := len(matrix[0])
 
-    inDegree := make([][]int, m)
+    indegree := make([][]int, m)
     for i := 0; i < m; i++ {
-        inDegree[i] = make([]int, n)
+        indegree[i] = make([]int, n)
     }
 
     for r := 0; r < m; r++ {
         for c := 0; c < n; c++ {
             for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
-                nr := r + dir[0]
-                nc := c + dir[1]
-                if nr < 0 || nc < 0 || nr == m || nc == n || matrix[nr][nc] <= matrix[r][c] {
+                nextRow := r + dir[0]
+                nextCol := c + dir[1]
+                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n || 
+                    matrix[nextRow][nextCol] <= matrix[r][c] { // increasing
                     continue
                 }
-                inDegree[r][c]++
+                indegree[r][c]++
             }
         }
     }
@@ -214,7 +215,7 @@ func longestIncreasingPath(matrix [][]int) int {
     queue := [][]int{}
     for r := 0; r < m; r++ {
         for c := 0; c < n; c++ {
-            if inDegree[r][c] == 0 {
+            if indegree[r][c] == 0 {
                 queue = append(queue, []int{r, c})
             }
         }
@@ -228,14 +229,15 @@ func longestIncreasingPath(matrix [][]int) int {
             queue = queue[1:]
 
             for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
-                nr := r + dir[0]
-                nc := c + dir[1]
-                if nr < 0 || nc < 0 || nr == m || nc == n || matrix[nr][nc] >= matrix[r][c] {
+                nextRow := r + dir[0]
+                nextCol := c + dir[1]
+                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n || 
+                    matrix[nextRow][nextCol] >= matrix[r][c] {
                     continue
                 }
-                inDegree[nr][nc]--
-                if inDegree[nr][nc] == 0 {
-                    queue = append(queue, []int{nr, nc})
+                indegree[nextRow][nextCol]--
+                if indegree[nextRow][nextCol] == 0 {
+                    queue = append(queue, []int{nextRow, nextCol})
                 }
             }
         }
