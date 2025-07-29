@@ -188,6 +188,9 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 
 /**
  * 329. Longest Increasing Path in a Matrix
+ *
+ * 1. DFS + memo
+ * 2. BFS + topological sort
  */
 func longestIncreasingPath(matrix [][]int) int {
     m := len(matrix)
@@ -243,4 +246,45 @@ func longestIncreasingPath(matrix [][]int) int {
     }
 
     return steps
+}
+
+func longestIncreasingPathMemoization(matrix [][]int) int {
+    if len(matrix) == 0 || len(matrix[0]) == 0 {
+        return 0
+    }
+
+    m, n := len(matrix), len(matrix[0])
+    memo := make([][]int, m)
+    for i := range memo {
+        memo[i] = make([]int, n)
+    }
+
+    dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+
+    var dfs func(int, int) int
+    dfs = func(x, y int) int {
+        if memo[x][y] != 0 {
+            return memo[x][y]
+        }
+        maxLen := 1
+        for _, dir := range dirs {
+            nx, ny := x+dir[0], y+dir[1]
+            if nx >= 0 && nx < m && ny >= 0 && ny < n && matrix[nx][ny] > matrix[x][y] {
+                length := 1 + dfs(nx, ny)
+                if length > maxLen {
+                    maxLen = length
+                }
+            }
+        }
+        memo[x][y] = maxLen
+        return maxLen
+    }
+
+    res := 0
+    for i := 0; i < m; i++ {
+        for j := 0; j < n; j++ {
+            res = max(res, dfs(i, j))
+        }
+    }
+    return res
 }
