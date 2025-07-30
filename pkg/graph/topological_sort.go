@@ -271,7 +271,8 @@ func longestIncreasingPathMemoization(matrix [][]int) int {
         maxLen := 1
         for _, dir := range dirs {
             nx, ny := x+dir[0], y+dir[1]
-            if nx >= 0 && nx < m && ny >= 0 && ny < n && matrix[nx][ny] > matrix[x][y] {
+            if nx >= 0 && nx < m && ny >= 0 && ny < n && 
+                matrix[nx][ny] > matrix[x][y] {
                 length := 1 + dfs(nx, ny)
                 if length > maxLen {
                     maxLen = length
