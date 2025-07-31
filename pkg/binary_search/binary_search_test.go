@@ -15,13 +15,13 @@ func Test_bsearchRotatedSortedArray(t *testing.T) {
     }{
         {
             "case 1",
-            []int{4,5,6,7,0,1,2},
+            []int{4, 5, 6, 7, 0, 1, 2},
             0,
             4,
         },
         {
             "case 2",
-            []int{4,5,6,7,0,1,2},
+            []int{4, 5, 6, 7, 0, 1, 2},
             3,
             -1,
         },
@@ -36,6 +36,41 @@ func Test_bsearchRotatedSortedArray(t *testing.T) {
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
             result := searchRotatedSortedArray(tc.nums, tc.target)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
+func Test_searchRange(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums     []int
+        target   int
+        expected []int
+    }{
+        {
+            "case 1",
+            []int{5, 7, 7, 8, 8, 10},
+            8,
+            []int{3, 4},
+        },
+        {
+            "case 2",
+            []int{5, 7, 7, 8, 8, 10},
+            6,
+            []int{-1, -1},
+        },
+        {
+            "case 3",
+            []int{},
+            8,
+            []int{-1, -1},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := searchRange(tc.nums, tc.target)
             assert.Equal(t, tc.expected, result)
         })
     }
