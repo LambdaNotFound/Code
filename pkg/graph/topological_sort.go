@@ -189,7 +189,7 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 /**
  * 329. Longest Increasing Path in a Matrix
  *
- * 1. DFS + memo
+ * 1. DFS + memo: dp[curr] = max(dp[curr], dp[neighbor] + 1)
  * 2. BFS + topological sort
  */
 func longestIncreasingPath(matrix [][]int) int {

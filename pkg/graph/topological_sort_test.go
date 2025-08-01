@@ -120,3 +120,47 @@ func Test_findMinHeightTrees(t *testing.T) {
         })
     }
 }
+
+func Test_longestIncreasingPath(t *testing.T) {
+    testCases := []struct {
+        name     string
+        matrix   [][]int
+        expected int
+    }{
+        {
+            "case 1",
+            [][]int{
+                {9, 9, 4},
+                {6, 6, 8},
+                {2, 1, 1},
+            },
+            4,
+        },
+        {
+            "case 2",
+            [][]int{
+                {3, 4, 5},
+                {3, 2, 6},
+                {2, 2, 1},
+            },
+            4,
+        },
+        {
+            "case 3",
+            [][]int{
+                {1},
+            },
+            1,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := longestIncreasingPath(tc.matrix)
+            assert.Equal(t, tc.expected, result)
+
+            result = longestIncreasingPathMemoization(tc.matrix)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
