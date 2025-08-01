@@ -1,7 +1,7 @@
 package graph
 
 /**
- * Adjacency List + Topological Sort
+ * Adjacency List + Topological Sort | DAGs and topo sort
  *
  * in-degree map + adjacent map + BFS search
  *
@@ -132,7 +132,7 @@ func scheduleCourse(courses [][]int) int {
 }
 
 /**
- * 310. Minimum Height Trees
+ * 310. Minimum Height Trees | NOT classic topo sort, Tree center = optimal root
  *
  * Given a tree of n nodes labelled from 0 to n - 1,
  * Return a list of all MHTs' root labels.
@@ -154,7 +154,7 @@ func findMinHeightTrees(n int, edges [][]int) []int {
         graph[dst] = append(graph[dst], src)
     }
 
-    // find all leaves (degree == 1)
+    // find all leaves (degree == 1), layer-by-layer leaf removal
     leaves := []int{}
     for k, v := range graph {
         if len(v) == 1 {
@@ -190,7 +190,7 @@ func findMinHeightTrees(n int, edges [][]int) []int {
  * 329. Longest Increasing Path in a Matrix
  *
  * 1. DFS + memo: dp[curr] = max(dp[curr], dp[neighbor] + 1)
- * 2. BFS + topological sort
+ * 2. BFS w/ in-degrees (Kahn’s algo)
  */
 func longestIncreasingPath(matrix [][]int) int {
     m := len(matrix)
@@ -206,7 +206,7 @@ func longestIncreasingPath(matrix [][]int) int {
             for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
                 nextRow := r + dir[0]
                 nextCol := c + dir[1]
-                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n || 
+                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
                     matrix[nextRow][nextCol] <= matrix[r][c] { // increasing
                     continue
                 }
@@ -224,7 +224,7 @@ func longestIncreasingPath(matrix [][]int) int {
         }
     }
 
-    steps := 0
+    level := 0
     for len(queue) > 0 {
         l := len(queue)
         for i := 0; i < l; i++ {
@@ -234,7 +234,7 @@ func longestIncreasingPath(matrix [][]int) int {
             for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
                 nextRow := r + dir[0]
                 nextCol := c + dir[1]
-                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n || 
+                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
                     matrix[nextRow][nextCol] >= matrix[r][c] {
                     continue
                 }
@@ -244,10 +244,10 @@ func longestIncreasingPath(matrix [][]int) int {
                 }
             }
         }
-        steps++
+        level++
     }
 
-    return steps
+    return level
 }
 
 func longestIncreasingPathMemoization(matrix [][]int) int {
@@ -271,7 +271,7 @@ func longestIncreasingPathMemoization(matrix [][]int) int {
         maxLen := 1
         for _, dir := range dirs {
             nx, ny := x+dir[0], y+dir[1]
-            if nx >= 0 && nx < m && ny >= 0 && ny < n && 
+            if nx >= 0 && nx < m && ny >= 0 && ny < n &&
                 matrix[nx][ny] > matrix[x][y] {
                 length := 1 + dfs(nx, ny)
                 if length > maxLen {
