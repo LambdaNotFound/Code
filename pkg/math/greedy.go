@@ -2,6 +2,8 @@ package math
 
 /**
  * 621. Task Scheduler
+ *
+ * but there's a constraint: there has to be a gap of at least n intervals between two tasks with the same label.
  */
 func leastInterval(tasks []byte, n int) int {
     maxFreq := 0
