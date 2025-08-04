@@ -14,15 +14,19 @@ func leastInterval(tasks []byte, n int) int {
         maxFreq = max(maxFreq, dict[tasks[i]])
     }
 
-    // No of idle slots depends on maxFreq task
-    res := (maxFreq - 1) * (n + 1)
-
-    // If there are tasks with equal freq, then time increases
+    maxFreqCount := 0
+    // if there are tasks with equal freq, then time increases
     for _, value := range dict {
         if value == maxFreq {
-            res++
+            maxFreqCount++
         }
     }
 
-    return max(res, len(tasks))
+    partCount := maxFreq - 1
+    partLength := n - (maxFreqCount - 1) // idol slots in each part
+    emptySlots := partCount * partLength
+    availableTasks := len(tasks) - maxFreq*maxFreqCount
+    idles := max(0, emptySlots-availableTasks)
+
+    return len(tasks) + idles
 }
