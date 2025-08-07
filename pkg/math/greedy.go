@@ -41,7 +41,7 @@ func jump(nums []int) int {
         }
     }
 
-    return 0‰
+    return 0
 }
 
 /**
