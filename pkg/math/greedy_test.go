@@ -35,6 +35,32 @@ func Test_canCompleteCircuit(t *testing.T) {
     }
 }
 
+func Test_jump(t *testing.T) {
+    testCases := []struct {
+        name     string
+        nums      []int
+        expected int
+    }{
+        {
+            "case 1",
+            []int{2,3,1,1,4},
+            2,
+        },
+        {
+            "case 1",
+            []int{2,3,0,1,4},
+            2,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := jump(tc.nums)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
 func Test_leastInterval(t *testing.T) {
     testCases := []struct {
         name     string
