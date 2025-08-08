@@ -45,6 +45,12 @@ func Test_twoSum(t *testing.T) {
             9,
             []int{1, 2},
         },
+        {
+            "case 2",
+            []int{2, 3, 4},
+            9,
+            nil,
+        },
     }
 
     for _, tc := range testCases {
