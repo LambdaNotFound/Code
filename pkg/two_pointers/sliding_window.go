@@ -48,7 +48,7 @@ func lengthOfLongestSubstring_optimized(s string) int {
             }
         }
 
-        length := i - 1 - left + 1
+        length := (i - 1) - left + 1
         if length > res {
             res = length
         }
