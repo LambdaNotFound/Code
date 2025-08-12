@@ -5,6 +5,9 @@ package two_pointers
  *
  * Sliding window w/ hashmap tracking if a char appeared before
  *     Two Pointers: i move if char seen before, otherwise j move
+ *
+ * Time: O(n)
+ * Space: O(1)
  */
 func lengthOfLongestSubstring(s string) int {
     if len(s) == 0 {
@@ -57,33 +60,35 @@ func lengthOfLongestSubstring_optimized(s string) int {
 
 /**
  * 438. Find All Anagrams in a String
+ *
+ * Given two strings s and p, return an array of all the start 
+ * indices of p's anagrams in s
+ *
  */
 func findAnagrams(s string, p string) []int {
     var res []int
-    charToCnt := make(map[rune]int)
-    for _, ch := range p {
-        charToCnt[ch] += 1
+    charToCnt := make(map[byte]int)
+    for i, _ := range p {
+        charToCnt[p[i]] += 1 // -1 if match a char, +1 to recover
     }
+    
     i := 0
     j := 0
     for j < len(s) {
-        ch := rune(s[j])
-        charCnt, ok := charToCnt[ch]
-        if !ok {
+        charCnt, ok := charToCnt[s[j]]
+        if !ok { // move left, right as char @ j not in anagram
             for i < j {
-                ch := rune(s[i])
-                charToCnt[ch] += 1
+                charToCnt[s[i]] += 1
                 i += 1
             }
             i += 1
             j += 1
-        } else if charCnt == 0 {
-            ch = rune(s[i])
-            charToCnt[ch] += 1
+        } else if charCnt == 0 { // move left, as no more char can be used @ j
+            charToCnt[s[i]] += 1
             i += 1
-        } else {
-            charToCnt[ch] -= 1
-            if charToCnt[ch] == 0 && (j-i+1) == len(p) {
+        } else { 
+            charToCnt[s[j]] -= 1
+            if charToCnt[s[j]] == 0 && (j-i+1) == len(p) {
                 res = append(res, i)
             }
             j += 1
