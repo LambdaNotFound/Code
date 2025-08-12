@@ -4,7 +4,7 @@ package two_pointers
  * 3. Longest Substring Without Repeating Characters
  *
  * Sliding window w/ hashmap tracking if a char appeared before
- * [i -> if char seen before, j ->]
+ *     Two Pointers: i move if char seen before, otherwise j move
  */
 func lengthOfLongestSubstring(s string) int {
     if len(s) == 0 {
@@ -30,7 +30,7 @@ func lengthOfLongestSubstring(s string) int {
     return res
 }
 
-/**
+/*
  * optimize to store index in a map
  */
 func lengthOfLongestSubstring_optimized(s string) int {
@@ -39,19 +39,15 @@ func lengthOfLongestSubstring_optimized(s string) int {
     }
 
     table := make(map[byte]int)
-    res, left := 1, -1
+    res, left := 1, -1 // left + 1 is the beginning of non-repeating str
     for i := 0; i < len(s); i++ {
         if _, ok := table[s[i]]; ok {
             prevIndex := table[s[i]]
-            if left < prevIndex {
-                left = prevIndex
-            }
+            left = max(left, prevIndex) // (left, i]
         }
 
-        length := (i - 1) - left + 1
-        if length > res {
-            res = length
-        }
+        length := i - (left + 1) + 1
+        res = max(res, length)
 
         table[s[i]] = i
     }
