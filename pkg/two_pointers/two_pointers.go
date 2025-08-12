@@ -5,6 +5,17 @@ import (
 	"strings"
 )
 
+/** Two Pointers
+ *
+ * 1). Opposite-end pointers (meet in the middle)
+ *
+ * 2). Same-direction (fast/slow pointers) (Linked List)
+ *
+ * 3). Sliding window (special case of two pointers) -> Sliding Window Problems
+ *
+ * 4). Partitioning with two pointers
+ */
+
 /**
  * 11. Container With Most Water
  *
