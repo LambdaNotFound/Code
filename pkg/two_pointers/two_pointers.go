@@ -19,7 +19,7 @@ import (
 /**
  * 11. Container With Most Water
  *
- * always move the shorter side
+ *    Always move the shorter side
  */
 func maxArea(height []int) int {
     res := 0
@@ -32,9 +32,7 @@ func maxArea(height []int) int {
             area = height[j] * (j - i)
             j -= 1
         }
-        if res < area {
-            res = area
-        }
+        res = max(res, area)
     }
     return res
 }
