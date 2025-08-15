@@ -50,7 +50,7 @@ func threeSum(nums []int) [][]int {
         return res
     }
 
-    sort.Ints(nums)
+    sort.Ints(nums) // asc ordering
     for i := 0; i < len(nums)-2; i += 1 {
         if nums[i] > 0 {
             break
@@ -63,7 +63,7 @@ func threeSum(nums []int) [][]int {
         for j < k {
             if nums[j]+nums[k] == target {
                 res = append(res, []int{nums[i], nums[j], nums[k]})
-
+                // skip
                 for {
                     j += 1
                     if !(j < k && nums[j] == nums[j-1]) {
