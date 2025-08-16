@@ -63,7 +63,6 @@ func threeSum(nums []int) [][]int {
         for j < k {
             if nums[j]+nums[k] == target {
                 res = append(res, []int{nums[i], nums[j], nums[k]})
-                // skip
                 for {
                     j += 1
                     if !(j < k && nums[j] == nums[j-1]) {
