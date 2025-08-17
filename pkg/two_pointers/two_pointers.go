@@ -93,7 +93,7 @@ func threeSum(nums []int) [][]int {
 func twoSum(numbers []int, target int) []int {
     left := 0
     right := len(numbers) - 1
-
+    // sort.Ints(nums)
     for left < right {
         sum := numbers[left] + numbers[right]
 
