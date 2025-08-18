@@ -117,18 +117,19 @@ func twoSum(numbers []int, target int) []int {
  * with the colors in the order red, white, and blue.
  *                              0,   1,         2
  *  [0, red,...  i,... blue] red <= i,
+ *      next red pos,  next blue pos
  */
 func sortColors(nums []int) {
     n := len(nums)
     for red, blue, i := 0, n-1, 0; i <= blue; {
-        if nums[i] == 0 {
+        if nums[i] == 0 { // red
             nums[i], nums[red] = nums[red], nums[i]
             red += 1
             i += 1 // advance both of the pointers
-        } else if nums[i] == 2 {
+        } else if nums[i] == 2 { // blue
             nums[i], nums[blue] = nums[blue], nums[i]
             blue -= 1
-        } else {
+        } else { // white
             i += 1
         }
     }
