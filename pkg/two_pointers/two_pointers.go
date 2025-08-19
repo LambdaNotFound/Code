@@ -145,16 +145,18 @@ func sortColors(nums []int) {
         }
         return false
     }
+
     for idx, jdx := 0, len(s)-1; idx <= jdx; {
-        if isValidChar(string(s[idx])) && isValidChar(string(s[jdx])) {
-            if strings.ToLower(string(s[idx])) != strings.ToLower(string(s[jdx])) {
+        left, right := string(s[idx]), string(s[jdx])
+        if isValidChar(left) && isValidChar(right) {
+            if strings.ToLower(left) != strings.ToLower(right) {
                 return false
             }
             idx++
             jdx--
-        } else if !isValidChar(string(s[idx])) {
+        } else if !isValidChar(left) {
             idx++
-        } else if !isValidChar(string(s[jdx])) {
+        } else if !isValidChar(right) {
             jdx--
         }
     }
