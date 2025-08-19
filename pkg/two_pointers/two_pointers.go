@@ -136,11 +136,25 @@ func sortColors(nums []int) {
 }
 
 /**
+ * 283. Move Zeroes
+ */
+func moveZeroes(nums []int) {
+    for i, zeroIdx := 0, 0; i < len(nums); i++ {
+        if nums[i] != 0 {
+            nums[zeroIdx], nums[i] = nums[i], nums[zeroIdx]
+            zeroIdx += 1
+        }
+    }
+}
+
+/**
  * 125. Valid Palindrome
  */
- func isPalindrome(s string) bool {
+func isPalindrome(s string) bool {
     var isValidChar = func(s1 string) bool {
-        if (s1 >= "A" && s1 <= "Z") || (s1 >= "a" && s1 <= "z") || (s1 >= "0" && s1 <= "9") {
+        if (s1 >= "A" && s1 <= "Z") ||
+            (s1 >= "a" && s1 <= "z") ||
+            (s1 >= "0" && s1 <= "9") {
             return true
         }
         return false

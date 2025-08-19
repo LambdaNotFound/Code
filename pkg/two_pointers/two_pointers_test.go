@@ -122,6 +122,32 @@ func Test_sortColors(t *testing.T) {
     }
 }
 
+func Test_moveZeroes(t *testing.T) {
+    testCases := []struct {
+        name     string
+        numbers  []int
+        expected []int
+    }{
+        {
+            "case 1",
+            []int{0, 1, 0, 3, 12},
+            []int{1, 3, 12, 0, 0},
+        },
+        {
+            "case 2",
+            []int{0},
+            []int{0},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            moveZeroes(tc.numbers)
+            assert.Equal(t, tc.expected, tc.numbers)
+        })
+    }
+}
+
 func Test_isPalindrome(t *testing.T) {
     testCases := []struct {
         name     string
