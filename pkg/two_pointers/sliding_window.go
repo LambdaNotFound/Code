@@ -122,9 +122,7 @@ func findAnagrams(s string, p string) []int {
         charToCnt[p[i]] += 1 // -1 if match a char, +1 to recover
     }
 
-    i := 0
-    j := 0
-    for j < len(s) {
+    for i, j := 0, 0; j < len(s); {
         charCnt, ok := charToCnt[s[j]]
         if !ok { // move left, right as char @ j not in anagram
             for i < j {
