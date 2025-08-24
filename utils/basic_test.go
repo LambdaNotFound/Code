@@ -61,3 +61,12 @@ func Test_slice_spread(t *testing.T) {
     sliceNew := append([]int{}, slice...)
     assert.Equal(t, expected, sliceNew)
 }
+
+func Test_map_key_value_lookup(t *testing.T) {
+    byteToIntMap := make(map[byte]int)
+
+    byteToIntMap['a'] = 1
+
+    assert.Equal(t, byteToIntMap['a'], 1)
+    assert.Equal(t, byteToIntMap['b'], 0)
+}
