@@ -71,34 +71,31 @@ func minWindow(s string, t string) string {
         return ""
     }
 
-    freqMap := [128]int{}
-    count := len(t)
-    start, minStart, minLen := 0, 0, math.MaxInt32
-
-    // Initialize the frequency map with characters from t
-    for _, c := range t {
-        freqMap[c]++
+    charCountMap := make(map[byte]int)
+    for i, _ := range t {
+        charCountMap[t[i]]++
     }
 
-    // Start the sliding window
-    for end := 0; end < len(s); end++ {
-        if freqMap[s[end]] > 0 {
-            count--
+    count := len(t)
+    minStart, minLen := 0, math.MaxInt32
+    for left, right := 0, 0; right < len(s); right++ {
+        if charCountMap[s[right]] > 0 {
+            count -= 1
         }
-        freqMap[s[end]]--
+        charCountMap[s[right]] -= 1
 
-        // Try to minimize the window
+        // try to minimize the window
         for count == 0 {
-            if end-start+1 < minLen {
-                minStart = start
-                minLen = end - start + 1
+            if right-left+1 < minLen {
+                minStart = left
+                minLen = right - left + 1
             }
 
-            freqMap[s[start]]++
-            if freqMap[s[start]] > 0 {
-                count++
+            charCountMap[s[left]]++
+            if charCountMap[s[left]] > 0 {
+                count += 1
             }
-            start++
+            left += 1
         }
     }
 
