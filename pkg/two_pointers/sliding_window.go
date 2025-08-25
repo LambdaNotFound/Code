@@ -106,6 +106,32 @@ func minWindow(s string, t string) string {
 }
 
 /**
+ * 209. Minimum Size Subarray Sum
+ *
+ * return the minimal length of a subarray whose sum is greater than or equal to target
+ */
+func minSubArrayLen(target int, nums []int) int {
+    res := math.MaxInt32
+
+    sum := 0
+    for left, right := 0, 0; right < len(nums); right++ {
+        sum += nums[right]
+
+        for sum >= target {
+            res = min(res, right - left + 1)
+
+            sum -= nums[left]
+            left += 1
+        }
+    }
+
+    if res == math.MaxInt32 {
+        return 0
+    }
+    return res
+}
+
+/**
  * 438. Find All Anagrams in a String
  *
  * Given two strings s and p, return an array of all the start

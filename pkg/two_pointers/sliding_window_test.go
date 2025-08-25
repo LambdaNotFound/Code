@@ -75,6 +75,41 @@ func Test_minWindow(t *testing.T) {
     }
 }
 
+func Test_minSubArrayLen(t *testing.T) {
+    testCases := []struct {
+        name     string
+        target        int
+        nums        []int
+        expected int
+    }{
+        {
+            "case 1",
+            7,
+            []int{2,3,1,2,4,3},
+            2,
+        },
+        {
+            "case 1",
+            4,
+            []int{1,4,4},
+            1,
+        },
+        {
+            "case 1",
+            11,
+            []int{1,1,1,1,1,1,1,1},
+            0,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result := minSubArrayLen(tc.target, tc.nums)
+            assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
 func Test_findAnagrams(t *testing.T) {
     testCases := []struct {
         name     string
