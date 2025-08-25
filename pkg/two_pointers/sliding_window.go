@@ -3,6 +3,15 @@ package two_pointers
 import "math"
 
 /**
+ * 1. Fixed-size window
+ *
+ * 2. Variable-size window (expand + shrink)
+ *
+ * 3. Anagram / frequency counter windows
+ *
+ */
+
+/**
  * 3. Longest Substring Without Repeating Characters
  *
  * Sliding window w/ hashmap tracking if a char appeared before
@@ -118,7 +127,7 @@ func minSubArrayLen(target int, nums []int) int {
         sum += nums[right]
 
         for sum >= target {
-            res = min(res, right - left + 1)
+            res = min(res, right-left+1)
 
             sum -= nums[left]
             left += 1
@@ -129,6 +138,39 @@ func minSubArrayLen(target int, nums []int) int {
         return 0
     }
     return res
+}
+
+/**
+ * 340. Longest Substring with At Most K Distinct Characters
+ */
+func lengthOfLongestSubstringKDistinct(s string, k int) int {
+    if k == 0 || len(s) == 0 {
+        return 0
+    }
+
+    left, maxLen := 0, 0
+    freq := make(map[byte]int)
+
+    for right := 0; right < len(s); right++ {
+        // expand window
+        freq[s[right]]++
+
+        // shrink window if too many distinct chars
+        for len(freq) > k {
+            freq[s[left]]--
+            if freq[s[left]] == 0 {
+                delete(freq, s[left])
+            }
+            left++
+        }
+
+        // update max length
+        if right-left+1 > maxLen {
+            maxLen = right - left + 1
+        }
+    }
+
+    return maxLen
 }
 
 /**
