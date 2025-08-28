@@ -4,7 +4,8 @@ package backtracking
  * Backtracking (Recursive approach, DFS to try all possibilities)
  *
  *    for choice in choices {
- *        if notAllowed(choice): continue
+ *        if notAllowed(choice) // Pruning
+ *            continue
  *
  *        makeChoice(choice)
  *        backtrack(path + choice, updatedChoices)
@@ -19,8 +20,6 @@ package backtracking
  * | **Constraints check**  | Skip invalid paths early (pruning)            |
  * | **Backtrack (undo)**   | Remove the last choice before trying the next |
  *
- *
- * Pruning
  */
 
 /**
