@@ -6,6 +6,10 @@ import (
 )
 
 /**
+ * Design Rate Limiter
+ */
+
+/**
  * Fixed Window Counter – count requests in each time window
  * (simple, but unfair at window boundaries).
  */
