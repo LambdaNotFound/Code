@@ -156,7 +156,7 @@ func lengthOfLongestSubstringKDistinct(s string, k int) int {
         freq[s[right]]++
 
         // shrink window if too many distinct chars
-        for len(freq) > k {
+        for len(freq) > k { // len(map[byte]int)
             freq[s[left]]--
             if freq[s[left]] == 0 {
                 delete(freq, s[left])
@@ -165,9 +165,7 @@ func lengthOfLongestSubstringKDistinct(s string, k int) int {
         }
 
         // update max length
-        if right-left+1 > maxLen {
-            maxLen = right - left + 1
-        }
+        maxLen = max(maxLen, right-left+1)
     }
 
     return maxLen
