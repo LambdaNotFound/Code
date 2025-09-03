@@ -19,11 +19,11 @@ func MergeSort(arr []int) []int {
     right := MergeSort(arr[mid:])
 
     // Conquer (merge two sorted halves)
-    return mergeTwo(left, right)
+    return mergeSlices(left, right)
 }
 
 // merge combines two sorted slices
-func mergeTwo(left, right []int) []int {
+func mergeSlices(left, right []int) []int {
     result := make([]int, 0, len(left)+len(right))
     i, j := 0, 0
 
