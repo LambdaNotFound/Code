@@ -67,6 +67,20 @@ func Test_map_key_value_lookup(t *testing.T) {
 
     byteToIntMap['a'] = 1
 
-    assert.Equal(t, byteToIntMap['a'], 1)
-    assert.Equal(t, byteToIntMap['b'], 0)
+    assert.Equal(t, 1, byteToIntMap['a'])
+    assert.Equal(t, 0, byteToIntMap['b'])
+}
+
+func Test_map_key_delete(t *testing.T) {
+    byteToIntMap := make(map[byte]int)
+
+    byteToIntMap['a'] = 1
+    byteToIntMap['b'] = 2
+    byteToIntMap['c'] = 3
+
+    assert.Equal(t, 3, len(byteToIntMap))
+
+    delete(byteToIntMap, 'a')
+    assert.Equal(t, 2, len(byteToIntMap))
+    assert.Equal(t, 0, byteToIntMap['a'])
 }
