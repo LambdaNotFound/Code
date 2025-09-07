@@ -29,3 +29,13 @@ func VerifyLinkedLists(list1 *ListNode, list2 *ListNode) bool {
 
     return true
 }
+
+func RemoveIf[T any](s []T, pred func(T) bool) []T {
+    result := s[:0] // reuse underlying array
+    for _, v := range s {
+        if !pred(v) {
+            result = append(result, v)
+        }
+    }
+    return result
+}
