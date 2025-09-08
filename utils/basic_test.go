@@ -52,6 +52,11 @@ func Test_slice_remove_item(t *testing.T) {
     slice = slice[:len(slice)-1]
 
     assert.Equal(t, slice, expected)
+
+    slice = []int{1, 3, 5, 8}
+    expected = []int{1, 3, 5}
+    slice = RemoveIf(slice, func(x int) bool { return x%2 == 0 })
+    assert.Equal(t, slice, expected)
 }
 
 func Test_slice_spread(t *testing.T) {
