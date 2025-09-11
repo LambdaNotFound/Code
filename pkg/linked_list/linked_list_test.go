@@ -62,3 +62,75 @@ func Test_swapPairs(t *testing.T) {
 
     assert.Equal(t, true, equal)
 }
+
+func Test_hasCycle(t *testing.T) {
+    tests := []struct {
+        name     string
+        build    func() *ListNode
+        expected bool
+    }{
+        {
+            name: "no_cycle",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n3 := &ListNode{Val: 3}
+                n1.Next = n2
+                n2.Next = n3
+                return n1
+            },
+            expected: false,
+        },
+        {
+            name: "simple_cycle",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n1.Next = n2
+                n2.Next = n1 // cycle back to n1
+                return n1
+            },
+            expected: true,
+        },
+        {
+            name: "longer_cycle",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n3 := &ListNode{Val: 3}
+                n4 := &ListNode{Val: 4}
+                n1.Next = n2
+                n2.Next = n3
+                n3.Next = n4
+                n4.Next = n2 // cycle back to n2
+                return n1
+            },
+            expected: true,
+        },
+        {
+            name: "single_node_no_cycle",
+            build: func() *ListNode {
+                return &ListNode{Val: 1}
+            },
+            expected: false,
+        },
+        {
+            name: "single_node_cycle",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n1.Next = n1 // self-cycle
+                return n1
+            },
+            expected: true,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            head := tt.build()
+            result := hasCycle(head)
+
+            assert.Equal(t, tt.expected, result)
+        })
+    }
+}
