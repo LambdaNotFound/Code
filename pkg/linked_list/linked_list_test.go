@@ -135,7 +135,7 @@ func Test_hasCycle(t *testing.T) {
     }
 }
 
-func TestMiddleNode(t *testing.T) {
+func Test_middleNode(t *testing.T) {
     tests := []struct {
         name     string
         build    func() *ListNode
