@@ -134,3 +134,71 @@ func Test_hasCycle(t *testing.T) {
         })
     }
 }
+
+func TestMiddleNode(t *testing.T) {
+    tests := []struct {
+        name     string
+        build    func() *ListNode
+        expected []int
+    }{
+        {
+            name: "odd_length",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n3 := &ListNode{Val: 3}
+                n4 := &ListNode{Val: 4}
+                n5 := &ListNode{Val: 5}
+                n1.Next, n2.Next, n3.Next, n4.Next = n2, n3, n4, n5
+                return n1
+            },
+            expected: []int{3, 4, 5}, // middle is 3
+        },
+        {
+            name: "even_length",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n3 := &ListNode{Val: 3}
+                n4 := &ListNode{Val: 4}
+                n5 := &ListNode{Val: 5}
+                n6 := &ListNode{Val: 6}
+                n1.Next, n2.Next, n3.Next, n4.Next, n5.Next = n2, n3, n4, n5, n6
+                return n1
+            },
+            expected: []int{4, 5, 6}, // middle is 4 (second middle)
+        },
+        {
+            name: "single_node",
+            build: func() *ListNode {
+                return &ListNode{Val: 1}
+            },
+            expected: []int{1},
+        },
+        {
+            name: "two_nodes",
+            build: func() *ListNode {
+                n1 := &ListNode{Val: 1}
+                n2 := &ListNode{Val: 2}
+                n1.Next = n2
+                return n1
+            },
+            expected: []int{2}, // second node is the middle
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            head := tt.build()
+            mid := middleNode(head)
+
+            // Collect values from mid to end
+            vals := []int{}
+            for cur := mid; cur != nil; cur = cur.Next {
+                vals = append(vals, cur.Val)
+            }
+
+            assert.Equal(t, tt.expected, vals)
+        })
+    }
+}
