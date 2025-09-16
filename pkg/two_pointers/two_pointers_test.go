@@ -177,12 +177,6 @@ func Test_removeElement(t *testing.T) {
             }
 
             gotSlice := numsCopy[:gotLen]
-            /*
-            if !reflect.DeepEqual(gotSlice, tt.expected) {
-                t.Errorf("removeElement(%v, %d) slice = %v; want %v",
-                    tt.nums, tt.val, gotSlice, tt.expected)
-            }
-            */
             assert.ElementsMatch(t, tt.expected, gotSlice)
         })
     }
