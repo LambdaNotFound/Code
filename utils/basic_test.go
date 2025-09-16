@@ -15,6 +15,10 @@ func Test_slice_nil(t *testing.T) {
     assert.Equal(t, nilSlice, array2d[0])
     assert.NotEqual(t, emptySlice, array2d[0])
     assert.ElementsMatch(t, nilSlice, emptySlice)
+
+    var sliceA = []int{1, 2, 3}
+    var sliceB = sliceA[:0]
+    assert.Equal(t, emptySlice, sliceB)
 }
 
 func Test_slice_range(t *testing.T) {

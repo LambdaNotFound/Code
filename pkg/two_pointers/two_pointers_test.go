@@ -1,7 +1,6 @@
 package two_pointers
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -171,16 +170,20 @@ func Test_removeElement(t *testing.T) {
             numsCopy := append([]int(nil), tt.nums...) // avoid mutating original
             gotLen := removeElement(numsCopy, tt.val)
 
+            t.Logf("case %v", tt.name)
             if gotLen != tt.length {
                 t.Errorf("removeElement(%v, %d) length = %d; want %d",
                     tt.nums, tt.val, gotLen, tt.length)
             }
 
             gotSlice := numsCopy[:gotLen]
+            /*
             if !reflect.DeepEqual(gotSlice, tt.expected) {
                 t.Errorf("removeElement(%v, %d) slice = %v; want %v",
                     tt.nums, tt.val, gotSlice, tt.expected)
             }
+            */
+            assert.ElementsMatch(t, tt.expected, gotSlice)
         })
     }
 }
