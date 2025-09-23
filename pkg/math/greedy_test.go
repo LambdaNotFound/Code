@@ -128,6 +128,9 @@ func TestProductExceptSelf(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             got := productExceptSelf(tc.nums)
             assert.Equal(t, tc.expected, got)
+
+            got = productExceptSelfWithMultiplier(tc.nums)
+            assert.Equal(t, tc.expected, got)
         })
     }
 }
