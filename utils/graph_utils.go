@@ -24,3 +24,25 @@ func GraphsEqual(a, b *Node, visited map[*Node]*Node) bool {
     }
     return true
 }
+
+// insert inserts a value into the BST
+func insert(root *TreeNode, val int) *TreeNode {
+	if root == nil {
+		return &TreeNode{Val: val}
+	}
+	if val < root.Val {
+		root.Left = insert(root.Left, val)
+	} else {
+		root.Right = insert(root.Right, val)
+	}
+	return root
+}
+
+// buildBST builds a BST from an array of integers
+func BuildBST(nums []int) *TreeNode {
+	var root *TreeNode
+	for _, v := range nums {
+		root = insert(root, v)
+	}
+	return root
+}
