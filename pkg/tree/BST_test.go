@@ -7,8 +7,78 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Example function signature:
-// func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode
+// helper to build a TreeNode manually
+func node(val int, left, right *TreeNode) *TreeNode {
+    return &TreeNode{Val: val, Left: left, Right: right}
+}
+
+func TestIsValidBST(t *testing.T) {
+    tests := []struct {
+        name     string
+        root     *TreeNode
+        expected bool
+    }{
+        {
+            name:     "Empty tree is valid",
+            root:     nil,
+            expected: true,
+        },
+        {
+            name: "Single node is valid",
+            root: &TreeNode{Val: 1},
+            expected: true,
+        },
+        {
+            name: "Valid BST",
+            //      2
+            //     / \
+            //    1   3
+            root:     node(2, &TreeNode{Val: 1}, &TreeNode{Val: 3}),
+            expected: true,
+        },
+        {
+            name: "Invalid BST (left child greater than root)",
+            //      5
+            //     / \
+            //    6   7
+            root:     node(5, &TreeNode{Val: 6}, &TreeNode{Val: 7}),
+            expected: false,
+        },
+        {
+            name: "Invalid BST (deep violation)",
+            //       10
+            //      /  \
+            //     5   15
+            //        /  \
+            //       6   20
+            root: node(10,
+                &TreeNode{Val: 5},
+                node(15, &TreeNode{Val: 6}, &TreeNode{Val: 20}),
+            ),
+            expected: false,
+        },
+        {
+            name: "Valid larger BST",
+            //       10
+            //      /  \
+            //     5   15
+            //        /  \
+            //       12   20
+            root: node(10,
+                &TreeNode{Val: 5},
+                node(15, &TreeNode{Val: 12}, &TreeNode{Val: 20}),
+            ),
+            expected: true,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            result := isValidBST(tt.root)
+            assert.Equal(t, tt.expected, result)
+        })
+    }
+}
 
 func buildBST() *TreeNode {
     /*
