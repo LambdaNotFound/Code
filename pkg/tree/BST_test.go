@@ -2,6 +2,7 @@ package tree
 
 import (
 	. "gocode/types"
+	"gocode/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -103,7 +104,7 @@ func buildBST() *TreeNode {
 }
 
 func TestLowestCommonAncestor(t *testing.T) {
-    root := buildBST()
+    root := utils.BuildBST([]int{6, 2, 8, 0, 4, 7, 9, 3, 5})
 
     tests := []struct {
         name     string
