@@ -96,7 +96,7 @@ func Test_leastInterval(t *testing.T) {
     }
 }
 
-func TestProductExceptSelf(t *testing.T) {
+func Test_productExceptSelf(t *testing.T) {
     tests := []struct {
         name     string
         nums     []int
