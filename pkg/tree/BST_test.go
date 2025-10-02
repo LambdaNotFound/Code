@@ -81,8 +81,8 @@ func TestIsValidBST(t *testing.T) {
     }
 }
 
-func buildBST() *TreeNode {
-    /*
+func Test_lowestCommonAncestor(t *testing.T) {
+        /*
            6
           / \
          2   8
@@ -91,19 +91,6 @@ func buildBST() *TreeNode {
          / \
         3   5
     */
-    root := &TreeNode{Val: 6}
-    root.Left = &TreeNode{Val: 2}
-    root.Right = &TreeNode{Val: 8}
-    root.Left.Left = &TreeNode{Val: 0}
-    root.Left.Right = &TreeNode{Val: 4}
-    root.Left.Right.Left = &TreeNode{Val: 3}
-    root.Left.Right.Right = &TreeNode{Val: 5}
-    root.Right.Left = &TreeNode{Val: 7}
-    root.Right.Right = &TreeNode{Val: 9}
-    return root
-}
-
-func TestLowestCommonAncestor(t *testing.T) {
     root := utils.BuildBST([]int{6, 2, 8, 0, 4, 7, 9, 3, 5})
 
     tests := []struct {
