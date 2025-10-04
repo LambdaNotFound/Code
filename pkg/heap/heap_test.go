@@ -84,10 +84,7 @@ func Test_kClosest(t *testing.T) {
             result := kClosest(tt.points, tt.k)
 
             // Since order of closest points can vary, we check via sets
-            if len(result) != len(tt.expected) {
-                t.Errorf("kClosest(%v, %d) = %v; want %v", tt.points, tt.k, result, tt.expected)
-                return
-            }
+            assert.Equal(t, len(tt.expected), len(result))
 
             // convert slices to maps for comparison
             toMap := func(points [][]int) map[[2]int]bool {
