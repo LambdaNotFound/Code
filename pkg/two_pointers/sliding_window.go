@@ -69,6 +69,26 @@ func lengthOfLongestSubstring_optimized(s string) int {
     return res
 }
 
+func lengthOfLongestSubstring_rune(s string) int {
+    lastSeen := make(map[rune]int) // stores last seen index of each rune
+    start := 0                     // start index of current window
+    maxLen := 0
+
+    for i, r := range []rune(s) { // iterate over runes, not bytes
+        if prevIndex, found := lastSeen[r]; found && prevIndex >= start {
+            // Move start to right of previous duplicate
+            start = prevIndex + 1
+        }
+        lastSeen[r] = i
+
+        // Current window length = i - start + 1
+        if i-start+1 > maxLen {
+            maxLen = i - start + 1
+        }
+    }
+    return maxLen
+}
+
 /**
  * 76. Minimum Window Substring
  *

@@ -27,14 +27,27 @@ func Test_lengthOfLongestSubstring(t *testing.T) {
             "pwwkew",
             3,
         },
+        {
+            "case 4",
+            "abc!@#abc",
+            6,
+        },
+        {
+            "case 5",
+            "你好世界",
+            4,
+        },
     }
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := lengthOfLongestSubstring(tc.str)
-            assert.Equal(t, tc.expected, result)
+            // result := lengthOfLongestSubstring(tc.str)
+            // assert.Equal(t, tc.expected, result)
 
-            result = lengthOfLongestSubstring_optimized(tc.str)
+            // result = lengthOfLongestSubstring_optimized(tc.str)
+            // assert.Equal(t, tc.expected, result)
+
+            result := lengthOfLongestSubstring_rune(tc.str)
             assert.Equal(t, tc.expected, result)
         })
     }
