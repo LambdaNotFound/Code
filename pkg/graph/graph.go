@@ -79,3 +79,22 @@ func cloneGraph(node *Node) *Node {
 
     return mapToCloned[node]
 }
+
+func cloneGraph_DFS(node *Node, visited map[*Node]*Node) *Node {
+    // If the node is already cloned, return it
+    if clone, found := visited[node]; found {
+        return clone
+    }
+
+    // Create a new clone
+    clone := &Node{Val: node.Val}
+    visited[node] = clone // mark as cloned before visiting neighbors
+
+    // Recurse on neighbors
+    for _, neighbor := range node.Neighbors {
+        neighborCopy := cloneGraph_DFS(neighbor, visited)
+        clone.Neighbors = append(clone.Neighbors, neighborCopy)
+    }
+
+    return clone
+}
