@@ -13,6 +13,7 @@ func GraphsEqual(a, b *Node, visited map[*Node]*Node) bool {
     if v, ok := visited[a]; ok {
         return v == b
     }
+
     visited[a] = b
     if len(a.Neighbors) != len(b.Neighbors) {
         return false
@@ -22,6 +23,7 @@ func GraphsEqual(a, b *Node, visited map[*Node]*Node) bool {
             return false
         }
     }
+
     return true
 }
 

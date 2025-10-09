@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestCloneGraph(t *testing.T) {
+func Test_cloneGraph(t *testing.T) {
     tests := []struct {
         name string
         root *Node

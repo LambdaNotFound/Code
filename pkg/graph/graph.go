@@ -81,7 +81,7 @@ func cloneGraph(node *Node) *Node {
 }
 
 func cloneGraph_DFS(node *Node) *Node {
-    visited := make(map[*Node]*Node)
+    visited := make(map[*Node]*Node) // map[ptr]ptr
 
     var dfs func(*Node) *Node
     dfs = func(node *Node) *Node {
@@ -100,8 +100,9 @@ func cloneGraph_DFS(node *Node) *Node {
 
         // Recurse on neighbors
         for _, neighbor := range node.Neighbors {
-            neighborCopy := dfs(neighbor)
-            clone.Neighbors = append(clone.Neighbors, neighborCopy)
+            neighborClone := dfs(neighbor)
+            clone.Neighbors = append(clone.Neighbors, neighborClone)
+            // clone.Neighbors = append(clone.Neighbors, dfs(neighbor))
         }
         return clone
     }
