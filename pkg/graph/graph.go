@@ -90,7 +90,7 @@ func cloneGraph_DFS(node *Node) *Node {
         }
 
         // If the node is already cloned, return it
-        if clone, found := visited[node]; found {
+        if clone, exist := visited[node]; exist {
             return clone
         }
 
