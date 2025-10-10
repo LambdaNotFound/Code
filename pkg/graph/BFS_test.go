@@ -6,30 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_orangesRotting_slice(t *testing.T) {
-    testCases := []struct {
-        name     string
-        grid     [][]int
-        expected int
-    }{
-        {
-            "case 1",
-            [][]int{{2, 1, 1}, {1, 1, 0}, {0, 1, 1}},
-            4,
-        },
-        {
-            "case 2",
-            [][]int{{2, 1, 1}, {0, 1, 1}, {1, 0, 1}},
-            -1,
-        },
+func deepCopy2D(src [][]int) [][]int {
+    dst := make([][]int, len(src))
+    for i := range src {
+        dst[i] = make([]int, len(src[i]))
+        copy(dst[i], src[i])
     }
-
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            result := orangesRotting_slice(tc.grid)
-            assert.Equal(t, tc.expected, result)
-        })
-    }
+    return dst
 }
 
 func Test_orangesRotting(t *testing.T) {
@@ -52,7 +35,12 @@ func Test_orangesRotting(t *testing.T) {
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := orangesRotting(tc.grid)
+            grid := deepCopy2D(tc.grid)
+            result := orangesRotting(grid)
+            assert.Equal(t, tc.expected, result)
+
+            grid = deepCopy2D(tc.grid)
+            result = orangesRotting_slice(grid)
             assert.Equal(t, tc.expected, result)
         })
     }
