@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDiameterOfBinaryTree(t *testing.T) {
+func Test_diameterOfBinaryTree(t *testing.T) {
     tests := []struct {
         name     string
         root     *TreeNode
