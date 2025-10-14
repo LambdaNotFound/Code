@@ -1,6 +1,7 @@
 package graph
 
 import (
+	. "gocode/types"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -126,5 +127,86 @@ func Test_updateMatrix(t *testing.T) {
 
     for _, tc := range tests {
         assert.Equal(t, tc.expected, updateMatrix(tc.input), "failed test: %s", tc.name)
+    }
+}
+
+// Helper: Build a binary tree from level-order array (nil = missing node)
+func buildTree(vals []any) *TreeNode {
+    if len(vals) == 0 || vals[0] == nil {
+        return nil
+    }
+
+    nodes := make([]*TreeNode, len(vals))
+    for i, v := range vals {
+        if v != nil {
+            nodes[i] = &TreeNode{Val: v.(int)}
+        }
+    }
+
+    for i := 0; i < len(vals); i++ {
+        if nodes[i] == nil {
+            continue
+        }
+        leftIdx := 2*i + 1
+        rightIdx := 2*i + 2
+        if leftIdx < len(vals) {
+            nodes[i].Left = nodes[leftIdx]
+        }
+        if rightIdx < len(vals) {
+            nodes[i].Right = nodes[rightIdx]
+        }
+    }
+    return nodes[0]
+}
+
+func Test_rightSideView(t *testing.T) {
+    tests := []struct {
+        name     string
+        input    []any
+        expected []int
+    }{
+        {
+            name:     "Example tree",
+            input:    []any{1, 2, 3, nil, 5, nil, 4},
+            expected: []int{1, 3, 4},
+        },
+        {
+            name:     "Single node",
+            input:    []any{1},
+            expected: []int{1},
+        },
+        {
+            name:     "Left-skewed tree",
+            input:    []any{1, 2, nil, 3, nil, 4},
+            expected: []int{1, 2, 3, 4},
+        },
+        {
+            name:     "Right-skewed tree",
+            input:    []any{1, nil, 2, nil, 3},
+            expected: []int{1, 2, 3},
+        },
+        {
+            name:     "Complete binary tree",
+            input:    []any{1, 2, 3, 4, 5, 6, 7},
+            expected: []int{1, 3, 7},
+        },
+        {
+            name:     "Sparse tree",
+            input:    []any{1, 2, 3, nil, 5, nil, 4},
+            expected: []int{1, 3, 4},
+        },
+        {
+            name:     "Empty tree",
+            input:    []any{},
+            expected: []int{},
+        },
+    }
+
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            root := buildTree(tc.input)
+            got := rightSideView(root)
+            assert.Equal(t, tc.expected, got)
+        })
     }
 }
