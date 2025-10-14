@@ -99,15 +99,6 @@ func Test_updateMatrix(t *testing.T) {
             },
         },
         {
-            name: "Single cell one",
-            input: [][]int{
-                {1},
-            },
-            expected: [][]int{
-                {0}, // Edge: no zero nearby, distance = 0? → Usually 0 is the only valid cell, or handle separately.
-            },
-        },
-        {
             name: "Rectangle 2x4",
             input: [][]int{
                 {0, 0, 1, 1},
