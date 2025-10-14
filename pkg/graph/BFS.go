@@ -111,14 +111,18 @@ func updateMatrix(mat [][]int) [][]int {
         return [][]int{}
     }
 
+    type Cell struct {
+        x, y int
+    }
+
     m, n := len(mat), len(mat[0])
-    queue := make([][]int, 0)
+    queue := make([]Cell, 0)
     MAX_VALUE := m * n
 
     for i := 0; i < m; i++ {
         for j := 0; j < n; j++ {
             if mat[i][j] == 0 {
-                queue = append(queue, []int{i, j})
+                queue = append(queue, Cell{ x: i, y: j})
             } else {
                 mat[i][j] = MAX_VALUE
             }
@@ -130,11 +134,11 @@ func updateMatrix(mat [][]int) [][]int {
         cell := queue[0]
         queue = queue[1:]
         for _, dir := range directions {
-            r, c := cell[0]+dir[0], cell[1]+dir[1] // check if there's a shorter path
+            r, c := cell.x+dir[0], cell.y+dir[1] // check if there's a shorter path
             if r >= 0 && r < m && c >= 0 && c < n && 
-               mat[r][c] > mat[cell[0]][cell[1]]+1 {
-                queue = append(queue, []int{r, c})
-                mat[r][c] = mat[cell[0]][cell[1]] + 1
+               mat[r][c] > mat[cell.x][cell.y]+1 {
+                queue = append(queue, Cell{ x: r, y: c})
+                mat[r][c] = mat[cell.x][cell.y] + 1
             }
         }
     }
