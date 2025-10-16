@@ -177,12 +177,12 @@ func Test_rightSideView(t *testing.T) {
         },
         {
             name:     "Left-skewed tree",
-            input:    []any{1, 2, nil, 3, nil, 4},
+            input:    []any{1, 2, nil, 3, nil, nil, nil, 4},
             expected: []int{1, 2, 3, 4},
         },
         {
             name:     "Right-skewed tree",
-            input:    []any{1, nil, 2, nil, 3},
+            input:    []any{1, nil, 2, nil, nil, nil, 3},
             expected: []int{1, 2, 3},
         },
         {
