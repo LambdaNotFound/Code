@@ -210,3 +210,55 @@ func Test_rightSideView(t *testing.T) {
         })
     }
 }
+
+func Test_levelOrder(t *testing.T) {
+    tests := []struct {
+        name     string
+        input    []any
+        expected [][]int
+    }{
+        {
+            name:     "Example tree",
+            input:    []any{3, 9, 20, nil, nil, 15, 7},
+            expected: [][]int{{3}, {9, 20}, {15, 7}},
+        },
+        {
+            name:     "Single node",
+            input:    []any{1},
+            expected: [][]int{{1}},
+        },
+        {
+            name:     "Left-skewed tree",
+            input:    []any{1, 2, nil, 3, nil, nil, nil, 4},
+            expected: [][]int{{1}, {2}, {3}, {4}},
+        },
+        {
+            name:     "Right-skewed tree",
+            input:    []any{1, nil, 2, nil, nil, nil, 3},
+            expected: [][]int{{1}, {2}, {3}},
+        },
+        {
+            name:     "Complete binary tree",
+            input:    []any{1, 2, 3, 4, 5, 6, 7},
+            expected: [][]int{{1}, {2, 3}, {4, 5, 6, 7}},
+        },
+        {
+            name:     "Sparse tree",
+            input:    []any{1, 2, 3, nil, 5, nil, 4},
+            expected: [][]int{{1}, {2, 3}, {5, 4}},
+        },
+        {
+            name:     "Empty tree",
+            input:    []any{},
+            expected: [][]int{},
+        },
+    }
+
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            root := buildTree(tc.input)
+            got := levelOrder(root)
+            assert.Equal(t, tc.expected, got)
+        })
+    }
+}
