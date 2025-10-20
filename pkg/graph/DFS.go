@@ -87,7 +87,8 @@ func maxDepth(root *TreeNode) int {
 func floodFill(image [][]int, sr int, sc int, newColor int) [][]int {
     var dfs func(int, int, int, int)
     dfs = func(x int, y int, sourceColor int, newColor int) {
-        if x < 0 || x >= len(image) || y < 0 || y >= len(image[0]) || image[x][y] != sourceColor {
+        if x < 0 || x >= len(image) || y < 0 || y >= len(image[0]) || 
+           image[x][y] != sourceColor {
             return
         }
         image[x][y] = newColor
