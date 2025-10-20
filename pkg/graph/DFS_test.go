@@ -72,7 +72,7 @@ func Test_diameterOfBinaryTree(t *testing.T) {
     }
 }
 
-func TestNumIslands(t *testing.T) {
+func Test_numIslands(t *testing.T) {
     tests := []struct {
         name     string
         grid     [][]byte
@@ -127,7 +127,7 @@ func TestNumIslands(t *testing.T) {
     }
 }
 
-func TestMaxDepth(t *testing.T) {
+func Test_maxDepth(t *testing.T) {
     tests := []struct {
         name     string
         root     *TreeNode
@@ -193,7 +193,7 @@ func TestMaxDepth(t *testing.T) {
 }
 
 
-func TestFloodFill(t *testing.T) {
+func Test_floodFill(t *testing.T) {
     tests := []struct {
         name     string
         image    [][]int
