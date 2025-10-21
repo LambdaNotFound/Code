@@ -41,14 +41,14 @@ func Test_lengthOfLongestSubstring(t *testing.T) {
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            // result := lengthOfLongestSubstring(tc.str)
-            // assert.Equal(t, tc.expected, result)
+            result := lengthOfLongestSubstring_rune(tc.str)
+            assert.Equal(t, tc.expected, result)
 
             // result = lengthOfLongestSubstring_optimized(tc.str)
             // assert.Equal(t, tc.expected, result)
-
-            result := lengthOfLongestSubstring_rune(tc.str)
-            assert.Equal(t, tc.expected, result)
+        
+            // result = lengthOfLongestSubstring(tc.str)
+            // assert.Equal(t, tc.expected, result)
         })
     }
 }
