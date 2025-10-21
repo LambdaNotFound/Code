@@ -1,10 +1,13 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
 
 type String string
 
-func (str String) foo() string {
+func foo(str string) string {
     for i := 0; i < len(str); i++ {
         b := str[i] // byte (uint8) everything’s ASCII, so 1 byte = 1 rune.
         fmt.Printf("s[%d] = %c (byte value: %d)\n", i, b, b)
@@ -20,4 +23,8 @@ func (str String) foo() string {
 func substr(str string, start, end int) string {
 	runes := []rune(str) // convert to rune slice
 	return string(runes[start:end])
+}
+
+func Test_string_rune(t *testing.T) {
+    foo("你好世界")
 }
