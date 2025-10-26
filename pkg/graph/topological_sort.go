@@ -1,5 +1,7 @@
 package graph
 
+import "sort"
+
 /**
  * Adjacency List + Topological Sort | DAGs and topo sort
  *
@@ -126,9 +128,29 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
  * You are given an array courses where courses[i] = [durationi, lastDayi]
  * indicate that the ith course should be taken continuously for durationi
  * days and must be finished before or on lastDayi
+ *
+ * Return the maximum number of courses that you can take
  */
 func scheduleCourse(courses [][]int) int {
-    return 0
+    sort.Slice(courses, func(i, j int) bool {
+        return courses[i][1] <= courses[j][1]
+    })
+
+    dp := make([]int, courses[len(courses)-1][1]+1)
+
+    for _, course := range courses {
+        for lastDay := course[1]; lastDay-course[0] >= 0; lastDay-- {
+            dp[lastDay] = max(dp[lastDay], dp[lastDay-course[0]]+1)
+        }
+    }
+
+    result := 0
+
+    for i := 0; i <= courses[len(courses)-1][1]; i++ {
+        result = max(result, dp[i])
+    }
+
+    return result
 }
 
 /**
