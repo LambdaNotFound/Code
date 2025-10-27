@@ -100,7 +100,10 @@ func Test_scheduleCourse(t *testing.T) {
 
     for _, tc := range tests {
         t.Run(tc.name, func(t *testing.T) {
-            got := scheduleCourse(tc.courses)
+            got := scheduleCourseHeap(tc.courses)
+            assert.Equal(t, tc.expected, got)
+
+            got = scheduleCourseHeap(tc.courses)
             assert.Equal(t, tc.expected, got)
         })
     }
