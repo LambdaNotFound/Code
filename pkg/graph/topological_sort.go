@@ -1,6 +1,9 @@
 package graph
 
-import "sort"
+import (
+	"container/heap"
+	"sort"
+)
 
 /**
  * Adjacency List + Topological Sort | DAGs and topo sort
@@ -29,45 +32,45 @@ import "sort"
  * Return true if you can finish all courses. Otherwise, return false
  */
 func canFinish(numCourses int, prerequisites [][]int) bool {
-    // Store the indegree of each course
-    indegree := make([]int, numCourses)
-    for _, pre := range prerequisites {
-        indegree[pre[0]]++
-    }
+	// Store the indegree of each course
+	indegree := make([]int, numCourses)
+	for _, pre := range prerequisites {
+		indegree[pre[0]]++
+	}
 
-    // Store the courses that can be completed (indegree == 0) in queue
-    var queue []int
-    for course, degree := range indegree {
-        if degree == 0 {
-            queue = append(queue, course)
-        }
-    }
+	// Store the courses that can be completed (indegree == 0) in queue
+	var queue []int
+	for course, degree := range indegree {
+		if degree == 0 {
+			queue = append(queue, course)
+		}
+	}
 
-    // These are the number of courses that can be completed
-    completeCount := len(queue)
-    for len(queue) != 0 {
-        leaf := queue[0]
-        queue = queue[1:]
+	// These are the number of courses that can be completed
+	completeCount := len(queue)
+	for len(queue) != 0 {
+		leaf := queue[0]
+		queue = queue[1:]
 
-        for _, pre := range prerequisites {
-            // If course is the prerequite of any other course?
-            if leaf == pre[1] {
-                // If yes, then reduce the indegree of that course
-                indegree[pre[0]]--
-                // Is there a cycle?
-                if indegree[pre[0]] < 0 {
-                    return false
-                }
-                // Can this course be completed now?
-                if indegree[pre[0]] == 0 {
-                    queue = append(queue, pre[0])
-                    completeCount++
-                }
-            }
-        }
-    }
+		for _, pre := range prerequisites {
+			// If course is the prerequite of any other course?
+			if leaf == pre[1] {
+				// If yes, then reduce the indegree of that course
+				indegree[pre[0]]--
+				// Is there a cycle?
+				if indegree[pre[0]] < 0 {
+					return false
+				}
+				// Can this course be completed now?
+				if indegree[pre[0]] == 0 {
+					queue = append(queue, pre[0])
+					completeCount++
+				}
+			}
+		}
+	}
 
-    return completeCount == numCourses
+	return completeCount == numCourses
 }
 
 /**
@@ -76,50 +79,50 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
  * Return the topological ordering
  */
 func findOrder(numCourses int, prerequisites [][]int) []int {
-    // Store the indegree of each course
-    indegree := make([]int, numCourses)
-    for _, pre := range prerequisites {
-        indegree[pre[0]]++
-    }
+	// Store the indegree of each course
+	indegree := make([]int, numCourses)
+	for _, pre := range prerequisites {
+		indegree[pre[0]]++
+	}
 
-    // Store the courses that can be completed (indegree == 0) in queue
-    var queue []int
-    for course, degree := range indegree {
-        if degree == 0 {
-            queue = append(queue, course)
-        }
-    }
+	// Store the courses that can be completed (indegree == 0) in queue
+	var queue []int
+	for course, degree := range indegree {
+		if degree == 0 {
+			queue = append(queue, course)
+		}
+	}
 
-    // These are the number of courses that can be completed
-    completeCount := len(queue)
-    res := []int{}
-    for len(queue) != 0 {
-        leaf := queue[0]
-        queue = queue[1:]
-        res = append(res, leaf)
+	// These are the number of courses that can be completed
+	completeCount := len(queue)
+	res := []int{}
+	for len(queue) != 0 {
+		leaf := queue[0]
+		queue = queue[1:]
+		res = append(res, leaf)
 
-        for _, pre := range prerequisites {
-            // If course is the prerequite of any other course?
-            if leaf == pre[1] {
-                // If yes, then reduce the indegree of that course
-                indegree[pre[0]]--
-                // Is there a cycle?
-                if indegree[pre[0]] < 0 {
-                    return []int{}
-                }
-                // Can this course be completed now?
-                if indegree[pre[0]] == 0 {
-                    queue = append(queue, pre[0])
-                    completeCount++
-                }
-            }
-        }
-    }
+		for _, pre := range prerequisites {
+			// If course is the prerequite of any other course?
+			if leaf == pre[1] {
+				// If yes, then reduce the indegree of that course
+				indegree[pre[0]]--
+				// Is there a cycle?
+				if indegree[pre[0]] < 0 {
+					return []int{}
+				}
+				// Can this course be completed now?
+				if indegree[pre[0]] == 0 {
+					queue = append(queue, pre[0])
+					completeCount++
+				}
+			}
+		}
+	}
 
-    if completeCount == numCourses {
-        return res
-    }
-    return []int{}
+	if completeCount == numCourses {
+		return res
+	}
+	return []int{}
 }
 
 /**
@@ -132,25 +135,58 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
  * Return the maximum number of courses that you can take
  */
 func scheduleCourse(courses [][]int) int {
-    sort.Slice(courses, func(i, j int) bool {
-        return courses[i][1] <= courses[j][1]
-    })
+	sort.Slice(courses, func(i, j int) bool {
+		return courses[i][1] <= courses[j][1]
+	})
 
-    dp := make([]int, courses[len(courses)-1][1]+1)
+	dp := make([]int, courses[len(courses)-1][1]+1)
 
-    for _, course := range courses {
-        for lastDay := course[1]; lastDay-course[0] >= 0; lastDay-- {
-            dp[lastDay] = max(dp[lastDay], dp[lastDay-course[0]]+1)
-        }
-    }
+	for _, course := range courses {
+		for lastDay := course[1]; lastDay-course[0] >= 0; lastDay-- {
+			dp[lastDay] = max(dp[lastDay], dp[lastDay-course[0]]+1)
+		}
+	}
 
-    result := 0
+	result := 0
 
-    for i := 0; i <= courses[len(courses)-1][1]; i++ {
-        result = max(result, dp[i])
-    }
+	for i := 0; i <= courses[len(courses)-1][1]; i++ {
+		result = max(result, dp[i])
+	}
 
-    return result
+	return result
+}
+
+type MaxHeap []int
+
+func (h *MaxHeap) Less(i, j int) bool { return (*h)[i] > (*h)[j] }
+func (h *MaxHeap) Swap(i, j int)      { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
+func (h *MaxHeap) Len() int           { return len(*h) }
+func (h *MaxHeap) Pop() (v interface{}) {
+	*h, v = (*h)[:h.Len()-1], (*h)[h.Len()-1]
+	return v
+}
+func (h *MaxHeap) Push(v interface{}) { *h = append(*h, v.(int)) }
+
+func scheduleCourseHeap(courses [][]int) int {
+	day, maxHeap := 0, &MaxHeap{}
+	sort.Slice(courses, func(i, j int) bool {
+		return courses[i][1] < courses[j][1]
+	})
+
+	for _, course := range courses {
+		heap.Push(maxHeap, course[0])
+		day += course[0]
+
+		if day > course[1] {
+			day -= heap.Pop(maxHeap).(int)
+		}
+
+		if day > course[1] {
+			return maxHeap.Len()
+		}
+	}
+
+	return maxHeap.Len()
 }
 
 /**
@@ -164,48 +200,48 @@ func scheduleCourse(courses [][]int) int {
  *
  */
 func findMinHeightTrees(n int, edges [][]int) []int {
-    if n == 1 {
-        return []int{0}
-    }
+	if n == 1 {
+		return []int{0}
+	}
 
-    // build the graph: adjacency list + degree count
-    graph := map[int][]int{}
-    for _, edge := range edges {
-        src, dst := edge[0], edge[1]
-        graph[src] = append(graph[src], dst)
-        graph[dst] = append(graph[dst], src)
-    }
+	// build the graph: adjacency list + degree count
+	graph := map[int][]int{}
+	for _, edge := range edges {
+		src, dst := edge[0], edge[1]
+		graph[src] = append(graph[src], dst)
+		graph[dst] = append(graph[dst], src)
+	}
 
-    // find all leaves (degree == 1), layer-by-layer leaf removal
-    leaves := []int{}
-    for k, v := range graph {
-        if len(v) == 1 {
-            leaves = append(leaves, k)
-        }
-    }
+	// find all leaves (degree == 1), layer-by-layer leaf removal
+	leaves := []int{}
+	for k, v := range graph {
+		if len(v) == 1 {
+			leaves = append(leaves, k)
+		}
+	}
 
-    for len(leaves) < n {
-        n -= len(leaves)
+	for len(leaves) < n {
+		n -= len(leaves)
 
-        new_leaves := []int{}
-        for _, leaf := range leaves {
-            currentLeaf := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
-            for i := 0; i < len(graph[currentLeaf]); i++ {
-                if graph[currentLeaf][i] == leaf {
-                    graph[currentLeaf] = append(graph[currentLeaf][:i], graph[currentLeaf][i+1:]...) // remove
-                    break
-                }
-            }
+		new_leaves := []int{}
+		for _, leaf := range leaves {
+			currentLeaf := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
+			for i := 0; i < len(graph[currentLeaf]); i++ {
+				if graph[currentLeaf][i] == leaf {
+					graph[currentLeaf] = append(graph[currentLeaf][:i], graph[currentLeaf][i+1:]...) // remove
+					break
+				}
+			}
 
-            if len(graph[currentLeaf]) == 1 { // add new leaf
-                new_leaves = append(new_leaves, currentLeaf)
-            }
-        }
+			if len(graph[currentLeaf]) == 1 { // add new leaf
+				new_leaves = append(new_leaves, currentLeaf)
+			}
+		}
 
-        leaves = new_leaves
-    }
+		leaves = new_leaves
+	}
 
-    return leaves
+	return leaves
 }
 
 /**
@@ -215,101 +251,101 @@ func findMinHeightTrees(n int, edges [][]int) []int {
  * 2. BFS w/ in-degrees (Kahn’s algo)
  */
 func longestIncreasingPath(matrix [][]int) int {
-    m := len(matrix)
-    n := len(matrix[0])
+	m := len(matrix)
+	n := len(matrix[0])
 
-    indegree := make([][]int, m)
-    for i := 0; i < m; i++ {
-        indegree[i] = make([]int, n)
-    }
+	indegree := make([][]int, m)
+	for i := 0; i < m; i++ {
+		indegree[i] = make([]int, n)
+	}
 
-    for r := 0; r < m; r++ {
-        for c := 0; c < n; c++ {
-            for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
-                nextRow := r + dir[0]
-                nextCol := c + dir[1]
-                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
-                    matrix[nextRow][nextCol] <= matrix[r][c] { // increasing
-                    continue
-                }
-                indegree[r][c]++
-            }
-        }
-    }
+	for r := 0; r < m; r++ {
+		for c := 0; c < n; c++ {
+			for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+				nextRow := r + dir[0]
+				nextCol := c + dir[1]
+				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
+					matrix[nextRow][nextCol] <= matrix[r][c] { // increasing
+					continue
+				}
+				indegree[r][c]++
+			}
+		}
+	}
 
-    queue := [][]int{}
-    for r := 0; r < m; r++ {
-        for c := 0; c < n; c++ {
-            if indegree[r][c] == 0 {
-                queue = append(queue, []int{r, c})
-            }
-        }
-    }
+	queue := [][]int{}
+	for r := 0; r < m; r++ {
+		for c := 0; c < n; c++ {
+			if indegree[r][c] == 0 {
+				queue = append(queue, []int{r, c})
+			}
+		}
+	}
 
-    level := 0
-    for len(queue) > 0 {
-        l := len(queue)
-        for i := 0; i < l; i++ {
-            r, c := queue[0][0], queue[0][1]
-            queue = queue[1:]
+	level := 0
+	for len(queue) > 0 {
+		l := len(queue)
+		for i := 0; i < l; i++ {
+			r, c := queue[0][0], queue[0][1]
+			queue = queue[1:]
 
-            for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
-                nextRow := r + dir[0]
-                nextCol := c + dir[1]
-                if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
-                    matrix[nextRow][nextCol] >= matrix[r][c] {
-                    continue
-                }
-                indegree[nextRow][nextCol]--
-                if indegree[nextRow][nextCol] == 0 {
-                    queue = append(queue, []int{nextRow, nextCol})
-                }
-            }
-        }
-        level++
-    }
+			for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+				nextRow := r + dir[0]
+				nextCol := c + dir[1]
+				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
+					matrix[nextRow][nextCol] >= matrix[r][c] {
+					continue
+				}
+				indegree[nextRow][nextCol]--
+				if indegree[nextRow][nextCol] == 0 {
+					queue = append(queue, []int{nextRow, nextCol})
+				}
+			}
+		}
+		level++
+	}
 
-    return level
+	return level
 }
 
 func longestIncreasingPathMemoization(matrix [][]int) int {
-    if len(matrix) == 0 || len(matrix[0]) == 0 {
-        return 0
-    }
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return 0
+	}
 
-    m, n := len(matrix), len(matrix[0])
-    memo := make([][]int, m)
-    for i := range memo {
-        memo[i] = make([]int, n)
-    }
+	m, n := len(matrix), len(matrix[0])
+	memo := make([][]int, m)
+	for i := range memo {
+		memo[i] = make([]int, n)
+	}
 
-    dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 
-    var dfs func(int, int) int
-    dfs = func(x, y int) int {
-        if memo[x][y] != 0 {
-            return memo[x][y]
-        }
-        maxLen := 1
-        for _, dir := range dirs {
-            nx, ny := x+dir[0], y+dir[1]
-            if nx >= 0 && nx < m && ny >= 0 && ny < n &&
-                matrix[nx][ny] > matrix[x][y] {
-                length := 1 + dfs(nx, ny)
-                if length > maxLen {
-                    maxLen = length
-                }
-            }
-        }
-        memo[x][y] = maxLen
-        return maxLen
-    }
+	var dfs func(int, int) int
+	dfs = func(x, y int) int {
+		if memo[x][y] != 0 {
+			return memo[x][y]
+		}
+		maxLen := 1
+		for _, dir := range dirs {
+			nx, ny := x+dir[0], y+dir[1]
+			if nx >= 0 && nx < m && ny >= 0 && ny < n &&
+				matrix[nx][ny] > matrix[x][y] {
+				length := 1 + dfs(nx, ny)
+				if length > maxLen {
+					maxLen = length
+				}
+			}
+		}
+		memo[x][y] = maxLen
+		return maxLen
+	}
 
-    res := 0
-    for i := 0; i < m; i++ {
-        for j := 0; j < n; j++ {
-            res = max(res, dfs(i, j))
-        }
-    }
-    return res
+	res := 0
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			res = max(res, dfs(i, j))
+		}
+	}
+	return res
 }
