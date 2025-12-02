@@ -103,8 +103,8 @@ func Test_scheduleCourse(t *testing.T) {
             got := scheduleCourseHeap(tc.courses)
             assert.Equal(t, tc.expected, got)
 
-            got = scheduleCourseHeap(tc.courses)
-            assert.Equal(t, tc.expected, got)
+            got = scheduleCourse(tc.courses)
+			assert.Equal(t, tc.expected, got)
         })
     }
 }
