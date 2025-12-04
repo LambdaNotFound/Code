@@ -6,6 +6,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+/*
+ * golang patterns
+ */
+
+// named return values
+func splitSum(a, b int) (x int, y int) {
+    x = a + b
+    y = a - b
+    return // returns x and y
+}
+
 func Test_slice_nil(t *testing.T) {
     var nilSlice []int = nil
     var emptySlice []int = []int{}
