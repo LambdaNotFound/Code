@@ -142,3 +142,64 @@ func TestCalculate(t *testing.T) {
         })
     }
 }
+
+func TestEvalRPN(t *testing.T) {
+    tests := []struct {
+        name   string
+        tokens []string
+        want   int
+    }{
+        {
+            name:   "basic multiplication",
+            tokens: []string{"2", "1", "+", "3", "*"},
+            want:   9,
+        },
+        {
+            name:   "division and addition",
+            tokens: []string{"4", "13", "5", "/", "+"},
+            want:   6,
+        },
+        {
+            name:   "large example",
+            tokens: []string{"10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"},
+            want:   22,
+        },
+        {
+            name:   "simple subtraction",
+            tokens: []string{"3", "4", "-"},
+            want:   -1,
+        },
+        {
+            name:   "negative multiplication",
+            tokens: []string{"-3", "4", "*"},
+            want:   -12,
+        },
+        {
+            name:   "division truncate positive",
+            tokens: []string{"4", "3", "/"},
+            want:   1,
+        },
+        {
+            name:   "division truncate negative left",
+            tokens: []string{"-7", "3", "/"},
+            want:   -2,
+        },
+        {
+            name:   "division truncate negative right",
+            tokens: []string{"7", "-3", "/"},
+            want:   -2,
+        },
+        {
+            name:   "single number",
+            tokens: []string{"42"},
+            want:   42,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := evalRPN(tt.tokens)
+            assert.Equal(t, tt.want, got)
+        })
+    }
+}
