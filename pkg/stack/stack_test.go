@@ -13,19 +13,49 @@ func Test_minRemoveToMakeValid(t *testing.T) {
         expected string
     }{
         {
-            "case 1",
-            "lee(t(c)o)de)",
-            "lee(t(c)o)de",
+            name:     "already valid",
+            s:        "a(b)c",
+            expected: "a(b)c",
         },
         {
-            "case 2",
-            "a)b(c)d",
-            "ab(c)d",
+            name:     "remove extra closing",
+            s:        "a)b(c)d",
+            expected: "ab(c)d",
         },
         {
-            "case 3",
-            "))((",
-            "",
+            name:     "remove extra opening",
+            s:        "a(b(c",
+            expected: "a(bc",
+        },
+        {
+            name:     "mixed invalid",
+            s:        ")a(b))c(",
+            expected: "a(b)c",
+        },
+        {
+            name:     "only parentheses open",
+            s:        "(()",
+            expected: "()",
+        },
+        {
+            name:     "only parentheses invalid",
+            s:        "))((",
+            expected: "",
+        },
+        {
+            name:     "empty string",
+            s:        "",
+            expected: "",
+        },
+        {
+            name:     "letters only",
+            s:        "abcde",
+            expected: "abcde",
+        },
+        {
+            name:     "nested complex",
+            s:        "a((b)c)d)",
+            expected: "a((b)c)d",
         },
     }
 
