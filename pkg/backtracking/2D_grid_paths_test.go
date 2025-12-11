@@ -53,6 +53,114 @@ func Test_exist(t *testing.T) {
     }
 }
 
+func TestExist(t *testing.T) {
+    testCases := []struct {
+        name     string
+        board    [][]byte
+        word     string
+        expected bool
+    }{
+        {
+            name: "leetcode example 1",
+            board: [][]byte{
+                {'A', 'B', 'C', 'E'},
+                {'S', 'F', 'C', 'S'},
+                {'A', 'D', 'E', 'E'},
+            },
+            word:     "ABCCED",
+            expected: true,
+        },
+        {
+            name: "leetcode example 2",
+            board: [][]byte{
+                {'A', 'B', 'C', 'E'},
+                {'S', 'F', 'C', 'S'},
+                {'A', 'D', 'E', 'E'},
+            },
+            word:     "SEE",
+            expected: true,
+        },
+        {
+            name: "leetcode example 3 (not found)",
+            board: [][]byte{
+                {'A', 'B', 'C', 'E'},
+                {'S', 'F', 'C', 'S'},
+                {'A', 'D', 'E', 'E'},
+            },
+            word:     "ABCB",
+            expected: false,
+        },
+        {
+            name: "straight line horizontal",
+            board: [][]byte{
+                {'A', 'B', 'C', 'D'},
+            },
+            word:     "BCD",
+            expected: true,
+        },
+        {
+            name: "straight line vertical",
+            board: [][]byte{
+                {'A'},
+                {'B'},
+                {'C'},
+            },
+            word:     "ABC",
+            expected: true,
+        },
+        {
+            name: "repeated letters but valid path",
+            board: [][]byte{
+                {'A', 'A', 'A'},
+                {'A', 'B', 'A'},
+                {'A', 'A', 'A'},
+            },
+            word:     "ABA",
+            expected: true,
+        },
+        {
+            name: "repeated letters but no valid non-repeating path",
+            board: [][]byte{
+                {'A', 'A'},
+                {'A', 'A'},
+            },
+            word:     "AAAAA",
+            expected: false,
+        },
+        {
+            name:     "word longer than total cells",
+            board:    [][]byte{{'A', 'B'}, {'C', 'D'}},
+            word:     "ABCDE",
+            expected: false,
+        },
+        {
+            name:     "empty word",
+            board:    [][]byte{{'A', 'B'}},
+            word:     "",
+            expected: false,
+        },
+        {
+            name:     "single cell match",
+            board:    [][]byte{{'Z'}},
+            word:     "Z",
+            expected: true,
+        },
+        {
+            name:     "single cell no match",
+            board:    [][]byte{{'Z'}},
+            word:     "A",
+            expected: false,
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            got := exist(tc.board, tc.word)
+            assert.Equal(t, tc.expected, got)
+        })
+    }
+}
+
 func Test_solveSudoku(t *testing.T) {
     testCases := []struct {
         name     string
