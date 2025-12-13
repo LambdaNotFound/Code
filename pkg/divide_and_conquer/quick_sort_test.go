@@ -1,6 +1,7 @@
 package divide_and_conquer
 
 import (
+	. "gocode/types"
 	"gocode/utils"
 
 	"testing"
@@ -141,6 +142,84 @@ func Test_sortListWithCopy(t *testing.T) {
             expected := utils.CreateLinkedList(tc.expected)
             isEqual := utils.VerifyLinkedLists(result, expected)
             assert.Equal(t, true, isEqual)
+        })
+    }
+}
+
+func buildList(nums []int) *ListNode {
+    dummy := &ListNode{}
+    curr := dummy
+    for _, n := range nums {
+        curr.Next = &ListNode{Val: n}
+        curr = curr.Next
+    }
+    return dummy.Next
+}
+
+func listToSlice(head *ListNode) []int {
+    var res []int
+    for head != nil {
+        res = append(res, head.Val)
+        head = head.Next
+    }
+    return res
+}
+
+func TestSortList(t *testing.T) {
+    testCases := []struct {
+        name     string
+        input    []int
+        expected []int
+    }{
+        {
+            name:     "empty list",
+            input:    []int{},
+            expected: []int{},
+        },
+        {
+            name:     "single node",
+            input:    []int{1},
+            expected: []int{1},
+        },
+        {
+            name:     "already sorted",
+            input:    []int{1, 2, 3, 4},
+            expected: []int{1, 2, 3, 4},
+        },
+        {
+            name:     "reverse sorted",
+            input:    []int{4, 3, 2, 1},
+            expected: []int{1, 2, 3, 4},
+        },
+        {
+            name:     "with duplicates",
+            input:    []int{4, 2, 1, 3, 2},
+            expected: []int{1, 2, 2, 3, 4},
+        },
+        {
+            name:     "negative numbers",
+            input:    []int{-1, 5, 3, 4, 0},
+            expected: []int{-1, 0, 3, 4, 5},
+        },
+        {
+            name:     "mixed positives and negatives",
+            input:    []int{10, -3, 7, 2, -1},
+            expected: []int{-3, -1, 2, 7, 10},
+        },
+        {
+            name:     "all equal",
+            input:    []int{5, 5, 5, 5},
+            expected: []int{5, 5, 5, 5},
+        },
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            head := buildList(tc.input)
+            sorted := sortListQuickSort(head)
+            got := listToSlice(sorted)
+
+            assert.Equal(t, tc.expected, got)
         })
     }
 }
