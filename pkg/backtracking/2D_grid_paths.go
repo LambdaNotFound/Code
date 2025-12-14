@@ -10,6 +10,13 @@ import "strings"
  * Time: O(m * n * 3^len) Space: O(L) callstack
  */
 func exist(board [][]byte, word string) bool {
+    if len(word) == 0 {
+        return false
+    }
+    if len(board) == 0 || len(board[0]) == 0 {
+        return false
+    }
+    
     var dfs func(int, int, int) bool
     dfs = func(i, j, wordIdx int) bool {
         if wordIdx == len(word) {
