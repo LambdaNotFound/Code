@@ -63,6 +63,10 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 }
 
 func findMedianSortedArrays_TwoPointersMerging(nums1 []int, nums2 []int) float64 {
+    if len(nums1) == 0 && len(nums2) == 0 {
+        return 0.0
+    }
+    
     merged := make([]int, 0, len(nums1)+len(nums2))
     i, j := 0, 0
 

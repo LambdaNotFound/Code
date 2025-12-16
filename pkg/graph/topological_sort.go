@@ -135,6 +135,10 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
  * Return the maximum number of courses that you can take
  */
 func scheduleCourse(courses [][]int) int {
+	if len(courses) == 0 {
+		return 0
+	}
+	
 	sort.Slice(courses, func(i, j int) bool {
 		return courses[i][1] <= courses[j][1]
 	})

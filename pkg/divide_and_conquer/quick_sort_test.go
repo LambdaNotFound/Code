@@ -157,6 +157,9 @@ func buildList(nums []int) *ListNode {
 }
 
 func listToSlice(head *ListNode) []int {
+    if head == nil {
+        return []int{}
+    }
     var res []int
     for head != nil {
         res = append(res, head.Val)

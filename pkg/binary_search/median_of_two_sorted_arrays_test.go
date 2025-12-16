@@ -65,7 +65,7 @@ func Test_findMedianSortedArrays(t *testing.T) {
             name:     "median in first array",
             nums1:    []int{10, 20, 30},
             nums2:    []int{5, 6, 7},
-            expected: 10.0,
+            expected: 8.5,
         },
         {
             name:     "single element each",
