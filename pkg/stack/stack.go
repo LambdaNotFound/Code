@@ -98,9 +98,9 @@ func minRemoveToMakeValid(s string) string {
         }
     }
 
-    // mark remaining '(' for removal
-    for _, index := range stack {
-        chars[index] = '*' // mark '(' for removal
+    // mark remaining '(' for removal (remove from right to left)
+    for i := len(stack) - 1; i >= 0; i-- {
+        chars[stack[i]] = '*' // mark '(' for removal
     }
 
     result := make([]rune, 0, len(chars))
