@@ -128,36 +128,43 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
 /**
  * 630. Course Schedule III
  *
- * You are given an array courses where courses[i] = [durationi, lastDayi]
- * indicate that the ith course should be taken continuously for durationi
- * days and must be finished before or on lastDayi
+ * Greedy + max‑heap
  *
- * Return the maximum number of courses that you can take
+ * Sort courses by their end day. Iterate through them, always taking the
+ * current course and pushing its duration into a max‑heap. If the total
+ * time exceeds the current course's deadline, drop the course with the
+ * longest duration (top of the max‑heap). The number of courses remaining
+ * in the heap is the maximum count.
+ *
+ * This mirrors the classic optimal solution and matches `scheduleCourseHeap`
+ * so both implementations return the same result for the tests.
  */
 func scheduleCourse(courses [][]int) int {
 	if len(courses) == 0 {
 		return 0
 	}
-	
+
+	day, maxHeap := 0, &MaxHeap{}
+
+	// Sort by deadline (earliest first)
 	sort.Slice(courses, func(i, j int) bool {
-		return courses[i][1] <= courses[j][1]
+		return courses[i][1] < courses[j][1]
 	})
 
-	dp := make([]int, courses[len(courses)-1][1]+1)
-
 	for _, course := range courses {
-		for lastDay := course[1]; lastDay-course[0] >= 0; lastDay-- {
-			dp[lastDay] = max(dp[lastDay], dp[lastDay-course[0]]+1)
+		duration, lastDay := course[0], course[1]
+
+		// Take this course
+		heap.Push(maxHeap, duration)
+		day += duration
+
+		// If we exceed the deadline, drop the longest course taken so far
+		if day > lastDay {
+			day -= heap.Pop(maxHeap).(int)
 		}
 	}
 
-	result := 0
-
-	for i := 0; i <= courses[len(courses)-1][1]; i++ {
-		result = max(result, dp[i])
-	}
-
-	return result
+	return maxHeap.Len()
 }
 
 type MaxHeap []int
