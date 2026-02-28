@@ -1,7 +1,7 @@
 package linked_list
 
 import (
-	. "gocode/types"
+    . "gocode/types"
 )
 
 /**
@@ -101,12 +101,12 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
 
 /**
  * 141. Linked List Cycle
- * 
- * if there is a loop and the faster pointer is approaching the 
+ *
+ * if there is a loop and the faster pointer is approaching the
  * slow pointer, there can only be 2 cases:
  *     1. the faster pointer is 1 step behind the slow pointer
  *     2. the faster pointer is 2 step behind the slow pointer
- * 
+ *
  * in case 1, fater pointer will meet slow pointer in next step
  * in case 2, it will reduces to case 1 in next step
  */
@@ -133,4 +133,28 @@ func middleNode(head *ListNode) *ListNode {
     }
 
     return slow
+}
+
+/**
+ * 138. Copy List with Random Pointer
+ */
+func copyRandomList(head *Node) *Node {
+    for cur := head; cur != nil; {
+        tmp := &Node{Val: cur.Val}
+        tmp.Next = cur.Next
+        cur.Next = tmp // Weave copied nodes into the original list
+
+        cur = tmp.Next
+    }
+
+    newHead := head.Next
+    for cur := head; cur != nil; {
+        copy := cur.Next
+
+        copy.Random = cur.Random.Next
+        cur = cur.Next.Next
+        copy.Next = cur.Next
+    }
+
+    return newHead
 }
