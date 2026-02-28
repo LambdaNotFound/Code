@@ -1,0 +1,13 @@
+# LeetCode Rules
+- **Goal:** Solve algorithmic problems with optimal time ($T$) and space ($S$) complexity.
+- **Language:** Golang, C++.
+- **Constraints:**
+  - Strictly adhere to the provided function signature.
+  - Assume input constraints are met (no extra validation needed unless specified).
+  - Use modern, functional, or clean iterative approaches.
+- **Thinking Process:**
+  - Think step-by-step: Identify edge cases, analyze time ($T$) and space ($S$) complexity, and explain the algorithm before coding.
+  - Optimize for runtime over memory if no specific constraints are given.
+  - Illustrate the algorithm and explain with example test cases
+- **Output:** Only output the solution inside the class/method, with helper method only when it's necessary.
+- **Best Practices:** Writing simple, readable, and maintainable code.
