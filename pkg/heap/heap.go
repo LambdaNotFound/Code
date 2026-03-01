@@ -1,7 +1,6 @@
 package heap
 
 import (
-	"container/heap"
 	. "gocode/types"
 )
 
@@ -30,37 +29,7 @@ func (h *MinHeap) Push(x interface{}) {
 }
 
 func (h *MinHeap) Pop() interface{} { // Slice header is passed by value
-	n := len(*h)
-	top := (*h)[n-1] // Remove last element
-	*h = (*h)[:n-1]
+	top := (*h)[len(*h)-1] // Remove last element
+	*h = (*h)[:len(*h)-1]
 	return top
-}
-
-/**
- * 23. Merge k Sorted Lists
- */
-func mergeKLists(lists []*ListNode) *ListNode {
-	h := &MinHeap{}
-	heap.Init(h) // Initialize heap
-
-	// Dynamically insert elements
-	for _, val := range lists {
-		if val != nil {
-			heap.Push(h, val)
-		}
-	}
-
-	dummy := ListNode{}
-	curr := &dummy
-	for h.Len() > 0 {
-		temp := heap.Pop(h).(*ListNode)
-		curr.Next = temp
-		curr = temp
-
-		if temp != nil && temp.Next != nil {
-			heap.Push(h, temp.Next)
-		}
-	}
-
-	return dummy.Next
 }
