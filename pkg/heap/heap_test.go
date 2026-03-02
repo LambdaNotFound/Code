@@ -101,3 +101,53 @@ func Test_kClosest(t *testing.T) {
         })
     }
 }
+
+func Test_MedianFinder(t *testing.T) {
+    tests := []struct {
+        name     string
+        nums     []int
+        expected []float64 // expected median after each AddNum
+    }{
+        {
+            name:     "single",
+            nums:     []int{1},
+            expected: []float64{1},
+        },
+        {
+            name:     "two",
+            nums:     []int{1, 2},
+            expected: []float64{1, 1.5},
+        },
+        {
+            name:     "three",
+            nums:     []int{1, 2, 3},
+            expected: []float64{1, 1.5, 2},
+        },
+        {
+            name:     "four",
+            nums:     []int{1, 2, 3, 4},
+            expected: []float64{1, 1.5, 2, 2.5},
+        },
+        {
+            name:     "reverse_order",
+            nums:     []int{4, 3, 2, 1},
+            expected: []float64{4, 3.5, 3, 2.5},
+        },
+        {
+            name:     "duplicates",
+            nums:     []int{2, 2, 2, 2},
+            expected: []float64{2, 2, 2, 2},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            mf := Constructor()
+            for i, num := range tt.nums {
+                mf.AddNum(num)
+                assert.InDelta(t, tt.expected[i], mf.FindMedian(), 1e-9,
+                    "median after AddNum(%d) at index %d", num, i)
+            }
+        })
+    }
+}

@@ -9,7 +9,7 @@ import (
  * 23. Merge k Sorted Lists
  */
 func mergeKLists(lists []*ListNode) *ListNode {
-	h := &MinHeap{}
+	h := &ListNodeMinHeap{}
 	heap.Init(h)
 	for _, val := range lists {
 		if val != nil {
