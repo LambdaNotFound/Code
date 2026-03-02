@@ -21,7 +21,7 @@ func Constructor() MedianFinder {
 // AddNum: Time: O(log n), Space: O(n)
 func (this *MedianFinder) AddNum(num int) {
 	sizeLargeHeap, sizeSmallHeap := this.largeHeap.Len(), this.smallHeap.Len()
-	if (sizeLargeHeap+sizeSmallHeap)%2 == 0 {
+	if (sizeLargeHeap+sizeSmallHeap)%2 == 0 { // Odd/Even case logic can be swapped
 		heap.Push(this.largeHeap, num)
 		item := heap.Pop(this.largeHeap)
 		heap.Push(this.smallHeap, item)
