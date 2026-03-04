@@ -1,6 +1,12 @@
 package binarysearch
 
 /**
+ * for rotated sorted array
+ *     compare nums[mid] with nums[right] to determine
+ *     which half is strictly sorted
+ */
+
+/**
  * 33. Search in Rotated Sorted Array
  */
 func searchRotatedSortedArray(nums []int, target int) int {
@@ -15,11 +21,11 @@ func searchRotatedSortedArray(nums []int, target int) int {
 			if nums[mid] < target && target <= nums[right] {
 				left = mid + 1
 			} else {
-				right = mid - 1
+				right = mid - 1 // nums[mid] == target
 			}
 		} else {
 			if nums[left] <= target && target < nums[mid] {
-				right = mid - 1
+				right = mid - 1 // nums[mid] == target
 			} else {
 				left = mid + 1
 			}
@@ -30,10 +36,8 @@ func searchRotatedSortedArray(nums []int, target int) int {
 
 /**
  * 153. Find Minimum in Rotated Sorted Array
- *
- * generally need to compare nums[mid] with nums[right]
  */
-func findMin(nums []int) int {
+func findMinInRotatedSortedArray(nums []int) int {
 	left, right := 0, len(nums)-1
 	for left < right {
 		mid := left + (right-left)/2
@@ -44,6 +48,65 @@ func findMin(nums []int) int {
 		}
 	}
 	return nums[left] // return nums[right]
+}
+
+/**
+ * 154. Find Minimum in Rotated Sorted Array II
+ *         (not necessarily with distinct values)
+ *
+ * shrink right when nums[mid] == nums[right], narrow the search by
+ * moving right: nums[mid] > nums[right]
+ *
+ */
+func findMinInRotatedSortedArrayII(nums []int) int {
+	left, right := 0, len(nums)-1
+	for left < right {
+		mid := left + (right-left)/2
+		if nums[mid] < nums[right] { // min is in [left, mid)
+			right = mid
+		} else if nums[mid] == nums[right] {
+			right -= 1
+		} else { // nums[mid] > nums[right]
+			left = mid + 1
+		}
+	}
+	return nums[left] // return nums[right]
+}
+
+/**
+ * 81. Search in Rotated Sorted Array II
+ *     (not necessarily with distinct values)
+ * Why right-- works: when they’re equal,
+ * we know the min is still somewhere in [left, right],
+ * and removing nums[right] doesn’t remove the minimum
+ * because nums[mid] has the same value.
+ * So the invariant that the min is in [left, right] is preserved.
+ */
+func searchRotatedSortedArrayII(nums []int, target int) bool {
+	left, right := 0, len(nums)-1
+	for left <= right {
+		mid := left + (right-left)/2
+		if nums[mid] == target {
+			return true
+		}
+
+		if nums[mid] < nums[right] {
+			if nums[mid] < target && target <= nums[right] {
+				left = mid + 1
+			} else {
+				right = mid - 1 // nums[mid] == target
+			}
+		} else if nums[mid] == nums[right] {
+			right--
+		} else {
+			if nums[left] <= target && target < nums[mid] {
+				right = mid - 1 // nums[mid] == target
+			} else {
+				left = mid + 1
+			}
+		}
+	}
+	return false
 }
 
 /*
