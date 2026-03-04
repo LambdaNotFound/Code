@@ -18,23 +18,44 @@ import "strconv"
  *
  * Kadane's algorithm
  *
- * DynamicProgramming, Time: O(n * sum), Space: O(n)
+ * DynamicProgramming, Time: O(n), Space: O(1)
  *     dp[i] stores the maximum subarray ending at i
  *     dp[i] = dp[i - 1] + nums[i] if dp[i - 1] > 0
  *                                 else dp[i] = nums[i]
  */
 func maxSubArray(nums []int) int {
-    globalMax, curSum := nums[0], 0 // opt space, replace dp[i] w/ a var
-    for _, num := range nums {
-        if curSum < 0 {
-            curSum = 0
-        }
-        curSum += num
-        if curSum > globalMax {
-            globalMax = curSum
-        }
-    }
-    return globalMax
+	globalMax, curSum := nums[0], 0 // opt space, replace dp[i] w/ a var
+	for _, num := range nums {
+		if curSum < 0 {
+			curSum = 0
+		}
+		curSum += num
+		if curSum > globalMax {
+			globalMax = curSum
+		}
+	}
+	return globalMax
+}
+
+/**
+ * 152. Maximum Product Subarray
+ *
+ * DynamicProgramming, Time: O(n), Space: O(1)
+ *     max[i] stores the maximum product subarray ending at i
+ *     max[i] = preMax[i - 1] * nums[i] OR
+ *              preMin[i - 1] * nums[i] OR
+ *              nums[i]
+ */
+func maxProduct(nums []int) int {
+	preMax, preMin, res := nums[0], nums[0], nums[0]
+	for i := 1; i < len(nums); i++ {
+		curMax := max(max(preMax*nums[i], preMin*nums[i]), nums[i]) // use previous max/min
+		curMin := min(min(preMax*nums[i], preMin*nums[i]), nums[i])
+		res = max(res, curMax)
+
+		preMax, preMin = curMax, curMin
+	}
+	return res
 }
 
 /**
@@ -52,22 +73,22 @@ func maxSubArray(nums []int) int {
  *         base case: dp[0] = 0
  */
 func coinChange(coins []int, amount int) int {
-    dp := make([]int, amount+1)
-    for i := range dp {
-        dp[i] = amount + 1
-    }
-    dp[0] = 0
-    for i := 1; i <= amount; i++ {
-        for _, coin := range coins { // reuse coins of same value
-            if coin <= i {
-                dp[i] = min(dp[i], dp[i-coin]+1)
-            }
-        }
-    }
-    if dp[amount] > amount {
-        return -1
-    }
-    return dp[amount]
+	dp := make([]int, amount+1)
+	for i := range dp {
+		dp[i] = amount + 1
+	}
+	dp[0] = 0
+	for i := 1; i <= amount; i++ {
+		for _, coin := range coins { // reuse coins of same value
+			if coin <= i {
+				dp[i] = min(dp[i], dp[i-coin]+1)
+			}
+		}
+	}
+	if dp[amount] > amount {
+		return -1
+	}
+	return dp[amount]
 }
 
 /**
@@ -86,58 +107,58 @@ func coinChange(coins []int, amount int) int {
  *         base case: dp[0] = 0
  */
 func canPartition(nums []int) bool {
-    totalSum := 0 // if total sum is odd, can't partition into equal subsets
-    for _, num := range nums {
-        totalSum += num
-    }
-    if totalSum%2 != 0 {
-        return false
-    }
+	totalSum := 0 // if total sum is odd, can't partition into equal subsets
+	for _, num := range nums {
+		totalSum += num
+	}
+	if totalSum%2 != 0 {
+		return false
+	}
 
-    target := totalSum / 2
-    dp := make([]bool, target+1)
-    dp[0] = true // base case: sum 0 can always be achieved
+	target := totalSum / 2
+	dp := make([]bool, target+1)
+	dp[0] = true // base case: sum 0 can always be achieved
 
-    for _, num := range nums {
-        // iterate backwards to ensure each number is only used once
-        // same number used more than once violates the rules of 0/1 knapsack
-        for j := target; j >= num; j-- { // [num, ..., target]
-            dp[j] = dp[j] || dp[j-num] // if Sum == j-num then theres Sum == j
-        }
-    }
-    return dp[target]
+	for _, num := range nums {
+		// iterate backwards to ensure each number is only used once
+		// same number used more than once violates the rules of 0/1 knapsack
+		for j := target; j >= num; j-- { // [num, ..., target]
+			dp[j] = dp[j] || dp[j-num] // if Sum == j-num then theres Sum == j
+		}
+	}
+	return dp[target]
 }
 
 func canPartitionMemoization(nums []int) bool {
-    sum := 0
-    for _, num := range nums {
-        sum += num
-    }
-    if sum%2 == 1 {
-        return false
-    }
+	sum := 0
+	for _, num := range nums {
+		sum += num
+	}
+	if sum%2 == 1 {
+		return false
+	}
 
-    cache := make(map[string]bool)
-    var validPartition func(int, int) bool
-    validPartition = func(target, idx int) bool {
-        if idx == len(nums) || target < 0 {
-            return false
-        }
-        if target-nums[idx] == 0 {
-            return true
-        }
+	cache := make(map[string]bool)
+	var validPartition func(int, int) bool
+	validPartition = func(target, idx int) bool {
+		if idx == len(nums) || target < 0 {
+			return false
+		}
+		if target-nums[idx] == 0 {
+			return true
+		}
 
-        key := strconv.Itoa(target) + "-" + strconv.Itoa(idx)
-        if value, ok := cache[key]; ok {
-            return value
-        }
+		key := strconv.Itoa(target) + "-" + strconv.Itoa(idx)
+		if value, ok := cache[key]; ok {
+			return value
+		}
 
-        cache[key] = validPartition(target, idx+1) || validPartition(target-nums[idx], idx+1)
+		cache[key] = validPartition(target, idx+1) || validPartition(target-nums[idx], idx+1)
 
-        return cache[key]
-    }
+		return cache[key]
+	}
 
-    return validPartition(sum/2, 0)
+	return validPartition(sum/2, 0)
 }
 
 /**
@@ -149,61 +170,61 @@ func canPartitionMemoization(nums []int) bool {
  *     dp[index][value] stores num of ways to make the sum equal to value
  */
 func findTargetSumWays(nums []int, target int) int {
-    total := 0
-    for _, num := range nums {
-        total += num
-    }
-    if target > total || target < -total {
-        return 0 // Out of possible range
-    }
+	total := 0
+	for _, num := range nums {
+		total += num
+	}
+	if target > total || target < -total {
+		return 0 // Out of possible range
+	}
 
-    offset := total // sum values can go negative, use an offset shift
-    dp := make([][]int, len(nums)+1)
-    for i := range dp {
-        dp[i] = make([]int, 2*total+1) // range from -total to +total
-    }
+	offset := total // sum values can go negative, use an offset shift
+	dp := make([][]int, len(nums)+1)
+	for i := range dp {
+		dp[i] = make([]int, 2*total+1) // range from -total to +total
+	}
 
-    dp[0][offset] = 1 // base case: 0 sum before starting
-    // dp[0][0]         -total
-    // dp[0][offset]    0
-    // dp[0][2*offset]  total
+	dp[0][offset] = 1 // base case: 0 sum before starting
+	// dp[0][0]         -total
+	// dp[0][offset]    0
+	// dp[0][2*offset]  total
 
-    for i := 0; i < len(nums); i++ {
-        for sum := -total; sum <= total; sum++ {
-            curr := dp[i][sum+offset]
-            if curr > 0 {
-                dp[i+1][sum+nums[i]+offset] += curr
-                dp[i+1][sum-nums[i]+offset] += curr
-            }
-        }
-    }
+	for i := 0; i < len(nums); i++ {
+		for sum := -total; sum <= total; sum++ {
+			curr := dp[i][sum+offset]
+			if curr > 0 {
+				dp[i+1][sum+nums[i]+offset] += curr
+				dp[i+1][sum-nums[i]+offset] += curr
+			}
+		}
+	}
 
-    return dp[len(nums)][target+offset]
+	return dp[len(nums)][target+offset]
 }
 
 func findTargetSumWaysMemoization(nums []int, target int) int {
-    memo := map[[2]int]int{}
+	memo := map[[2]int]int{}
 
-    var dfs func(int, int) int
-    dfs = func(idx int, sum int) int {
-        if idx == len(nums) {
-            if sum == target {
-                return 1
-            }
-            return 0
-        }
+	var dfs func(int, int) int
+	dfs = func(idx int, sum int) int {
+		if idx == len(nums) {
+			if sum == target {
+				return 1
+			}
+			return 0
+		}
 
-        key := [2]int{idx, sum}
-        if val, ok := memo[key]; ok {
-            return val
-        }
+		key := [2]int{idx, sum}
+		if val, ok := memo[key]; ok {
+			return val
+		}
 
-        add := dfs(idx+1, sum+nums[idx])
-        subtract := dfs(idx+1, sum-nums[idx])
+		add := dfs(idx+1, sum+nums[idx])
+		subtract := dfs(idx+1, sum-nums[idx])
 
-        memo[key] = add + subtract
-        return memo[key]
-    }
+		memo[key] = add + subtract
+		return memo[key]
+	}
 
-    return dfs(0, 0)
+	return dfs(0, 0)
 }
