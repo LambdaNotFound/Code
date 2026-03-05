@@ -62,3 +62,35 @@ func countBits(n int) []int {
 	}
 	return ans
 }
+
+/*
+ * 268. Missing Number
+ *
+ * The key insight is that XOR has a special property: a ^ a = 0
+ * and a ^ 0 = a. If we XOR all numbers from 0 to n
+ * with all numbers in the array, the duplicates will cancel out,
+ * leaving only the missing number.
+ */
+func missingNumber(nums []int) int {
+	n := len(nums)
+	ans := 0
+	for i := 1; i <= n; i++ {
+		ans ^= i
+		ans ^= nums[i-1]
+	}
+	return ans
+}
+
+/*
+ * 190. Reverse Bits
+ *
+ * bitwise OR: res |= (n & 1) << (31 - i)
+ */
+func reverseBits(n int) int {
+	ans := 0
+	for i := 0; i < 32; i++ {
+		ans |= (n & 1) << (31 - i)
+		n >>= 1
+	}
+	return ans
+}
