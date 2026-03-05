@@ -8,25 +8,25 @@ import (
  * 543. Diameter of Binary Tree
  */
 func diameterOfBinaryTree(root *TreeNode) int {
-    res := 0
-    max := func(a, b int) int {
-        if a > b {
-            return a
-        }
-        return b
-    }
+	res := 0
+	max := func(a, b int) int {
+		if a > b {
+			return a
+		}
+		return b
+	}
 
-    var dfs func(*TreeNode) int
-    dfs = func(node *TreeNode) int {
-        if node == nil {
-            return 0
-        }
-        left, right := dfs(node.Left), dfs(node.Right)
-        res = max(res, left+right)
-        return 1 + max(left, right)
-    }
-    dfs(root)
-    return res
+	var dfs func(*TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		left, right := dfs(node.Left), dfs(node.Right)
+		res = max(res, left+right)
+		return 1 + max(left, right)
+	}
+	dfs(root)
+	return res
 }
 
 /**
@@ -38,69 +38,68 @@ func diameterOfBinaryTree(root *TreeNode) int {
  * DFS: Time: O(m x n), Space: O(m x n)
  */
 func numIslands(grid [][]byte) int {
-    var dfsHelper func(int, int)
-    dfsHelper = func(i, j int) {
-        if grid[i][j] != '1' {
-            return
-        }
-        grid[i][j] = '2'
+	m, n := len(grid), len(grid[0])
+	directions := [][]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 
-        if i != 0 {
-            dfsHelper(i-1, j)
-        }
-        if i != len(grid)-1 {
-            dfsHelper(i+1, j)
-        }
-        if j != 0 {
-            dfsHelper(i, j-1)
-        }
-        if j != len(grid[0])-1 {
-            dfsHelper(i, j+1)
-        }
-    }
+	var dfs func(int, int)
+	dfs = func(i, j int) {
+		if grid[i][j] != '1' {
+			return
+		}
 
-    res := 0
-    for i := 0; i < len(grid); i++ {
-        for j := 0; j < len(grid[0]); j++ {
-            if grid[i][j] == '1' {
-                res++
-                dfsHelper(i, j)
-            }
-        }
-    }
-    return res
+		if grid[i][j] == '1' {
+			grid[i][j] = 'X'
+		}
+		for _, dir := range directions {
+			row, col := i+dir[0], j+dir[1]
+			if row >= 0 && row < m && col >= 0 && col < n {
+				dfs(row, col)
+			}
+		}
+	}
+
+	res := 0
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] == '1' {
+				res++
+				dfs(i, j)
+			}
+		}
+	}
+	return res
 }
 
 /**
  * 104. Maximum Depth of Binary Tree
  */
 func maxDepth(root *TreeNode) int {
-    if root == nil {
-        return 0
-    }
-    return 1 + max(maxDepth(root.Left), maxDepth(root.Right))
+	if root == nil {
+		return 0
+	}
+	return 1 + max(maxDepth(root.Left), maxDepth(root.Right))
 }
 
 /**
  * 733. Flood Fill
  */
 func floodFill(image [][]int, sr int, sc int, newColor int) [][]int {
-    var dfs func(int, int, int, int)
-    dfs = func(x int, y int, sourceColor int, newColor int) {
-        if x < 0 || x >= len(image) || y < 0 || y >= len(image[0]) || 
-           image[x][y] != sourceColor {
-            return
-        }
-        image[x][y] = newColor
-        dfs(x-1, y, sourceColor, newColor)
-        dfs(x+1, y, sourceColor, newColor)
-        dfs(x, y-1, sourceColor, newColor)
-        dfs(x, y+1, sourceColor, newColor)
-    }
-    sourceColor := image[sr][sc]
-    if sourceColor != newColor {
-        dfs(sr, sc, sourceColor, newColor)
-    }
+	var dfs func(int, int, int, int)
+	dfs = func(x int, y int, sourceColor int, newColor int) {
+		if x < 0 || x >= len(image) || y < 0 || y >= len(image[0]) ||
+			image[x][y] != sourceColor {
+			return
+		}
+		image[x][y] = newColor
+		dfs(x-1, y, sourceColor, newColor)
+		dfs(x+1, y, sourceColor, newColor)
+		dfs(x, y-1, sourceColor, newColor)
+		dfs(x, y+1, sourceColor, newColor)
+	}
+	sourceColor := image[sr][sc]
+	if sourceColor != newColor {
+		dfs(sr, sc, sourceColor, newColor)
+	}
 
-    return image
+	return image
 }
