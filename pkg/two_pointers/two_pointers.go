@@ -22,19 +22,18 @@ import (
  *    Always move the shorter side
  */
 func maxArea(height []int) int {
-	res := 0
-	for i, j := 0, len(height)-1; i < j; {
-		area := 0
-		if height[i] <= height[j] {
-			area = height[i] * (j - i)
-			i += 1
+	area := 0
+	for left, right := 0, len(height)-1; left < right; {
+		h := min(height[left], height[right])
+		w := right - left
+		area = max(area, h*w)
+		if height[left] > height[right] {
+			right--
 		} else {
-			area = height[j] * (j - i)
-			j -= 1
+			left++
 		}
-		res = max(res, area)
 	}
-	return res
+	return area
 }
 
 /**
@@ -45,44 +44,31 @@ func maxArea(height []int) int {
  *
  */
 func threeSum(nums []int) [][]int {
-	var res [][]int
-	if len(nums) < 3 {
-		return res
-	}
+	res := make([][]int, 0)
+	sort.Ints(nums)
 
-	sort.Ints(nums) // asc ordering
-	for i := 0; i < len(nums)-2; i += 1 {
-		if nums[i] > 0 {
-			break
-		}
-		if i > 0 && nums[i] == nums[i-1] {
+	for i := 0; i < len(nums); i++ {
+		if i > 0 && nums[i] == nums[i-1] { // skip previously used num
 			continue
 		}
 
-		target, j, k := 0-nums[i], i+1, len(nums)-1
-		for j < k {
-			if nums[j]+nums[k] == target {
+		for j, k := i+1, len(nums)-1; j < k; {
+			sum := nums[i] + nums[j] + nums[k]
+			if sum == 0 {
 				res = append(res, []int{nums[i], nums[j], nums[k]})
-				for {
-					j += 1
-					if !(j < k && nums[j] == nums[j-1]) {
-						break
-					}
+				j++
+				k--
+				for ; j < k && nums[j] == nums[j-1]; j++ {
 				}
-				for {
-					k -= 1
-					if !(j < k && nums[k] == nums[k+1]) {
-						break
-					}
+				for ; j < k && nums[k] == nums[k+1]; k-- {
 				}
-			} else if nums[j]+nums[k] < target {
-				j += 1
+			} else if sum > 0 {
+				k--
 			} else {
-				k -= 1
+				j++
 			}
 		}
 	}
-
 	return res
 }
 
@@ -151,15 +137,15 @@ func moveZeroes(nums []int) {
  * 283. Remove Element
  */
 func removeElement(nums []int, val int) int {
-    pos := 0
-    for i := 0; i < len(nums); i++ {
-        if nums[i] != val {
-            nums[pos] = nums[i]
-            pos += 1
-        }
-    }
+	pos := 0
+	for i := 0; i < len(nums); i++ {
+		if nums[i] != val {
+			nums[pos] = nums[i]
+			pos += 1
+		}
+	}
 
-    return pos
+	return pos
 }
 
 /**
