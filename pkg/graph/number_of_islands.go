@@ -1,15 +1,22 @@
 package graph
 
-/**
- * 200. Number of Islands
- *
- * Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water),
- * return the number of islands.
- *
- * DFS: Time: O(m x n), Space: O(m x n)
- * BFS: Time: O(m x n), Space: O(m x n)
- * UF:
- */
+/*
+*
+
+  - 200. Number of Islands
+    *
+
+  - Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water),
+
+  - return the number of islands.
+    *
+
+  - DFS: Time: O(m x n), Space: O(m x n)
+
+  - BFS: Time: O(m x n), Space: O(m x n)
+
+  - UF:  Time: O(m x n), Space: O(m x n)
+*/
 func numIslandsDFS(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
 		return 0
@@ -83,4 +90,54 @@ func numIslandsBFS(grid [][]byte) int {
 		}
 	}
 	return res
+}
+
+func numIslandsUF(grid [][]byte) int {
+	if len(grid) == 0 || len(grid[0]) == 0 {
+		return 0
+	}
+	m, n := len(grid), len(grid[0])
+
+	parent := make([]int, m*n)
+	for i := range parent {
+		parent[i] = i // parent array only (no rank/size)
+	}
+
+	var find func(int) int
+	find = func(x int) int {
+		if parent[x] != x {
+			parent[x] = find(parent[x]) // path compression only
+		}
+		return parent[x]
+	}
+
+	union := func(a, b int) bool {
+		ra, rb := find(a), find(b)
+		if ra == rb {
+			return false
+		}
+		parent[rb] = ra // no rank: arbitrarily attach rb under ra
+		return true
+	}
+
+	dirs := [][]int{{1, 0}, {0, 1}} // Only check down and right to avoid double-union of same edge
+	count := 0
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] != '1' {
+				continue
+			}
+			count++
+			idx := i*n + j // flat 2D grid
+			for _, d := range dirs {
+				row, col := i+d[0], j+d[1]
+				if row >= 0 && row < m && col >= 0 && col < n && grid[row][col] == '1' {
+					if union(idx, row*n+col) {
+						count--
+					}
+				}
+			}
+		}
+	}
+	return count
 }
