@@ -42,6 +42,19 @@ func reverseList(head *ListNode) *ListNode {
 		return head
 	}
 
+	tail := head.Next
+	head.Next = nil // reset pointer
+	newHead := reverseList(tail)
+	tail.Next = head
+
+	return newHead
+}
+
+func reverseList_iterative(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+
 	var prev, curr *ListNode = nil, head // 3 pointers
 	for curr != nil {
 		next := curr.Next
@@ -50,19 +63,6 @@ func reverseList(head *ListNode) *ListNode {
 		curr = next
 	}
 	return prev
-}
-
-func reverseList_recursive(head *ListNode) *ListNode {
-	if head == nil || head.Next == nil {
-		return head
-	}
-
-	tail := head.Next
-	head.Next = nil // reset pointer
-	newHead := reverseList_recursive(tail)
-	tail.Next = head
-
-	return newHead
 }
 
 func reverseList_recursive2(head *ListNode) *ListNode {
