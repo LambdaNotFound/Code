@@ -48,24 +48,17 @@ func lengthOfLongestSubstring(s string) int {
  * optimize to store index in a map
  */
 func lengthOfLongestSubstring_optimized(s string) int {
-	if len(s) == 0 {
-		return 0
-	}
-
-	table := make(map[byte]int)
-	res, left := 1, -1 // left + 1 is the beginning of non-repeating str
-	for i := 0; i < len(s); i++ {
-		if _, ok := table[s[i]]; ok {
-			prevIndex := table[s[i]]
-			left = max(left, prevIndex) // (left, i]
+	res := 0
+	hashmap := make(map[byte]int)
+	for left, right := 0, 0; right < len(s); right++ {
+		_, exist := hashmap[s[right]]
+		if exist {
+			preIndex := hashmap[s[right]]
+			left = max(left, preIndex+1)
 		}
-
-		length := i - (left + 1) + 1
-		res = max(res, length)
-
-		table[s[i]] = i
+		hashmap[s[right]] = right
+		res = max(res, right-left+1)
 	}
-
 	return res
 }
 
@@ -87,6 +80,29 @@ func lengthOfLongestSubstring_rune(s string) int {
 		}
 	}
 	return maxLen
+}
+
+func lengthOfLongestSubstring_alt(s string) int {
+	res := 0
+	hashmap := make(map[byte]bool)
+	for left, right := 0, 0; right < len(s); {
+		_, exist := hashmap[s[right]]
+		if !exist {
+			hashmap[s[right]] = true
+			res = max(res, right-left+1)
+
+			right += 1
+		} else {
+			for ; left < right; left++ {
+				delete(hashmap, s[left])
+				if s[left] == s[right] {
+					break
+				}
+			}
+			left += 1
+		}
+	}
+	return res
 }
 
 /**
@@ -200,8 +216,8 @@ func lengthOfLongestSubstringKDistinct(s string, k int) int {
  */
 func findAnagrams(s string, p string) []int {
 	hashmap := make(map[byte]int)
-	for i, _ := range p {
-		hashmap[p[i]] += 1
+	for i := range p {
+		hashmap[p[i]]++
 	}
 
 	res := make([]int, 0)
