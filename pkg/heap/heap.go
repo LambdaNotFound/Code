@@ -4,7 +4,13 @@ import (
 	. "gocode/types"
 )
 
-// heap.Interface = sort.Interface + Push, Pop
+/*
+ * Heap implementation
+ *    heap.Interface = sort.Interface + Push, Pop
+ *
+ *    less func(T, T) bool
+ *    ... return h.less(h.items[i], h.items[j])
+ */
 type Heap struct {
 	items []int
 	less  func(int, int) bool
