@@ -1,22 +1,15 @@
 package graph
 
 /*
-*
-
-  - 200. Number of Islands
-    *
-
-  - Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water),
-
-  - return the number of islands.
-    *
-
-  - DFS: Time: O(m x n), Space: O(m x n)
-
-  - BFS: Time: O(m x n), Space: O(m x n)
-
-  - UF:  Time: O(m x n), Space: O(m x n)
-*/
+ * 200. Number of Islands
+ *
+ * - Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water),
+ * - return the number of islands.
+ *
+ * DFS: Time: O(m x n), Space: O(m x n)
+ * BFS: Time: O(m x n), Space: O(m x n)
+ * UF:  Time: O(m x n), Space: O(m x n)
+ */
 func numIslandsDFS(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
 		return 0
