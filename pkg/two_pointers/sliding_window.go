@@ -112,42 +112,36 @@ func lengthOfLongestSubstring_alt(s string) int {
  * every character in t (including duplicates) is included in the window
  */
 func minWindow(s string, t string) string {
-	if len(s) < len(t) {
+	hashmap := make(map[byte]int)
+	for i := range t {
+		hashmap[t[i]]++
+	}
+
+	cnt, start, size := len(t), 0, math.MaxInt
+	for right, left := 0, 0; right < len(s); {
+		hashmap[s[right]] -= 1
+		if hashmap[s[right]] >= 0 {
+			cnt -= 1
+			for cnt == 0 {
+				if size > right-left+1 {
+					size = right - left + 1
+					start = left
+				}
+
+				hashmap[s[left]] += 1
+				if hashmap[s[left]] > 0 {
+					cnt += 1
+				}
+				left += 1
+			}
+		}
+		right += 1
+	}
+
+	if size == math.MaxInt {
 		return ""
 	}
-
-	charCountMap := make(map[byte]int)
-	for i, _ := range t {
-		charCountMap[t[i]]++
-	}
-
-	count := len(t)
-	minStart, minLen := 0, math.MaxInt32
-	for left, right := 0, 0; right < len(s); right++ {
-		if charCountMap[s[right]] > 0 {
-			count -= 1
-		}
-		charCountMap[s[right]] -= 1
-
-		// try to minimize the window
-		for count == 0 {
-			if right-left+1 < minLen {
-				minStart = left
-				minLen = right - left + 1
-			}
-
-			charCountMap[s[left]]++
-			if charCountMap[s[left]] > 0 {
-				count += 1
-			}
-			left += 1
-		}
-	}
-
-	if minLen == math.MaxInt32 {
-		return ""
-	}
-	return s[minStart : minStart+minLen]
+	return s[start : start+size]
 }
 
 /**
