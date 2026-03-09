@@ -25,6 +25,10 @@ func (t *TopKHeap) Pop() interface{} {
 	return item
 }
 
+/*
+ * 347. Top K Frequent Elements
+ */
+
 func topKFrequent(nums []int, k int) []int {
 	freqMap := make(map[int]int)
 	for _, v := range nums {
