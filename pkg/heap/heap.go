@@ -32,7 +32,7 @@ func NewHeap(less func(int, int) bool) *Heap {
 	return &Heap{less: less}
 }
 
-// MinHeap struct
+// Heap w/ ListNode
 type ListNodeMinHeap []*ListNode
 
 // Implement heap.Interface methods
@@ -56,38 +56,6 @@ func (h *ListNodeMinHeap) Push(x interface{}) {
 
 func (h *ListNodeMinHeap) Pop() interface{} { // Slice header is passed by value
 	top := (*h)[len(*h)-1] // Remove last element
-	*h = (*h)[:len(*h)-1]
-	return top
-}
-
-type MaxHeap []int
-
-func (h MaxHeap) Len() int           { return len(h) }
-func (h MaxHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h MaxHeap) Less(i, j int) bool { return h[i] > h[j] }
-
-func (h *MaxHeap) Push(n interface{}) {
-	*h = append(*h, n.(int))
-}
-
-func (h *MaxHeap) Pop() interface{} {
-	top := (*h)[len(*h)-1]
-	*h = (*h)[:len(*h)-1]
-	return top
-}
-
-type MinHeap []int
-
-func (h MinHeap) Len() int           { return len(h) }
-func (h MinHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h MinHeap) Less(i, j int) bool { return h[i] < h[j] }
-
-func (h *MinHeap) Push(n interface{}) {
-	*h = append(*h, n.(int))
-}
-
-func (h *MinHeap) Pop() interface{} {
-	top := (*h)[len(*h)-1]
 	*h = (*h)[:len(*h)-1]
 	return top
 }

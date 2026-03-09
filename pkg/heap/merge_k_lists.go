@@ -46,7 +46,7 @@ func mergeKLists(lists []*ListNode) *ListNode {
 		cur.Next = tmp
 		cur = tmp
 
-		if tmp.Next != nil {
+		if tmp.Next != nil { // push the next item in sorted linked list
 			heap.Push(minHeap, tmp.Next)
 		}
 	}
