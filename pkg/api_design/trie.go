@@ -3,52 +3,52 @@ package apidesign
 /**
  * 208. Implement Trie (Prefix Tree)
  */
-
 type Trie struct {
-    children [26]*Trie
-    isEnd    bool
+	children map[rune]*Trie
+	isEnd    bool
 }
 
 /** Initialize your data structure here. */
 func ConstructorPrefixTree() Trie {
-    return Trie{}
+	return Trie{
+		children: make(map[rune]*Trie),
+	}
 }
 
 /** Inserts a word into the trie. */
 func (this *Trie) Insert(word string) {
-    curr := this
-    for _, ch := range word {
-        idx := ch - 'a'
-        if curr.children[idx] == nil {
-            curr.children[idx] = &Trie{}
-        }
-        curr = curr.children[idx]
-    }
-    curr.isEnd = true
+	cur := this
+	for _, ch := range word {
+		if _, exist := cur.children[ch]; !exist {
+			cur.children[ch] = &Trie{
+				children: make(map[rune]*Trie),
+			}
+		}
+		cur = cur.children[ch]
+	}
+	cur.isEnd = true
 }
 
 /** Returns if the word is in the trie. */
 func (this *Trie) Search(word string) bool {
-    curr := this
-    for _, ch := range word {
-        idx := ch - 'a'
-        if curr.children[idx] == nil {
-            return false
-        }
-        curr = curr.children[idx]
-    }
-    return curr.isEnd
+	cur := this
+	for _, ch := range word {
+		if _, exist := cur.children[ch]; !exist {
+			return false
+		}
+		cur = cur.children[ch]
+	}
+	return cur.isEnd
 }
 
 /** Returns if there is any word in the trie that starts with the given prefix. */
 func (this *Trie) StartsWith(prefix string) bool {
-    curr := this
-    for _, ch := range prefix {
-        idx := ch - 'a'
-        if curr.children[idx] == nil {
-            return false
-        }
-        curr = curr.children[idx]
-    }
-    return true
+	cur := this
+	for _, ch := range prefix {
+		if _, exist := cur.children[ch]; !exist {
+			return false
+		}
+		cur = cur.children[ch]
+	}
+	return true
 }
