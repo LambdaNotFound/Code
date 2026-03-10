@@ -8,7 +8,11 @@ import (
 /**
  * 124. Binary Tree Maximum Path Sum
  *
- * Postorder traversal
+ * 1. root.Val + leftMaxSum + rightMaxSum (as a whole tree)
+ * 2. root.Val + leftMaxSum (as a left branch)
+ * 3. root.Val + rightMaxSum (as a right branch)
+ *
+ * need to compute leftMaxSum and rightMaxSum first => Postorder traversal
  */
 func maxPathSum(root *TreeNode) int {
 	maxSum := math.MinInt
