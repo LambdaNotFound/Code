@@ -6,17 +6,14 @@ package hashmap
  * one-pass, to avoid using same number twice
  */
 func twoSum(nums []int, target int) []int {
-	hashmap := make(map[int]int)
-
-	for i, val := range nums {
-		diff := target - val
-		if index, exist := hashmap[diff]; exist {
+	complements := make(map[int]int)
+	for i, num := range nums {
+		if index, found := complements[target-num]; found {
 			return []int{index, i}
 		} else {
-			hashmap[val] = i
+			complements[num] = i
 		}
 	}
-
 	return nil
 }
 
