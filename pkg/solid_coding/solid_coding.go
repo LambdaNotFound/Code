@@ -1,13 +1,43 @@
 package solid_coding
 
-import (
-	. "gocode/utils"
-)
-
 /**
  * 54. Spiral Matrix
  */
 func spiralOrder(matrix [][]int) []int {
+	top, bottom := 0, len(matrix)-1
+	left, right := 0, len(matrix[0])-1
+	spiral := []int{}
+
+	for top <= bottom && left <= right {
+		for i := left; i <= right; i++ {
+			spiral = append(spiral, matrix[top][i])
+		}
+		top++
+
+		for j := top; j <= bottom; j++ {
+			spiral = append(spiral, matrix[j][right])
+		}
+		right--
+
+		if top <= bottom {
+			for k := right; k >= left; k-- {
+				spiral = append(spiral, matrix[bottom][k])
+			}
+			bottom--
+		}
+
+		if left <= right {
+			for l := bottom; l >= top; l-- {
+				spiral = append(spiral, matrix[l][left])
+			}
+			left++
+		}
+	}
+
+	return spiral
+}
+
+func spiralOrderWithMap(matrix [][]int) []int {
 	nextDirection := map[string]string{
 		"top":    "right",
 		"right":  "bottom",
