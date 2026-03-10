@@ -26,20 +26,19 @@ func uniquePaths(m int, n int) int {
 }
 
 func uniquePathsNaive(m int, n int) int {
-	table := make([][]int, m)
-	for i := 0; i < m; i++ {
-		table[i] = make([]int, n)
+	ways := make([][]int, m)
+	for r := range ways {
+		ways[r] = make([]int, n)
+		ways[r][0] = 1
+	}
+	for c := range ways[0] {
+		ways[0][c] = 1
 	}
 
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if i == 0 || j == 0 {
-				table[i][j] = 1
-			} else {
-				table[i][j] = table[i-1][j] + table[i][j-1]
-			}
+	for r := 1; r < m; r++ {
+		for c := 1; c < n; c++ {
+			ways[r][c] = ways[r-1][c] + ways[r][c-1]
 		}
 	}
-
-	return table[m-1][n-1]
+	return ways[m-1][n-1]
 }
