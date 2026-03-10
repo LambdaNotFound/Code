@@ -5,6 +5,23 @@ import (
 	"sort"
 )
 
+/*
+ * Intervals => sort intervals by start time, such that intervals[i].Start < intervals[j].Start
+ *
+ * 1. overlap: intervals[i].End >= intervals[j].Start
+ *  i:        [a, ..., b]
+ *  j:            [x, ..., y]               merge: End = max(intervals[i].End, intervals[j].End)
+ *
+ * 2. overlap: intervals[i].End >= intervals[j].Start && intervals[i].End >= intervals[j].End
+ *  i:        [a, ............, b]
+ *  j:            [x, ..., y]               merge: End = max(intervals[i].End, intervals[j].End)
+ *
+ * 3. no overlap: intervals[i].End < intervals[j].Start
+ *  i:        [a, ..., b]
+ *  j:                      [x, ..., y]
+ *
+ */
+
 /**
  * 57. Insert Interval
  */
@@ -69,6 +86,36 @@ func merge(intervals [][]int) [][]int {
 	}
 
 	return result
+}
+
+/**
+ * 435. Non-overlapping Intervals
+ *
+ * return the minimum number of intervals you need to remove to make
+ *     the rest of the intervals non-overlapping.
+ *
+ * A greedy strategy works well here. After sorting intervals by their start time,
+ *     we process them from left to right and always keep the interval that ends
+ *     earlier when an overlap occurs.
+ */
+func eraseOverlapIntervals(intervals [][]int) int {
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	pre, erased := intervals[0], 0
+	for _, interval := range intervals[1:] {
+		if pre[1] <= interval[0] { // no erase
+			pre = interval
+		} else if interval[1] < pre[1] { // erase pre
+			pre = interval
+			erased += 1
+		} else { // interval[0] < pre[1] < interval[1]
+			erased += 1
+		}
+	}
+
+	return erased
 }
 
 /**
