@@ -4,51 +4,41 @@ package apidesign
  * 208. Implement Trie (Prefix Tree)
  */
 type Trie struct {
-	children map[rune]*Trie
-	isEnd    bool
+	nodes     map[rune]*Trie
+	endOfWord bool
 }
 
-/** Initialize your data structure here. */
-func ConstructorPrefixTree() Trie {
-	return Trie{
-		children: make(map[rune]*Trie),
-	}
+func ConstructorTrie() Trie {
+	return Trie{make(map[rune]*Trie), false}
 }
 
-/** Inserts a word into the trie. */
-func (this *Trie) Insert(word string) {
-	cur := this
-	for _, ch := range word {
-		if _, exist := cur.children[ch]; !exist {
-			cur.children[ch] = &Trie{
-				children: make(map[rune]*Trie),
-			}
+func (t *Trie) Insert(word string) {
+	for _, c := range word {
+		if _, found := t.nodes[c]; !found {
+			node := ConstructorTrie()
+			t.nodes[c] = &node
 		}
-		cur = cur.children[ch]
+		t = t.nodes[c]
 	}
-	cur.isEnd = true
+	t.endOfWord = true
 }
 
-/** Returns if the word is in the trie. */
-func (this *Trie) Search(word string) bool {
-	cur := this
-	for _, ch := range word {
-		if _, exist := cur.children[ch]; !exist {
+func (t *Trie) Search(word string) bool {
+	for _, c := range word {
+		if _, found := t.nodes[c]; !found {
 			return false
 		}
-		cur = cur.children[ch]
+		t = t.nodes[c]
 	}
-	return cur.isEnd
+	return t.endOfWord == true
 }
 
-/** Returns if there is any word in the trie that starts with the given prefix. */
-func (this *Trie) StartsWith(prefix string) bool {
-	cur := this
-	for _, ch := range prefix {
-		if _, exist := cur.children[ch]; !exist {
+func (t *Trie) StartsWith(prefix string) bool {
+	for _, c := range prefix {
+		if _, found := t.nodes[c]; !found {
 			return false
 		}
-		cur = cur.children[ch]
+		t = t.nodes[c]
 	}
 	return true
 }
