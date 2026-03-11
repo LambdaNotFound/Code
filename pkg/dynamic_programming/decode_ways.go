@@ -5,20 +5,68 @@ import "strconv"
 /**
  * 91. Decode Ways
  */
+func numDecodingsTopDown(s string) int {
+	var dfs func(pos int) int
+	dfs = func(pos int) int {
+		if pos == len(s) {
+			return 1
+		}
+		numWays := 0
+		if pos+1 <= len(s) {
+			if oneDigit, _ := strconv.Atoi(s[pos : pos+1]); oneDigit != 0 {
+				numWays += dfs(pos + 1)
+			}
+		}
+		if pos+2 <= len(s) {
+			if twoDigits, _ := strconv.Atoi(s[pos : pos+2]); twoDigits >= 10 && twoDigits <= 26 {
+				numWays += dfs(pos + 2)
+			}
+		}
+		return numWays
+	}
+	return dfs(0)
+}
+
+func numDecodingsTopDownMemo(s string) int {
+	memo := map[int]int{}
+	var dfs func(pos int) int
+	dfs = func(pos int) int {
+		if pos == len(s) {
+			return 1
+		}
+		if numWays, found := memo[pos]; found {
+			return numWays
+		}
+		numWays := 0
+		if pos+1 <= len(s) {
+			if oneDigit, _ := strconv.Atoi(s[pos : pos+1]); oneDigit != 0 {
+				numWays += dfs(pos + 1)
+			}
+		}
+		if pos+2 <= len(s) {
+			if twoDigits, _ := strconv.Atoi(s[pos : pos+2]); twoDigits >= 10 && twoDigits <= 26 {
+				numWays += dfs(pos + 2)
+			}
+		}
+		memo[pos] = numWays
+		return numWays
+	}
+	return dfs(0)
+}
+
 func numDecodings(s string) int {
-	table := make([]int, len(s)+1)
-	table[0] = 1
+	dp := make([]int, len(s)+1)
+	dp[0] = 1
 	if s[0] != '0' {
-		table[1] = 1
+		dp[1] = 1
 	}
 	for i := 2; i <= len(s); i++ {
-		if num, _ := strconv.Atoi(s[i-2 : i]); num >= 10 && num <= 26 {
-			table[i] += table[i-2]
+		if oneDigit, _ := strconv.Atoi(s[i-1 : i]); oneDigit > 0 {
+			dp[i] += dp[i-1]
 		}
-		if num, _ := strconv.Atoi(s[i-1 : i]); num < 10 && num > 0 {
-			table[i] += table[i-1]
+		if twoDigits, _ := strconv.Atoi(s[i-2 : i]); twoDigits >= 10 && twoDigits <= 26 {
+			dp[i] += dp[i-2]
 		}
 	}
-
-	return table[len(s)]
+	return dp[len(s)]
 }
