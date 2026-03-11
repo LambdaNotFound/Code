@@ -10,14 +10,14 @@ import (
  *
  * in-degree map + adjacent map + BFS search
  *
- *    indegree := make(map[int][]int)
+ *    indegree := make(map[int][]int) => make(map[int]int)
  *    adjacent := make(map[int][]int)
  *    count := 0
  *
  *    for _,  prerequisite := range  prerequisites {
  *        src, dst :=  prerequisite[1], prerequisite[0]
  *
- *        indegree[dst] = append(indegree[dst], src)
+ *        indegree[dst] = append(indegree[dst], src) => indegree[dst] += 1
  *        adjacent[src] = append(adjacent[src], dst)
  *    }
  *
@@ -32,45 +32,36 @@ import (
  * Return true if you can finish all courses. Otherwise, return false
  */
 func canFinish(numCourses int, prerequisites [][]int) bool {
-	// Store the indegree of each course
 	indegree := make([]int, numCourses)
-	for _, pre := range prerequisites {
-		indegree[pre[0]]++
+	adjList := make([][]int, numCourses)
+	for _, prerequisite := range prerequisites {
+		src, dst := prerequisite[0], prerequisite[1]
+		indegree[dst] += 1
+		adjList[src] = append(adjList[src], dst)
 	}
 
-	// Store the courses that can be completed (indegree == 0) in queue
-	var queue []int
-	for course, degree := range indegree {
-		if degree == 0 {
-			queue = append(queue, course)
+	queue := []int{}
+	for i := range indegree {
+		if indegree[i] == 0 {
+			queue = append(queue, i)
 		}
 	}
 
-	// These are the number of courses that can be completed
-	completeCount := len(queue)
-	for len(queue) != 0 {
-		leaf := queue[0]
+	res := []int{}
+	for len(queue) > 0 {
+		cur := queue[0]
 		queue = queue[1:]
+		res = append(res, cur)
 
-		for _, pre := range prerequisites {
-			// If course is the prerequite of any other course?
-			if leaf == pre[1] {
-				// If yes, then reduce the indegree of that course
-				indegree[pre[0]]--
-				// Is there a cycle?
-				if indegree[pre[0]] < 0 {
-					return false
-				}
-				// Can this course be completed now?
-				if indegree[pre[0]] == 0 {
-					queue = append(queue, pre[0])
-					completeCount++
-				}
+		for _, v := range adjList[cur] {
+			indegree[v] -= 1
+			if indegree[v] == 0 {
+				queue = append(queue, v)
 			}
 		}
 	}
 
-	return completeCount == numCourses
+	return len(res) == numCourses
 }
 
 /**
