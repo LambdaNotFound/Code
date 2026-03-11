@@ -64,12 +64,12 @@ func reverseList_iterative(head *ListNode) *ListNode {
 	return pre
 }
 
-func reverseList_recursive2(head *ListNode) *ListNode {
+func reverseList_recursive(head *ListNode) *ListNode {
 	if head == nil || head.Next == nil {
 		return head
 	}
 
-	newHead := reverseList_recursive2(head.Next)
+	newHead := reverseList_recursive(head.Next)
 	head.Next.Next = head
 	head.Next = nil
 
@@ -77,8 +77,18 @@ func reverseList_recursive2(head *ListNode) *ListNode {
 }
 
 /**
+ * 143. Reorder List
+ */
+
+/**
  * 24. Swap Nodes in Pairs
- * 25. Reverse Nodes in k-Group
+ *
+ * //    node1    node2    node3
+ * //    nTail    nHead
+ * //    nHead.Next        nTail.Next
+ * //             pre.Next
+ * //    pre      nTail
+ *
  */
 func swapPairs(head *ListNode) *ListNode {
 	dummy := ListNode{}
@@ -89,11 +99,36 @@ func swapPairs(head *ListNode) *ListNode {
 		newHead := newTail.Next
 		newTail.Next = newHead.Next
 		newHead.Next = newTail
-
 		pre.Next = newHead
 		pre = newTail
 		newTail = pre.Next
 	}
+
+	return dummy.Next
+}
+
+/**
+ * 25. Reverse Nodes in k-Group
+ */
+
+/**
+ * 19. Remove Nth Node From End of List
+ */
+func removeNthFromEnd(head *ListNode, n int) *ListNode {
+	fast, slow := head, head
+	for i := 0; i < n; i++ {
+		fast = fast.Next
+	}
+
+	dummy := &ListNode{}
+	dummy.Next = head
+	pre := dummy
+	for fast != nil {
+		fast = fast.Next
+		pre = slow
+		slow = slow.Next
+	}
+	pre.Next = slow.Next
 
 	return dummy.Next
 }
