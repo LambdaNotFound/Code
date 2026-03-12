@@ -6,35 +6,39 @@ package solid_coding
 func spiralOrder(matrix [][]int) []int {
 	top, bottom := 0, len(matrix)-1
 	left, right := 0, len(matrix[0])-1
-	spiral := []int{}
+	res := make([]int, 0, len(matrix)*len(matrix[0])) // pre-allocate exact capacity
 
-	for top <= bottom && left <= right {
-		for i := left; i <= right; i++ {
-			spiral = append(spiral, matrix[top][i])
+	for left <= right && top <= bottom {
+		// Traverse top row left → right
+		for col := left; col <= right; col++ {
+			res = append(res, matrix[top][col])
 		}
 		top++
 
-		for j := top; j <= bottom; j++ {
-			spiral = append(spiral, matrix[j][right])
+		// Traverse right column top → bottom
+		for row := top; row <= bottom; row++ {
+			res = append(res, matrix[row][right])
 		}
 		right--
 
+		// Traverse bottom row right → left (only if row still valid)
 		if top <= bottom {
-			for k := right; k >= left; k-- {
-				spiral = append(spiral, matrix[bottom][k])
+			for col := right; col >= left; col-- {
+				res = append(res, matrix[bottom][col])
 			}
 			bottom--
 		}
 
+		// Traverse left column bottom → top (only if col still valid)
 		if left <= right {
-			for l := bottom; l >= top; l-- {
-				spiral = append(spiral, matrix[l][left])
+			for row := bottom; row >= top; row-- {
+				res = append(res, matrix[row][left])
 			}
 			left++
 		}
 	}
 
-	return spiral
+	return res
 }
 
 func spiralOrderWithMap(matrix [][]int) []int {
