@@ -5,7 +5,7 @@ package apidesign
  */
 type Trie struct {
 	nodes     map[rune]*Trie
-	endOfWord bool
+	endOfWord bool // endOfWord string
 }
 
 func ConstructorTrie() Trie {
