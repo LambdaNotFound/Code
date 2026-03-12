@@ -11,24 +11,49 @@ package dynamic_programming
  *                                            a, aa, aba        substring[i+1, j-1] is a palindrome
  */
 func longestPalindrome(s string) string {
-    start, length, size := 0, 1, len(s)
-    dp := make([][]bool, size)
-    for i := 0; i < size; i++ {
-        dp[i] = make([]bool, size)
-    }
+	start, length, size := 0, 1, len(s)
+	dp := make([][]bool, size)
+	for i := 0; i < size; i++ {
+		dp[i] = make([]bool, size)
+	}
 
-    for j := 0; j < size; j++ {
-        for i := 0; i <= j; i++ {
-            dp[i][j] = (s[i] == s[j]) && (j-i+1 <= 2 || dp[i+1][j-1])
+	for j := 0; j < size; j++ {
+		for i := 0; i <= j; i++ {
+			dp[i][j] = (s[i] == s[j]) && (j-i+1 <= 2 || dp[i+1][j-1])
 
-            if dp[i][j] && (length < j-i+1) {
-                length = j - i + 1
-                start = i
-            }
-        }
-    }
+			if dp[i][j] && (length < j-i+1) {
+				length = j - i + 1
+				start = i
+			}
+		}
+	}
 
-    return s[start : start+length]
+	return s[start : start+length]
+}
+
+/**
+ * 647. Palindromic Substrings
+ */
+func countSubstrings(s string) int {
+	n := len(s)
+	dp := make([][]bool, n)
+	for i := range dp {
+		dp[i] = make([]bool, n)
+	}
+
+	count := 0
+	for right := 0; right < n; right++ {
+		for left := 0; left <= right; left++ {
+			isEdgeCase := right-left+1 <= 2     // single char or pair
+			isInnerPalin := dp[left+1][right-1] // inner substring is palindrome
+			if s[left] == s[right] && (isEdgeCase || isInnerPalin) {
+				dp[left][right] = true
+				count++
+			}
+		}
+	}
+
+	return count
 }
 
 /**
@@ -38,19 +63,19 @@ func longestPalindrome(s string) string {
  *  v [i+1][j-1]
  */
 func longestPalindrome_optimized(s string) string {
-    start, length, size := 0, 1, len(s)
-    dp := make([]bool, size)
+	start, length, size := 0, 1, len(s)
+	dp := make([]bool, size)
 
-    for j := 0; j < size; j++ {
-        for i := 0; i <= j; i++ {
-            dp[i] = (s[i] == s[j]) && (j-i+1 <= 2 || dp[i+1])
+	for j := 0; j < size; j++ {
+		for i := 0; i <= j; i++ {
+			dp[i] = (s[i] == s[j]) && (j-i+1 <= 2 || dp[i+1])
 
-            if dp[i] && (length < j-i+1) {
-                length = j - i + 1
-                start = i
-            }
-        }
-    }
+			if dp[i] && (length < j-i+1) {
+				length = j - i + 1
+				start = i
+			}
+		}
+	}
 
-    return s[start : start+length]
+	return s[start : start+length]
 }

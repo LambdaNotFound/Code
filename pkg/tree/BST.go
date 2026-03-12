@@ -77,15 +77,25 @@ func lowestCommonAncestorRecursive(root, p, q *TreeNode) *TreeNode {
 }
 
 func lowestCommonAncestorIterative(root, p, q *TreeNode) *TreeNode {
+	// ensure p.Val <= q.Val so we can reason about one ordering
+	if p.Val > q.Val {
+		return lowestCommonAncestor(root, q, p)
+	}
+
 	for root != nil {
-		if p.Val < root.Val && q.Val < root.Val {
-			root = root.Left
-		} else if p.Val > root.Val && q.Val > root.Val {
-			root = root.Right
-		} else {
+		switch {
+		case p.Val <= root.Val && root.Val <= q.Val:
+			// root lies between p and q (inclusive) — this is the LCA
 			return root
+		case q.Val < root.Val:
+			// both p and q are in left subtree
+			root = root.Left
+		default:
+			// both p and q are in right subtree
+			root = root.Right
 		}
 	}
+
 	return nil
 }
 
