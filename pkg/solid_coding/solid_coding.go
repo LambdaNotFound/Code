@@ -78,3 +78,75 @@ func spiralOrderWithMap(matrix [][]int) []int {
 
 	return res
 }
+
+/**
+ * 73. Set Matrix Zeroes
+ */
+func setZeroes(matrix [][]int) {
+	m, n := len(matrix), len(matrix[0])
+	rows, cols := make([]bool, m), make([]bool, n)
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if matrix[i][j] == 0 {
+				rows[i] = true
+				cols[j] = true
+			}
+		}
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if rows[i] || cols[j] {
+				matrix[i][j] = 0
+			}
+		}
+	}
+}
+
+func setZeroesOptimal(matrix [][]int) {
+	numRows, numCols := len(matrix), len(matrix[0])
+
+	// Extra variable since matrix[0][0] can't represent both
+	// row 0 and col 0 simultaneously
+	firstColHasZero := false
+
+	// Pass 1: use first row/col as markers
+	for row := 0; row < numRows; row++ {
+		// Check col 0 separately since it shares matrix[0][0]
+		if matrix[row][0] == 0 {
+			firstColHasZero = true
+		}
+		// Start col from 1 — col 0 is handled by firstColHasZero
+		for col := 1; col < numCols; col++ {
+			if matrix[row][col] == 0 {
+				matrix[row][0] = 0 // mark row
+				matrix[0][col] = 0 // mark col
+			}
+		}
+	}
+
+	// Pass 2: zero out cells based on markers in first row/col
+	// Start from row=1, col=1 — don't touch the markers yet!
+	for row := 1; row < numRows; row++ {
+		for col := 1; col < numCols; col++ {
+			if matrix[row][0] == 0 || matrix[0][col] == 0 {
+				matrix[row][col] = 0
+			}
+		}
+	}
+
+	// Pass 3: handle first row using matrix[0][0] as marker
+	if matrix[0][0] == 0 {
+		for col := 0; col < numCols; col++ {
+			matrix[0][col] = 0
+		}
+	}
+
+	// Pass 4: handle first col using firstColHasZero
+	if firstColHasZero {
+		for row := 0; row < numRows; row++ {
+			matrix[row][0] = 0
+		}
+	}
+}
