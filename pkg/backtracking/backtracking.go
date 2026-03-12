@@ -141,6 +141,27 @@ func combinationSum(candidates []int, target int) [][]int {
 }
 
 /**
+ * 377. Combination Sum IV
+ *
+ * dp[amount] += dp[amount - num]
+ */
+func combinationSum4(nums []int, target int) int {
+	dp := make([]int, target+1)
+	dp[0] = 1 // base case: one way to sum to 0 — pick nothing
+
+	// outer loop: amounts — counts permutations (order matters)
+	for amount := 1; amount <= target; amount++ {
+		for _, num := range nums {
+			if num <= amount {
+				dp[amount] += dp[amount-num]
+			}
+		}
+	}
+
+	return dp[target]
+}
+
+/**
  * 78. Subsets
  */
 func subsets(nums []int) [][]int {
