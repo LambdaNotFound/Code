@@ -94,3 +94,75 @@ func existClaude(board [][]byte, word string) bool {
 
 	return false
 }
+
+/**
+ * 212. Word Search II
+ *
+ * Backtracking w/ Trie
+ */
+type Trie struct {
+	nodes     map[rune]*Trie
+	endOfWord string // store word itself instead of bool — avoids rebuilding prefix
+}
+
+func Constructor() Trie {
+	return Trie{nodes: make(map[rune]*Trie)}
+}
+
+func (t *Trie) Insert(word string) {
+	for _, c := range word {
+		if _, found := t.nodes[c]; !found {
+			node := Constructor()
+			t.nodes[c] = &node
+		}
+		t = t.nodes[c]
+	}
+	t.endOfWord = word // store word at terminal node — no need to track prefix in DFS
+}
+
+func findWords(board [][]byte, words []string) []string {
+	trie := Constructor()
+	for _, word := range words {
+		trie.Insert(word)
+	}
+
+	m, n := len(board), len(board[0])
+	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	res := make([]string, 0)
+
+	var dfs func(row, col int, node *Trie)
+	dfs = func(row, col int, node *Trie) {
+		if row < 0 || row >= m || col < 0 || col >= n {
+			return
+		}
+
+		c := rune(board[row][col])
+
+		// single trie lookup — replaces both Search and StartsWith
+		nextNode, found := node.nodes[c]
+		if !found {
+			return // prefix not in trie — prune this path
+		}
+
+		// word found — add to result and delete from trie to prevent duplicates
+		if nextNode.endOfWord != "" {
+			res = append(res, nextNode.endOfWord)
+			nextNode.endOfWord = "" // trie deletion — prevent duplicate matches
+		}
+
+		// mark visited via board modification — saves O(m×n) visited matrix
+		board[row][col] = '#'
+		for _, d := range dirs {
+			dfs(row+d[0], col+d[1], nextNode)
+		}
+		board[row][col] = byte(c) // restore cell
+	}
+
+	for row := 0; row < m; row++ {
+		for col := 0; col < n; col++ {
+			dfs(row, col, &trie)
+		}
+	}
+
+	return res
+}
