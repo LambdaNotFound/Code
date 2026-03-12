@@ -208,10 +208,3 @@ func levelOrder(root *TreeNode) [][]int {
 	}
 	return res
 }
-
-/**
- * Graph Valid Tree
- */
-func validTree(n int, edges [][]int) bool {
-
-}
