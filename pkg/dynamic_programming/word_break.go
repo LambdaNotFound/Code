@@ -12,27 +12,25 @@ package dynamic_programming
  *                      (2). dp[j] == true AND s[j, i - 1] in dict
  */
 func wordBreak(s string, wordDict []string) bool {
-    wordMap := make(map[string]bool)
-    for _, word := range wordDict {
-        wordMap[word] = true
-    }
+	wordMap := make(map[string]bool)
+	for _, word := range wordDict {
+		wordMap[word] = true
+	}
 
-    n := len(s)
-    dp := make([]bool, n+1)
-    for i := 1; i <= n; i += 1 {
-        substr := s[0:i]
-        if _, exist := wordMap[substr]; exist {
-            dp[i] = true
-        } else {
-            for j := 0; j < i; j += 1 {
-                substr = s[j:i]
-                if _, exist := wordMap[substr]; exist && dp[j] {
-                    dp[i] = true
-                }
-            }
-        }
-    }
-    return dp[n]
+	n := len(s)
+	dp := make([]bool, n+1)
+	dp[0] = true // base case: empty string is always valid
+
+	for i := 1; i <= n; i++ {
+		for j := 0; j < i; j++ {
+			if dp[j] && wordMap[s[j:i]] {
+				dp[i] = true
+				break // no need to check other split points
+			}
+		}
+	}
+
+	return dp[n]
 }
 
 /**
@@ -40,32 +38,32 @@ func wordBreak(s string, wordDict []string) bool {
  *
  */
 func wordBreak2(s string, wordDict []string) []string {
-    wordMap := make(map[string]bool)
-    for _, word := range wordDict {
-        wordMap[word] = true
-    }
+	wordMap := make(map[string]bool)
+	for _, word := range wordDict {
+		wordMap[word] = true
+	}
 
-    n := len(s)
-    dp := make([]bool, n+1)
-    table := make([][]string, n+1)
-    for i := 1; i <= n; i += 1 {
-        substr := s[0:i]
-        if _, exist := wordMap[substr]; exist {
-            dp[i] = true
+	n := len(s)
+	dp := make([]bool, n+1)
+	table := make([][]string, n+1)
+	for i := 1; i <= n; i += 1 {
+		substr := s[0:i]
+		if _, exist := wordMap[substr]; exist {
+			dp[i] = true
 
-            table[i] = append(table[i], substr)
-        }
+			table[i] = append(table[i], substr)
+		}
 
-        for j := 0; j < i; j += 1 {
-            substr = s[j:i]
-            if _, exist := wordMap[substr]; exist && dp[j] {
-                dp[i] = true
+		for j := 0; j < i; j += 1 {
+			substr = s[j:i]
+			if _, exist := wordMap[substr]; exist && dp[j] {
+				dp[i] = true
 
-                for _, str := range table[j] {
-                    table[i] = append(table[i], str+" "+substr)
-                }
-            }
-        }
-    }
-    return table[n]
+				for _, str := range table[j] {
+					table[i] = append(table[i], str+" "+substr)
+				}
+			}
+		}
+	}
+	return table[n]
 }
