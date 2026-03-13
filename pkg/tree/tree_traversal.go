@@ -3,6 +3,34 @@ package tree
 import . "gocode/types"
 
 /**
+ * 105. Construct Binary Tree from Preorder and Inorder Traversal
+ */
+func buildTree(preorder []int, inorder []int) *TreeNode {
+	if len(preorder) == 0 {
+		return nil
+	}
+
+	// preorder[0] is always the root of the current subtree
+	rootVal := preorder[0]
+
+	// find root in inorder — splits into left and right subtrees
+	idx := 0
+	for ; idx < len(inorder); idx++ {
+		if inorder[idx] == rootVal {
+			break
+		}
+	}
+
+	// idx = number of nodes in left subtree
+	leftSize := idx
+	root := &TreeNode{Val: rootVal}
+	root.Left = buildTree(preorder[1:1+leftSize], inorder[:leftSize])
+	root.Right = buildTree(preorder[1+leftSize:], inorder[leftSize+1:])
+
+	return root
+}
+
+/**
  * 145. Binary Tree Postorder Traversal
  */
 func postorderTraversal(root *TreeNode) []int {
