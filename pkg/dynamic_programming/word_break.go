@@ -25,7 +25,7 @@ func wordBreak(s string, wordDict []string) bool {
 		for j := 0; j < i; j++ {
 			if dp[j] && wordMap[s[j:i]] {
 				dp[i] = true
-				break // no need to check other split points
+				break // dp[i] confirmed — no need to check remaining splits
 			}
 		}
 	}
