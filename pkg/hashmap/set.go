@@ -36,12 +36,12 @@ func longestConsecutive(nums []int) int {
  * 217. Contains Duplicate
  */
 func containsDuplicate(nums []int) bool {
-	set := make(map[int]bool) // map[int]struct{}
+	seen := make(map[int]struct{})
 	for _, num := range nums {
-		if _, hasNum := set[num]; hasNum {
+		if _, found := seen[num]; found {
 			return true
 		}
-		set[num] = true // struct{}{}
+		seen[num] = struct{}{}
 	}
 	return false
 }
