@@ -125,10 +125,10 @@ func sortColors(nums []int) {
  * 283. Move Zeroes
  */
 func moveZeroes(nums []int) {
-	for i, zeroIdx := 0, 0; i < len(nums); i++ {
-		if nums[i] != 0 {
-			nums[zeroIdx], nums[i] = nums[i], nums[zeroIdx]
-			zeroIdx += 1
+	for left, right := 0, 0; right < len(nums); right++ {
+		if nums[right] != 0 {
+			nums[left], nums[right] = nums[right], nums[left]
+			left++
 		}
 	}
 }
