@@ -5,12 +5,11 @@ package math
  *
  * [a, b, c, d]
  *
- * LEFT  [1     a    ab    abc]
- * RIGHT [bcd  cd     d     1 ]
- * ANS  [bcd   acd   abd   abc]
- *
+ * LEFT  [1      a     ab     abc]    prefix
+ * RIGHT [bcd    cd    d       1 ]    suffix
+ * ANS   [bcd    acd   abd    abc]
  */
-func productExceptSelfWithMultiplier(nums []int) []int {
+func productExceptSelf(nums []int) []int {
 	res := make([]int, len(nums))
 
 	multiplier := 1
@@ -28,20 +27,19 @@ func productExceptSelfWithMultiplier(nums []int) []int {
 	return res
 }
 
-func productExceptSelf(nums []int) []int {
-	l := len(nums)
-	left := make([]int, l)
-	right := make([]int, l)
-	ans := make([]int, l)
-	left[0] = 1
-	right[l-1] = 1
-	for i := 1; i < l; i++ {
-		j := l - i - 1
-		left[i] = nums[i-1] * left[i-1]
-		right[j] = nums[j+1] * right[j+1]
+func productExceptSelfClaude(nums []int) []int {
+	n := len(nums)
+	res := make([]int, n)
+	// forward pass: res[i] = product of all elements to the LEFT of i
+	res[0] = 1
+	for i := 1; i < n; i++ {
+		res[i] = res[i-1] * nums[i-1]
 	}
-	for i := 0; i < l; i++ {
-		ans[i] = left[i] * right[i]
+	// backward pass: multiply res[i] by product of all elements to the RIGHT of i
+	suffix := 1
+	for i := n - 2; i >= 0; i-- {
+		suffix *= nums[i+1]
+		res[i] *= suffix
 	}
-	return ans
+	return res
 }
