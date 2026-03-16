@@ -27,8 +27,8 @@ func (this *Codec) serialize(root *TreeNode) string {
 	res := []string{}
 	q := []*TreeNode{root} // BFS
 
-	for len(q) > 0 { // pop out top
-		top := q[0]
+	for len(q) > 0 {
+		top := q[0] // append str on dequeue
 		q = q[1:]
 		if top == nil {
 			res = append(res, "nil")
@@ -56,16 +56,16 @@ func (this *Codec) deserialize(data string) *TreeNode {
 		node := q[0]
 		q = q[1:]
 
-		if len(slice) > 0 {
-			if val, err := strconv.Atoi(slice[0]); err == nil { // Left child
+		if len(slice) > 0 { // Left child, err != nil when parsing "nil"
+			if val, err := strconv.Atoi(slice[0]); err == nil {
 				node.Left = &TreeNode{Val: val}
 				q = append(q, node.Left)
 			}
 			slice = slice[1:]
 		}
 
-		if len(slice) > 0 {
-			if val, err := strconv.Atoi(slice[0]); err == nil { // Right child
+		if len(slice) > 0 { // Right child, err != nil when parsing "nil"
+			if val, err := strconv.Atoi(slice[0]); err == nil {
 				node.Right = &TreeNode{Val: val}
 				q = append(q, node.Right)
 			}
