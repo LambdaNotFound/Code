@@ -58,6 +58,18 @@ func maxProduct(nums []int) int {
 	return res
 }
 
+func maxProduct2(nums []int) int {
+	res := nums[0]
+	for preMin, preMax, i := nums[0], nums[0], 1; i < len(nums); i++ {
+		curMin := min(min(preMin*nums[i], preMax*nums[i]), nums[i])
+		curMax := max(max(preMin*nums[i], preMax*nums[i]), nums[i])
+		preMin, preMax = curMin, curMax
+
+		res = max(res, curMax)
+	}
+	return res
+}
+
 /**
  * 416. Partition Equal Subset Sum
  *
