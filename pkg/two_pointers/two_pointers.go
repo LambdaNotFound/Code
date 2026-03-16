@@ -164,7 +164,7 @@ func isPalindrome(s string) bool {
 	for idx, jdx := 0, len(s)-1; idx <= jdx; {
 		left, right := string(s[idx]), string(s[jdx])
 		if isValidChar(left) && isValidChar(right) {
-			if strings.ToLower(left) != strings.ToLower(right) {
+			if !strings.EqualFold(left, right) {
 				return false
 			}
 			idx++
