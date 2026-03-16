@@ -57,7 +57,7 @@ func threeSum(nums []int) [][]int {
 			if sum == 0 {
 				res = append(res, []int{nums[i], nums[j], nums[k]})
 				j++
-				k--
+				k-- // k + 1 < len(nums) unnecessary, k is decremented BEFORE the duplicate check
 				for ; j < k && nums[j] == nums[j-1]; j++ {
 				}
 				for ; j < k && nums[k] == nums[k+1]; k-- {
