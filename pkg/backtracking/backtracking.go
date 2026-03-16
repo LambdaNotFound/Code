@@ -135,6 +135,29 @@ func combine(n int, k int) [][]int {
 	return res
 }
 
+func combineClaude(n int, k int) [][]int {
+	res := make([][]int, 0)
+
+	var dfs func(start int, path []int)
+	dfs = func(start int, path []int) {
+		if len(path) == k {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+
+		// pruning: remaining elements must be enough to fill path to size k
+		// need k-len(path) more elements, last valid start = n-(k-len(path))+1
+		for i := start; i <= n-(k-len(path))+1; i++ {
+			path = append(path, i)
+			dfs(i+1, path)
+			path = path[:len(path)-1]
+		}
+	}
+
+	dfs(1, []int{})
+	return res
+}
+
 /**
  * 39. Combination Sum
  *
