@@ -15,7 +15,7 @@ func (s *Solution) Encode(strs []string) string {
 	list := make([]string, 0)
 	for _, str := range strs {
 		l := len(str)
-		s := strconv.Itoa(l) + string('#') + str
+		s := strconv.Itoa(l) + "#" + str
 		list = append(list, s)
 	}
 

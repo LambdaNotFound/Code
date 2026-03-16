@@ -4,7 +4,7 @@ package backtracking
  * Backtracking (Recursive approach, DFS to try all possibilities)
  *
  *    for choice in choices {
- *        if notAllowed(choice) // Pruning
+ *        if notAllowed(choice) // Pruning => mark visited & skip if visited
  *            continue
  *
  *        makeChoice(choice)
@@ -26,6 +26,34 @@ package backtracking
  * 46. Permutations (ordered)
  */
 func permute(nums []int) [][]int {
+	res := make([][]int, 0)
+	visited := make([]bool, len(nums)) // index-based
+
+	var dfs func(path []int)
+	dfs = func(path []int) {
+		if len(path) == len(nums) {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+
+		for i := 0; i < len(nums); i++ {
+			if visited[i] {
+				continue
+			}
+
+			path = append(path, nums[i])
+			visited[i] = true
+			dfs(path)
+			visited[i] = false
+			path = path[:len(path)-1]
+		}
+	}
+
+	dfs([]int{})
+	return res
+}
+
+func permuteClaude(nums []int) [][]int {
 	var res [][]int
 
 	permutation := make([]int, len(nums))
