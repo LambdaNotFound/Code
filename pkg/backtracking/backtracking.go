@@ -31,8 +31,8 @@ func permute(nums []int) [][]int {
 	res := make([][]int, 0)
 	visited := make([]bool, len(nums)) // index-based
 
-	var dfs func(path []int)
-	dfs = func(path []int) {
+	var backtrack func(path []int)
+	backtrack = func(path []int) {
 		if len(path) == len(nums) {
 			res = append(res, append([]int{}, path...))
 			return
@@ -45,13 +45,13 @@ func permute(nums []int) [][]int {
 
 			path = append(path, nums[i])
 			visited[i] = true
-			dfs(path)
+			backtrack(path)
 			visited[i] = false
 			path = path[:len(path)-1]
 		}
 	}
 
-	dfs([]int{})
+	backtrack([]int{})
 	return res
 }
 
@@ -125,8 +125,8 @@ func permuteUnique(nums []int) [][]int {
 	res := make([][]int, 0)
 	visited := make([]bool, len(nums)) // index-based
 
-	var dfs func(path []int)
-	dfs = func(path []int) {
+	var backtrack func(path []int)
+	backtrack = func(path []int) {
 		if len(path) == len(nums) {
 			res = append(res, append([]int{}, path...))
 			return
@@ -143,13 +143,13 @@ func permuteUnique(nums []int) [][]int {
 
 			path = append(path, nums[i])
 			visited[i] = true
-			dfs(path)
+			backtrack(path)
 			visited[i] = false
 			path = path[:len(path)-1]
 		}
 	}
 
-	dfs([]int{})
+	backtrack([]int{})
 	return res
 }
 
@@ -210,8 +210,8 @@ func combine(n int, k int) [][]int {
 func combineClaude(n int, k int) [][]int {
 	res := make([][]int, 0)
 
-	var dfs func(start int, path []int)
-	dfs = func(start int, path []int) {
+	var backtrack func(start int, path []int)
+	backtrack = func(start int, path []int) {
 		if len(path) == k {
 			res = append(res, append([]int{}, path...))
 			return
@@ -221,12 +221,12 @@ func combineClaude(n int, k int) [][]int {
 		// need k-len(path) more elements, last valid start = n-(k-len(path))+1
 		for i := start; i <= n-(k-len(path))+1; i++ {
 			path = append(path, i)
-			dfs(i+1, path)
+			backtrack(i+1, path)
 			path = path[:len(path)-1]
 		}
 	}
 
-	dfs(1, []int{})
+	backtrack(1, []int{})
 	return res
 }
 
@@ -314,19 +314,19 @@ dfs(0, [])
 func subsets(nums []int) [][]int {
 	res := make([][]int, 0)
 
-	var dfs func(start int, path []int)
-	dfs = func(start int, path []int) {
+	var backtrack func(start int, path []int)
+	backtrack = func(start int, path []int) {
 		// record at every node — not just base case
 		res = append(res, append([]int{}, path...))
 
 		for i := start; i < len(nums); i++ {
 			path = append(path, nums[i]) // make choice
-			dfs(i+1, path)
+			backtrack(i+1, path)
 			path = path[:len(path)-1] // undo choice
 		}
 	}
 
-	dfs(0, []int{})
+	backtrack(0, []int{})
 	return res
 }
 
@@ -401,23 +401,23 @@ func generateParenthesis(n int) []string {
 	var result []string
 
 	str := make([]byte, n*2)
-	var dfs func(int, int)
-	dfs = func(left, right int) {
+	var backtrack func(int, int)
+	backtrack = func(left, right int) {
 		if left+right == n*2 {
 			result = append(result, string(str[:n*2]))
 		}
 
 		if left < n {
 			str[left+right] = '('
-			dfs(left+1, right)
+			backtrack(left+1, right)
 		}
 
 		if right < left {
 			str[left+right] = ')'
-			dfs(left, right+1)
+			backtrack(left, right+1)
 		}
 	}
 
-	dfs(0, 0)
+	backtrack(0, 0)
 	return result
 }

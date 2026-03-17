@@ -25,15 +25,15 @@ func solveSudoku(board [][]byte) {
 		return true
 	}
 
-	var dfs func() bool
-	dfs = func() bool {
+	var backtrack func() bool
+	backtrack = func() bool {
 		for row := 0; row < 9; row++ {
 			for col := 0; col < 9; col++ {
 				if board[row][col] == '.' {
 					for num := byte('1'); num <= '9'; num++ { // enumerate
 						if isValid(row, col, num) {
 							board[row][col] = num
-							if dfs() {
+							if backtrack() {
 								return true
 							}
 							board[row][col] = '.'
@@ -45,7 +45,7 @@ func solveSudoku(board [][]byte) {
 		}
 		return true
 	}
-	dfs()
+	backtrack()
 }
 
 /**
@@ -83,8 +83,8 @@ func solveNQueens(n int) [][]string {
 		return true
 	}
 
-	var dfs func(int)
-	dfs = func(row int) {
+	var backtrack func(int)
+	backtrack = func(row int) {
 		if row == n {
 			temp := make([]string, n)
 			copy(temp, board) // deep copy
@@ -98,7 +98,7 @@ func solveNQueens(n int) [][]string {
 				newRow[col] = 'Q'
 				board[row] = string(newRow)
 
-				dfs(row + 1)
+				backtrack(row + 1)
 
 				newRow[col] = '.'
 				board[row] = string(newRow)
@@ -106,6 +106,6 @@ func solveNQueens(n int) [][]string {
 		}
 	}
 
-	dfs(0)
+	backtrack(0)
 	return result
 }

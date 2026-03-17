@@ -14,9 +14,9 @@ func exist(board [][]byte, word string) bool {
 		visited[i] = make([]bool, n)
 	}
 
-	var dfs func(int, int, int) bool
+	var backtrack func(int, int, int) bool
 	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-	dfs = func(row, col, pos int) bool {
+	backtrack = func(row, col, pos int) bool {
 		if pos == len(word) {
 			return true
 		}
@@ -31,7 +31,7 @@ func exist(board [][]byte, word string) bool {
 		found := false
 		for _, d := range dirs {
 			r, c := row+d[0], col+d[1]
-			if dfs(r, c, pos+1) { // explores all directions even after finding answer
+			if backtrack(r, c, pos+1) { // explores all directions even after finding answer
 				found = true
 			}
 		}
@@ -42,7 +42,7 @@ func exist(board [][]byte, word string) bool {
 
 	for i := 0; i < len(board); i++ {
 		for j := 0; j < len(board[0]); j++ {
-			if board[i][j] == word[0] && dfs(i, j, 0) {
+			if board[i][j] == word[0] && backtrack(i, j, 0) {
 				return true
 			}
 		}
@@ -56,8 +56,8 @@ func existClaude(board [][]byte, word string) bool {
 
 	// mark cell as visited by modifying board in-place
 	// eliminates need for separate visited matrix → O(1) space
-	var dfs func(row, col, pos int) bool
-	dfs = func(row, col, pos int) bool {
+	var backtrack func(row, col, pos int) bool
+	backtrack = func(row, col, pos int) bool {
 		if pos == len(word) {
 			return true
 		}
@@ -73,7 +73,7 @@ func existClaude(board [][]byte, word string) bool {
 		board[row][col] = '#'
 
 		for _, d := range dirs {
-			if dfs(row+d[0], col+d[1], pos+1) {
+			if backtrack(row+d[0], col+d[1], pos+1) {
 				board[row][col] = temp // restore before returning
 				return true
 			}
@@ -86,7 +86,7 @@ func existClaude(board [][]byte, word string) bool {
 
 	for row := 0; row < m; row++ {
 		for col := 0; col < n; col++ {
-			if dfs(row, col, 0) {
+			if backtrack(row, col, 0) {
 				return true
 			}
 		}
@@ -130,8 +130,8 @@ func findWords(board [][]byte, words []string) []string {
 	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 	res := make([]string, 0)
 
-	var dfs func(row, col int, node *Trie)
-	dfs = func(row, col int, node *Trie) {
+	var backtrack func(row, col int, node *Trie)
+	backtrack = func(row, col int, node *Trie) {
 		if row < 0 || row >= m || col < 0 || col >= n {
 			return
 		}
@@ -153,14 +153,14 @@ func findWords(board [][]byte, words []string) []string {
 		// mark visited via board modification — saves O(m×n) visited matrix
 		board[row][col] = '#'
 		for _, d := range dirs {
-			dfs(row+d[0], col+d[1], nextNode)
+			backtrack(row+d[0], col+d[1], nextNode)
 		}
 		board[row][col] = byte(c) // restore cell
 	}
 
 	for row := 0; row < m; row++ {
 		for col := 0; col < n; col++ {
-			dfs(row, col, &trie)
+			backtrack(row, col, &trie)
 		}
 	}
 
