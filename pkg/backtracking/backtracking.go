@@ -215,29 +215,47 @@ func combinationSum4(nums []int, target int) int {
 /**
  * 78. Subsets
  */
+
+/*
+dfs(0, [])
+│   record []
+├── i=0: path=[1]
+│   │   record [1]
+│   ├── i=1: path=[1,2]
+│   │   │   record [1,2]
+│   │   └── i=2: path=[1,2,3]
+│   │           record [1,2,3]
+│   │           return
+│   └── i=2: path=[1,3]
+│           record [1,3]
+│           return
+├── i=1: path=[2]
+│   │   record [2]
+│   └── i=2: path=[2,3]
+│           record [2,3]
+│           return
+└── i=2: path=[3]
+        record [3]
+        return
+*/
+
 func subsets(nums []int) [][]int {
-	var result [][]int
+	res := make([][]int, 0)
 
-	var subset []int
+	var dfs func(start int, path []int)
+	dfs = func(start int, path []int) {
+		// record at every node — not just base case
+		res = append(res, append([]int{}, path...))
 
-	var search func(int)
-	search = func(index int) {
-		if index == len(nums) {
-			copiedSubset := make([]int, len(subset))
-			copy(copiedSubset, subset)
-			result = append(result, copiedSubset)
-			return
+		for i := start; i < len(nums); i++ {
+			path = append(path, nums[i]) // make choice
+			dfs(i+1, path)
+			path = path[:len(path)-1] // undo choice
 		}
-
-		subset = append(subset, nums[index])
-		search(index + 1)
-
-		subset = subset[:len(subset)-1]
-		search(index + 1)
 	}
 
-	search(0)
-	return result
+	dfs(0, []int{})
+	return res
 }
 
 /**
