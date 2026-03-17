@@ -1,5 +1,7 @@
 package backtracking
 
+import "sort"
+
 /**
  * Backtracking (Recursive approach, DFS to try all possibilities)
  *
@@ -105,6 +107,50 @@ func permuteWithSliceSpread(nums []int) [][]int {
 	}
 	backtrack(nums, []int{})
 	return result
+}
+
+/*
+ *
+ * 47. Permutations II
+ *   !visited[i-1] means: "my identical left sibling is NOT currently in the path"
+ *   → that sibling was already used at this position in a previous branch
+ *   → skipping me prevents duplicate permutations
+ *
+ *   visited[i-1] means: "my identical left sibling IS currently in the path"
+ *	→ sibling is at a DIFFERENT position than me
+ *	→ picking me here creates a genuinely different permutation ✅
+ */
+func permuteUnique(nums []int) [][]int {
+	sort.Ints(nums)
+	res := make([][]int, 0)
+	visited := make([]bool, len(nums)) // index-based
+
+	var dfs func(path []int)
+	dfs = func(path []int) {
+		if len(path) == len(nums) {
+			res = append(res, append([]int{}, path...))
+			return
+		}
+
+		for i := 0; i < len(nums); i++ {
+			if visited[i] {
+				continue
+			}
+
+			if i > 0 && nums[i] == nums[i-1] && !visited[i-1] {
+				continue
+			}
+
+			path = append(path, nums[i])
+			visited[i] = true
+			dfs(path)
+			visited[i] = false
+			path = path[:len(path)-1]
+		}
+	}
+
+	dfs([]int{})
+	return res
 }
 
 /**
