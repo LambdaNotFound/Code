@@ -25,6 +25,69 @@ import "sort"
  */
 
 /**
+ * 22. Generate Parentheses
+ *
+ * Given n pairs of parentheses, write a function to generate
+ * all combinations of well-formed parentheses.
+ */
+func generateParenthesis(n int) []string {
+	res := []string{}
+	var backtrack func(int, int, string)
+	backtrack = func(left, right int, str string) {
+		if left+right == n*2 {
+			res = append(res, str)
+			return
+		}
+
+		if left < n {
+			str = str + "("
+			backtrack(left+1, right, str)
+			str = str[:len(str)-1]
+		}
+
+		if right < left {
+			str = str + ")"
+			backtrack(left, right+1, str)
+			str = str[:len(str)-1]
+		}
+	}
+
+	backtrack(0, 0, "")
+	return res
+}
+
+func generateParenthesisCalude(n int) []string {
+	result := make([]string, 0)
+	path := make([]byte, 0, n*2) // pre-allocate exact capacity
+
+	var dfs func(left, right int)
+	dfs = func(left, right int) {
+		// base case: all n pairs placed
+		if left+right == n*2 {
+			result = append(result, string(path))
+			return
+		}
+
+		// place '(' if we still have opening parens left
+		if left < n {
+			path = append(path, '(')
+			dfs(left+1, right)
+			path = path[:len(path)-1]
+		}
+
+		// place ')' only if it won't exceed open count
+		if right < left {
+			path = append(path, ')')
+			dfs(left, right+1)
+			path = path[:len(path)-1]
+		}
+	}
+
+	dfs(0, 0)
+	return result
+}
+
+/**
  * 46. Permutations (ordered)
  */
 func permute(nums []int) [][]int {
@@ -286,31 +349,28 @@ func combinationSum4(nums []int, target int) int {
 
 /**
  * 78. Subsets
+ *
+ *  dfs(0, [])
+ *  │   record []
+ *  ├── i=0: path=[1]
+ *  │   │   record [1]
+ *  │   ├── i=1: path=[1,2]
+ *  │   │   │   record [1,2]
+ *  │   │   └── i=2: path=[1,2,3]
+ *  │   │           record [1,2,3]
+ *  │   │           return
+ *  │   └── i=2: path=[1,3]
+ *  │           record [1,3]
+ *  │           return
+ *  ├── i=1: path=[2]
+ *  │   │   record [2]
+ *  │   └── i=2: path=[2,3]
+ *  │           record [2,3]
+ *  │           return
+ *  └── i=2: path=[3]
+ *          record [3]
+ *          return
  */
-
-/*
-dfs(0, [])
-│   record []
-├── i=0: path=[1]
-│   │   record [1]
-│   ├── i=1: path=[1,2]
-│   │   │   record [1,2]
-│   │   └── i=2: path=[1,2,3]
-│   │           record [1,2,3]
-│   │           return
-│   └── i=2: path=[1,3]
-│           record [1,3]
-│           return
-├── i=1: path=[2]
-│   │   record [2]
-│   └── i=2: path=[2,3]
-│           record [2,3]
-│           return
-└── i=2: path=[3]
-        record [3]
-        return
-*/
-
 func subsets(nums []int) [][]int {
 	res := make([][]int, 0)
 
@@ -389,35 +449,4 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
 			out = out[:len(out)-1]
 		}
 	}
-}
-
-/**
- * 22. Generate Parentheses
- *
- * Given n pairs of parentheses, write a function to generate
- * all combinations of well-formed parentheses.
- */
-func generateParenthesis(n int) []string {
-	var result []string
-
-	str := make([]byte, n*2)
-	var backtrack func(int, int)
-	backtrack = func(left, right int) {
-		if left+right == n*2 {
-			result = append(result, string(str[:n*2]))
-		}
-
-		if left < n {
-			str[left+right] = '('
-			backtrack(left+1, right)
-		}
-
-		if right < left {
-			str[left+right] = ')'
-			backtrack(left, right+1)
-		}
-	}
-
-	backtrack(0, 0)
-	return result
 }
