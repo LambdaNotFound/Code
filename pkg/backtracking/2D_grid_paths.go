@@ -68,13 +68,13 @@ func solveNQueens(n int) [][]string {
 				return false
 			}
 		}
-		// upper-left diagonal
+		// to upper-left diagonal
 		for i, j := row-1, col-1; i >= 0 && j >= 0; i, j = i-1, j-1 {
 			if board[i][j] == 'Q' {
 				return false
 			}
 		}
-		// upper-right diagonal
+		// to upper-right diagonal
 		for i, j := row-1, col+1; i >= 0 && j < n; i, j = i-1, j+1 {
 			if board[i][j] == 'Q' {
 				return false
