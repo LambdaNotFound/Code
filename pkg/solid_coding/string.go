@@ -197,19 +197,18 @@ func groupAnagrams(strs []string) [][]string {
  * 125. Valid Palindrome
  */
 func isPalindrome(s string) bool {
-	var newStr []rune
-	for _, i := range s {
-		if unicode.IsLetter(i) || unicode.IsDigit(i) {
-			newStr = append(newStr, unicode.ToLower(i))
+	var cleaned strings.Builder
+	for _, char := range strings.ToLower(s) {
+		if unicode.IsLetter(char) || unicode.IsDigit(char) {
+			cleaned.WriteRune(char)
 		}
 	}
-	l, r := 0, len(newStr)-1
-	for l < r {
-		if newStr[l] != newStr[r] {
+	cleanedStr := cleaned.String()
+
+	for i, j := 0, len(cleanedStr)-1; i < j; i, j = i+1, j-1 {
+		if cleanedStr[i] != cleanedStr[j] {
 			return false
 		}
-		l++
-		r--
 	}
 	return true
 }
