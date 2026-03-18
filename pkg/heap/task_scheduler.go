@@ -15,54 +15,50 @@ package heap
 import "container/heap"
 
 func leastInterval(tasks []byte, n int) int {
+	// Step 1: count task frequencies
 	freqMap := make(map[byte]int)
 	for _, t := range tasks {
 		freqMap[t]++
 	}
 
-	queue := []Task{}
+	// Step 2: seed max-heap with all unique tasks
 	maxHeap := &TaskHeap{
-		items: make([]Task, 0),
-		less: func(a Task, b Task) bool {
-			return a.freq > b.freq
-		},
+		items: make([]Task, 0, len(freqMap)),
+		less:  func(a, b Task) bool { return a.freq > b.freq },
 	}
-	for k, v := range freqMap {
-		task := Task{
-			name:        k,
-			freq:        v,
-			availableAt: 0,
-		}
-		heap.Push(maxHeap, task)
+	for name, freq := range freqMap {
+		heap.Push(maxHeap, Task{name: name, freq: freq})
 	}
 
-	time := 0
-	for maxHeap.Len() != 0 || len(queue) != 0 {
-		if maxHeap.Len() != 0 {
+	// Step 3: simulate scheduling
+	cooldownQueue := make([]Task, 0) // tasks cooling down, ordered by availableAt
+	currentTime := 0
+
+	for maxHeap.Len() > 0 || len(cooldownQueue) > 0 {
+		// schedule highest frequency available task
+		if maxHeap.Len() > 0 {
 			task := heap.Pop(maxHeap).(Task)
-			time++
+			currentTime++
 			if task.freq-1 > 0 {
 				task.freq--
-				task.availableAt = time + n + 1
-				queue = append(queue, task)
+				task.availableAt = currentTime + n + 1
+				cooldownQueue = append(cooldownQueue, task)
 			}
 		}
 
-		if len(queue) != 0 {
-			next := queue[0]
-			if next.availableAt <= time {
-				queue = queue[1:]
-				heap.Push(maxHeap, next)
-			}
+		// move cooled-down tasks back to heap
+		if len(cooldownQueue) > 0 && cooldownQueue[0].availableAt <= currentTime {
+			heap.Push(maxHeap, cooldownQueue[0])
+			cooldownQueue = cooldownQueue[1:]
 		}
 
-		if maxHeap.Len() == 0 && len(queue) != 0 {
-			next := queue[0]
-			time = next.availableAt
+		// no task available — jump time to next available task
+		if maxHeap.Len() == 0 && len(cooldownQueue) > 0 {
+			currentTime = cooldownQueue[0].availableAt
 		}
 	}
 
-	return time
+	return currentTime
 }
 
 type Task struct {
@@ -76,24 +72,16 @@ type TaskHeap struct {
 	less  func(Task, Task) bool
 }
 
-func (t *TaskHeap) Len() int {
-	return len(t.items)
+func (h *TaskHeap) Len() int           { return len(h.items) }
+func (h *TaskHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
+func (h *TaskHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
+
+func (h *TaskHeap) Push(x interface{}) {
+	h.items = append(h.items, x.(Task))
 }
 
-func (t *TaskHeap) Less(i int, j int) bool {
-	return t.less(t.items[i], t.items[j])
-}
-
-func (t *TaskHeap) Swap(i int, j int) {
-	t.items[i], t.items[j] = t.items[j], t.items[i]
-}
-
-func (t *TaskHeap) Push(task interface{}) {
-	t.items = append(t.items, task.(Task))
-}
-
-func (t *TaskHeap) Pop() interface{} {
-	item := t.items[len(t.items)-1]
-	t.items = t.items[:len(t.items)-1]
+func (h *TaskHeap) Pop() interface{} {
+	item := h.items[len(h.items)-1]
+	h.items = h.items[:len(h.items)-1]
 	return item
 }
