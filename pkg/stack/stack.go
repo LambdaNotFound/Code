@@ -7,23 +7,47 @@ import "strconv"
  */
 func isValid(s string) bool {
 	stack := make([]byte, 0)
-	for i := 0; i < len(s); i++ {
-		if s[i] == '(' || s[i] == '[' || s[i] == '{' {
-			stack = append(stack, s[i])
-		} else {
-			if len(stack) == 0 {
+	for i := range s {
+		switch s[i] {
+		case '(':
+			stack = append(stack, ')')
+		case '[':
+			stack = append(stack, ']')
+		case '{':
+			stack = append(stack, '}')
+		default: // closing bracket
+			if len(stack) == 0 || stack[len(stack)-1] != s[i] {
 				return false
 			}
-
-			top := stack[len(stack)-1]
-
-			if (s[i] == ')' && top == '(') || (s[i] == ']' && top == '[') || (s[i] == '}' && top == '{') {
-				stack = stack[:len(stack)-1]
-			} else {
-				return false
-			}
+			stack = stack[:len(stack)-1]
 		}
 	}
+	return len(stack) == 0
+}
+
+func isValidClaude(s string) bool {
+	// map closing bracket to its expected opening bracket
+	match := map[byte]byte{
+		')': '(',
+		']': '[',
+		'}': '{',
+	}
+
+	stack := make([]byte, 0)
+	for i := range s {
+		c := s[i]
+		if expected, isClosing := match[c]; isClosing {
+			// closing bracket — check top of stack matches
+			if len(stack) == 0 || stack[len(stack)-1] != expected {
+				return false
+			}
+			stack = stack[:len(stack)-1]
+		} else {
+			// opening bracket — push to stack
+			stack = append(stack, c)
+		}
+	}
+
 	return len(stack) == 0
 }
 
