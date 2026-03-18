@@ -1,6 +1,10 @@
 package two_pointers
 
-import "math"
+import (
+	"math"
+	"sort"
+	"strconv"
+)
 
 /**
  * 1. Fixed-size window
@@ -239,4 +243,43 @@ func findAnagrams(s string, p string) []int {
 	}
 
 	return res
+}
+
+/**
+ * 2933. High-Access Employees
+ *
+ * Input: access_times = [["a","0549"],["b","0457"],["a","0532"],["a","0621"],["b","0540"]]
+ * Output: ["a"]
+ * Explanation: "a" has three access times in the one-hour period of [05:32, 06:31] which are 05:32, 05:49, and 06:21.
+ * But "b" does not have more than two access times at all.
+ * So the answer is ["a"].
+ *
+ */
+func findHighAccessEmployees(accessTimes [][]string) []string {
+	// group and parse access times by employee name
+	timesByEmployee := make(map[string][]int)
+	for _, entry := range accessTimes {
+		name := entry[0]
+		t, _ := strconv.Atoi(entry[1])
+		timesByEmployee[name] = append(timesByEmployee[name], t)
+	}
+
+	highAccess := make([]string, 0)
+	for name, times := range timesByEmployee {
+		if len(times) < 3 {
+			continue
+		}
+		sort.Ints(times)
+
+		// sliding window of size 3 — check if 3 accesses fit within 1 hour
+		// HHMM format: difference < 100 means within same hour window
+		for i := 0; i+2 < len(times); i++ {
+			if times[i+2]-times[i] < 100 {
+				highAccess = append(highAccess, name)
+				break
+			}
+		}
+	}
+
+	return highAccess
 }
