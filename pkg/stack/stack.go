@@ -1,6 +1,9 @@
 package stack
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 /**
  * 20. Valid Parentheses
@@ -159,4 +162,36 @@ func minRemoveToMakeValid(s string) string {
 	}
 
 	return string(result)
+}
+
+func minRemoveToMakeValidClaude(s string) string {
+	// Step 1: find all unmatched bracket indices
+	stack := make([]int, 0) // indices of unmatched brackets
+	for i := 0; i < len(s); i++ {
+		if s[i] == '(' {
+			stack = append(stack, i) // candidate for removal
+		} else if s[i] == ')' {
+			if len(stack) > 0 && s[stack[len(stack)-1]] == '(' {
+				stack = stack[:len(stack)-1] // matched — pop
+			} else {
+				stack = append(stack, i) // unmatched ')' — mark for removal
+			}
+		}
+	}
+
+	// Step 2: build result skipping unmatched indices
+	// convert stack to set for O(1) lookup
+	remove := make(map[int]bool, len(stack))
+	for _, idx := range stack {
+		remove[idx] = true
+	}
+
+	var sb strings.Builder
+	for i := 0; i < len(s); i++ {
+		if !remove[i] {
+			sb.WriteByte(s[i])
+		}
+	}
+
+	return sb.String()
 }
