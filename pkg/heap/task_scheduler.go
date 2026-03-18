@@ -15,13 +15,11 @@ package heap
 import "container/heap"
 
 func leastInterval(tasks []byte, n int) int {
-	// Step 1: count task frequencies
 	freqMap := make(map[byte]int)
 	for _, t := range tasks {
 		freqMap[t]++
 	}
 
-	// Step 2: seed max-heap with all unique tasks
 	maxHeap := &TaskHeap{
 		items: make([]Task, 0, len(freqMap)),
 		less:  func(a, b Task) bool { return a.freq > b.freq },
@@ -30,29 +28,28 @@ func leastInterval(tasks []byte, n int) int {
 		heap.Push(maxHeap, Task{name: name, freq: freq})
 	}
 
-	// Step 3: simulate scheduling
-	cooldownQueue := make([]Task, 0) // tasks cooling down, ordered by availableAt
+	cooldownQueue := make([]Task, 0)
 	currentTime := 0
 
 	for maxHeap.Len() > 0 || len(cooldownQueue) > 0 {
-		// schedule highest frequency available task
-		if maxHeap.Len() > 0 {
-			task := heap.Pop(maxHeap).(Task)
-			currentTime++
-			if task.freq-1 > 0 {
-				task.freq--
-				task.availableAt = currentTime + n + 1
-				cooldownQueue = append(cooldownQueue, task)
-			}
-		}
-
-		// move cooled-down tasks back to heap
+		// Step 1: move cooled-down tasks back to heap FIRST
 		if len(cooldownQueue) > 0 && cooldownQueue[0].availableAt <= currentTime {
 			heap.Push(maxHeap, cooldownQueue[0])
 			cooldownQueue = cooldownQueue[1:]
 		}
 
-		// no task available — jump time to next available task
+		// Step 2: schedule highest frequency available task
+		if maxHeap.Len() > 0 {
+			task := heap.Pop(maxHeap).(Task)
+			currentTime++
+			if task.freq-1 > 0 {
+				task.freq--
+				task.availableAt = currentTime + n
+				cooldownQueue = append(cooldownQueue, task)
+			}
+		}
+
+		// Step 3: no task available — jump to next available task
 		if maxHeap.Len() == 0 && len(cooldownQueue) > 0 {
 			currentTime = cooldownQueue[0].availableAt
 		}
