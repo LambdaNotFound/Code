@@ -4,6 +4,7 @@ package hashmap
  * 128. Longest Consecutive Sequence
  *
  * Hash Set: map[int]bool
+ *     iterate through keys
  */
 func longestConsecutive(nums []int) int {
 	numSet := make(map[int]bool)
@@ -13,17 +14,14 @@ func longestConsecutive(nums []int) int {
 
 	longestStreak := 0
 
-	for num := range numSet {
-		// only start sequence from the smallest number
-		// skip if num has a left neighbour
-		if numSet[num-1] {
+	for num := range numSet { // map's keys are unordered
+		if numSet[num-1] { // only start sequence from the smallest number
 			continue
 		}
 
-		// expand sequence rightward
 		currentStreak := 1
 		for numSet[num+currentStreak] {
-			currentStreak++
+			currentStreak++ // expand sequence rightward
 		}
 
 		longestStreak = max(longestStreak, currentStreak)
