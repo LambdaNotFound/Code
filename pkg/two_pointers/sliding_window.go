@@ -25,33 +25,22 @@ import (
  * Space: O(1)
  */
 func lengthOfLongestSubstring(s string) int {
-	if len(s) == 0 {
-		return 0
-	}
-
-	table := make(map[byte]bool)
-	res := 1
-	for i, j := 0, 0; i < len(s) && j < len(s); {
-		if !table[s[j]] {
-			table[s[j]] = true
-			length := j - i + 1
-			if length > res {
-				res = length
-			}
-			j++
-		} else {
-			table[s[i]] = false // flip
-			i++
+	res, freqMap := 0, make(map[byte]int)
+	for left, right := 0, 0; right < len(s); right++ {
+		freqMap[s[right]]++
+		for freqMap[s[right]] > 1 {
+			freqMap[s[left]]--
+			left++
 		}
+		res = max(res, right-left+1)
 	}
-
 	return res
 }
 
 /*
  * optimize to store index in a map
  */
-func lengthOfLongestSubstring_optimized(s string) int {
+func lengthOfLongestSubstringTrackIndex(s string) int {
 	res := 0
 	hashmap := make(map[byte]int)
 	for left, right := 0, 0; right < len(s); right++ {
