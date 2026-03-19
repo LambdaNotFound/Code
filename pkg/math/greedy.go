@@ -8,40 +8,40 @@ package math
  * 55. Jump Game
  */
 func canJump(nums []int) bool {
-    reachablePosition := 0
-    for i := 0; i < len(nums); i++ {
-        if i > reachablePosition {
-            return false
-        }
-        if i + nums[i] > reachablePosition {
-            reachablePosition = i + nums[i]
-        }
-    }
-    return true
+	reachablePosition := 0
+	for i := 0; i < len(nums); i++ {
+		if i > reachablePosition {
+			return false
+		}
+		if i+nums[i] > reachablePosition {
+			reachablePosition = i + nums[i]
+		}
+	}
+	return true
 }
 
 /**
  * 45. Jump Game II
  */
 func jump(nums []int) int {
-    curJump, farthestJump, jumps := 0, 0, 0
-    for i := 0; i < len(nums)-1; i++ {
-        // push index of furthest jump during current iteration
-        if i+nums[i] > farthestJump {
-            farthestJump = i + nums[i]
-        }
+	curJump, farthestJump, jumps := 0, 0, 0
+	for i := 0; i < len(nums)-1; i++ {
+		// push index of furthest jump during current iteration
+		if i+nums[i] > farthestJump {
+			farthestJump = i + nums[i]
+		}
 
-        // if current iteration is ended - setup the next one
-        if i == curJump {
-            jumps, curJump = jumps+1, farthestJump
+		// if current iteration is ended - setup the next one
+		if i == curJump {
+			jumps, curJump = jumps+1, farthestJump
 
-            if curJump >= len(nums)-1 {
-                return jumps
-            }
-        }
-    }
+			if curJump >= len(nums)-1 {
+				return jumps
+			}
+		}
+	}
 
-    return 0
+	return 0
 }
 
 /**
@@ -55,21 +55,50 @@ func jump(nums []int) int {
  * otherwise return -1
  */
 func canCompleteCircuit(gas []int, cost []int) int {
-    n := len(gas)
-    fuelLeft, globalFuelLeft, start := 0, 0, 0
-    for i := 0; i < n; i++ {
-        globalFuelLeft += gas[i] - cost[i]
-        fuelLeft += gas[i] - cost[i]
-        if fuelLeft < 0 {
-            start = i + 1 // always restart from the next station after failure
-            fuelLeft = 0
-        }
-    }
+	totalTank, currTank, start := 0, 0, 0
 
-    if globalFuelLeft < 0 {
-        return -1
-    }
-    return start
+	for i := 0; i < len(gas); i++ {
+		diff := gas[i] - cost[i]
+		totalTank += diff
+		currTank += diff
+
+		// currTank < 0 means we can't reach i+1 from start
+		// so start fresh from i+1
+		if currTank < 0 {
+			start = i + 1
+			currTank = 0
+		}
+	}
+
+	// if total gas < total cost, no solution exists
+	if totalTank < 0 {
+		return -1
+	}
+	return start
+}
+
+func canCompleteCircuitBruteForce(gas []int, cost []int) int {
+	n := len(gas)
+
+	for start := 0; start < n; start++ {
+		tank := 0
+		completed := 0
+
+		for completed < n {
+			i := (start + completed) % n
+			tank += gas[i] - cost[i]
+			if tank < 0 {
+				break // can't continue from this start
+			}
+			completed++
+		}
+
+		if completed == n {
+			return start
+		}
+	}
+
+	return -1
 }
 
 /**
@@ -82,27 +111,27 @@ func canCompleteCircuit(gas []int, cost []int) int {
  * but there's a constraint: there has to be a gap of at least n intervals between two tasks with the same label.
  */
 func leastInterval(tasks []byte, n int) int {
-    maxFreq := 0
-    dict := make(map[byte]int)
+	maxFreq := 0
+	dict := make(map[byte]int)
 
-    for i := 0; i < len(tasks); i++ {
-        dict[tasks[i]]++
-        maxFreq = max(maxFreq, dict[tasks[i]])
-    }
+	for i := 0; i < len(tasks); i++ {
+		dict[tasks[i]]++
+		maxFreq = max(maxFreq, dict[tasks[i]])
+	}
 
-    maxFreqCount := 0
-    // if there are tasks with equal freq, then time increases
-    for _, value := range dict {
-        if value == maxFreq {
-            maxFreqCount++
-        }
-    }
+	maxFreqCount := 0
+	// if there are tasks with equal freq, then time increases
+	for _, value := range dict {
+		if value == maxFreq {
+			maxFreqCount++
+		}
+	}
 
-    partCount := maxFreq - 1
-    partLength := n - (maxFreqCount - 1) // idol slots in each part
-    emptySlots := partCount * partLength
-    availableTasks := len(tasks) - maxFreq*maxFreqCount
-    idles := max(0, emptySlots-availableTasks)
+	partCount := maxFreq - 1
+	partLength := n - (maxFreqCount - 1) // idol slots in each part
+	emptySlots := partCount * partLength
+	availableTasks := len(tasks) - maxFreq*maxFreqCount
+	idles := max(0, emptySlots-availableTasks)
 
-    return len(tasks) + idles
+	return len(tasks) + idles
 }
