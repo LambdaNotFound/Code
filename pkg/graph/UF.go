@@ -37,3 +37,68 @@ func countComponents(n int, edges [][]int) int {
 	}
 	return count
 }
+
+func countComponentsBFS(n int, edges [][]int) int {
+	// build adjacency list
+	adjList := make(map[int][]int)
+	for _, edge := range edges {
+		adjList[edge[0]] = append(adjList[edge[0]], edge[1])
+		adjList[edge[1]] = append(adjList[edge[1]], edge[0])
+	}
+
+	visited := make([]bool, n)
+	components := 0
+
+	for node := 0; node < n; node++ {
+		if visited[node] {
+			continue
+		}
+		// BFS from unvisited node — explores entire component
+		components++
+		queue := []int{node}
+		visited[node] = true
+
+		for len(queue) > 0 {
+			cur := queue[0]
+			queue = queue[1:]
+			for _, neighbor := range adjList[cur] {
+				if !visited[neighbor] {
+					visited[neighbor] = true
+					queue = append(queue, neighbor)
+				}
+			}
+		}
+	}
+
+	return components
+}
+
+func countComponentsDFS(n int, edges [][]int) int {
+	adjList := make(map[int][]int)
+	for _, edge := range edges {
+		adjList[edge[0]] = append(adjList[edge[0]], edge[1])
+		adjList[edge[1]] = append(adjList[edge[1]], edge[0])
+	}
+
+	visited := make([]bool, n)
+
+	var dfs func(node int)
+	dfs = func(node int) {
+		visited[node] = true
+		for _, neighbor := range adjList[node] {
+			if !visited[neighbor] {
+				dfs(neighbor)
+			}
+		}
+	}
+
+	components := 0
+	for node := 0; node < n; node++ {
+		if !visited[node] {
+			components++
+			dfs(node)
+		}
+	}
+
+	return components
+}
