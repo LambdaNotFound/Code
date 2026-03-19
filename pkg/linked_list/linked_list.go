@@ -51,11 +51,8 @@ func reverseList(head *ListNode) *ListNode {
 }
 
 func reverseList_iterative(head *ListNode) *ListNode {
-	if head == nil || head.Next == nil {
-		return head
-	}
-	pre, cur := (*ListNode)(nil), head
-	for cur != nil {
+	pre := (*ListNode)(nil)
+	for cur := head; cur != nil; {
 		next := cur.Next
 		cur.Next = pre
 		pre = cur
