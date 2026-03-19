@@ -3,7 +3,7 @@ package graph
 /**
  * 417. Pacific Atlantic Water Flow
  *
- * multi-source
+ * multi-source BFS, DFS
  */
 func pacificAtlanticDFS(heights [][]int) [][]int {
 	if len(heights) == 0 || len(heights[0]) == 0 {

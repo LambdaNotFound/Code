@@ -182,7 +182,7 @@ func validPalindrome(s string) bool {
 }
 
 func isPalindromeHelper(s string, l, r int) bool {
-	for l < r {
+	for l < r { // covers both cases: odd/even length
 		if s[l] != s[r] {
 			return false
 		}

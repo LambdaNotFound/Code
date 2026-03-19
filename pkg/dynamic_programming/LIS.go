@@ -9,7 +9,7 @@ package dynamic_programming
 func lengthOfLIS(nums []int) int {
 	LIS := make([]int, len(nums))
 	for i := range LIS {
-		LIS[i] = 1
+		LIS[i] = 1 // base case, LIS of single char
 	}
 
 	res := 1
