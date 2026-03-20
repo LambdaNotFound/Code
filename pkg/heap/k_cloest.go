@@ -1,33 +1,53 @@
 package heap
 
-import "container/heap"
-
 /**
  * 973. K Closest Points to Origin
- *
  */
+import "container/heap"
 
-func distance(point []int) int { return point[0]*point[0] + point[1]*point[1] }
+func kClosest(points [][]int, k int) [][]int {
+	maxHeap := &PointHeap{
+		items: make([][]int, 0, k),
+		less:  func(a, b []int) bool { return distance(a) > distance(b) },
+	}
 
-type PointMaxHeap [][]int
+	for _, point := range points {
+		if maxHeap.Len() == k {
+			// only replace if new point is closer than current farthest
+			if distance(point) < distance(maxHeap.items[0]) {
+				heap.Pop(maxHeap)
+				heap.Push(maxHeap, point)
+			}
+		} else {
+			heap.Push(maxHeap, point)
+		}
+	}
 
-func (h PointMaxHeap) Len() int            { return len(h) }
-func (h PointMaxHeap) Less(i, j int) bool  { return distance(h[i]) > distance(h[j]) }
-func (h PointMaxHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *PointMaxHeap) Push(x interface{}) { *h = append(*h, x.([]int)) }
-func (h *PointMaxHeap) Pop() interface{} {
-	res := (*h)[len(*h)-1]
-	*h = (*h)[:len(*h)-1]
+	res := make([][]int, 0, k)
+	for maxHeap.Len() > 0 {
+		res = append(res, heap.Pop(maxHeap).([]int))
+	}
+
 	return res
 }
 
-func kClosest(points [][]int, k int) [][]int {
-	max := PointMaxHeap{}
-	for _, point := range points {
-		heap.Push(&max, point)
-		if len(max) > k {
-			heap.Pop(&max)
-		}
-	}
-	return max
+func distance(point []int) int { return point[0]*point[0] + point[1]*point[1] }
+
+type PointHeap struct {
+	items [][]int
+	less  func([]int, []int) bool
+}
+
+func (h *PointHeap) Len() int           { return len(h.items) }
+func (h *PointHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
+func (h *PointHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
+
+func (h *PointHeap) Push(item interface{}) {
+	h.items = append(h.items, item.([]int))
+}
+
+func (h *PointHeap) Pop() interface{} {
+	item := h.items[len(h.items)-1]
+	h.items = h.items[:len(h.items)-1]
+	return item
 }
