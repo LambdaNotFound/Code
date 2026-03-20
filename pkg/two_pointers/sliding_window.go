@@ -116,13 +116,12 @@ func minWindow(s string, t string) string {
 		if freqMap[s[right]] >= 0 {
 			cnt--
 			for cnt == 0 {
-				if right-left+1 < size {
-					size = right - left + 1
-					res = s[left : left+size]
-				}
-
 				if freqMap[s[left]] == 0 {
 					cnt++
+					if right-left+1 < size {
+						size = right - left + 1
+						res = s[left : left+size]
+					}
 				}
 				freqMap[s[left]]++
 				left++
@@ -139,30 +138,29 @@ func minWindowClaude(s string, t string) string {
 		freqMap[t[i]]++
 	}
 
-	res := ""
-	minSize := math.MaxInt
-	cnt := len(t) // number of chars still needed
-
+	res, size, cnt := "", math.MaxInt, len(t)
 	for left, right := 0, 0; right < len(s); right++ {
-		// expand window: add s[right]
 		freqMap[s[right]]--
 		if freqMap[s[right]] >= 0 {
-			cnt-- // one more required char satisfied
-		}
+			cnt--
+			for cnt == 0 {
+				// shrink past non-required chars first
+				for freqMap[s[left]] < 0 {
+					freqMap[s[left]]++
+					left++
+				}
 
-		// shrink window from left while valid
-		for cnt == 0 {
-			if right-left+1 < minSize {
-				minSize = right - left + 1
-				res = s[left : left+minSize]
-			}
+				// now s[left] is a required char — record window
+				if right-left+1 < size {
+					size = right - left + 1
+					res = s[left : left+size]
+				}
 
-			// remove s[left] from window
-			if freqMap[s[left]] == 0 {
-				cnt++ // losing a required char
+				// invalidate window by removing s[left]
+				freqMap[s[left]]++
+				cnt++
+				left++
 			}
-			freqMap[s[left]]++
-			left++
 		}
 	}
 
@@ -224,6 +222,55 @@ func lengthOfLongestSubstringKDistinct(s string, k int) int {
 	}
 
 	return maxLen
+}
+
+/**
+ * 424. Longest Repeating Character Replacement
+ *
+ * You are given a string s and an integer k. You can choose any character of the string and
+ * change it to any other uppercase English character. You can perform this operation at most k times.
+ */
+func characterReplacement(s string, k int) int {
+	freqMap := make(map[byte]int)
+	res := 0
+	for left, right := 0, 0; right < len(s); right++ {
+		freqMap[s[right]]++
+		maxFreq := 0
+		for i := left; i <= right; i++ {
+			maxFreq = max(maxFreq, freqMap[s[i]])
+		}
+
+		if right-left+1 > k+maxFreq {
+			freqMap[s[left]]--
+			left++
+		}
+		res = max(res, right-left+1)
+	}
+	return res
+}
+
+func characterReplacementClaude(s string, k int) int {
+	freqMap := make(map[byte]int)
+	res := 0
+
+	for left, right := 0, 0; right < len(s); right++ {
+		freqMap[s[right]]++
+
+		// scan freqMap — always O(26), not O(window size)
+		maxFreq := 0
+		for _, freq := range freqMap {
+			maxFreq = max(maxFreq, freq)
+		}
+
+		if right-left+1 > k+maxFreq {
+			freqMap[s[left]]--
+			left++
+		}
+
+		res = max(res, right-left+1)
+	}
+
+	return res
 }
 
 /**
