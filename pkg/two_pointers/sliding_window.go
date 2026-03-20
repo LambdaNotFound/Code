@@ -105,36 +105,68 @@ func lengthOfLongestSubstring_alt(s string) int {
  * every character in t (including duplicates) is included in the window
  */
 func minWindow(s string, t string) string {
-	hashmap := make(map[byte]int)
+	freqMap := make(map[byte]int)
 	for i := range t {
-		hashmap[t[i]]++
+		freqMap[t[i]]++
 	}
 
-	cnt, start, size := len(t), 0, math.MaxInt
-	for right, left := 0, 0; right < len(s); {
-		hashmap[s[right]] -= 1
-		if hashmap[s[right]] >= 0 {
-			cnt -= 1
+	res, size, cnt := "", math.MaxInt, len(t)
+	for left, right := 0, 0; right < len(s); right++ {
+		freqMap[s[right]]--
+		if freqMap[s[right]] >= 0 {
+			cnt--
 			for cnt == 0 {
-				if size > right-left+1 {
+				if right-left+1 < size {
 					size = right - left + 1
-					start = left
+					res = s[left : left+size]
 				}
 
-				hashmap[s[left]] += 1
-				if hashmap[s[left]] > 0 {
-					cnt += 1
+				if freqMap[s[left]] == 0 {
+					cnt++
 				}
-				left += 1
+				freqMap[s[left]]++
+				left++
 			}
 		}
-		right += 1
 	}
 
-	if size == math.MaxInt {
-		return ""
+	return res
+}
+
+func minWindowClaude(s string, t string) string {
+	freqMap := make(map[byte]int)
+	for i := range t {
+		freqMap[t[i]]++
 	}
-	return s[start : start+size]
+
+	res := ""
+	minSize := math.MaxInt
+	cnt := len(t) // number of chars still needed
+
+	for left, right := 0, 0; right < len(s); right++ {
+		// expand window: add s[right]
+		freqMap[s[right]]--
+		if freqMap[s[right]] >= 0 {
+			cnt-- // one more required char satisfied
+		}
+
+		// shrink window from left while valid
+		for cnt == 0 {
+			if right-left+1 < minSize {
+				minSize = right - left + 1
+				res = s[left : left+minSize]
+			}
+
+			// remove s[left] from window
+			if freqMap[s[left]] == 0 {
+				cnt++ // losing a required char
+			}
+			freqMap[s[left]]++
+			left++
+		}
+	}
+
+	return res
 }
 
 /**
