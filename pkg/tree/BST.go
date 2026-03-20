@@ -66,12 +66,12 @@ func kthSmallestAlt(root *TreeNode, k int) int {
 /**
  * 235. Lowest Common Ancestor of a Binary Search Tree
  */
-func lowestCommonAncestorRecursive(root, p, q *TreeNode) *TreeNode {
+func lowestCommonAncestorBST(root, p, q *TreeNode) *TreeNode {
 	if p.Val < root.Val && q.Val < root.Val {
-		return lowestCommonAncestorRecursive(root.Left, p, q)
+		return lowestCommonAncestorBST(root.Left, p, q)
 	}
 	if p.Val > root.Val && q.Val > root.Val {
-		return lowestCommonAncestorRecursive(root.Right, p, q)
+		return lowestCommonAncestorBST(root.Right, p, q)
 	}
 	return root
 }

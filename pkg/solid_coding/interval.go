@@ -102,19 +102,32 @@ func eraseOverlapIntervals(intervals [][]int) int {
 	sort.Slice(intervals, func(i, j int) bool {
 		return intervals[i][0] < intervals[j][0]
 	})
-
-	pre, erased := intervals[0], 0
-	for _, interval := range intervals[1:] {
-		if pre[1] <= interval[0] { // no erase
-			pre = interval
-		} else if interval[1] < pre[1] { // erase pre
-			pre = interval
-			erased += 1
-		} else { // interval[0] < pre[1] < interval[1]
-			erased += 1
+	erased := 0
+	for i, j := 0, 1; j < len(intervals); j++ {
+		if intervals[i][1] <= intervals[j][0] {
+			i = j
+		} else if intervals[i][1] > intervals[j][1] {
+			erased++
+			i = j
+		} else if intervals[i][1] <= intervals[j][1] {
+			erased++
 		}
 	}
+	return erased
+}
 
+func eraseOverlapIntervalsSortByEndTime(intervals [][]int) int {
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][1] < intervals[j][1]
+	})
+	erased := 0
+	for i, j := 0, 1; j < len(intervals); j++ {
+		if intervals[j][0] < intervals[i][1] {
+			erased++
+		} else {
+			i = j
+		}
+	}
 	return erased
 }
 
