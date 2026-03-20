@@ -54,30 +54,3 @@ func isAnagram(s string, t string) bool {
 
 	return len(s) == len(t)
 }
-
-/**
- * 525. Contiguous Array
- */
-func findMaxLength(nums []int) int {
-	// balance: +1 for 0, -1 for 1
-	// equal 0s and 1s → balance returns to same value
-	// store first occurrence of each balance value
-	balanceToIndex := map[int]int{0: -1}
-
-	res, balance := 0, 0
-	for i, num := range nums {
-		if num == 0 {
-			balance++
-		} else {
-			balance--
-		}
-
-		if idx, found := balanceToIndex[balance]; found {
-			res = max(res, i-idx)
-		} else {
-			balanceToIndex[balance] = i
-		}
-	}
-
-	return res
-}
