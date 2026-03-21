@@ -1,6 +1,7 @@
 package solid_coding
 
 import (
+	"container/heap"
 	. "gocode/types"
 	"sort"
 )
@@ -196,4 +197,46 @@ func minMeetingRoomsSweepLine(intervals []Interval) int {
 		res = max(res, prev)
 	}
 	return res
+}
+
+func minMeetingRoomsMinHeap(intervals [][]int) int {
+	// sort meetings by start time
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	// min-heap of end times — tracks when each room becomes free
+	minHeap := &EndTimeHeap{}
+	heap.Init(minHeap)
+
+	for _, interval := range intervals {
+		start, end := interval[0], interval[1]
+
+		if minHeap.Len() > 0 && (*minHeap)[0] <= start {
+			// earliest-ending room is free — reuse it
+			heap.Pop(minHeap)
+		}
+		// assign meeting to room (new or reused)
+		heap.Push(minHeap, end)
+	}
+
+	return minHeap.Len()
+}
+
+// min-heap ordered by end time
+type EndTimeHeap []int
+
+func (h EndTimeHeap) Len() int           { return len(h) }
+func (h EndTimeHeap) Less(i, j int) bool { return h[i] < h[j] }
+func (h EndTimeHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+
+func (h *EndTimeHeap) Push(x interface{}) {
+	*h = append(*h, x.(int))
+}
+
+func (h *EndTimeHeap) Pop() interface{} {
+	old := *h
+	item := old[len(old)-1]
+	*h = old[:len(old)-1]
+	return item
 }

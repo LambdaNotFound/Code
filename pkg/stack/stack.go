@@ -91,45 +91,6 @@ func evalRPN(tokens []string) int {
 }
 
 /**
- * 224. Basic Calculator
- *
- * Given a string s representing a valid expression, implement a basic calculator to evaluate it,
- * and return the result of the evaluation.
- *
- * s consists of digits, '+', '-', '(', ')', and ' '.
- */
-func calculate(s string) int {
-	if len(s) == 0 {
-		return 0
-	}
-
-	result, sign, num := 0, 1, 0
-
-	var stk []int
-	stk = append(stk, sign)
-
-	for i := range s {
-		if s[i] >= '0' && s[i] <= '9' {
-			num = num*10 + int(s[i]-'0')
-		} else if s[i] == '+' || s[i] == '-' {
-			result += sign * num
-			sign = stk[len(stk)-1]
-			if s[i] != '+' {
-				sign *= -1
-			}
-			num = 0
-		} else if s[i] == '(' {
-			stk = append(stk, sign)
-		} else if s[i] == ')' {
-			stk = stk[:len(stk)-1]
-		}
-	}
-
-	result += sign * num
-	return result
-}
-
-/**
  * 1249. Minimum Remove to Make Valid Parentheses
  */
 func minRemoveToMakeValid(s string) string {
