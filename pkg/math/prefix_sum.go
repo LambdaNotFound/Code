@@ -144,3 +144,22 @@ func subarraySumWithHashmap(nums []int, k int) int {
 
 	return count
 }
+
+/**
+ * 930. Binary Subarrays With Sum
+ *
+ * [0, ..., i]            prefixSum[i]
+ * [0, ..., ..., j]       prefixSum[j]
+ *            delta       subarray's sum
+ */
+func numSubarraysWithSum(nums []int, goal int) int {
+	countMap, prefixSum := map[int]int{0: 1}, 0
+	count := 0
+	for _, num := range nums {
+		prefixSum += num
+
+		count += countMap[prefixSum-goal]
+		countMap[prefixSum]++
+	}
+	return count
+}
