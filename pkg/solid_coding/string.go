@@ -191,3 +191,31 @@ func isPalindromeHelper(s string, l, r int) bool {
 	}
 	return true
 }
+
+/**
+ * 409. Longest Palindrome
+ *
+ *  Given a string s which consists of lowercase or uppercase letters,
+ * return the length of the longest palindrome that can be built with those letters.
+ */
+func longestPalindrome(s string) int {
+	freqMap := make(map[byte]int)
+	for i := range s {
+		freqMap[s[i]]++
+	}
+
+	res, hasOdd := 0, false
+	for _, v := range freqMap {
+		res += v - (v % 2) // take even part: v if even, v-1 if odd
+		if v%2 == 1 {
+			hasOdd = true // at least one odd freq char exists
+		}
+	}
+
+	// place one odd char in the center
+	if hasOdd {
+		res++
+	}
+
+	return res
+}
