@@ -240,3 +240,46 @@ func (h *EndTimeHeap) Pop() interface{} {
 	*h = old[:len(old)-1]
 	return item
 }
+
+/**
+ * Employee Free Time
+ *
+ * Write a function to find the common free time for all employees from a list called schedule.
+ * Each employee's schedule is represented by a list of non-overlapping intervals sorted by start times.
+ * The function should return a list of finite, non-zero length intervals where all employees are free, also sorted in order.
+ *
+ * Input: schedule = [[[2,4],[7,10]],[[1,5]],[[6,9]]]
+ * Output: [(5,6)]
+ * Explanation: The three employees collectively have only one common free time interval, which is from 5 to 6.
+ */
+func employeeFreeTime(schedule [][][]int) [][]int {
+	// Step 1: flatten all intervals
+	flattened := make([][]int, 0)
+	for _, employee := range schedule {
+		flattened = append(flattened, employee...)
+	}
+
+	// Step 2: sort by start time
+	sort.Slice(flattened, func(i, j int) bool {
+		return flattened[i][0] < flattened[j][0]
+	})
+
+	// Step 3: merge overlapping intervals
+	merged := [][]int{flattened[0]} // ← seed with first interval
+	for _, interval := range flattened[1:] {
+		last := merged[len(merged)-1]
+		if last[1] < interval[0] {
+			merged = append(merged, interval)
+		} else {
+			last[1] = max(last[1], interval[1])
+		}
+	}
+
+	// Step 4: gaps between merged intervals = free time
+	freeTimes := make([][]int, 0)
+	for i := 1; i < len(merged); i++ {
+		freeTimes = append(freeTimes, []int{merged[i-1][1], merged[i][0]})
+	}
+
+	return freeTimes
+}
