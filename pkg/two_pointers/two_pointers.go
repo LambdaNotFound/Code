@@ -73,6 +73,47 @@ func threeSum(nums []int) [][]int {
 }
 
 /**
+ * 16. 3Sum Closest
+ */
+func threeSumClosest(nums []int, target int) int {
+	sort.Ints(nums)
+	closest := nums[0] + nums[1] + nums[2] // initialise with first triplet
+
+	abs := func(x int) int {
+		if x < 0 {
+			return -x
+		}
+		return x
+	}
+
+	for i := 0; i < len(nums)-2; i++ {
+		if i > 0 && nums[i] == nums[i-1] {
+			continue
+		}
+
+		j, k := i+1, len(nums)-1
+		for j < k {
+			sum := nums[i] + nums[j] + nums[k]
+
+			// update closest if this sum is nearer to target
+			if abs(sum-target) < abs(closest-target) {
+				closest = sum
+			}
+
+			if sum == target {
+				return sum // can't get closer than exact match
+			} else if sum < target {
+				j++
+			} else {
+				k--
+			}
+		}
+	}
+
+	return closest
+}
+
+/**
  * 167. Two Sum II - Input Array Is Sorted
  * T: O(n)
  */
