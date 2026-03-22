@@ -103,50 +103,6 @@ func orangesRotting_slice(grid [][]int) int {
 }
 
 /**
- * 542. 01 Matrix
- * a multi-source BFS approach
- */
-func updateMatrix(mat [][]int) [][]int {
-	if mat == nil || len(mat) == 0 || len(mat[0]) == 0 {
-		return [][]int{}
-	}
-
-	type Cell struct {
-		x, y int
-	}
-
-	m, n := len(mat), len(mat[0])
-	queue := make([]Cell, 0)
-	MAX_VALUE := m * n
-
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if mat[i][j] == 0 {
-				queue = append(queue, Cell{x: i, y: j})
-			} else {
-				mat[i][j] = MAX_VALUE
-			}
-		}
-	}
-
-	directions := [][]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
-	for len(queue) > 0 {
-		cell := queue[0]
-		queue = queue[1:]
-		for _, dir := range directions {
-			r, c := cell.x+dir[0], cell.y+dir[1] // check if there's a shorter path
-			if r >= 0 && r < m && c >= 0 && c < n &&
-				mat[r][c] > mat[cell.x][cell.y]+1 {
-				queue = append(queue, Cell{x: r, y: c})
-				mat[r][c] = mat[cell.x][cell.y] + 1
-			}
-		}
-	}
-
-	return mat
-}
-
-/**
  * 199. Binary Tree Right Side View
  */
 func rightSideView(root *TreeNode) []int {
