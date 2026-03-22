@@ -9,17 +9,17 @@ package memoization
  * Idea: Draw the recursion tree then solve the problem
  */
 func climbStairs1(n int) int {
-    var fn func(int) int
-    fn = func(num int) int {
-        if num == 0 {
-            return 1
-        }
-        if num < 0 {
-            return 0
-        }
-        return fn(num-1) + fn(num-2)
-    }
-    return fn(n)
+	var dfs func(steps int) int
+	dfs = func(steps int) int {
+		if steps == 0 {
+			return 1
+		}
+		if steps == 1 {
+			return 1
+		}
+		return dfs(steps-1) + dfs(steps-2)
+	}
+	return dfs(n)
 }
 
 /*
@@ -27,23 +27,26 @@ func climbStairs1(n int) int {
  * Idea: Use a map to store results of subproblems
  */
 func climbStairs2(n int) int {
-    memo := map[int]int{}
-    var fn func(int) int
-    fn = func(num int) int {
-        if val, ok := memo[num]; ok {
-            return val
-        }
-        if num == 0 {
-            return 1
-        }
-        if num < 0 {
-            return 0
-        }
-        ret := fn(num-1) + fn(num-2)
-        memo[num] = ret
-        return ret
-    }
-    return fn(n)
+	memo := make([]int, n+1)
+	for i := range memo {
+		memo[i] = -1
+	}
+
+	var dfs func(steps int) int
+	dfs = func(steps int) int {
+		if steps == 0 {
+			return 1
+		}
+		if steps == 1 {
+			return 1
+		}
+		if memo[steps] != -1 {
+			return memo[steps]
+		}
+		memo[steps] = dfs(steps-1) + dfs(steps-2)
+		return memo[steps]
+	}
+	return dfs(n)
 }
 
 /*
@@ -51,13 +54,12 @@ func climbStairs2(n int) int {
  * Idea: Use an array to mock fuction calls. Start from the base cases till you reach the top initial problem.
  */
 func climbStairs3(n int) int {
-    arr := make([]int, n+1)
-    arr[0] = 1
-    arr[1] = 1
-    for i := 2; i <= n; i++ {
-        arr[i] = arr[i-1] + arr[i-2]
-    }
-    return arr[n]
+	memo := make([]int, n+1)
+	memo[0], memo[1] = 1, 1
+	for i := 2; i <= n; i++ {
+		memo[i] = memo[i-2] + memo[i-1]
+	}
+	return memo[n]
 }
 
 /*
@@ -66,10 +68,15 @@ func climbStairs3(n int) int {
  * So we can use two variables to store the last two values instead of using an array.
  */
 func climbStairs4(n int) int {
-    first := 1
-    second := 1
-    for i := 2; i <= n; i++ {
-        second, first = first+second, second
-    }
-    return second
+	if n == 0 {
+		return 1
+	}
+	if n == 1 {
+		return 1
+	}
+	iMinus1, res := 1, 2
+	for i := 2; i < n; i++ {
+		res, iMinus1 = iMinus1+res, res
+	}
+	return res
 }
