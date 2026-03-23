@@ -67,27 +67,28 @@ func trap(height []int) int {
 	return res
 }
 
-func trap_slice(height []int) int {
-	stack := []int{}
+func trapSlice(height []int) int {
 	res := 0
-	for i := 0; i < len(height); i += 1 {
-		right := height[i]
-		for len(stack) != 0 && height[stack[len(stack)-1]] < right {
-			bottom := height[stack[len(stack)-1]]
-			stack = stack[:len(stack)-1]
-			if len(stack) == 0 {
-				break
+	st := make([]int, 0) // monotonic decreasing stack of indices
+
+	for i := 0; i < len(height); i++ {
+		for len(st) > 0 && height[st[len(st)-1]] < height[i] {
+			bottomIdx := st[len(st)-1]
+			st = st[:len(st)-1] // pop bottom
+
+			if len(st) == 0 {
+				break // no left wall — can't trap water
 			}
-			left := height[stack[len(stack)-1]]
-			length := i - 1 - stack[len(stack)-1]
-			if left > right {
-				res += (right - bottom) * length
-			} else {
-				res += (left - bottom) * length
-			}
+
+			leftIdx := st[len(st)-1]
+
+			waterHeight := min(height[leftIdx], height[i]) - height[bottomIdx]
+			waterWidth := i - leftIdx - 1
+			res += waterHeight * waterWidth
 		}
-		stack = append(stack, i)
+		st = append(st, i)
 	}
+
 	return res
 }
 
@@ -122,7 +123,7 @@ func trap_slice(height []int) int {
  *    -----------
  *      t h     i
  */
-func largestRectangleArea_slice(heights []int) int {
+func largestRectangleAreaSlice(heights []int) int {
 	st := make([]int, 0)
 	res := 0
 	heights = append(heights, 0) // sentinel to flush stack
