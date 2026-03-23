@@ -24,6 +24,21 @@ func isSameTree(p *TreeNode, q *TreeNode) bool {
 }
 
 /**
+ * 101. Symmetric Tree
+ */
+func isSymmetric(root *TreeNode) bool {
+	var dfs func(p, q *TreeNode) bool
+	dfs = func(p, q *TreeNode) bool {
+		if p == nil || q == nil {
+			return p == q
+		}
+		return p.Val == q.Val && dfs(p.Left, q.Right) && dfs(p.Right, q.Left)
+	}
+
+	return dfs(root.Left, root.Right)
+}
+
+/**
  * 110. Balanced Binary Tree
  *
  * Time: O(n), each node visited once

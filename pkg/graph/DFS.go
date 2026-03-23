@@ -9,21 +9,14 @@ import (
  */
 func diameterOfBinaryTree(root *TreeNode) int {
 	res := 0
-	max := func(a, b int) int {
-		if a > b {
-			return a
-		}
-		return b
-	}
-
 	var dfs func(*TreeNode) int
 	dfs = func(node *TreeNode) int {
 		if node == nil {
 			return 0
 		}
 		left, right := dfs(node.Left), dfs(node.Right)
-		res = max(res, left+right)
-		return 1 + max(left, right)
+		res = max(res, left+right)  // diameter = edges through node
+		return 1 + max(left, right) // height = edges to deepest leaf
 	}
 	dfs(root)
 	return res
