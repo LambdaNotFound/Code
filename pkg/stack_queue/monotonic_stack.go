@@ -44,71 +44,71 @@ import . "gocode/containers"
  *      t b     i
  */
 func trap(height []int) int {
-    stack := Stack[int]{}
-    res := 0
-    for i := 0; i < len(height); i += 1 {
-        right := height[i]
-        for !stack.IsEmpty() && height[stack.Top()] < right {
-            bottom := height[stack.Top()]
-            stack.Pop()
-            if stack.IsEmpty() {
-                break
-            }
-            left := height[stack.Top()]
-            width := i - 1 - stack.Top()
-            if left > right {
-                res += (right - bottom) * width
-            } else {
-                res += (left - bottom) * width
-            }
-        }
-        stack = append(stack, i)
-    }
-    return res
+	stack := Stack[int]{}
+	res := 0
+	for i := 0; i < len(height); i += 1 {
+		right := height[i]
+		for !stack.IsEmpty() && height[stack.Top()] < right {
+			bottom := height[stack.Top()]
+			stack.Pop()
+			if stack.IsEmpty() {
+				break
+			}
+			left := height[stack.Top()]
+			width := i - 1 - stack.Top()
+			if left > right {
+				res += (right - bottom) * width
+			} else {
+				res += (left - bottom) * width
+			}
+		}
+		stack = append(stack, i)
+	}
+	return res
 }
 
 func trap_slice(height []int) int {
-    stack := []int{}
-    res := 0
-    for i := 0; i < len(height); i += 1 {
-        right := height[i]
-        for len(stack) != 0 && height[stack[len(stack)-1]] < right {
-            bottom := height[stack[len(stack)-1]]
-            stack = stack[:len(stack)-1]
-            if len(stack) == 0 {
-                break
-            }
-            left := height[stack[len(stack)-1]]
-            length := i - 1 - stack[len(stack)-1]
-            if left > right {
-                res += (right - bottom) * length
-            } else {
-                res += (left - bottom) * length
-            }
-        }
-        stack = append(stack, i)
-    }
-    return res
+	stack := []int{}
+	res := 0
+	for i := 0; i < len(height); i += 1 {
+		right := height[i]
+		for len(stack) != 0 && height[stack[len(stack)-1]] < right {
+			bottom := height[stack[len(stack)-1]]
+			stack = stack[:len(stack)-1]
+			if len(stack) == 0 {
+				break
+			}
+			left := height[stack[len(stack)-1]]
+			length := i - 1 - stack[len(stack)-1]
+			if left > right {
+				res += (right - bottom) * length
+			} else {
+				res += (left - bottom) * length
+			}
+		}
+		stack = append(stack, i)
+	}
+	return res
 }
 
 /**
  * 84. Largest Rectangle in Histogram <- Monotonic Ascending Stack
  *
  * Given an array of integers heights representing the histogram's bar height
- * where the width of each bar is 1, return the area of the largest rectangle in the histogram. 
+ * where the width of each bar is 1, return the area of the largest rectangle in the histogram.
  *
  * Monotonic ascending stack storing the index
  * popping all the heights on stack
  * when hitting a right height < stack.top()
  *
- *            A
- *        X X A
- *      X X X A #
- *    X X X X A #
- *    -----------
- *          t h i
+ *            A                        X
+ *        X X A                        X
+ *      X X X A #                X     X
+ *    X X X X A #              X X     X x         monotonic stack, popping out all items > current
+ *    -----------              -----------         between i, j, the values are larger than height[j]
+ *          t h i                i     j cur
  *
- *            X 
+ *            X
  *        X B B
  *      X X B B #     by def, when popping height h,
  *    X X X B B #     all the bars to the right, are >= h
@@ -122,62 +122,54 @@ func trap_slice(height []int) int {
  *    -----------
  *      t h     i
  */
-func largestRectangleArea(heights []int) int {
-    heights = append(heights, 0)
+func largestRectangleArea_slice(heights []int) int {
+	st := make([]int, 0)
+	res := 0
+	heights = append(heights, 0) // sentinel to flush stack
 
-    stack := Stack[int]{}
-    res := 0
-    for i := 0; i < len(heights); i += 1 {
-        right := heights[i]
-        for !stack.IsEmpty() && heights[stack.Top()] > right {
-            height := heights[stack.Top()]
-            stack.Pop()
+	for i := 0; i < len(heights); i++ {
+		for len(st) > 0 && heights[st[len(st)-1]] > heights[i] {
+			height := heights[st[len(st)-1]]
+			st = st[:len(st)-1] // pop first
 
-            width := 0
-            if stack.IsEmpty() {
-                width = i
-            } else {
-                width = i - 1 - stack.Top()
-            }
+			width := i       // empty stack → extends to index 0
+			if len(st) > 0 { // st top is the left boundary
+				width = i - st[len(st)-1] - 1 // i-1 - (st.top+1) + 1
+			}
+			res = max(res, height*width)
+		}
+		st = append(st, i)
+	}
 
-            area := height * width
-            if res < area {
-                res = area
-            }
-        }
-
-        stack.Push(i)
-    }
-
-    return res
+	return res
 }
 
-func largestRectangleArea_slice(heights []int) int {
-    heights = append(heights, 0)
+func largestRectangleArea(heights []int) int {
+	heights = append(heights, 0)
 
-    stack := []int{}
-    res := 0
-    for i := 0; i < len(heights); i += 1 {
-        right := heights[i]
-        for len(stack) != 0 && heights[stack[len(stack)-1]] > right {
-            height := heights[stack[len(stack)-1]]
-            stack = stack[:len(stack)-1]
+	stack := Stack[int]{}
+	res := 0
+	for i := 0; i < len(heights); i += 1 {
+		right := heights[i]
+		for !stack.IsEmpty() && heights[stack.Top()] > right {
+			height := heights[stack.Top()]
+			stack.Pop()
 
-            width := 0
-            if len(stack) == 0 {
-                width = i
-            } else {
-                width = i - 1 - stack[len(stack)-1]
-            }
+			width := 0
+			if stack.IsEmpty() {
+				width = i
+			} else {
+				width = i - 1 - stack.Top()
+			}
 
-            area := height * width
-            if res < area {
-                res = area
-            }
-        }
+			area := height * width
+			if res < area {
+				res = area
+			}
+		}
 
-        stack = append(stack, i)
-    }
+		stack.Push(i)
+	}
 
-    return res
+	return res
 }
