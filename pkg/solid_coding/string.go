@@ -219,3 +219,20 @@ func longestPalindrome(s string) int {
 
 	return res
 }
+
+/**
+ * 14. Longest Common Prefix
+ */
+func longestCommonPrefix(strs []string) string {
+	res := ""
+	for i := 0; i < len(strs[0]); i++ {
+		char := strs[0][i]
+		for j := 1; j < len(strs); j++ {
+			if i >= len(strs[j]) || strs[j][i] != char {
+				return res // ← return immediately on mismatch
+			}
+		}
+		res += string(char)
+	}
+	return res
+}
