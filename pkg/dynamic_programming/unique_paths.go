@@ -1,5 +1,7 @@
 package dynamic_programming
 
+import "math"
+
 /**
  * 62. Unique Paths
  *
@@ -41,4 +43,43 @@ func uniquePathsNaive(m int, n int) int {
 		}
 	}
 	return ways[m-1][n-1]
+}
+
+/**
+ * 64. Minimum Path Sum
+ */
+func minPathSumBottomUp(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	for r := 0; r < m; r++ {
+		for c := 0; c < n; c++ {
+			switch {
+			case r == 0 && c == 0:
+				continue
+			case r == 0:
+				grid[r][c] += grid[r][c-1]
+			case c == 0:
+				grid[r][c] += grid[r-1][c]
+			default:
+				grid[r][c] += min(grid[r][c-1], grid[r-1][c])
+			}
+		}
+	}
+	return grid[m-1][n-1]
+}
+
+func minPathSumTopDown(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+
+	var dfs func(r, c int) int
+	dfs = func(r, c int) int {
+		if r == m || c == n {
+			return math.MaxInt
+		}
+		if r == m-1 && c == n-1 {
+			return grid[r][c]
+		}
+		return grid[r][c] + min(dfs(r, c+1), dfs(r+1, c))
+	}
+
+	return dfs(0, 0)
 }
