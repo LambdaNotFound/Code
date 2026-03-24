@@ -1,5 +1,7 @@
 package math
 
+import "math"
+
 /**
  * Math/Greedy Tricks
  */
@@ -42,6 +44,21 @@ func jump(nums []int) int {
 	}
 
 	return 0
+}
+
+func jumpDP(nums []int) int {
+	dp := make([]int, len(nums))
+	for i := range dp {
+		dp[i] = math.MaxInt32
+	}
+	dp[0] = 0
+
+	for i := 0; i < len(nums); i++ {
+		for j := i; j <= i+nums[i] && j < len(nums); j++ {
+			dp[j] = min(dp[j], 1+dp[i])
+		}
+	}
+	return dp[len(nums)-1]
 }
 
 /**
