@@ -347,6 +347,32 @@ func combinationSum4(nums []int, target int) int {
 	return dp[target]
 }
 
+func combinationSum4RecursionMemoization(nums []int, target int) int {
+	memo := make([]int, target+1)
+	for i := range memo {
+		memo[i] = -1
+	}
+	var dfs func(t int) int
+	dfs = func(t int) int {
+		if t < 0 {
+			return 0
+		}
+		if t == 0 {
+			return 1
+		}
+		if memo[t] != -1 {
+			return memo[t]
+		}
+		noc := 0
+		for _, n := range nums {
+			noc += dfs(t - n)
+		}
+		memo[t] = noc
+		return noc
+	}
+	return dfs(target)
+}
+
 /**
  * 78. Subsets
  *
