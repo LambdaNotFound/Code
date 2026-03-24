@@ -18,21 +18,23 @@ import "math"
  */
 func coinChange(coins []int, amount int) int {
 	dp := make([]int, amount+1)
-	for i := range dp {
-		dp[i] = amount + 1
+	for i := 1; i < amount+1; i++ {
+		dp[i] = math.MaxInt
 	}
-	dp[0] = 0
-	for i := 1; i <= amount; i++ {
-		for _, coin := range coins { // reuse coins of same value
-			if coin <= i {
-				dp[i] = min(dp[i], dp[i-coin]+1)
+
+	for _, c := range coins { //
+		for a := 1; a < amount+1; a++ {
+			if a-c >= 0 && dp[a-c] != math.MaxInt {
+				dp[a] = min(dp[a], 1+dp[a-c])
 			}
 		}
 	}
-	if dp[amount] > amount {
+
+	if dp[amount] == math.MaxInt {
 		return -1
+	} else {
+		return dp[amount]
 	}
-	return dp[amount]
 }
 
 func coinChangeRecursion(coins []int, amount int) int {
@@ -60,7 +62,7 @@ func coinChangeRecursion(coins []int, amount int) int {
 	return numberOfCoins
 }
 
-func coinChangeRecursionnMemoization(coins []int, amount int) int {
+func coinChangeRecursionMemoization(coins []int, amount int) int {
 	memo := make([]*int, amount+1)
 	var dfs func(remain int) int
 	dfs = func(remain int) int {
@@ -133,4 +135,85 @@ func coinChange1DDP(coins []int, amount int) int {
 		return -1
 	}
 	return dp[amount]
+}
+
+/**
+ * 518. Coin Change II
+ *
+ * Return the number of combinations that make up that amount.
+ * If that amount of money cannot be made up by any combination of the coins, return 0.
+ */
+func change(amount int, coins []int) int {
+	dp := make([]int, amount+1)
+	dp[0] = 1
+	for _, c := range coins { // coins outer → each coin considered in fixed order
+		for a := 1; a <= amount; a++ {
+			if a >= c {
+				dp[a] += dp[a-c]
+			}
+		}
+	}
+	return dp[amount]
+}
+
+func changeRecursion(amount int, coins []int) int {
+	var dfs func(amount, pos int) int
+	dfs = func(amount, pos int) int {
+		if amount == 0 {
+			return 1
+		}
+		if amount < 0 {
+			return 0
+		}
+		if pos == len(coins) {
+			return 0
+		}
+		return dfs(amount-coins[pos], pos) + dfs(amount, pos+1)
+	}
+	return dfs(amount, 0)
+}
+
+func changeRecursionMemoization(amount int, coins []int) int {
+	memo := make([][]*int, len(coins))
+	for i := range memo {
+		memo[i] = make([]*int, amount+1)
+	}
+	var dfs func(amount, pos int) int
+	dfs = func(amount, pos int) int {
+		if amount == 0 {
+			return 1
+		}
+		if amount < 0 {
+			return 0
+		}
+		if pos == len(coins) {
+			return 0
+		}
+		if memo[pos][amount] != nil {
+			return *memo[pos][amount]
+		}
+		res := dfs(amount-coins[pos], pos) + dfs(amount, pos+1)
+		memo[pos][amount] = &res
+		return res
+	}
+	return dfs(amount, 0)
+}
+
+func change2DDP(amount int, coins []int) int {
+	dp := make([][]int, len(coins)+1)
+	for i := range dp {
+		dp[i] = make([]int, amount+1)
+		dp[i][0] = 1
+	}
+
+	for c := 1; c <= len(coins); c++ {
+		for a := 1; a <= amount; a++ {
+			if a >= coins[c-1] {
+				dp[c][a] = dp[c-1][a] + dp[c][a-coins[c-1]]
+			} else {
+				dp[c][a] = dp[c-1][a]
+			}
+		}
+	}
+	return dp[len(coins)][amount]
 }
