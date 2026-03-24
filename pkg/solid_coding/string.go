@@ -18,6 +18,8 @@ import (
 
 /**
  * 8. String to Integer (atoi)
+ *
+ * Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer.
  */
 func myAtoi(s string) int {
 	s = strings.TrimSpace(s)
@@ -32,20 +34,20 @@ func myAtoi(s string) int {
 	}
 
 	res := 0
-	for _, r := range s {
-		if !unicode.IsDigit(r) {
+	for i, r := range s {
+		if unicode.IsDigit(r) {
+			num := s[i] - '0'
+			res = res*10 + int(num)
+
+			if multiplier*res > math.MaxInt32 {
+				return math.MaxInt32
+			}
+			if multiplier*res < math.MinInt32 {
+				return math.MinInt32
+			}
+		} else {
 			break
 		}
-		curr, _ := strconv.Atoi(string(r))
-
-		if multiplier == 1 && (res*10 > math.MaxInt32-curr) {
-			return math.MaxInt32
-		}
-		if multiplier == -1 && (-res*10 < math.MinInt32+curr) {
-			return math.MinInt32
-		}
-
-		res = res*10 + curr
 	}
 	return multiplier * res
 }
