@@ -106,7 +106,7 @@ func orangesRotting_slice(grid [][]int) int {
  * 199. Binary Tree Right Side View
  */
 func rightSideView(root *TreeNode) []int {
-	res := []int{}
+	res := make([]int, 0)
 	if root == nil {
 		return res
 	}
@@ -114,22 +114,25 @@ func rightSideView(root *TreeNode) []int {
 	queue := []*TreeNode{root}
 	for len(queue) > 0 {
 		levelSize := len(queue)
+
 		for i := 0; i < levelSize; i++ {
-			cur := queue[0]
+			node := queue[0]
 			queue = queue[1:]
 
-			if cur.Left != nil {
-				queue = append(queue, cur.Left)
-			}
-			if cur.Right != nil {
-				queue = append(queue, cur.Right)
+			// last node in level is visible from right side
+			if i == levelSize-1 {
+				res = append(res, node.Val)
 			}
 
-			if i == levelSize-1 {
-				res = append(res, cur.Val)
+			if node.Left != nil {
+				queue = append(queue, node.Left)
+			}
+			if node.Right != nil {
+				queue = append(queue, node.Right)
 			}
 		}
 	}
+
 	return res
 }
 
