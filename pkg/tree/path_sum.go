@@ -34,3 +34,41 @@ func maxPathSum(root *TreeNode) int {
 	postOrderTraversal(root)
 	return maxSum
 }
+
+/**
+ * 113. Path Sum II
+ *
+ * Given the root of a binary tree and an integer targetSum,
+ * return all root-to-leaf paths where the sum of the node values in the path equals targetSum.
+ *
+ * A root-to-leaf path is a path starting from the root and ending at any leaf node. A leaf is a node with no children.
+ */
+func pathSum(root *TreeNode, targetSum int) [][]int {
+	res := make([][]int, 0)
+	path := make([]int, 0)
+
+	var dfs func(node *TreeNode, remaining int)
+	dfs = func(node *TreeNode, remaining int) {
+		if node == nil {
+			return
+		}
+
+		// make choice
+		path = append(path, node.Val)
+		remaining -= node.Val
+
+		// leaf node with exact sum — record path
+		if node.Left == nil && node.Right == nil && remaining == 0 {
+			res = append(res, append([]int{}, path...))
+		} else {
+			dfs(node.Left, remaining)
+			dfs(node.Right, remaining)
+		}
+
+		// undo choice
+		path = path[:len(path)-1]
+	}
+
+	dfs(root, targetSum)
+	return res
+}
