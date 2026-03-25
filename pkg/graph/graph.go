@@ -52,35 +52,7 @@ func DFS(start *Node, visited map[*Node]bool) {
  *
  * BFS + HashMap: queue, map[*Node]*Node
  */
-func cloneGraph(node *Node) *Node {
-	if node == nil {
-		return nil
-	}
-
-	queue := []*Node{node}
-	mapToCopy := make(map[*Node]*Node)
-	mapToCopy[node] = &Node{Val: node.Val} // tracks visited nodes
-
-	for len(queue) > 0 {
-		currNode := queue[0]
-		queue = queue[1:]
-		currNodeCopy := mapToCopy[currNode]
-
-		for _, neighbor := range currNode.Neighbors {
-			if _, exist := mapToCopy[neighbor]; !exist {
-				mapToCopy[neighbor] = &Node{Val: neighbor.Val}
-				queue = append(queue, neighbor) // only enqueue un-visited
-			}
-
-			neighborCopy := mapToCopy[neighbor]
-			currNodeCopy.Neighbors = append(currNodeCopy.Neighbors, neighborCopy)
-		}
-	}
-
-	return mapToCopy[node]
-}
-
-func cloneGraph_DFS(node *Node) *Node {
+func cloneGraphDFS(node *Node) *Node {
 	visited := make(map[*Node]*Node) // map[ptr]ptr
 
 	var dfs func(*Node) *Node
@@ -108,4 +80,32 @@ func cloneGraph_DFS(node *Node) *Node {
 	}
 
 	return dfs(node)
+}
+
+func cloneGraphBFS(node *Node) *Node {
+	if node == nil {
+		return nil
+	}
+
+	queue := []*Node{node}
+	mapToCopy := make(map[*Node]*Node)
+	mapToCopy[node] = &Node{Val: node.Val} // tracks visited nodes
+
+	for len(queue) > 0 {
+		currNode := queue[0]
+		queue = queue[1:]
+		currNodeCopy := mapToCopy[currNode]
+
+		for _, neighbor := range currNode.Neighbors {
+			if _, exist := mapToCopy[neighbor]; !exist {
+				mapToCopy[neighbor] = &Node{Val: neighbor.Val}
+				queue = append(queue, neighbor) // only enqueue un-visited
+			}
+
+			neighborCopy := mapToCopy[neighbor]
+			currNodeCopy.Neighbors = append(currNodeCopy.Neighbors, neighborCopy)
+		}
+	}
+
+	return mapToCopy[node]
 }
