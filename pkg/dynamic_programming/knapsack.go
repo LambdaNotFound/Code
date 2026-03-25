@@ -20,21 +20,31 @@ import "strconv"
  *
  * DynamicProgramming, Time: O(n), Space: O(1)
  *     dp[i] stores the maximum subarray ending at i
- *     dp[i] = dp[i - 1] + nums[i] if dp[i - 1] > 0
- *                                 else dp[i] = nums[i]
+ *     dp[i] = max(nums[i],    ← start fresh at current element
+ *             dp[i-1]+nums[i] ← extend previous subarray)
  */
 func maxSubArray(nums []int) int {
-	globalMax, curSum := nums[0], 0 // opt space, replace dp[i] w/ a var
-	for _, num := range nums {
-		if curSum < 0 {
-			curSum = 0
-		}
-		curSum += num
-		if curSum > globalMax {
-			globalMax = curSum
-		}
+	res := nums[0]
+	prev := nums[0]
+	for _, num := range nums[1:] {
+		prev = max(num, prev+num)
+		res = max(res, prev)
 	}
-	return globalMax
+	return res
+}
+
+func maxSubArrayAlt(nums []int) int {
+	n := len(nums)
+	dp := make([]int, n)
+	dp[0] = nums[0]
+	res := dp[0]
+
+	for i := 1; i < n; i++ {
+		dp[i] = max(nums[i], dp[i-1]+nums[i])
+		res = max(res, dp[i])
+	}
+
+	return res
 }
 
 /**

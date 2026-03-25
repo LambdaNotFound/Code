@@ -10,9 +10,9 @@ type ListNodeHeap struct {
 	less  func(*ListNode, *ListNode) bool
 }
 
+func (h *ListNodeHeap) Len() int               { return len(h.items) }
 func (h *ListNodeHeap) Less(i int, j int) bool { return h.less(h.items[i], h.items[j]) }
 func (h *ListNodeHeap) Swap(i int, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
-func (h *ListNodeHeap) Len() int               { return len(h.items) }
 
 func (h *ListNodeHeap) Push(item interface{}) {
 	h.items = append(h.items, item.(*ListNode))
