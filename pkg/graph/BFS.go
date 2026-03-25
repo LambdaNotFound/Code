@@ -58,7 +58,7 @@ func orangesRotting(grid [][]int) int {
 	return minutes
 }
 
-func orangesRotting_slice(grid [][]int) int {
+func orangesRottingSlice(grid [][]int) int {
 	m, n := len(grid), len(grid[0])
 	queue := [][]int{}
 	for i := 0; i < m; i++ {
@@ -85,6 +85,48 @@ func orangesRotting_slice(grid [][]int) int {
 					grid[r][c] = 2
 					queue = append(queue, []int{r, c})
 
+				}
+			}
+		}
+		if len(queue) > 0 {
+			minute++
+		}
+	}
+
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] == 1 {
+				return -1
+			}
+		}
+	}
+	return minute
+}
+
+func orangesRottingSlice2(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	queue := [][]int{}
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] == 2 {
+				queue = append(queue, []int{i, j})
+			}
+			if grid[i][j] == 1 {
+			}
+		}
+	}
+
+	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	minute := 0
+	for len(queue) > 0 {
+		for _, i := range queue {
+			queue = queue[1:]
+
+			for _, d := range dirs {
+				r, c := i[0]+d[0], i[1]+d[1]
+				if r >= 0 && r < m && c >= 0 && c < n && grid[r][c] == 1 {
+					grid[r][c] = 2
+					queue = append(queue, []int{r, c})
 				}
 			}
 		}
