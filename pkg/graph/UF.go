@@ -25,6 +25,7 @@ func countComponents(n int, edges [][]int) int {
 		if rootX == rootY {
 			return false
 		}
+		// the union operation must update the root of one set to point to the root of the other set
 		parent[rootX] = rootY
 		return true
 	}
