@@ -58,36 +58,34 @@ func isValidClaude(s string) bool {
  * 150. Evaluate Reverse Polish Notation
  */
 func evalRPN(tokens []string) int {
-	if len(tokens) == 1 {
-		num, _ := strconv.Atoi(tokens[0])
-		return num
-	}
+	stack := make([]int, 0)
 
-	stack := []int{}
-	res := 0
 	for _, token := range tokens {
-		if num, ok := strconv.Atoi(token); ok == nil {
-			stack = append(stack, num)
-		} else {
-			l := len(stack)
-			a, b := stack[l-2], stack[l-1]
-			stack = stack[:l-2]
+		val, err := strconv.Atoi(token)
+		if err == nil {
+			stack = append(stack, val)
+			continue
+		}
 
-			switch token {
-			case "+":
-				res = a + b
-			case "-":
-				res = a - b
-			case "*":
-				res = a * b
-			case "/":
-				res = a / b
-			}
+		// pop two operands — right before left
+		right := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		left := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
 
-			stack = append(stack, res)
+		switch token {
+		case "+":
+			stack = append(stack, left+right)
+		case "-":
+			stack = append(stack, left-right)
+		case "*":
+			stack = append(stack, left*right)
+		case "/":
+			stack = append(stack, left/right)
 		}
 	}
-	return res
+
+	return stack[0]
 }
 
 /**
@@ -155,4 +153,25 @@ func minRemoveToMakeValidClaude(s string) string {
 	}
 
 	return sb.String()
+}
+
+/**
+ * 844. Backspace String Compare
+ */
+func backspaceCompare(s string, t string) bool {
+	process := func(str string) string {
+		stack := make([]byte, 0)
+		for i := range str {
+			if str[i] == '#' {
+				if len(stack) > 0 {
+					stack = stack[:len(stack)-1]
+				}
+			} else {
+				stack = append(stack, str[i])
+			}
+		}
+		return string(stack)
+	}
+
+	return process(s) == process(t)
 }
