@@ -110,7 +110,7 @@ func canPartition(nums []int) bool {
 	for _, num := range nums {
 		// iterate backwards to ensure each number is only used once
 		// same number used more than once violates the rules of 0/1 knapsack
-		for j := target; j >= num; j-- { // [num, ..., target]
+		for j := target; j-num >= 0; j-- { // [num, ..., target]
 			dp[j] = dp[j] || dp[j-num] // if Sum == j-num then theres Sum == j
 		}
 	}
