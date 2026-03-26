@@ -7,10 +7,12 @@ import (
 
 /**
  * 98. Validate Binary Search Tree
+ *
+ * lower_bound, root.Val, upper_bound
  */
 func isValidBST(root *TreeNode) bool {
 	var validate func(*TreeNode, int, int) bool
-	validate = func(node *TreeNode, lower int, upper int) bool {
+	validate = func(node *TreeNode, lower, upper int) bool {
 		if node == nil {
 			return true
 		}

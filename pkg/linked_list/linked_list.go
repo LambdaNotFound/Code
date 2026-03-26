@@ -203,3 +203,68 @@ func copyRandomList(head *Node) *Node {
 
 	return dummy.Next
 }
+
+/**
+ * 61. Rotate List
+ */
+func rotateRight(head *ListNode, k int) *ListNode {
+	if head == nil {
+		return head
+	}
+
+	// single pass: compute length AND capture tail
+	length := 1
+	tail := head
+	for tail.Next != nil {
+		tail = tail.Next
+		length++
+	}
+
+	offset := length - k%length
+	if offset == length {
+		return head
+	}
+
+	// find split point
+	cur := head
+	for i := 0; i < offset-1; i++ {
+		cur = cur.Next
+	}
+
+	// rewire
+	newHead := cur.Next
+	cur.Next = nil
+	tail.Next = head
+	return newHead
+}
+
+/**
+ * 2. Add Two Numbers
+ */
+func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+	dummy := &ListNode{}
+	cur := dummy
+	carry := 0
+
+	val := func(node *ListNode) int {
+		if node == nil {
+			return 0
+		}
+		return node.Val
+	}
+
+	for l1 != nil || l2 != nil || carry != 0 {
+		sum := val(l1) + val(l2) + carry
+		carry = sum / 10
+		cur.Next = &ListNode{Val: sum % 10}
+		cur = cur.Next
+		if l1 != nil {
+			l1 = l1.Next
+		}
+		if l2 != nil {
+			l2 = l2.Next
+		}
+	}
+
+	return dummy.Next
+}
