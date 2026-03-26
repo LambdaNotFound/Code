@@ -181,6 +181,33 @@ func backspaceCompare(s string, t string) bool {
  */
 func asteroidCollision(asteroids []int) []int {
 	st := []int{}
+	for i := 0; i < len(asteroids); {
+		push := true
+		ast := asteroids[i]
+		if len(st) > 0 {
+			top := st[len(st)-1]
+			if top > 0 && ast < 0 {
+				push = false
+				if top+ast == 0 {
+					st = st[:len(st)-1]
+					i++
+				} else if top+ast > 0 {
+					i++
+				} else { // if st[len(st)-1] + ast < 0
+					st = st[:len(st)-1]
+				}
+			}
+		}
+		if push {
+			st = append(st, ast)
+			i++
+		}
+	}
+	return st
+}
+
+func asteroidCollisionCalude(asteroids []int) []int {
+	st := []int{}
 	for _, asteroid := range asteroids {
 		alive := true
 		for alive && asteroid < 0 && len(st) > 0 && st[len(st)-1] > 0 {
