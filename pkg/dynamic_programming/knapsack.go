@@ -1,7 +1,5 @@
 package dynamic_programming
 
-import "strconv"
-
 /**
  * 0/1 Knapsack, Unbounded Knapsack
  *
@@ -88,6 +86,7 @@ func maxProduct2(nums []int) int {
  *
  * DynamicProgramming, Time: O(n * sum), Space: O(sum)
  *     dp[i] stores if sum i can be partitioned to 2 equal subsets
+ *        dp[i] = "can I form sum i using elements seen so far?"
  *     target = sum of the nums in the array / 2
  *
  *     Sum1 [a, b, c...], Sum2 [x] => Sum1 == Sum2
@@ -127,7 +126,7 @@ func canPartitionMemoization(nums []int) bool {
 		return false
 	}
 
-	cache := make(map[string]bool)
+	cache := make(map[[2]int]bool)
 	var validPartition func(int, int) bool
 	validPartition = func(target, idx int) bool {
 		if idx == len(nums) || target < 0 {
@@ -137,7 +136,7 @@ func canPartitionMemoization(nums []int) bool {
 			return true
 		}
 
-		key := strconv.Itoa(target) + "-" + strconv.Itoa(idx)
+		key := [2]int{target, idx}
 		if value, ok := cache[key]; ok {
 			return value
 		}

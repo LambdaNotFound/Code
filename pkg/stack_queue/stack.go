@@ -175,3 +175,28 @@ func backspaceCompare(s string, t string) bool {
 
 	return process(s) == process(t)
 }
+
+/**
+ * 735. Asteroid Collision
+ */
+func asteroidCollision(asteroids []int) []int {
+	st := []int{}
+	for _, asteroid := range asteroids {
+		alive := true
+		for alive && asteroid < 0 && len(st) > 0 && st[len(st)-1] > 0 {
+			top := st[len(st)-1]
+			if top < -asteroid { // asteroid wins, pop and keep fighting
+				st = st[:len(st)-1]
+			} else if top == -asteroid { // mutual destruction
+				st = st[:len(st)-1]
+				alive = false
+			} else { // top wins, asteroid dies
+				alive = false
+			}
+		}
+		if alive {
+			st = append(st, asteroid)
+		}
+	}
+	return st
+}
