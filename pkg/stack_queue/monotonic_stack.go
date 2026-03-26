@@ -174,3 +174,40 @@ func largestRectangleArea(heights []int) int {
 
 	return res
 }
+
+/**
+ * 739. Daily Temperatures
+ *
+ * Input: temperatures = [73,74,75,71,69,72,76,73]
+ * Output: [1,1,4,2,1,1,0,0]
+ */
+func dailyTemperatures(temperatures []int) []int {
+	res := make([]int, len(temperatures))
+	st := []int{}
+	for i := 0; i < len(temperatures); i++ {
+		for len(st) > 0 && temperatures[st[len(st)-1]] < temperatures[i] {
+			j := st[len(st)-1]
+			st = st[:len(st)-1]
+			res[j] = i - j
+		}
+		st = append(st, i)
+	}
+	return res
+}
+
+func dailyTemperaturesRightToLeft(temperatures []int) []int {
+	res := make([]int, len(temperatures))
+	st := []int{}
+	for i := len(temperatures) - 1; i >= 0; i-- {
+		for len(st) > 0 && temperatures[st[len(st)-1]] <= temperatures[i] {
+			st = st[:len(st)-1]
+		}
+		if len(st) == 0 {
+			res[i] = 0
+		} else {
+			res[i] = st[len(st)-1] - i
+		}
+		st = append(st, i)
+	}
+	return res
+}
