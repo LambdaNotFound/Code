@@ -125,3 +125,40 @@ func invertTreeIterative(root *TreeNode) *TreeNode {
 	}
 	return root
 }
+
+/**
+ * 662. Maximum Width of Binary Tree
+ *
+ */
+func widthOfBinaryTree(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+
+	type Node struct {
+		node *TreeNode
+		idx  int
+	}
+
+	queue := []Node{}
+	queue = append(queue, Node{node: root, idx: 0})
+	res := 0
+	for len(queue) > 0 {
+		size := len(queue)
+		left, right := queue[0], queue[len(queue)-1]
+		res = max(res, right.idx-left.idx+1)
+
+		for i := 0; i < size; i++ {
+			front := queue[0]
+			queue = queue[1:]
+
+			if front.node.Left != nil {
+				queue = append(queue, Node{node: front.node.Left, idx: front.idx*2 + 1})
+			}
+			if front.node.Right != nil {
+				queue = append(queue, Node{node: front.node.Right, idx: front.idx*2 + 2})
+			}
+		}
+	}
+	return res
+}
