@@ -3,6 +3,7 @@ package graph
 import (
 	. "gocode/containers"
 	. "gocode/types"
+	"slices"
 )
 
 /**
@@ -181,8 +182,6 @@ func rightSideView(root *TreeNode) []int {
 
 /**
  * 102. Binary Tree Level Order Traversal
- *
- * BFS
  */
 func levelOrder(root *TreeNode) [][]int {
 	if root == nil {
@@ -205,6 +204,39 @@ func levelOrder(root *TreeNode) [][]int {
 			if node.Right != nil {
 				queue = append(queue, node.Right)
 			}
+		}
+		res = append(res, level)
+	}
+	return res
+}
+
+/**
+ * 103. Binary Tree Zigzag Level Order Traversal
+ */
+func zigzagLevelOrder(root *TreeNode) [][]int {
+	if root == nil {
+		return [][]int{}
+	}
+
+	queue := []*TreeNode{root}
+	res := [][]int{}
+	for len(queue) > 0 {
+		size := len(queue)
+		level := []int{}
+		for i := 0; i < size; i++ {
+			f := queue[0]
+			queue = queue[1:]
+			level = append(level, f.Val)
+			if f.Left != nil {
+				queue = append(queue, f.Left)
+			}
+			if f.Right != nil {
+				queue = append(queue, f.Right)
+			}
+		}
+
+		if len(res)%2 == 1 {
+			slices.Reverse(level)
 		}
 		res = append(res, level)
 	}

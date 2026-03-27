@@ -54,6 +54,7 @@ func searchRotatedSortedArray(nums []int, target int) int {
 				right = mid - 1 // nums[mid] == target
 			}
 		} else {
+			// if nums[right] < target && target < nums[mid] {
 			if nums[left] <= target && target < nums[mid] {
 				right = mid - 1 // nums[mid] == target
 			} else {
@@ -67,11 +68,9 @@ func searchRotatedSortedArray(nums []int, target int) int {
 /**
  * 81. Search in Rotated Sorted Array II
  *     (not necessarily with distinct values)
- * Why right-- works: when they’re equal,
- * we know the min is still somewhere in [left, right],
- * and removing nums[right] doesn’t remove the minimum
- * because nums[mid] has the same value.
- * So the invariant that the min is in [left, right] is preserved.
+ * Why right-- works: when they’re equal, we know the min is still somewhere in [left, right],
+ *     and removing nums[right] doesn’t remove the minimum because nums[mid] has the same value.
+ *     So the invariant that the min is in [left, right] is preserved.
  */
 func searchRotatedSortedArrayII(nums []int, target int) bool {
 	left, right := 0, len(nums)-1
@@ -88,10 +87,10 @@ func searchRotatedSortedArrayII(nums []int, target int) bool {
 				right = mid - 1 // nums[mid] == target
 			}
 		} else if nums[mid] == nums[right] {
-			right--
+			right-- // safely shrink from the right
 		} else {
 			if nums[left] <= target && target < nums[mid] {
-				right = mid - 1 // nums[mid] == target
+				right = mid - 1 // nums[mid] == target, exlude mid
 			} else {
 				left = mid + 1
 			}
