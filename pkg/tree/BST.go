@@ -28,6 +28,25 @@ func isValidBST(root *TreeNode) bool {
 }
 
 /**
+ * 108. Convert Sorted Array to Binary Search Tree
+ */
+func sortedArrayToBST(nums []int) *TreeNode {
+	if len(nums) == 0 {
+		return nil
+	}
+
+	mid := len(nums) / 2
+	left := nums[:mid]
+	right := nums[mid+1:]
+
+	root := &TreeNode{Val: nums[mid]}
+	root.Left = sortedArrayToBST(left)
+	root.Right = sortedArrayToBST(right)
+
+	return root
+}
+
+/**
  * 230. Kth Smallest Element in a BST
  */
 func kthSmallest(root *TreeNode, k int) int {

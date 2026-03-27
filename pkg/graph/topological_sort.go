@@ -206,44 +206,101 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 		return []int{0}
 	}
 
-	// build the graph: adjacency list + degree count
-	graph := map[int][]int{}
-	for _, edge := range edges {
-		src, dst := edge[0], edge[1]
-		graph[src] = append(graph[src], dst)
-		graph[dst] = append(graph[dst], src)
+	graph := make([][]int, n)
+	degree := make([]int, n) // ← separate degree tracking
+	for _, e := range edges {
+		graph[e[0]] = append(graph[e[0]], e[1])
+		graph[e[1]] = append(graph[e[1]], e[0])
+		degree[e[0]]++
+		degree[e[1]]++
 	}
 
-	// find all leaves (degree == 1), layer-by-layer leaf removal
-	leaves := []int{}
-	for k, v := range graph {
-		if len(v) == 1 {
-			leaves = append(leaves, k)
+	queue := []int{}
+	for i := 0; i < n; i++ {
+		if degree[i] == 1 {
+			queue = append(queue, i)
 		}
 	}
 
-	for len(leaves) < n {
-		n -= len(leaves)
-
-		new_leaves := []int{}
-		for _, leaf := range leaves {
-			currentLeaf := graph[leaf][0] // remove leaf (degree == 1) from Adjacency List
-			for i := 0; i < len(graph[currentLeaf]); i++ {
-				if graph[currentLeaf][i] == leaf {
-					graph[currentLeaf] = append(graph[currentLeaf][:i], graph[currentLeaf][i+1:]...) // remove
-					break
+	for len(queue) < n { // len(leaves) == n, every remaining node is a leaf
+		n -= len(queue)
+		nextQueue := []int{}
+		for _, leaf := range queue {
+			for _, neighbor := range graph[leaf] {
+				degree[neighbor]-- // ← decrement instead of mutate
+				if degree[neighbor] == 1 {
+					nextQueue = append(nextQueue, neighbor)
 				}
 			}
-
-			if len(graph[currentLeaf]) == 1 { // add new leaf
-				new_leaves = append(new_leaves, currentLeaf)
-			}
 		}
-
-		leaves = new_leaves
+		queue = nextQueue
 	}
 
-	return leaves
+	return queue
+}
+
+func findMinHeightTreesTwoPassBFS(n int, edges [][]int) []int {
+	if n == 1 {
+		return []int{0}
+	}
+
+	// build adjacency list
+	graph := make([][]int, n)
+	for _, e := range edges {
+		graph[e[0]] = append(graph[e[0]], e[1])
+		graph[e[1]] = append(graph[e[1]], e[0])
+	}
+
+	// BFS from a given start, returns (farthest node, parent map)
+	bfs := func(start int) (int, []int) {
+		dist := make([]int, n)
+		for i := range dist {
+			dist[i] = -1
+		}
+		parent := make([]int, n)
+		for i := range parent {
+			parent[i] = -1
+		}
+
+		dist[start] = 0
+		queue := []int{start}
+		farthest := start
+
+		for len(queue) > 0 {
+			node := queue[0]
+			queue = queue[1:]
+			if dist[node] > dist[farthest] {
+				farthest = node
+			}
+			for _, nei := range graph[node] {
+				if dist[nei] == -1 {
+					dist[nei] = dist[node] + 1
+					parent[nei] = node
+					queue = append(queue, nei)
+				}
+			}
+		}
+		return farthest, parent
+	}
+
+	// pass 1: find one endpoint u of the diameter
+	u, _ := bfs(0)
+
+	// pass 2: find other endpoint v + track path
+	v, parent := bfs(u)
+
+	// reconstruct diameter path from v back to u
+	path := []int{}
+	for node := v; node != -1; node = parent[node] {
+		path = append(path, node)
+	}
+
+	// centers are middle node(s) of diameter path
+	m := len(path)
+	if m%2 == 1 {
+		return []int{path[m/2]}
+	}
+	return []int{path[m/2-1], path[m/2]}
 }
 
 /**
