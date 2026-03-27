@@ -16,6 +16,42 @@ package graph
  *	}
  *
  */
+func validTree(n int, edges [][]int) bool {
+	if len(edges) != n-1 {
+		return false
+	}
+
+	parent := make([]int, n)
+	for i := 0; i < n; i++ {
+		parent[i] = i
+	}
+
+	var find func(int) int
+	find = func(a int) int {
+		if parent[a] != a {
+			return find(parent[a])
+		}
+		return parent[a]
+	}
+
+	union := func(a, b int) bool {
+		rootA, rootB := find(a), find(b)
+		if rootA == rootB {
+			return false
+		}
+
+		parent[rootA] = rootB
+		return true
+	}
+
+	for _, edge := range edges {
+		if !union(edge[0], edge[1]) {
+			return false
+		}
+	}
+	return true
+}
+
 func validTreeBFS(n int, edges [][]int) bool {
 	// a valid tree must have exactly n-1 edges
 	// more edges = cycle, fewer edges = disconnected
