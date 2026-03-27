@@ -268,3 +268,56 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 
 	return dummy.Next
 }
+
+/**
+ * 328. Odd Even Linked List
+ */
+func oddEvenList(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	dummyOdd, dummyEven := &ListNode{}, &ListNode{}
+	preOdd, preEven := dummyOdd, dummyEven
+	cur := head
+	for cur != nil && cur.Next != nil {
+		next := cur.Next
+		cur.Next = next.Next
+		next.Next = nil
+
+		preOdd.Next = cur
+		preOdd = preOdd.Next
+
+		cur = cur.Next
+
+		preEven.Next = next
+		preEven = preEven.Next
+	}
+
+	if cur != nil {
+		cur.Next = dummyEven.Next
+	} else {
+		preOdd.Next = dummyEven.Next
+	}
+
+	return dummyOdd.Next
+}
+
+func oddEvenListCalude(head *ListNode) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	odd, even := head, head.Next
+	evenHead := even // anchor even list's head
+
+	for even != nil && even.Next != nil {
+		odd.Next = even.Next
+		odd = odd.Next
+		even.Next = odd.Next
+		even = even.Next
+	}
+
+	odd.Next = evenHead // splice even list onto odd list
+	return head
+}
