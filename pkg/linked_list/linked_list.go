@@ -84,14 +84,14 @@ func reverseList_recursive(head *ListNode) *ListNode {
  *
  */
 func swapPairs(head *ListNode) *ListNode {
-	dummy := ListNode{}
-	dummy.Next = head
+	dummy := ListNode{Next: head}
 
-	pre, newTail := &dummy, dummy.Next
+	pre, newTail := &dummy, head
 	for newTail != nil && newTail.Next != nil {
 		newHead := newTail.Next
 		newTail.Next = newHead.Next
 		newHead.Next = newTail
+
 		pre.Next = newHead
 		pre = newTail
 		newTail = pre.Next
