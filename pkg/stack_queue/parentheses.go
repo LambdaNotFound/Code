@@ -26,6 +26,82 @@ func longestValidParentheses(s string) int {
 	return res
 }
 
+/*
+ * Case 1: s[i-1] == '('   → direct match "()"
+ *	       dp[i] = dp[i-2] + 2
+ *
+ * Case 2: s[i-1] == ')'   → previous char closes its own group "))"
+ *	need to check if char BEFORE that group matches
+ *	j = i - dp[i-1] - 1
+ *	if s[j] == '(' :
+ *	    dp[i] = dp[i-1] + 2 + dp[j-1]
+ */
+func longestValidParenthesesDP(s string) int {
+	n := len(s)
+	dp := make([]int, n)
+	res := 0
+
+	for i := 1; i < n; i++ {
+		if s[i] == ')' {
+			if s[i-1] == '(' {
+				// case 1: direct "()" match
+				if i >= 2 {
+					dp[i] = dp[i-2] + 2
+				} else {
+					dp[i] = 2
+				}
+			} else if dp[i-1] > 0 {
+				// case 2: ends with "))" — look before inner group
+				j := i - dp[i-1] - 1
+				if j >= 0 && s[j] == '(' {
+					dp[i] = dp[i-1] + 2
+					if j > 0 {
+						dp[i] += dp[j-1]
+					}
+				}
+			}
+			res = max(res, dp[i])
+		}
+	}
+	return res
+}
+
+func longestValidParenthesesTwoPointers(s string) int {
+	res := 0
+
+	// pass 1: left → right
+	open, close := 0, 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == '(' {
+			open++
+		} else {
+			close++
+		}
+		if open == close {
+			res = max(res, 2*close)
+		} else if close > open {
+			open, close = 0, 0 // unmatched ')' — reset
+		}
+	}
+
+	// pass 2: right → left
+	open, close = 0, 0
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] == '(' {
+			open++
+		} else {
+			close++
+		}
+		if open == close {
+			res = max(res, 2*open)
+		} else if open > close {
+			open, close = 0, 0 // unmatched '(' — reset
+		}
+	}
+
+	return res
+}
+
 /**
  * 1249. Minimum Remove to Make Valid Parentheses
  */
