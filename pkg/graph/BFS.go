@@ -242,3 +242,98 @@ func zigzagLevelOrder(root *TreeNode) [][]int {
 	}
 	return res
 }
+
+/**
+ * 863. All Nodes Distance K in Binary Tree
+ *
+ * parentMap
+ */
+func distanceK(root *TreeNode, target *TreeNode, k int) []int {
+	parent := make(map[*TreeNode]*TreeNode)
+	var dfs func(*TreeNode, *TreeNode)
+	dfs = func(node, p *TreeNode) {
+		if node == nil {
+			return
+		}
+		parent[node] = p
+
+		dfs(node.Left, node)
+		dfs(node.Right, node)
+	}
+	dfs(root, nil)
+
+	queue := []*TreeNode{target}
+	visited := map[*TreeNode]bool{target: true}
+	dist := 0
+	res := []int{}
+	for len(queue) > 0 {
+		size := len(queue)
+		for i := 0; i < size; i++ {
+			f := queue[0]
+			queue = queue[1:]
+
+			if f.Left != nil && !visited[f.Left] {
+				visited[f] = true
+				queue = append(queue, f.Left)
+			}
+			if f.Right != nil && !visited[f.Right] {
+				visited[f] = true
+				queue = append(queue, f.Right)
+			}
+
+			if parent[f] != nil && !visited[parent[f]] {
+				visited[f] = true
+				queue = append(queue, parent[f])
+			}
+		}
+		dist++
+
+		if dist == k {
+			for _, node := range queue {
+				res = append(res, node.Val)
+			}
+		}
+	}
+	return res
+}
+
+func distanceKClaude(root *TreeNode, target *TreeNode, k int) []int {
+	// pass 1: build parent pointers
+	parent := map[*TreeNode]*TreeNode{}
+	var dfs func(*TreeNode, *TreeNode)
+	dfs = func(node, p *TreeNode) {
+		if node == nil {
+			return
+		}
+		parent[node] = p
+		dfs(node.Left, node)
+		dfs(node.Right, node)
+	}
+	dfs(root, nil)
+
+	// pass 2: BFS from target treating tree as undirected graph
+	queue := []*TreeNode{target}
+	visited := map[*TreeNode]bool{target: true}
+
+	for dist := 0; len(queue) > 0; dist++ {
+		if dist == k {
+			res := []int{}
+			for _, node := range queue {
+				res = append(res, node.Val)
+			}
+			return res
+		}
+
+		next := []*TreeNode{}
+		for _, node := range queue {
+			for _, nei := range []*TreeNode{node.Left, node.Right, parent[node]} {
+				if nei != nil && !visited[nei] {
+					visited[nei] = true
+					next = append(next, nei)
+				}
+			}
+		}
+		queue = next
+	}
+	return []int{}
+}
