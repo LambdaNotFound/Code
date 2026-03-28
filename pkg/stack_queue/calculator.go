@@ -3,6 +3,7 @@ package stack
 import (
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 /**
@@ -70,6 +71,47 @@ func calculate(s string) int {
 	// apply last number
 	result += sign * num
 	return result
+}
+
+/**
+ * 227. Basic Calculator II
+ *
+ * Input: s = "3+2*2"
+ * Output: 7
+ */
+func calculate2(s string) int {
+	s = strings.ReplaceAll(s, " ", "")
+	st := []int{}
+	op, num := '+', 0
+	for i, c := range s {
+		if unicode.IsDigit(c) {
+			num = num*10 + (int(c) - '0')
+		}
+		if i == len(s)-1 || !unicode.IsDigit(c) {
+			switch op {
+			case '+':
+				st = append(st, num)
+			case '-':
+				st = append(st, -num)
+			case '*':
+				operand := st[len(st)-1]
+				st = st[:len(st)-1]
+				st = append(st, operand*num)
+			case '/':
+				operand := st[len(st)-1]
+				st = st[:len(st)-1]
+				st = append(st, operand/num)
+			}
+			op = c
+			num = 0
+		}
+	}
+
+	res := 0
+	for _, num := range st {
+		res += num
+	}
+	return res
 }
 
 /**
