@@ -114,6 +114,78 @@ func calculate2(s string) int {
 	return res
 }
 
+/*
+ * expr    = term   (('+' | '-') term)*      ← lowest precedence
+ * term    = factor (('*' | '/') factor)*    ← higher precedence
+ * factor  = number | '(' expr ')'           ← highest precedence
+ */
+func calculateRecursiveDescentParser(s string) int {
+	pos := 0
+
+	var parseExpr func() int
+	var parseTerm func() int
+	var parseFactor func() int
+
+	skipSpaces := func() {
+		for pos < len(s) && s[pos] == ' ' {
+			pos++
+		}
+	}
+
+	parseFactor = func() int {
+		skipSpaces()
+		if s[pos] == '(' {
+			pos++ // consume '('
+			val := parseExpr()
+			pos++ // consume ')'
+			return val
+		}
+		// parse number
+		num := 0
+		for pos < len(s) && s[pos] >= '0' && s[pos] <= '9' {
+			num = num*10 + int(s[pos]-'0')
+			pos++
+		}
+		return num
+	}
+
+	parseTerm = func() int {
+		val := parseFactor()
+		skipSpaces()
+		for pos < len(s) && (s[pos] == '*' || s[pos] == '/') {
+			op := s[pos]
+			pos++
+			right := parseFactor()
+			if op == '*' {
+				val *= right
+			} else {
+				val /= right
+			}
+			skipSpaces()
+		}
+		return val
+	}
+
+	parseExpr = func() int {
+		val := parseTerm()
+		skipSpaces()
+		for pos < len(s) && (s[pos] == '+' || s[pos] == '-') {
+			op := s[pos]
+			pos++
+			right := parseTerm()
+			if op == '+' {
+				val += right
+			} else {
+				val -= right
+			}
+			skipSpaces()
+		}
+		return val
+	}
+
+	return parseExpr()
+}
+
 /**
  * 394. Decode String
  *
