@@ -7,32 +7,12 @@ import "container/heap"
  *
  * Min Heap + Max Heap
  */
-
-type Heap struct {
-	items []int
-	less  func(int, int) bool
-}
-
-func (h *Heap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
-func (h *Heap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
-func (h *Heap) Len() int           { return len(h.items) }
-func (h *Heap) Peek() int          { return h.items[0] }
-func (h *Heap) Pop() (v interface{}) {
-	h.items, v = h.items[:h.Len()-1], h.items[h.Len()-1]
-	return v
-}
-func (h *Heap) Push(v interface{}) { h.items = append(h.items, v.(int)) }
-
-func NewHeap(less func(int, int) bool) *Heap {
-	return &Heap{less: less}
-}
-
 type MedianFinder struct {
-	minHeap *Heap
-	maxHeap *Heap
+	minHeap *IntHeap
+	maxHeap *IntHeap
 }
 
-func MedianFinderConstructor() MedianFinder {
+func ConstructorMedianFinder() MedianFinder {
 	return MedianFinder{
 		minHeap: NewHeap(func(a, b int) bool {
 			return a > b
@@ -58,4 +38,23 @@ func (mf *MedianFinder) FindMedian() float64 {
 		return (float64(mf.minHeap.Peek()) + float64(mf.maxHeap.Peek())) / 2
 	}
 	return float64(mf.minHeap.Peek())
+}
+
+type IntHeap struct {
+	items []int
+	less  func(int, int) bool
+}
+
+func (h *IntHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
+func (h *IntHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
+func (h *IntHeap) Len() int           { return len(h.items) }
+func (h *IntHeap) Peek() int          { return h.items[0] }
+func (h *IntHeap) Pop() (v interface{}) {
+	h.items, v = h.items[:h.Len()-1], h.items[h.Len()-1]
+	return v
+}
+func (h *IntHeap) Push(v interface{}) { h.items = append(h.items, v.(int)) }
+
+func NewHeap(less func(int, int) bool) *IntHeap {
+	return &IntHeap{less: less}
 }
