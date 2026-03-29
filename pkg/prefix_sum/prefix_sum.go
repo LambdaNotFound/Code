@@ -1,4 +1,4 @@
-package math
+package prefixsum
 
 import (
 	. "gocode/types"
