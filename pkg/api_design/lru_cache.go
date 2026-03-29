@@ -1,9 +1,5 @@
 package apidesign
 
-import (
-	"container/list"
-)
-
 /**
  * 146. LRU Cache
  *
@@ -74,48 +70,6 @@ func (l *LRUCache) Put(key int, value int) {
 			lru := l.tail.prev
 			l.remove(lru)
 			delete(l.cache, lru.key)
-		}
-	}
-}
-
-/**
- * w/ "container/list"
- */
-type LRUCacheWithList[K comparable] struct {
-	capacity int
-	list     *list.List
-	hashmap  map[K]*list.Element
-}
-
-func ConstructorLRUCacheWithList[K comparable](capacity int) LRUCacheWithList[K] {
-	return LRUCacheWithList[K]{
-		capacity: capacity,
-		list:     list.New(),
-		hashmap:  make(map[K]*list.Element),
-	}
-}
-
-func (l *LRUCacheWithList[K]) Get(key K) any {
-	if node, ok := l.hashmap[key]; ok {
-		value := l.list.Remove(node)
-		e := l.list.PushFront(value)
-		l.hashmap[key] = e
-		return node.Value
-	}
-	return nil
-}
-
-func (l *LRUCacheWithList[K]) Put(key K, value any) {
-	if node, ok := l.hashmap[key]; ok {
-		l.list.Remove(node)
-		l.list.PushFront(value)
-	} else {
-		e := l.list.PushFront(value)
-		l.hashmap[key] = e
-		if l.list.Len() > l.capacity {
-			back := l.list.Back()
-			l.list.Remove(back)
-			delete(l.hashmap, back.Value.(K))
 		}
 	}
 }
