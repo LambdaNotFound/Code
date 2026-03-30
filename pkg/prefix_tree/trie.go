@@ -1,4 +1,4 @@
-package apidesign
+package prefixtree
 
 /**
  * 208. Implement Trie (Prefix Tree)
