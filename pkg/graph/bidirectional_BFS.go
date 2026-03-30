@@ -1,6 +1,62 @@
 package graph
 
 /**
+ * 127. Word Ladder
+ */
+func ladderLengthBidirectionalBFS(beginWord string, endWord string, wordList []string) int {
+	wordSet := make(map[string]bool)
+	for _, str := range wordList {
+		wordSet[str] = true
+	}
+	if _, found := wordSet[endWord]; !found {
+		return 0
+	}
+
+	queueForward, queueBackward := []string{beginWord}, []string{endWord}
+	visitedForward, visitedBackward := map[string]int{beginWord: 0}, map[string]int{endWord: 1}
+	for len(queueForward) > 0 && len(queueBackward) > 0 {
+		if len(queueForward) > len(queueBackward) {
+			queueForward, queueBackward = queueBackward, queueForward
+			visitedForward, visitedBackward = visitedBackward, visitedForward
+		}
+
+		size := len(queueForward)
+		for i := 0; i < size; i++ {
+			word := queueForward[0]
+			queueForward = queueForward[1:]
+
+			for j := 0; j < len(word); j++ {
+				chars := []rune(word)
+				for k := 'a'; k <= 'z'; k++ {
+					if k == chars[j] {
+						continue
+					}
+					chars[j] = k
+					next := string(chars)
+					if _, found := wordSet[next]; !found {
+						continue
+					}
+					if _, found := visitedForward[next]; found {
+						continue
+					}
+					if steps, found := visitedBackward[next]; found {
+						return visitedForward[word] + steps + 1
+					}
+					queueForward = append(queueForward, next)
+					visitedForward[next] = visitedForward[word] + 1
+				}
+			}
+		}
+	}
+
+	return 0
+}
+
+/**
+ * 126. Word Ladder II
+ */
+
+/**
  * Minimum Knight Moves
  *
  * 1. TWO FRONTIERS    — current layer being expanded on each side
