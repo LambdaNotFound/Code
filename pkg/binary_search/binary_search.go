@@ -227,3 +227,28 @@ func searchMatrix(matrix [][]int, target int) bool {
 	}
 	return false
 }
+
+/**
+ * 240. Search a 2D Matrix II
+ *
+ * Integers in each row are sorted in ascending from left to right.
+ * Integers in each column are sorted in ascending from top to bottom.
+ */
+func searchMatrix2(matrix [][]int, target int) bool {
+	if len(matrix) == 0 || len(matrix[0]) == 0 {
+		return false
+	}
+
+	m, n := len(matrix), len(matrix[0])
+	row, col := 0, n-1 // top-right
+	for row >= 0 && row < m && col >= 0 && col < n {
+		if matrix[row][col] == target {
+			return true
+		} else if matrix[row][col] > target {
+			col--
+		} else {
+			row++
+		}
+	}
+	return false
+}
