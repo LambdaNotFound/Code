@@ -194,6 +194,40 @@ func isPalindromeHelper(s string, l, r int) bool {
 	return true
 }
 
+// delete at most k chars
+func validPalindromeAtMostK(s string, k int) bool {
+	memo := make(map[[3]int]bool)
+
+	var dfs func(left, right, remaining int) bool
+	dfs = func(left, right, remaining int) bool {
+		// base case: pointers met or crossed
+		if left >= right {
+			return true
+		}
+
+		key := [3]int{left, right, remaining}
+		if val, found := memo[key]; found {
+			return val
+		}
+
+		var res bool
+		if s[left] == s[right] {
+			res = dfs(left+1, right-1, remaining)
+		} else if remaining == 0 {
+			res = false
+		} else {
+			// try deleting left char OR right char
+			res = dfs(left+1, right, remaining-1) ||
+				dfs(left, right-1, remaining-1)
+		}
+
+		memo[key] = res
+		return res
+	}
+
+	return dfs(0, len(s)-1, k)
+}
+
 /**
  * 409. Longest Palindrome
  *
@@ -260,4 +294,49 @@ func largestNumber(nums []int) string {
 	}
 
 	return strings.Join(strs, "")
+}
+
+/**
+ * 1047. Remove All Adjacent Duplicates In String
+ */
+func removeDuplicates(s string) string {
+	stack := []rune{}
+	for _, c := range s {
+		if len(stack) > 0 && stack[len(stack)-1] == c {
+			stack = stack[:len(stack)-1]
+		} else {
+			stack = append(stack, c)
+		}
+	}
+	return string(stack)
+}
+
+func removeKDuplicates(s string, k int) string {
+	type frame struct {
+		ch    byte
+		count int
+	}
+
+	stack := []frame{}
+
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if len(stack) > 0 && stack[len(stack)-1].ch == ch {
+			stack[len(stack)-1].count++
+			if stack[len(stack)-1].count == k {
+				stack = stack[:len(stack)-1] // pop when count reaches k
+			}
+		} else {
+			stack = append(stack, frame{ch, 1})
+		}
+	}
+
+	// reconstruct string from stack
+	var sb strings.Builder
+	for _, f := range stack {
+		for i := 0; i < f.count; i++ {
+			sb.WriteByte(f.ch)
+		}
+	}
+	return sb.String()
 }
