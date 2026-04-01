@@ -81,11 +81,11 @@ func mostVisitedPattern(username []string, timestamp []int, website []string) []
 }
 
 func mostVisitedPatternClaude(username []string, timestamp []int, website []string) []string {
-	// group visits by user, sorted by timestamp
 	type visit struct {
 		time int
 		site string
 	}
+
 	userVisits := map[string][]visit{}
 	for i := range username {
 		userVisits[username[i]] = append(userVisits[username[i]], visit{timestamp[i], website[i]})
@@ -96,7 +96,6 @@ func mostVisitedPatternClaude(username []string, timestamp []int, website []stri
 		})
 	}
 
-	// count patterns — each pattern counted once per user
 	patternCount := map[[3]string]int{}
 	for _, visits := range userVisits {
 		sites := make([]string, len(visits))
@@ -104,7 +103,6 @@ func mostVisitedPatternClaude(username []string, timestamp []int, website []stri
 			sites[i] = v.site
 		}
 
-		// deduplicate patterns for this user
 		seen := map[[3]string]bool{}
 		for i := 0; i < len(sites); i++ {
 			for j := i + 1; j < len(sites); j++ {
@@ -119,16 +117,25 @@ func mostVisitedPatternClaude(username []string, timestamp []int, website []stri
 		}
 	}
 
-	// find pattern with highest count, break ties lexicographically
 	var best [3]string
 	highestCount := 0
 	for pattern, count := range patternCount {
 		if count > highestCount ||
-			(count == highestCount && pattern < best) { // [3]string supports < directly!
+			(count == highestCount && lessPattern(pattern, best)) {
 			highestCount = count
 			best = pattern
 		}
 	}
 
 	return []string{best[0], best[1], best[2]}
+}
+
+func lessPattern(a, b [3]string) bool {
+	if a[0] != b[0] {
+		return a[0] < b[0]
+	}
+	if a[1] != b[1] {
+		return a[1] < b[1]
+	}
+	return a[2] < b[2]
 }
