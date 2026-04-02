@@ -2,6 +2,7 @@ package stack
 
 import (
 	"strconv"
+	"strings"
 )
 
 /**
@@ -141,6 +142,8 @@ func removeDuplicateLetters(s string) string {
 /**
  * 1209. Remove All Adjacent Duplicates in String II
  *
+ * a k duplicate removal consists of choosing k adjacent and equal letters from s
+ *
  * We repeatedly make k duplicate removals on s until we no longer can.
  */
 func removeDuplicates(s string, k int) string {
@@ -160,4 +163,32 @@ func removeDuplicates(s string, k int) string {
 		}
 	}
 	return string(stack)
+}
+
+func removeDuplicatesClaude(s string, k int) string {
+	type pair struct {
+		val  byte
+		freq int
+	}
+
+	stk := []pair{}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if len(stk) > 0 && stk[len(stk)-1].val == c {
+			stk[len(stk)-1].freq++
+		} else {
+			stk = append(stk, pair{c, 1})
+		}
+
+		// pop immediately when freq reaches k
+		if stk[len(stk)-1].freq == k {
+			stk = stk[:len(stk)-1]
+		}
+	}
+
+	var sb strings.Builder
+	for _, p := range stk {
+		sb.WriteString(strings.Repeat(string(p.val), p.freq))
+	}
+	return sb.String()
 }
