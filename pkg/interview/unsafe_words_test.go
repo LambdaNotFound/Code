@@ -1,4 +1,4 @@
-package prefixtree
+package interview
 
 import (
 	"testing"

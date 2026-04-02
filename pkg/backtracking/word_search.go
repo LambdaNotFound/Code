@@ -31,8 +31,9 @@ func exist(board [][]byte, word string) bool {
 		found := false
 		for _, d := range dirs {
 			r, c := row+d[0], col+d[1]
-			if backtrack(r, c, pos+1) { // explores all directions even after finding answer
-				found = true
+			if backtrack(r, c, pos+1) {
+				visited[row][col] = false
+				return true
 			}
 		}
 		visited[row][col] = false
