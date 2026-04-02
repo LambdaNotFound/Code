@@ -7,12 +7,13 @@ import (
 )
 
 /**
+ * Sliding Window
+ *
  * 1. Fixed-size window
  *
  * 2. Variable-size window (expand + shrink)
  *
  * 3. Anagram / frequency counter windows
- *
  */
 
 /**
@@ -25,22 +26,6 @@ import (
  * Space: O(1)
  */
 func lengthOfLongestSubstring(s string) int {
-	res, freqMap := 0, make(map[byte]int)
-	for left, right := 0, 0; right < len(s); right++ {
-		freqMap[s[right]]++
-		for freqMap[s[right]] > 1 {
-			freqMap[s[left]]--
-			left++
-		}
-		res = max(res, right-left+1)
-	}
-	return res
-}
-
-/*
- * optimize to store index in a map
- */
-func lengthOfLongestSubstringTrackIndex(s string) int {
 	res := 0
 	hashmap := make(map[byte]int)
 	for left, right := 0, 0; right < len(s); right++ {
@@ -55,7 +40,7 @@ func lengthOfLongestSubstringTrackIndex(s string) int {
 	return res
 }
 
-func lengthOfLongestSubstring_rune(s string) int {
+func lengthOfLongestSubstringRune(s string) int {
 	lastSeen := make(map[rune]int) // stores last seen index of each rune
 	start := 0                     // start index of current window
 	maxLen := 0
@@ -66,36 +51,12 @@ func lengthOfLongestSubstring_rune(s string) int {
 			start = prevIndex + 1
 		}
 		lastSeen[r] = i
-
 		// Current window length = i - start + 1
 		if i-start+1 > maxLen {
 			maxLen = i - start + 1
 		}
 	}
 	return maxLen
-}
-
-func lengthOfLongestSubstring_alt(s string) int {
-	res := 0
-	hashmap := make(map[byte]bool)
-	for left, right := 0, 0; right < len(s); {
-		_, exist := hashmap[s[right]]
-		if !exist {
-			hashmap[s[right]] = true
-			res = max(res, right-left+1)
-
-			right += 1
-		} else {
-			for ; left < right; left++ {
-				delete(hashmap, s[left])
-				if s[left] == s[right] {
-					break
-				}
-			}
-			left += 1
-		}
-	}
-	return res
 }
 
 /**
@@ -110,118 +71,30 @@ func minWindow(s string, t string) string {
 		freqMap[t[i]]++
 	}
 
-	res, size, cnt := "", math.MaxInt, len(t)
+	res, size, count := "", math.MaxInt, len(t)
 	for left, right := 0, 0; right < len(s); right++ {
 		freqMap[s[right]]--
 		if freqMap[s[right]] >= 0 {
-			cnt--
-			for cnt == 0 {
-				if freqMap[s[left]] == 0 {
-					cnt++
-					if right-left+1 < size {
-						size = right - left + 1
-						res = s[left : left+size]
-					}
-				}
+			count--
+		}
+		for count == 0 {
+			// shrink past non-required chars first
+			for freqMap[s[left]] < 0 {
 				freqMap[s[left]]++
 				left++
 			}
-		}
-	}
-
-	return res
-}
-
-func minWindowClaude(s string, t string) string {
-	freqMap := make(map[byte]int)
-	for i := range t {
-		freqMap[t[i]]++
-	}
-
-	res, size, cnt := "", math.MaxInt, len(t)
-	for left, right := 0, 0; right < len(s); right++ {
-		freqMap[s[right]]--
-		if freqMap[s[right]] >= 0 {
-			cnt--
-			for cnt == 0 {
-				// shrink past non-required chars first
-				for freqMap[s[left]] < 0 {
-					freqMap[s[left]]++
-					left++
-				}
-
-				// now s[left] is a required char — record window
-				if right-left+1 < size {
-					size = right - left + 1
-					res = s[left : left+size]
-				}
-
-				// invalidate window by removing s[left]
-				freqMap[s[left]]++
-				cnt++
-				left++
+			// now s[left] is a required char — record window
+			if right-left+1 < size {
+				size = right - left + 1
+				res = s[left : left+size]
 			}
-		}
-	}
-
-	return res
-}
-
-/**
- * 209. Minimum Size Subarray Sum
- *
- * return the minimal length of a subarray whose sum is greater than or equal to target
- */
-func minSubArrayLen(target int, nums []int) int {
-	res := math.MaxInt32
-
-	sum := 0
-	for left, right := 0, 0; right < len(nums); right++ {
-		sum += nums[right]
-
-		for sum >= target {
-			res = min(res, right-left+1)
-
-			sum -= nums[left]
-			left += 1
-		}
-	}
-
-	if res == math.MaxInt32 {
-		return 0
-	}
-	return res
-}
-
-/**
- * 340. Longest Substring with At Most K Distinct Characters
- */
-func lengthOfLongestSubstringKDistinct(s string, k int) int {
-	if k == 0 || len(s) == 0 {
-		return 0
-	}
-
-	left, maxLen := 0, 0
-	freq := make(map[byte]int)
-
-	for right := 0; right < len(s); right++ {
-		// expand window
-		freq[s[right]]++
-
-		// shrink window if too many distinct chars
-		for len(freq) > k { // len(map[byte]int)
-			freq[s[left]]--
-			if freq[s[left]] == 0 {
-				delete(freq, s[left])
-			}
+			// invalidate window by removing s[left]
+			freqMap[s[left]]++
+			count++
 			left++
 		}
-
-		// update max length
-		maxLen = max(maxLen, right-left+1)
 	}
-
-	return maxLen
+	return res
 }
 
 /**
@@ -281,36 +154,78 @@ func characterReplacementClaude(s string, k int) int {
  *
  */
 func findAnagrams(s string, p string) []int {
-	hashmap := make(map[byte]int)
+	freqMap := make(map[byte]int)
 	for i := range p {
-		hashmap[p[i]]++
+		freqMap[p[i]]++ // ← fix 1: p[i] not s[i]
 	}
 
-	res := make([]int, 0)
-	for left, right := 0, 0; right < len(s); {
-		cnt, exist := hashmap[s[right]]
-		if !exist {
-			for left < right { // move left side
-				hashmap[s[left]] += 1
-				left += 1
-			}
-			right += 1
-			left = right
-		} else {
-			if cnt > 0 {
-				hashmap[s[right]] -= 1
-				if right-left+1 == len(p) {
-					res = append(res, left)
-				}
-				right += 1
-			} else {
-				hashmap[s[left]] += 1
-				left += 1
-			}
+	res := []int{}
+	for left, right := 0, 0; right < len(s); right++ {
+		freqMap[s[right]]--
+		// shrink until window is valid again
+		for freqMap[s[right]] < 0 { // ← fix 2: targeted shrink
+			freqMap[s[left]]++
+			left++
+		}
+		if right-left+1 == len(p) {
+			res = append(res, left)
+			freqMap[s[left]]++
+			left++
+		}
+	}
+	return res
+}
+
+/**
+ * 209. Minimum Size Subarray Sum
+ *
+ * return the minimal length of a subarray whose sum is greater than or equal to target
+ */
+func minSubArrayLen(target int, nums []int) int {
+	res, sum := math.MaxInt32, 0
+	for left, right := 0, 0; right < len(nums); right++ {
+		sum += nums[right]
+
+		for sum >= target {
+			res = min(res, right-left+1)
+
+			sum -= nums[left]
+			left += 1
 		}
 	}
 
+	if res == math.MaxInt32 {
+		return 0
+	}
 	return res
+}
+
+/**
+ * 340. Longest Substring with At Most K Distinct Characters
+ */
+func lengthOfLongestSubstringKDistinct(s string, k int) int {
+	if k == 0 || len(s) == 0 {
+		return 0
+	}
+
+	maxLen := math.MinInt
+	freq := make(map[byte]int)
+	for left, right := 0, 0; right < len(s); right++ {
+		freq[s[right]]++
+
+		// shrink window if too many distinct chars
+		for len(freq) > k { // len(map[byte]int)
+			freq[s[left]]--
+			if freq[s[left]] == 0 {
+				delete(freq, s[left])
+			}
+			left++
+		}
+
+		maxLen = max(maxLen, right-left+1)
+	}
+
+	return maxLen
 }
 
 /**
