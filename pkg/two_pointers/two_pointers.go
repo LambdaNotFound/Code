@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-/** Two Pointers
+/**
+ * Two Pointers
  *
  * 1). Opposite-end pointers (meet in the middle)
  *
@@ -164,6 +165,25 @@ func sortColors(nums []int) {
 			i++
 		}
 	}
+}
+
+/**
+ * 977. Squares of a Sorted Array
+ *
+ */
+func sortedSquares(nums []int) []int {
+	res := make([]int, len(nums))
+	for left, right, i := 0, len(nums)-1, len(nums)-1; left <= right; i-- {
+		a, b := nums[left]*nums[left], nums[right]*nums[right]
+		if a > b {
+			res[i] = a
+			left++
+		} else {
+			res[i] = b
+			right--
+		}
+	}
+	return res
 }
 
 /**

@@ -9,11 +9,11 @@ import (
 /**
  * Sliding Window
  *
- * 1. Fixed-size window
+ * 1). Fixed-size window
  *
- * 2. Variable-size window (expand + shrink)
+ * 2). Variable-size window (expand + shrink)
  *
- * 3. Anagram / frequency counter windows
+ * 3). Anagram / frequency counter windows
  */
 
 /**
