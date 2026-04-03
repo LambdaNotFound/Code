@@ -13,54 +13,75 @@ func Test_reverseList(t *testing.T) {
 	testCases := []struct {
 		name     string
 		input    []int
-		expected *ListNode
+		expected []int
 	}{
-		{
-			"case 1",
-			[]int{1, 2, 3, 4, 5},
-			utils.CreateLinkedList([]int{5, 4, 3, 2, 1}),
-		},
+		{"multiple_nodes", []int{1, 2, 3, 4, 5}, []int{5, 4, 3, 2, 1}},
+		{"single_node", []int{1}, []int{1}},
+		{"two_nodes", []int{1, 2}, []int{2, 1}},
+		{"nil", []int{}, []int{}},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			head := utils.CreateLinkedList(tc.input)
-			result := reverseList(head)
-			equal := utils.VerifyLinkedLists(tc.expected, result)
-			assert.Equal(t, true, equal)
-
-			head = utils.CreateLinkedList(tc.input)
-			result = reverseList_recursive(head)
-			equal = utils.VerifyLinkedLists(tc.expected, result)
-			assert.Equal(t, true, equal)
-
-			head = utils.CreateLinkedList(tc.input)
-			result = reverseList_recursive2(head)
-			equal = utils.VerifyLinkedLists(tc.expected, result)
-			assert.Equal(t, true, equal)
+			want := utils.CreateLinkedList(tc.expected)
+			impls := []struct {
+				name string
+				fn   func(*ListNode) *ListNode
+			}{
+				{"iterative", reverseList_iterative},
+				{"recursive", reverseList_recursive},
+				{"recursive_alt", reverseList},
+			}
+			for _, impl := range impls {
+				head := utils.CreateLinkedList(tc.input)
+				result := impl.fn(head)
+				assert.True(t, utils.VerifyLinkedLists(want, result), "%s failed", impl.name)
+			}
 		})
 	}
 }
 
 func Test_mergeTwoLists(t *testing.T) {
-	list1 := utils.CreateLinkedList([]int{1, 3, 5, 7})
-	list2 := utils.CreateLinkedList([]int{2, 4, 6, 8})
+	testCases := []struct {
+		name     string
+		l1, l2   []int
+		expected []int
+	}{
+		{"interleaved", []int{1, 3, 5, 7}, []int{2, 4, 6, 8}, []int{1, 2, 3, 4, 5, 6, 7, 8}},
+		{"l1_nil", []int{}, []int{1, 2, 3}, []int{1, 2, 3}},
+		{"l2_nil", []int{1, 2, 3}, []int{}, []int{1, 2, 3}},
+		{"both_nil", []int{}, []int{}, []int{}},
+		{"l1_shorter", []int{1, 2}, []int{3, 4, 5, 6}, []int{1, 2, 3, 4, 5, 6}},
+		{"duplicates", []int{1, 1, 2}, []int{1, 2, 3}, []int{1, 1, 1, 2, 2, 3}},
+	}
 
-	want := utils.CreateLinkedList([]int{1, 2, 3, 4, 5, 6, 7, 8})
-	got := mergeTwoLists(list1, list2)
-	equal := utils.VerifyLinkedLists(want, got)
-
-	assert.Equal(t, true, equal)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := mergeTwoLists(utils.CreateLinkedList(tc.l1), utils.CreateLinkedList(tc.l2))
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
 }
 
 func Test_swapPairs(t *testing.T) {
-	list1 := utils.CreateLinkedList([]int{1, 2, 3, 4})
+	testCases := []struct {
+		name     string
+		input    []int
+		expected []int
+	}{
+		{"even_length", []int{1, 2, 3, 4}, []int{2, 1, 4, 3}},
+		{"odd_length", []int{1, 2, 3}, []int{2, 1, 3}},
+		{"single_node", []int{1}, []int{1}},
+		{"nil", []int{}, []int{}},
+		{"two_nodes", []int{1, 2}, []int{2, 1}},
+	}
 
-	want := utils.CreateLinkedList([]int{2, 1, 4, 3})
-	got := swapPairs(list1)
-	equal := utils.VerifyLinkedLists(want, got)
-
-	assert.Equal(t, true, equal)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := swapPairs(utils.CreateLinkedList(tc.input))
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
 }
 
 func Test_hasCycle(t *testing.T) {
@@ -351,4 +372,118 @@ func verifyCopyRandomList(head, got *Node) bool {
 	}
 
 	return true
+}
+
+func Test_removeNthFromEnd(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []int
+		n        int
+		expected []int
+	}{
+		{"remove_last", []int{1, 2, 3, 4, 5}, 1, []int{1, 2, 3, 4}},
+		{"remove_first", []int{1, 2, 3, 4, 5}, 5, []int{2, 3, 4, 5}},
+		{"remove_middle", []int{1, 2, 3, 4, 5}, 3, []int{1, 2, 4, 5}},
+		{"single_node", []int{1}, 1, []int{}},
+		{"two_nodes_remove_first", []int{1, 2}, 2, []int{2}},
+		{"two_nodes_remove_last", []int{1, 2}, 1, []int{1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := removeNthFromEnd(utils.CreateLinkedList(tc.input), tc.n)
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
+}
+
+func Test_rotateRight(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []int
+		k        int
+		expected []int
+	}{
+		{"k=2", []int{1, 2, 3, 4, 5}, 2, []int{4, 5, 1, 2, 3}},
+		{"k=0", []int{1, 2, 3}, 0, []int{1, 2, 3}},
+		{"k=length", []int{1, 2, 3}, 3, []int{1, 2, 3}},
+		{"k_gt_length", []int{1, 2, 3}, 5, []int{2, 3, 1}}, // 5 % 3 = 2, last 2 move to front
+		{"single_node", []int{1}, 10, []int{1}},
+		{"two_nodes", []int{1, 2}, 1, []int{2, 1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := rotateRight(utils.CreateLinkedList(tc.input), tc.k)
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
+}
+
+func Test_addTwoNumbers(t *testing.T) {
+	testCases := []struct {
+		name     string
+		l1, l2   []int // digits in reverse order (LSB first)
+		expected []int
+	}{
+		{"no_carry", []int{1, 2, 3}, []int{4, 5, 6}, []int{5, 7, 9}},
+		{"with_carry", []int{9, 9, 9}, []int{1}, []int{0, 0, 0, 1}},
+		{"carry_at_end", []int{5}, []int{5}, []int{0, 1}},
+		{"different_lengths", []int{2, 4, 3}, []int{5, 6, 4}, []int{7, 0, 8}}, // 342 + 465 = 807
+		{"zeros", []int{0}, []int{0}, []int{0}},
+		{"l2_longer", []int{1}, []int{9, 9}, []int{0, 0, 1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := addTwoNumbers(utils.CreateLinkedList(tc.l1), utils.CreateLinkedList(tc.l2))
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
+}
+
+func Test_oddEvenList(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []int
+		expected []int
+	}{
+		{"five_nodes", []int{1, 2, 3, 4, 5}, []int{1, 3, 5, 2, 4}},
+		{"four_nodes", []int{2, 1, 3, 5}, []int{2, 3, 1, 5}},
+		{"single_node", []int{1}, []int{1}},
+		{"two_nodes", []int{1, 2}, []int{1, 2}},
+		{"three_nodes", []int{1, 2, 3}, []int{1, 3, 2}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := oddEvenList(utils.CreateLinkedList(tc.input))
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+
+			got = oddEvenListCalude(utils.CreateLinkedList(tc.input))
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
+}
+
+func Test_reverseKGroup(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []int
+		k        int
+		expected []int
+	}{
+		{"k=2", []int{1, 2, 3, 4, 5}, 2, []int{2, 1, 4, 3, 5}},
+		{"k=3", []int{1, 2, 3, 4, 5}, 3, []int{3, 2, 1, 4, 5}},
+		{"k=1_no_change", []int{1, 2, 3}, 1, []int{1, 2, 3}},
+		{"k=length", []int{1, 2, 3, 4}, 4, []int{4, 3, 2, 1}},
+		{"single_node", []int{1}, 1, []int{1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := reverseKGroup(utils.CreateLinkedList(tc.input), tc.k)
+			assert.True(t, utils.VerifyLinkedLists(utils.CreateLinkedList(tc.expected), got))
+		})
+	}
 }
