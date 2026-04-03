@@ -28,69 +28,56 @@ func (hc *HitCounter) GetHits(timestamp int) int {
 }
 
 /*
- * Circular Buffer
+ * Circular Buffer (alternative implementation — commented out to avoid redeclaration)
+ *
+ * type HitCounter struct {
+ * 	timestamps [300]int
+ * 	counts     [300]int
+ * }
+ *
+ * func (hc *HitCounter) Hit(timestamp int) {
+ * 	idx := timestamp % 300
+ * 	if hc.timestamps[idx] == timestamp {
+ * 		hc.counts[idx]++
+ * 	} else {
+ * 		hc.timestamps[idx] = timestamp
+ * 		hc.counts[idx] = 1
+ * 	}
+ * }
+ *
+ * func (hc *HitCounter) GetHits(timestamp int) int {
+ * 	total := 0
+ * 	for i := 0; i < 300; i++ {
+ * 		if hc.timestamps[i] > timestamp-300 {
+ * 			total += hc.counts[i]
+ * 		}
+ * 	}
+ * 	return total
+ * }
  */
-type HitCounter struct {
-	timestamps [300]int
-	counts     [300]int
-}
-
-func Constructor() HitCounter {
-	return HitCounter{}
-}
-
-func (hc *HitCounter) Hit(timestamp int) {
-	idx := timestamp % 300
-
-	if hc.timestamps[idx] == timestamp {
-		// same second — increment count
-		hc.counts[idx]++
-	} else {
-		// new timestamp overwrites stale slot
-		hc.timestamps[idx] = timestamp
-		hc.counts[idx] = 1
-	}
-}
-
-func (hc *HitCounter) GetHits(timestamp int) int {
-	total := 0
-	for i := 0; i < 300; i++ {
-		// only count slots within the 300 second window
-		if hc.timestamps[i] > timestamp-300 {
-			total += hc.counts[i]
-		}
-	}
-	return total
-}
 
 /*
- * Binary Search
+ * Binary Search (alternative implementation — commented out to avoid redeclaration)
+ *
+ * type HitCounter struct {
+ * 	timestamps []int
+ * }
+ *
+ * func (hc *HitCounter) Hit(timestamp int) {
+ * 	hc.timestamps = append(hc.timestamps, timestamp)
+ * }
+ *
+ * func (hc *HitCounter) GetHits(timestamp int) int {
+ * 	cutoff := timestamp - 300
+ * 	left, right := 0, len(hc.timestamps)
+ * 	for left < right {
+ * 		mid := left + (right-left)/2
+ * 		if hc.timestamps[mid] <= cutoff {
+ * 			left = mid + 1
+ * 		} else {
+ * 			right = mid
+ * 		}
+ * 	}
+ * 	return len(hc.timestamps) - left
+ * }
  */
-type HitCounter struct {
-	timestamps []int
-}
-
-func Constructor() HitCounter {
-	return HitCounter{timestamps: make([]int, 0)}
-}
-
-func (hc *HitCounter) Hit(timestamp int) {
-	hc.timestamps = append(hc.timestamps, timestamp)
-}
-
-func (hc *HitCounter) GetHits(timestamp int) int {
-	cutoff := timestamp - 300
-
-	// binary search for first timestamp > cutoff
-	left, right := 0, len(hc.timestamps)
-	for left < right {
-		mid := left + (right-left)/2
-		if hc.timestamps[mid] <= cutoff {
-			left = mid + 1
-		} else {
-			right = mid
-		}
-	}
-
-	return len(hc.timestamps) - left
-}

@@ -28,24 +28,19 @@ func Test_LRUCache(t *testing.T) {
     assert.Equal(t, 3, value)
 }
 
-func Test_LRUCacheWithList(t *testing.T) {
-    cache := ConstructorLRUCacheWithList[int](3)
+func Test_LRUCacheEviction(t *testing.T) {
+    // identical eviction scenario using the concrete LRUCache API
+    cache := ConstructorLRUCache(3)
 
     cache.Put(1, 1)
     cache.Put(2, 2)
-    value := cache.Get(1)
+    assert.Equal(t, 1, cache.Get(1)) // hit, refreshes key 1
 
-    assert.Equal(t, 1, value.(int))
     cache.Put(3, 3)
-    value = cache.Get(2)
-    assert.Equal(t, 2, value.(int))
+    assert.Equal(t, 2, cache.Get(2)) // hit, refreshes key 2
 
-    cache.Put(4, 4)
-    value = cache.Get(1)
-    assert.Equal(t, nil, value)
-    value = cache.Get(4)
-    assert.Equal(t, 4, value.(int))
-
-    value = cache.Get(3)
-    assert.Equal(t, 3, value.(int))
+    cache.Put(4, 4)                   // evicts key 1 (LRU)
+    assert.Equal(t, -1, cache.Get(1)) // miss
+    assert.Equal(t, 4, cache.Get(4))  // hit
+    assert.Equal(t, 3, cache.Get(3))  // hit
 }

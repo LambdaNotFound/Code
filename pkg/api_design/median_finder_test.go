@@ -7,7 +7,7 @@ import (
 )
 
 func Test_MedianFinder(t *testing.T) {
-    medianFinder := MedianFinderConstructor()
+    medianFinder := ConstructorMedianFinder()
 
     medianFinder.AddNum(1)
     medianFinder.AddNum(2)
