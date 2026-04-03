@@ -37,6 +37,21 @@ func TestClimbStairs(t *testing.T) {
             n:        5,
             expected: 8,
         },
+        {
+            name:     "n = 6",
+            n:        6,
+            expected: 13,
+        },
+        {
+            name:     "n = 10",
+            n:        10,
+            expected: 89,
+        },
+        {
+            name:     "n = 20",
+            n:        20,
+            expected: 10946,
+        },
     }
 
     for _, tc := range tests {
