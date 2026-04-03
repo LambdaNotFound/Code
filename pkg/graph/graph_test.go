@@ -41,7 +41,7 @@ func Test_cloneGraph(t *testing.T) {
 
     for _, tc := range tests {
         t.Run(tc.name, func(t *testing.T) {
-            cloned := cloneGraph(tc.root)
+            cloned := cloneGraphBFS(tc.root)
             if tc.root == nil {
                 if cloned != nil {
                     t.Errorf("Expected nil, got %v", cloned)
@@ -58,7 +58,7 @@ func Test_cloneGraph(t *testing.T) {
                 t.Errorf("Cloned graph does not match original for test %s", tc.name)
             }
 
-            cloned = cloneGraph_DFS(tc.root)
+            cloned = cloneGraphDFS(tc.root)
             if tc.root == nil {
                 if cloned != nil {
                     t.Errorf("Expected nil, got %v", cloned)

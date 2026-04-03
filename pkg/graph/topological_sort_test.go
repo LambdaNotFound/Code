@@ -13,23 +13,13 @@ func Test_canFinish(t *testing.T) {
         prerequisites [][]int
         expected      bool
     }{
-        {
-            "case 1",
-            2,
-            [][]int{
-                {1, 0},
-            },
-            true,
-        },
-        {
-            "case 2",
-            2,
-            [][]int{
-                {1, 0},
-                {0, 1},
-            },
-            false,
-        },
+        {"case 1", 2, [][]int{{1, 0}}, true},
+        {"case 2", 2, [][]int{{1, 0}, {0, 1}}, false},
+        {name: "no_prereqs", numCourses: 3, prerequisites: [][]int{}, expected: true},
+        {name: "single_course", numCourses: 1, prerequisites: [][]int{}, expected: true},
+        {name: "linear_chain", numCourses: 4, prerequisites: [][]int{{1, 0}, {2, 1}, {3, 2}}, expected: true},
+        {name: "two_separate_cycles", numCourses: 4, prerequisites: [][]int{{0, 1}, {1, 0}, {2, 3}, {3, 2}}, expected: false},
+        {name: "self_loop", numCourses: 2, prerequisites: [][]int{{0, 0}}, expected: false},
     }
 
     for _, tc := range testCases {
@@ -52,9 +42,10 @@ func Test_scheduleCourse(t *testing.T) {
             expected: 3,
         },
         {
+            // day=1 (take {1,2}), day=3 (take {2,3}), day=6 > 4 → drop longest (3), day=3; take 2
             name:     "All fit perfectly",
             courses:  [][]int{{1, 2}, {2, 3}, {3, 4}},
-            expected: 3,
+            expected: 2,
         },
         {
             name:     "None fit (all deadlines too short)",
@@ -67,9 +58,10 @@ func Test_scheduleCourse(t *testing.T) {
             expected: 2, // Can take {4,6} and {2,6} or {5,5} and {2,6}
         },
         {
+            // only {2,4} and {1,100} fit; courses with deadlines 2 and 3 can't be kept
             name:     "Tight deadlines require optimal replacement",
             courses:  [][]int{{3, 2}, {4, 3}, {2, 4}, {1, 100}},
-            expected: 3,
+            expected: 2,
         },
         {
             name:     "Empty input",
@@ -92,9 +84,10 @@ func Test_scheduleCourse(t *testing.T) {
             expected: 2, // Best pick shortest ones: {1,5} + {2,5}
         },
         {
+            // {2,2} fits, {3,4} pushed day to 5 > 4 so drop {3,4}, then {10,100} fits; total 2
             name:     "Large course late in schedule",
             courses:  [][]int{{2, 2}, {3, 4}, {10, 100}},
-            expected: 3, // Enough total time for all
+            expected: 2,
         },
     }
 

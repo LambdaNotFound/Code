@@ -32,6 +32,21 @@ func Test_orangesRotting(t *testing.T) {
             [][]int{{2, 1, 1}, {0, 1, 1}, {1, 0, 1}},
             -1,
         },
+        {
+            name:     "single_fresh_adjacent",
+            grid:     [][]int{{2, 1}},
+            expected: 1,
+        },
+        {
+            name:     "isolated_fresh",
+            grid:     [][]int{{1, 0, 2}},
+            expected: -1,
+        },
+        {
+            name:     "single_fresh_cell",
+            grid:     [][]int{{1}},
+            expected: -1,
+        },
     }
 
     for _, tc := range testCases {
@@ -41,7 +56,7 @@ func Test_orangesRotting(t *testing.T) {
             assert.Equal(t, tc.expected, result)
 
             grid = deepCopy2D(tc.grid)
-            result = orangesRotting_slice(grid)
+            result = orangesRottingSlice(grid)
             assert.Equal(t, tc.expected, result)
         })
     }
