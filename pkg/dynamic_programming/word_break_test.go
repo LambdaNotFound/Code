@@ -13,30 +13,40 @@ func Test_wordBreak(t *testing.T) {
         input_wordDict []string
         expected       bool
     }{
+        {"case 1", "leetcode", []string{"leet", "code"}, true},
+        {"case 2", "applepenapple", []string{"apple", "pen"}, true},
+        {"case 3", "catsandog", []string{"cats", "dog", "sand", "and", "cat"}, false},
+
         {
-            "case 1",
-            "leetcode",
-            []string{"leet", "code"},
-            true,
+            name:           "single_word_match",
+            input_string:   "hello",
+            input_wordDict: []string{"hello"},
+            expected:       true,
         },
         {
-            "case 2",
-            "applepenapple",
-            []string{"apple", "pen"},
-            true,
+            name:           "no_match",
+            input_string:   "hello",
+            input_wordDict: []string{"world"},
+            expected:       false,
         },
         {
-            "case 3",
-            "catsandog",
-            []string{"cats", "dog", "sand", "and", "cat"},
-            false,
+            name:           "repeated_word",
+            input_string:   "aaaa",
+            input_wordDict: []string{"a", "aa"},
+            expected:       true,
+        },
+        {
+            name:           "word_used_multiple_times",
+            input_string:   "appleapple",
+            input_wordDict: []string{"apple"},
+            expected:       true,
         },
     }
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            result := wordBreak(tc.input_string, tc.input_wordDict)
-            assert.Equal(t, tc.expected, result)
+            assert.Equal(t, tc.expected, wordBreak(tc.input_string, tc.input_wordDict))
+            assert.Equal(t, tc.expected, wordBreakTrie(tc.input_string, tc.input_wordDict))
         })
     }
 }
@@ -65,6 +75,18 @@ func Test_wordBreak2(t *testing.T) {
             "catsandog",
             []string{"cats", "dog", "sand", "and", "cat"},
             []string{},
+        },
+        {
+            name:           "single_word",
+            input_string:   "hello",
+            input_wordDict: []string{"hello"},
+            expected:       []string{"hello"},
+        },
+        {
+            name:           "repeated_word",
+            input_string:   "aa",
+            input_wordDict: []string{"a"},
+            expected:       []string{"a a"},
         },
     }
 

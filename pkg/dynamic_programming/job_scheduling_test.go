@@ -35,6 +35,27 @@ func Test_jobScheduling(t *testing.T) {
             []int{5, 6, 4},
             6,
         },
+        {
+            name:      "single_job",
+            startTime: []int{5},
+            endTime:   []int{10},
+            profit:    []int{42},
+            expected:  42,
+        },
+        {
+            name:      "non_overlapping_take_all",
+            startTime: []int{1, 3, 5},
+            endTime:   []int{3, 5, 7},
+            profit:    []int{10, 20, 30},
+            expected:  60,
+        },
+        {
+            name:      "all_overlapping_take_best",
+            startTime: []int{1, 1, 1},
+            endTime:   []int{10, 10, 10},
+            profit:    []int{5, 15, 8},
+            expected:  15,
+        },
     }
 
     for _, tc := range testCases {

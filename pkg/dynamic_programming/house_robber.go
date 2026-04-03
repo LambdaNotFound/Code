@@ -41,6 +41,7 @@ func robII(nums []int) int {
 		}
 
 		return dp[len(nums)-1]
+	}
 
 	nums1 := nums[:len(nums)-1]
 	nums2 := nums[1:]
