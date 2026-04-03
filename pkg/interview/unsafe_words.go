@@ -1,6 +1,10 @@
 package interview
 
-import "strings"
+import (
+	"strings"
+
+	prefixtree "gocode/pkg/prefix_tree"
+)
 
 /**
  * Unsafe Words
@@ -11,7 +15,7 @@ import "strings"
  * text:   "this hate speech is very bad indeed today"
  */
 func filterUnsafeWords(text string, bannedWords []string) string {
-	trie := ConstructorTrie()
+	trie := prefixtree.ConstructorTrie()
 	for _, word := range bannedWords {
 		trie.Insert(strings.ToLower(word))
 	}
