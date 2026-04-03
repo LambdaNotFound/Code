@@ -29,6 +29,36 @@ func Test_sortList(t *testing.T) {
             []int{},
             []int{},
         },
+        {
+            name:     "single_node",
+            list:     []int{7},
+            expected: []int{7},
+        },
+        {
+            name:     "already_sorted",
+            list:     []int{1, 2, 3, 4, 5},
+            expected: []int{1, 2, 3, 4, 5},
+        },
+        {
+            name:     "reverse_sorted",
+            list:     []int{5, 4, 3, 2, 1},
+            expected: []int{1, 2, 3, 4, 5},
+        },
+        {
+            name:     "with_duplicates",
+            list:     []int{3, 1, 2, 1, 3},
+            expected: []int{1, 1, 2, 3, 3},
+        },
+        {
+            name:     "all_same",
+            list:     []int{4, 4, 4, 4},
+            expected: []int{4, 4, 4, 4},
+        },
+        {
+            name:     "mixed_negatives",
+            list:     []int{10, -3, 7, -1, 2},
+            expected: []int{-3, -1, 2, 7, 10},
+        },
     }
 
     for _, tc := range testCases {
