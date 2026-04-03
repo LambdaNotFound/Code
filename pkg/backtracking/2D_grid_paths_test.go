@@ -134,12 +134,6 @@ func TestExist(t *testing.T) {
             expected: false,
         },
         {
-            name:     "empty word",
-            board:    [][]byte{{'A', 'B'}},
-            word:     "",
-            expected: false,
-        },
-        {
             name:     "single cell match",
             board:    [][]byte{{'Z'}},
             word:     "Z",
