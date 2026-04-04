@@ -28,6 +28,8 @@ func Test_spiralOrder(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             result := spiralOrder(tc.matrix)
             assert.Equal(t, tc.expected, result)
+            result = spiralOrderWithMap(tc.matrix)
+            assert.Equal(t, tc.expected, result)
         })
     }
 }
@@ -82,6 +84,8 @@ func Test_insert(t *testing.T) {
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
             result := insert(tc.intervals, tc.newInterval)
+            assert.Equal(t, tc.expected, result)
+            result = insertWithSlice(tc.intervals, tc.newInterval)
             assert.Equal(t, tc.expected, result)
         })
     }

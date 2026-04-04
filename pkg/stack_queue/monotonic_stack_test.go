@@ -24,7 +24,7 @@ func Test_trap(t *testing.T) {
             result := trap(tc.height)
             assert.Equal(t, tc.expected, result)
 
-            result = trap_slice(tc.height)
+            result = trapSlice(tc.height)
             assert.Equal(t, tc.expected, result)
         })
     }
@@ -53,7 +53,7 @@ func Test_largestRectangleArea(t *testing.T) {
             result := largestRectangleArea(tc.height)
             assert.Equal(t, tc.expected, result)
 
-            result = largestRectangleArea_slice(tc.height)
+            result = largestRectangleAreaSlice(tc.height)
             assert.Equal(t, tc.expected, result)
         })
     }

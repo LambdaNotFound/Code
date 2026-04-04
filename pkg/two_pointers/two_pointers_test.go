@@ -207,8 +207,52 @@ func Test_isPalindrome(t *testing.T) {
 
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
-            isPalindrome(tc.input)
-            assert.Equal(t, tc.expected, tc.expected)
+            result := isPalindrome(tc.input)
+            assert.Equal(t, tc.expected, result)
         })
     }
+}
+
+func Test_threeSumClosest(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		target   int
+		expected int
+	}{
+		{"leetcode_1", []int{-1, 2, 1, -4}, 1, 2},
+		{"leetcode_2", []int{0, 0, 0}, 1, 0},
+		{"exact_match", []int{1, 2, 3}, 6, 6},
+		{"negative_target", []int{-5, -3, -1, 0, 2}, -4, -4},
+		{"three_elements", []int{1, 1, 1}, 10, 3},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nums := append([]int(nil), tt.nums...)
+			assert.Equal(t, tt.expected, threeSumClosest(nums, tt.target))
+		})
+	}
+}
+
+func Test_sortedSquares(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		expected []int
+	}{
+		{"leetcode_1", []int{-4, -1, 0, 3, 10}, []int{0, 1, 9, 16, 100}},
+		{"leetcode_2", []int{-7, -3, 2, 3, 11}, []int{4, 9, 9, 49, 121}},
+		{"all_negative", []int{-5, -3, -1}, []int{1, 9, 25}},
+		{"all_positive", []int{1, 2, 3}, []int{1, 4, 9}},
+		{"single", []int{-3}, []int{9}},
+		{"zeros", []int{-1, 0, 1}, []int{0, 1, 1}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nums := append([]int(nil), tt.nums...)
+			assert.Equal(t, tt.expected, sortedSquares(nums))
+		})
+	}
 }

@@ -113,3 +113,98 @@ func Test_lowestCommonAncestor(t *testing.T) {
         })
     }
 }
+
+func Test_sortedArrayToBST(t *testing.T) {
+	tests := []struct {
+		name string
+		nums []int
+	}{
+		{"single", []int{0}},
+		{"three", []int{-3, 0, 9}},
+		{"five", []int{-10, -3, 0, 5, 9}},
+		{"seven", []int{1, 2, 3, 4, 5, 6, 7}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := sortedArrayToBST(tt.nums)
+			// The result must be a valid BST
+			assert.True(t, isValidBST(root))
+			// Inorder traversal of BST == sorted input
+			got := inorderTraversal(root)
+			assert.Equal(t, tt.nums, got)
+			// The tree should be height-balanced
+			assert.True(t, isBalanced(root))
+		})
+	}
+}
+
+func Test_kthSmallest(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int // build BST from these sorted values
+		k        int
+		expected int
+	}{
+		{"k_1", []int{3, 5, 6, 8, 10}, 1, 3},
+		{"k_3", []int{1, 2, 3, 4, 5}, 3, 3},
+		{"k_last", []int{1, 2, 3}, 3, 3},
+		{"single", []int{5}, 1, 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := sortedArrayToBST(tt.nums)
+			assert.Equal(t, tt.expected, kthSmallest(root, tt.k), "kthSmallest")
+			assert.Equal(t, tt.expected, kthSmallestAlt(root, tt.k), "kthSmallestAlt")
+		})
+	}
+}
+
+func Test_lowestCommonAncestorBST(t *testing.T) {
+	/*
+	       6
+	      / \
+	     2   8
+	    / \ / \
+	   0  4 7  9
+	     / \
+	    3   5
+	*/
+	root := utils.BuildBST([]int{6, 2, 8, 0, 4, 7, 9, 3, 5})
+
+	// collect all nodes by value for easy reference
+	var collectNodes func(*TreeNode, map[int]*TreeNode)
+	collectNodes = func(n *TreeNode, m map[int]*TreeNode) {
+		if n == nil {
+			return
+		}
+		m[n.Val] = n
+		collectNodes(n.Left, m)
+		collectNodes(n.Right, m)
+	}
+	nodeMap := make(map[int]*TreeNode)
+	collectNodes(root, nodeMap)
+
+	tests := []struct {
+		name     string
+		p, q     int
+		expected int
+	}{
+		{"lca_2_8_is_6", 2, 8, 6},
+		{"lca_2_4_is_2", 2, 4, 2},
+		{"lca_3_5_is_4", 3, 5, 4},
+		{"lca_7_9_is_8", 7, 9, 8},
+		{"lca_0_5_is_2", 0, 5, 2},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, q := nodeMap[tt.p], nodeMap[tt.q]
+			result := lowestCommonAncestorBST(root, p, q)
+			assert.NotNil(t, result)
+			assert.Equal(t, tt.expected, result.Val)
+		})
+	}
+
+}

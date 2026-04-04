@@ -66,6 +66,54 @@ func Test_minRemoveToMakeValid(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := minRemoveToMakeValid(tc.s)
 			assert.Equal(t, tc.expected, result)
+			result = minRemoveToMakeValidClaude(tc.s)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}
+
+func Test_isValid(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected bool
+	}{
+		{"empty", "", true},
+		{"single_pair", "()", true},
+		{"multiple_types", "()[]{}", true},
+		{"wrong_order", "(]", false},
+		{"nested", "([{}])", true},
+		{"only_open", "(((", false},
+		{"only_close", ")))", false},
+		{"mismatch", "([)]", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isValid(tt.s), "isValid")
+			assert.Equal(t, tt.expected, isValidClaude(tt.s), "isValidClaude")
+		})
+	}
+}
+
+func Test_calculate2(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected int
+	}{
+		{"add_mul", "3+2*2", 7},
+		{"div", " 3/2 ", 1},
+		{"sub_div", " 3+5 / 2 ", 5},
+		{"all_mul", "2*3*4", 24},
+		{"all_div", "100/10/2", 5},
+		{"single", "42", 42},
+		{"add_sub", "1+2-3+4", 4},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, calculate2(tt.s))
 		})
 	}
 }
