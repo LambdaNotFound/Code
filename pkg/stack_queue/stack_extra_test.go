@@ -103,12 +103,33 @@ func Test_decodeString(t *testing.T) {
 		s        string
 		expected string
 	}{
+		// LeetCode examples
 		{"leetcode_1", "3[a]2[bc]", "aaabcbc"},
 		{"leetcode_2", "3[a2[c]]", "accaccacc"},
 		{"leetcode_3", "2[abc]3[cd]ef", "abcabccdcdcdef"},
+
+		// Single bracket group
 		{"single_repeat", "1[a]", "a"},
+		{"k_equals_1", "1[abc]", "abc"},
+		{"large_k", "10[a]", "aaaaaaaaaa"},
+
+		// Nesting
 		{"nested_repeat", "2[3[a]]", "aaaaaa"},
+		{"triple_nested", "2[3[2[a]]]", "aaaaaaaaaaaa"},  // 2*3*2 = 12 a's
+		{"nested_diff", "2[a3[b]]", "abbbabbb"},
+
+		// Multiple adjacent groups
+		{"two_groups", "2[a]3[b]", "aabbb"},
+		{"three_groups", "1[a]2[b]3[c]", "abbccc"},
+
+		// Letters outside brackets
+		{"prefix_suffix", "x2[y]z", "xyyz"},
 		{"no_brackets", "abc", "abc"},
+		{"letters_between", "a2[b]c3[d]e", "abbcddde"},
+
+		// Multi-char substrings
+		{"multi_char", "2[ab]", "abab"},
+		{"multi_char_nested", "2[a2[bc]]", "abcbcabcbc"},
 	}
 
 	for _, tt := range tests {
