@@ -114,6 +114,104 @@ func calculateII(s string) int {
  * Input:  "(2+6*3+5-(3*14/7+2)*5)+3"
  * Output: -12
  */
+func calculateIII(s string) int {
+	stack := []int{}
+	num, op := 0, '+'
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+
+		if c == '(' {
+			count, next := 1, i+1
+			for next < len(s) {
+				if s[next] == '(' {
+					count++
+				}
+				if s[next] == ')' {
+					count--
+				}
+				if count == 0 {
+					break
+				}
+				next++
+			}
+			num = calculateIII(s[i+1 : next])
+			i = next
+		}
+
+		if c >= '0' && c <= '9' {
+			num = num*10 + int(c-'0')
+		}
+		if c == '+' || c == '-' || c == '*' || c == '/' || i == len(s)-1 {
+			switch op {
+			case '+':
+				stack = append(stack, num)
+			case '-':
+				stack = append(stack, -num)
+			case '*':
+				stack[len(stack)-1] *= num
+			case '/':
+				stack[len(stack)-1] /= num
+			}
+			num = 0
+			op = rune(c)
+		}
+	}
+
+	res := 0
+	for _, v := range stack {
+		res += v
+	}
+	return res
+}
+
+func calculateClaude(s string) int {
+	pos := 0
+
+	var parse func() int
+	parse = func() int {
+		stack := []int{}
+		num, op := 0, byte('+')
+
+		for pos < len(s) {
+			ch := s[pos]
+			pos++
+
+			if ch >= '0' && ch <= '9' {
+				num = num*10 + int(ch-'0')
+			}
+
+			if ch == '(' {
+				num = parse() // recurse into parens
+			}
+
+			if (ch != ' ' && ch < '0') || pos == len(s) {
+				switch op {
+				case '+':
+					stack = append(stack, num)
+				case '-':
+					stack = append(stack, -num)
+				case '*':
+					stack[len(stack)-1] *= num
+				case '/':
+					stack[len(stack)-1] /= num
+				}
+				num, op = 0, ch
+			}
+
+			if ch == ')' {
+				break // return to caller
+			}
+		}
+
+		result := 0
+		for _, v := range stack {
+			result += v
+		}
+		return result
+	}
+
+	return parse()
+}
 
 /**
  * 394. Decode String

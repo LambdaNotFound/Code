@@ -93,3 +93,23 @@ func Test_calculateII(t *testing.T) {
 		})
 	}
 }
+
+func Test_calculateIII(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected int
+	}{
+		// LeetCode examples
+		{"example 1", "2*(5+5*2)/3+(6/2+8)", 21},
+		{"example 2", "(2+6*3+5-(3*14/7+2)*5)+3", -12},
+		{"example 3", "2*(3+4)-1", 13},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, calculateIII(tt.input))
+			assert.Equal(t, tt.expected, calculateClaude(tt.input))
+		})
+	}
+}
