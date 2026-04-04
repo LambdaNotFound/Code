@@ -3,7 +3,6 @@ package stack
 import (
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 /**
@@ -26,7 +25,7 @@ import (
 func calculate(s string) int {
 	stack := []int{} // stores result + sign before each '('
 	result, num, sign := 0, 0, 1
-	for _, ch := range s {
+	for i, ch := range s {
 		switch {
 		case ch >= '0' && ch <= '9':
 			num = num*10 + int(ch-'0')
@@ -54,8 +53,11 @@ func calculate(s string) int {
 			stack = stack[:len(stack)-2]
 			result = outerResult + outerSign*result
 		}
+		if i == len(s)-1 {
+			result += sign * num
+		}
 	}
-	return result + sign*num
+	return result
 }
 
 /**
@@ -64,112 +66,54 @@ func calculate(s string) int {
  * Input: s = "3+2*2"
  * Output: 7
  */
-func calculate2(s string) int {
-	s = strings.ReplaceAll(s, " ", "")
-	st := []int{}
-	op, num := '+', 0
+func calculateII(s string) int {
+	s = strings.Trim(s, " ")
+	stack := []int{}
+	num, op := 0, '+'
 	for i, c := range s {
-		if unicode.IsDigit(c) {
-			num = num*10 + (int(c) - '0')
+		if c >= '0' && c <= '9' {
+			num = num*10 + int(c-'0')
 		}
-		if i == len(s)-1 || !unicode.IsDigit(c) {
+		if i == len(s)-1 || c == '+' || c == '-' || c == '*' || c == '/' {
 			switch op {
 			case '+':
-				st = append(st, num)
+				stack = append(stack, num)
 			case '-':
-				st = append(st, -num)
+				stack = append(stack, -num)
 			case '*':
-				operand := st[len(st)-1]
-				st = st[:len(st)-1]
-				st = append(st, operand*num)
+				top := stack[len(stack)-1]
+				stack[len(stack)-1] = top * num
 			case '/':
-				operand := st[len(st)-1]
-				st = st[:len(st)-1]
-				st = append(st, operand/num)
+				top := stack[len(stack)-1]
+				stack[len(stack)-1] = top / num
 			}
-			op = c
 			num = 0
+			op = c
 		}
 	}
 
 	res := 0
-	for _, num := range st {
+	for _, num := range stack {
 		res += num
 	}
 	return res
 }
 
-/*
- * expr    = term   (('+' | '-') term)*      ← lowest precedence
- * term    = factor (('*' | '/') factor)*    ← higher precedence
- * factor  = number | '(' expr ')'           ← highest precedence
+/**
+ * 772. Basic Calculator III
+ *
+ * Input:  "1+1"
+ * Output: 2
+ *
+ * Input:  "6-4/2"
+ * Output: 4
+ *
+ * Input:  "2*(5+5*2)/3+(6/2+8)"
+ * Output: 21
+ *
+ * Input:  "(2+6*3+5-(3*14/7+2)*5)+3"
+ * Output: -12
  */
-func calculateRecursiveDescentParser(s string) int {
-	pos := 0
-
-	var parseExpr func() int
-	var parseTerm func() int
-	var parseFactor func() int
-
-	skipSpaces := func() {
-		for pos < len(s) && s[pos] == ' ' {
-			pos++
-		}
-	}
-
-	parseFactor = func() int {
-		skipSpaces()
-		if s[pos] == '(' {
-			pos++ // consume '('
-			val := parseExpr()
-			pos++ // consume ')'
-			return val
-		}
-		// parse number
-		num := 0
-		for pos < len(s) && s[pos] >= '0' && s[pos] <= '9' {
-			num = num*10 + int(s[pos]-'0')
-			pos++
-		}
-		return num
-	}
-
-	parseTerm = func() int {
-		val := parseFactor()
-		skipSpaces()
-		for pos < len(s) && (s[pos] == '*' || s[pos] == '/') {
-			op := s[pos]
-			pos++
-			right := parseFactor()
-			if op == '*' {
-				val *= right
-			} else {
-				val /= right
-			}
-			skipSpaces()
-		}
-		return val
-	}
-
-	parseExpr = func() int {
-		val := parseTerm()
-		skipSpaces()
-		for pos < len(s) && (s[pos] == '+' || s[pos] == '-') {
-			op := s[pos]
-			pos++
-			right := parseTerm()
-			if op == '+' {
-				val += right
-			} else {
-				val -= right
-			}
-			skipSpaces()
-		}
-		return val
-	}
-
-	return parseExpr()
-}
 
 /**
  * 394. Decode String
