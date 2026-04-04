@@ -100,16 +100,61 @@ func Test_calculateIII(t *testing.T) {
 		input    string
 		expected int
 	}{
-		// LeetCode examples
-		{"example 1", "2*(5+5*2)/3+(6/2+8)", 21},
-		{"example 2", "(2+6*3+5-(3*14/7+2)*5)+3", -12},
-		{"example 3", "2*(3+4)-1", 13},
+		// LeetCode 772 examples
+		{"leetcode_1", "1+1", 2},
+		{"leetcode_2", "6-4/2", 4},   // 6 - 2 = 4
+		{"leetcode_3", "2*(5+5*2)/3+(6/2+8)", 21},
+		{"leetcode_4", "(2+6*3+5-(3*14/7+2)*5)+3", -12},
+		{"leetcode_5", "2*(3+4)-1", 13},
+
+		// Operator precedence (* and / before + and -)
+		{"mul_before_add", "2+3*4", 14},
+		{"div_before_sub", "10-6/3", 8},
+		{"chain_mul_div", "6*2/4", 3},    // left-to-right: (6*2)/4 = 3
+		{"chain_div_mul", "8/2*3", 12},   // left-to-right: (8/2)*3 = 12
+
+		// Parentheses override precedence
+		{"parens_add_first", "(1+2)*3", 9},
+		{"parens_vs_mul", "(2+3)*(4+5)", 45},
+		{"parens_in_div", "10/(2+3)", 2},     // 10/5 = 2
+		{"deep_parens", "((1+2))", 3},
+		{"nested_mul", "((3+2)*2)", 10},
+
+		// All four operators with parentheses
+		{"mixed_all", "(1+2)*(3+(4*5))", 69}, // 3*(3+20) = 3*23 = 69
+		{"sub_in_parens", "(10-3)*2", 14},
+		{"div_in_parens", "(10/2)+3", 8},
+
+		// Integer division truncates toward zero
+		{"int_div", "7/2", 3},
+		{"int_div_exact", "10/2", 5},
+		{"int_div_chain", "100/10/2", 5},
+
+		// Single operations and numbers
+		{"single_number", "5", 5},
+		{"single_add", "1+2", 3},
+		{"single_mul", "4*3", 12},
+		{"single_div", "10/3", 3},
+
+		// Negative results
+		{"negative_result", "1-5", -4},
+		{"negative_mul", "10-3*4", -2}, // 10 - 12 = -2
+		{"zero_result", "3-3", 0},
+
+		// Multi-digit numbers
+		{"multi_digit", "100*2+50/5", 210}, // 200 + 10 = 210
+		{"large_parens", "(100+200)*3", 900},
+
+		// Chain same operation
+		{"chain_add", "1+2+3+4", 10},
+		{"chain_mul", "1*2*3*4", 24},
+		{"chain_sub", "10-1-2-3", 4},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, calculateIII(tt.input))
-			assert.Equal(t, tt.expected, calculateClaude(tt.input))
+			assert.Equal(t, tt.expected, calculateIII(tt.input), "calculateIII")
+			assert.Equal(t, tt.expected, calculateClaude(tt.input), "calculateClaude")
 		})
 	}
 }
