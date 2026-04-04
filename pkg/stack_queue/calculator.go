@@ -21,56 +21,41 @@ import (
  * Input: s = "(1+(4+5+2)-3)+(6+8)"
  * Output: 23
  *
+ * stack stores stores result + sign before each '('
  */
 func calculate(s string) int {
-	stack := make([]int, 0)
+	stack := []int{} // stores result + sign before each '('
 	result, num, sign := 0, 0, 1
-
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-
+	for _, ch := range s {
 		switch {
-		case c >= '0' && c <= '9':
-			// build multi-digit number
-			num = num*10 + int(c-'0')
+		case ch >= '0' && ch <= '9':
+			num = num*10 + int(ch-'0')
 
-		case c == '+' || c == '-':
-			// apply previous number with its sign
-			result += sign * num
+		case ch == '+' || ch == '-':
+			result += sign * num // commit current number
 			num = 0
-			if c == '+' {
+			if ch == '+' {
 				sign = 1
 			} else {
 				sign = -1
 			}
 
-		case c == '(':
-			// save current state — result and sign before '('
-			stack = append(stack, result)
-			stack = append(stack, sign)
-			// reset for expression inside parentheses
-			result = 0
-			sign = 1
+		case ch == '(':
+			// save current state, start fresh inside parens
+			stack = append(stack, result, sign)
+			result, sign = 0, 1
 
-		case c == ')':
-			// apply last number inside parentheses
-			result += sign * num
+		case ch == ')':
+			result += sign * num // commit last number in parens
 			num = 0
-
-			// restore outer expression state
+			// restore outer context
 			outerSign := stack[len(stack)-1]
-			stack = stack[:len(stack)-1]
-			outerResult := stack[len(stack)-1]
-			stack = stack[:len(stack)-1]
-
-			// combine: outer + outerSign * inner
+			outerResult := stack[len(stack)-2]
+			stack = stack[:len(stack)-2]
 			result = outerResult + outerSign*result
 		}
 	}
-
-	// apply last number
-	result += sign * num
-	return result
+	return result + sign*num
 }
 
 /**
