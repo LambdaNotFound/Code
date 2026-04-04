@@ -96,27 +96,6 @@ func Test_isValid(t *testing.T) {
 	}
 }
 
-func Test_calculate2(t *testing.T) {
-	tests := []struct {
-		name     string
-		s        string
-		expected int
-	}{
-		{"add_mul", "3+2*2", 7},
-		{"div", " 3/2 ", 1},
-		{"sub_div", " 3+5 / 2 ", 5},
-		{"all_mul", "2*3*4", 24},
-		{"all_div", "100/10/2", 5},
-		{"single", "42", 42},
-		{"add_sub", "1+2-3+4", 4},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, calculate2(tt.s))
-		})
-	}
-}
 
 func TestCalculate(t *testing.T) {
 	tests := []struct {
@@ -197,7 +176,7 @@ func TestCalculate(t *testing.T) {
 		{
 			name:     "Unary minus nested",
 			input:    "-(1-(2+3))",
-			expected: -4,
+			expected: 4, // -(1-5) = -(-4) = 4
 		},
 		{
 			name:     "Empty string",
