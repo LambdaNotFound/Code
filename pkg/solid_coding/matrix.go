@@ -1,5 +1,7 @@
 package solid_coding
 
+import "slices"
+
 /**
  * 54. Spiral Matrix
  */
@@ -108,27 +110,42 @@ func setZeroesOptimal(matrix [][]int) {
 }
 
 /**
- * 13. Roman to Integer
+ * 48. Rotate Image
+ *
+ *      reverse + diagonal swap
+ *  1, 2, 3    7, 8, 9    7, 4, 1
+ *  4, 5, 6    4, 5, 6    8, 5, 2
+ *  7, 8, 9    1, 2, 3    9, 6, 3
+ *
  */
-func romanToInt(s string) int {
-	toInt := map[byte]int{
-		'I': 1,
-		'V': 5,
-		'X': 10,
-		'L': 50,
-		'C': 100,
-		'D': 500,
-		'M': 1000,
+func rotateImage(matrix [][]int) {
+	n := len(matrix)
+
+	// slices.Reverse(matrix)
+	for i, j := 0, n-1; i < j; i, j = i+1, j-1 {
+		matrix[i], matrix[j] = matrix[j], matrix[i]
 	}
 
-	res := 0
-	for i := range s {
-		if i+1 < len(s) && toInt[s[i]] < toInt[s[i+1]] {
-			res -= toInt[s[i]]
-		} else {
-			res += toInt[s[i]]
+	for i := 0; i < n; i++ {
+		for j := i; j < n; j++ {
+			matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
 		}
 	}
+}
 
-	return res
+/**
+ * 189. Rotate Array
+ *
+ * [1,2,3,4,5,6,7], k = 3 => [5,6,7,1,2,3,4]
+ *
+ * reverse subarray + full reverse
+ * [0:n-k] [n-k,n]
+ * 4,3,2,1, 7,6,5
+ */
+func rotateArray(nums []int, k int) {
+	n := len(nums)
+	k = k % n
+	slices.Reverse(nums[:n-k])
+	slices.Reverse(nums[n-k : n])
+	slices.Reverse(nums)
 }
