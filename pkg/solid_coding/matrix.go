@@ -4,80 +4,36 @@ package solid_coding
  * 54. Spiral Matrix
  */
 func spiralOrder(matrix [][]int) []int {
-	top, bottom := 0, len(matrix)-1
-	left, right := 0, len(matrix[0])-1
-	res := make([]int, 0, len(matrix)*len(matrix[0])) // pre-allocate exact capacity
-
-	for left <= right && top <= bottom {
-		// Traverse top row left → right
-		for col := left; col <= right; col++ {
-			res = append(res, matrix[top][col])
-		}
-		top++
-
-		// Traverse right column top → bottom
-		for row := top; row <= bottom; row++ {
-			res = append(res, matrix[row][right])
-		}
-		right--
-
-		// Traverse bottom row right → left (only if row still valid)
-		if top <= bottom {
-			for col := right; col >= left; col-- {
-				res = append(res, matrix[bottom][col])
-			}
-			bottom--
-		}
-
-		// Traverse left column bottom → top (only if col still valid)
-		if left <= right {
-			for row := bottom; row >= top; row-- {
-				res = append(res, matrix[row][left])
-			}
-			left++
-		}
-	}
-
-	return res
-}
-
-func spiralOrderWithMap(matrix [][]int) []int {
-	nextDirection := map[string]string{
-		"top":    "right",
-		"right":  "bottom",
-		"bottom": "left",
-		"left":   "top",
-	}
-
 	m, n := len(matrix), len(matrix[0])
+	next := map[string]string{"top": "right", "right": "bottom", "bottom": "left", "left": "top"}
 	res := []int{}
-	rowTop, rowBottom := 0, m-1
-	colLeft, colRight := 0, n-1
-	direction := "top"
 
-	for len(res) != m*n {
-		if direction == "top" {
-			for j := colLeft; j <= colRight; j++ {
-				res = append(res, matrix[rowTop][j])
+	dir := "top"
+	topRow, rightCol, bottomRow, leftCol := 0, n-1, m-1, 0
+	for len(res) < m*n {
+		switch {
+		case dir == "top":
+			for c := leftCol; c <= rightCol; c++ {
+				res = append(res, matrix[topRow][c])
 			}
-			rowTop++
-		} else if direction == "right" {
-			for i := rowTop; i <= rowBottom; i++ {
-				res = append(res, matrix[i][colRight])
+			topRow++
+		case dir == "right":
+			for r := topRow; r <= bottomRow; r++ {
+				res = append(res, matrix[r][rightCol])
 			}
-			colRight--
-		} else if direction == "bottom" {
-			for j := colRight; j >= colLeft; j-- {
-				res = append(res, matrix[rowBottom][j])
+			rightCol--
+		case dir == "bottom":
+			for c := rightCol; c >= leftCol; c-- {
+				res = append(res, matrix[bottomRow][c])
 			}
-			rowBottom--
-		} else if direction == "left" {
-			for i := rowBottom; i >= rowTop; i-- {
-				res = append(res, matrix[i][colLeft])
+			bottomRow--
+		case dir == "left":
+			for r := bottomRow; r >= topRow; r-- {
+				res = append(res, matrix[r][leftCol])
 			}
-			colLeft++
+			leftCol++
 		}
-		direction = nextDirection[direction]
+		dir = next[dir]
 	}
 
 	return res
@@ -109,48 +65,44 @@ func setZeroes(matrix [][]int) {
 }
 
 func setZeroesOptimal(matrix [][]int) {
-	numRows, numCols := len(matrix), len(matrix[0])
-
-	// Extra variable since matrix[0][0] can't represent both
-	// row 0 and col 0 simultaneously
-	firstColHasZero := false
-
-	// Pass 1: use first row/col as markers
-	for row := 0; row < numRows; row++ {
-		// Check col 0 separately since it shares matrix[0][0]
-		if matrix[row][0] == 0 {
+	m, n := len(matrix), len(matrix[0])
+	firstRowHasZero, firstColHasZero := false, false
+	for i := 0; i < m; i++ {
+		if matrix[i][0] == 0 {
 			firstColHasZero = true
 		}
-		// Start col from 1 — col 0 is handled by firstColHasZero
-		for col := 1; col < numCols; col++ {
-			if matrix[row][col] == 0 {
-				matrix[row][0] = 0 // mark row
-				matrix[0][col] = 0 // mark col
+	}
+	for j := 0; j < n; j++ {
+		if matrix[0][j] == 0 {
+			firstRowHasZero = true
+		}
+	}
+
+	for i := 1; i < m; i++ {
+		for j := 1; j < n; j++ {
+			if matrix[i][j] == 0 {
+				matrix[i][0] = 0
+				matrix[0][j] = 0
 			}
 		}
 	}
 
-	// Pass 2: zero out cells based on markers in first row/col
-	// Start from row=1, col=1 — don't touch the markers yet!
-	for row := 1; row < numRows; row++ {
-		for col := 1; col < numCols; col++ {
-			if matrix[row][0] == 0 || matrix[0][col] == 0 {
-				matrix[row][col] = 0
+	for i := 1; i < m; i++ {
+		for j := 1; j < n; j++ {
+			if matrix[i][0] == 0 || matrix[0][j] == 0 {
+				matrix[i][j] = 0
 			}
 		}
 	}
 
-	// Pass 3: handle first row using matrix[0][0] as marker
-	if matrix[0][0] == 0 {
-		for col := 0; col < numCols; col++ {
-			matrix[0][col] = 0
+	if firstRowHasZero {
+		for j := 0; j < n; j++ {
+			matrix[0][j] = 0
 		}
 	}
-
-	// Pass 4: handle first col using firstColHasZero
 	if firstColHasZero {
-		for row := 0; row < numRows; row++ {
-			matrix[row][0] = 0
+		for i := 0; i < m; i++ {
+			matrix[i][0] = 0
 		}
 	}
 }
