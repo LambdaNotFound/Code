@@ -103,3 +103,86 @@ func countComponentsDFS(n int, edges [][]int) int {
 
 	return components
 }
+
+/**
+ * 128. Longest Consecutive Sequence
+ *
+ * HashSet is strictly simpler for this problem — Union Find shines when the problem has dynamic updates
+ * (adding numbers one by one and querying max sequence length after each insertion).
+ */
+type UnionFind struct {
+	parent map[int]int
+	rank   map[int]int
+	size   map[int]int // size of each component
+}
+
+func NewUnionFind() *UnionFind {
+	return &UnionFind{
+		parent: map[int]int{},
+		rank:   map[int]int{},
+		size:   map[int]int{},
+	}
+}
+
+func (uf *UnionFind) Add(x int) {
+	if _, exists := uf.parent[x]; !exists {
+		uf.parent[x] = x
+		uf.rank[x] = 0
+		uf.size[x] = 1
+	}
+}
+
+func (uf *UnionFind) Find(x int) int {
+	if uf.parent[x] != x {
+		uf.parent[x] = uf.Find(uf.parent[x]) // path compression
+	}
+	return uf.parent[x]
+}
+
+func (uf *UnionFind) Union(x, y int) {
+	px, py := uf.Find(x), uf.Find(y)
+	if px == py {
+		return
+	}
+	// union by rank
+	if uf.rank[px] < uf.rank[py] {
+		px, py = py, px
+	}
+	uf.parent[py] = px
+	uf.size[px] += uf.size[py]
+	if uf.rank[px] == uf.rank[py] {
+		uf.rank[px]++
+	}
+}
+
+func (uf *UnionFind) MaxSize() int {
+	best := 0
+	for x, px := range uf.parent {
+		if x == px { // only check roots
+			best = max(best, uf.size[px])
+		}
+	}
+	return best
+}
+
+func longestConsecutive(nums []int) int {
+	if len(nums) == 0 {
+		return 0
+	}
+
+	uf := NewUnionFind()
+	numSet := map[int]bool{}
+
+	for _, num := range nums {
+		uf.Add(num)
+		numSet[num] = true
+	}
+
+	for _, num := range nums {
+		if numSet[num+1] {
+			uf.Union(num, num+1) // union consecutive neighbors
+		}
+	}
+
+	return uf.MaxSize()
+}

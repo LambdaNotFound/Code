@@ -13,7 +13,6 @@ func longestConsecutive(nums []int) int {
 	}
 
 	longestStreak := 0
-
 	for num := range numSet { // map's keys are unordered
 		if numSet[num-1] { // only start sequence from the smallest number
 			continue
