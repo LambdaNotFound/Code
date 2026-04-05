@@ -1,3 +1,5 @@
+package types
+
 /**
  * Definition for a Node.
  * type Node struct {
@@ -6,11 +8,9 @@
  * }
  */
 
-package types
-
 type Node struct {
-    Val       int
-    Neighbors []*Node
-    Next *Node
-    Random *Node
+	Val       int
+	Neighbors []*Node
+	Next      *Node
+	Random    *Node
 }

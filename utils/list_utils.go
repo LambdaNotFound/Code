@@ -3,39 +3,39 @@ package utils
 import . "gocode/types"
 
 func CreateLinkedList(arr []int) *ListNode {
-    dummy := ListNode{}
+	dummy := ListNode{}
 
-    cur := &dummy
-    for _, val := range arr {
-        cur.Next = &ListNode{Val: val}
-        cur = cur.Next
-    }
+	cur := &dummy
+	for _, val := range arr {
+		cur.Next = &ListNode{Val: val}
+		cur = cur.Next
+	}
 
-    return dummy.Next
+	return dummy.Next
 }
 
 func VerifyLinkedLists(list1 *ListNode, list2 *ListNode) bool {
-    for list1 != nil && list2 != nil {
-        if list1.Val != list2.Val {
-            return false
-        }
-        list1 = list1.Next
-        list2 = list2.Next
-    }
+	for list1 != nil && list2 != nil {
+		if list1.Val != list2.Val {
+			return false
+		}
+		list1 = list1.Next
+		list2 = list2.Next
+	}
 
-    if list1 != nil || list2 != nil {
-        return false
-    }
+	if list1 != nil || list2 != nil {
+		return false
+	}
 
-    return true
+	return true
 }
 
 func RemoveIf[T any](s []T, pred func(T) bool) []T {
-    result := s[:0] // reuse underlying array
-    for _, v := range s {
-        if !pred(v) {
-            result = append(result, v)
-        }
-    }
-    return result
+	result := s[:0] // reuse underlying array
+	for _, v := range s {
+		if !pred(v) {
+			result = append(result, v)
+		}
+	}
+	return result
 }

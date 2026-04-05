@@ -8,14 +8,14 @@ import (
 type String string
 
 func foo(str string) string {
-    for i := 0; i < len(str); i++ {
-        b := str[i] // byte (uint8) everything’s ASCII, so 1 byte = 1 rune.
-        fmt.Printf("s[%d] = %c (byte value: %d)\n", i, b, b)
-    }
+	for i := 0; i < len(str); i++ {
+		b := str[i] // byte (uint8) everything’s ASCII, so 1 byte = 1 rune.
+		fmt.Printf("s[%d] = %c (byte value: %d)\n", i, b, b)
+	}
 
-    for i, r := range str {
-        fmt.Printf("index %d: rune %c (Unicode: %U)\n", i, r, r)
-    }
+	for i, r := range str {
+		fmt.Printf("index %d: rune %c (Unicode: %U)\n", i, r, r)
+	}
 
 	return string(str) + " method on custom type"
 }
@@ -26,5 +26,5 @@ func substr(str string, start, end int) string {
 }
 
 func Test_string_rune(t *testing.T) {
-    foo("你好世界")
+	foo("你好世界")
 }

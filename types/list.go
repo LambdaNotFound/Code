@@ -1,10 +1,10 @@
+package types
+
 /**
  * Definition for singly-linked list.
  */
 
-package types
-
 type ListNode struct {
-    Val  int
-    Next *ListNode
+	Val  int
+	Next *ListNode
 }
