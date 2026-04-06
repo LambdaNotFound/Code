@@ -1,19 +1,19 @@
-package stack
+package monoqueue
 
 /**
  * 239. Sliding Window Maximum
  *
  * Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
  * Output: [3,3,5,5,6,7]
- * Explanation:
+ *
  * Window position                Max
  * ---------------               -----
  * [1  3  -1] -3  5  3  6  7       3
- * 1 [3  -1  -3] 5  3  6  7       3
- * 1  3 [-1  -3  5] 3  6  7       5
- * 1  3  -1 [-3  5  3] 6  7       5
- * 1  3  -1  -3 [5  3  6] 7       6
- * 1  3  -1  -3  5 [3  6  7]      7
+ * 1  [3  -1  -3] 5  3  6  7       3
+ * 1  3  [-1  -3  5] 3  6  7       5
+ * 1  3  -1  [-3  5  3] 6  7       5
+ * 1  3  -1  -3  [5  3  6] 7       6
+ * 1  3  -1  -3  5 [3  6  7]       7
  *
  */
 func maxSlidingWindow(nums []int, k int) []int {
@@ -63,4 +63,24 @@ func maxSlidingWindowClaude(nums []int, k int) []int {
 	}
 
 	return result
+}
+
+/**
+ * 1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
+ *
+ */
+func longestSubarray(nums []int, limit int) int {
+	res := 1
+	for i := 0; i < len(nums); i++ {
+		minVal, maxVal := nums[i], nums[i]
+		for j := i + 1; j < len(nums); j++ {
+			minVal = min(minVal, nums[j])
+			maxVal = max(maxVal, nums[j])
+
+			if maxVal-minVal <= limit {
+				res = max(res, j-i+1)
+			}
+		}
+	}
+	return res
 }

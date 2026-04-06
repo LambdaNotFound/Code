@@ -17,6 +17,23 @@ func splitSum(a, b int) (x int, y int) {
 	return // returns x and y
 }
 
+// Time:  O(n²) — two nested loops, O(1) work each
+// Space: O(n²) — n(n+1)/2 results stored
+func minMaxPerSubSlice(nums []int) [][2]int {
+	n := len(nums)
+	results := make([][2]int, 0, n*(n+1)/2)
+
+	for start := 0; start < n; start++ {
+		curMin, curMax := nums[start], nums[start]
+		for end := start + 1; end <= n; end++ {
+			curMin = min(curMin, nums[end-1])
+			curMax = max(curMax, nums[end-1])
+			results = append(results, [2]int{curMin, curMax})
+		}
+	}
+	return results
+}
+
 func Test_slice_nil(t *testing.T) {
 	var nilSlice []int = nil
 	var emptySlice []int = []int{}
