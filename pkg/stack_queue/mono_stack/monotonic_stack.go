@@ -1,4 +1,4 @@
-package stack
+package monostack
 
 import . "gocode/containers"
 

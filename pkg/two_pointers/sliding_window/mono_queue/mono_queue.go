@@ -1,45 +1,31 @@
 package monoqueue
 
 /**
+ * Increasing Monotonic Queue: It only keeps elements in increasing order,
+ *    and any element that is smaller than the current minimum is removed.
+ * Decreasing Monotonic Queue: It only keeps elements in decreasing order,
+ *    and any element that is larger than the current maximum is removed.
+ *
+ *
+ * We use a MonoQueue as the data structure to query both the minimum and maximum values in O(1) time complexity.
+ */
+
+/**
  * 239. Sliding Window Maximum
  *
  * Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
  * Output: [3,3,5,5,6,7]
- *
- * Window position                Max
- * ---------------               -----
- * [1  3  -1] -3  5  3  6  7       3
- * 1  [3  -1  -3] 5  3  6  7       3
- * 1  3  [-1  -3  5] 3  6  7       5
- * 1  3  -1  [-3  5  3] 6  7       5
- * 1  3  -1  -3  [5  3  6] 7       6
- * 1  3  -1  -3  5 [3  6  7]       7
- *
+ *                                             Decreasing Monotonic Queue
+ *  Window position                Max         Window
+ *  ---------------               -----       --------
+ * [1  3  -1] -3  5  3  6  7       3          [1, 2]
+ *  1 [3  -1  -3] 5  3  6  7       3          [1, 2, 3]
+ *  1  3 [-1  -3  5] 3  6  7       5          [4]
+ *  1  3  -1 [-3  5  3] 6  7       5          [4, 5]
+ *  1  3  -1  -3 [5  3  6] 7       6          [6]
+ *  1  3  -1  -3  5 [3  6  7]      7          [7]
  */
 func maxSlidingWindow(nums []int, k int) []int {
-	deque := make([]int, 0)
-	res := make([]int, 0)
-	for l, r := 0, 0; r < len(nums); r++ {
-		for len(deque) > 0 && deque[len(deque)-1] < nums[r] {
-			deque = deque[:len(deque)-1]
-		}
-		deque = append(deque, nums[r]) // deque front tracks biggest num
-
-		if r-l+1 == k {
-			front := deque[0]
-			res = append(res, front)
-
-			if nums[l] == front {
-				deque = deque[1:]
-			}
-			l++
-		}
-	}
-
-	return res
-}
-
-func maxSlidingWindowClaude(nums []int, k int) []int {
 	result := make([]int, 0, len(nums)-k+1)
 	deque := make([]int, 0) // stores indices, decreasing order of values
 
