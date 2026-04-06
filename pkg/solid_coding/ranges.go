@@ -6,6 +6,24 @@ import (
 )
 
 /**
+ * Ranges template
+ */
+func linearScan(nums []int) [][]int {
+	res := [][]int{}
+
+	for i := 0; i < len(nums)-1; i++ {
+		// check relationship between nums[i] and nums[i+1]
+		if nums[i+1]-nums[i] >= 2 { // gap → missing range
+			res = append(res, []int{nums[i] + 1, nums[i+1] - 1})
+		}
+		if nums[i+1] == nums[i]+1 { // consecutive → summary range
+			// extend current range
+		}
+	}
+	return res
+}
+
+/**
  * 228. Summary Ranges
  *
  * Input: nums = [0,2,3,4,6,8,9]

@@ -21,7 +21,37 @@ import (
  *  i:        [a, ..., b]
  *  j:                      [x, ..., y]
  *
+ *
+ * Two intervals [a,b] and [c,d] overlap iff: a <= d AND c <= b
+ *
+ * They DON'T overlap iff:
+ *   b < c  (first ends before second starts)
+ * OR
+ *   d < a  (second ends before first starts)
+ *
  */
+
+// merge intervals template
+func mergeIntervals(intervals [][]int) [][]int {
+	// step 1: sort by start time
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	res := [][]int{intervals[0]}
+
+	for i := 1; i < len(intervals); i++ {
+		last := res[len(res)-1]
+		cur := intervals[i]
+
+		if cur[0] <= last[1] { // overlap: merge
+			last[1] = max(last[1], cur[1])
+		} else { // no overlap: append
+			res = append(res, cur)
+		}
+	}
+	return res
+}
 
 /**
  * 57. Insert Interval
@@ -130,6 +160,53 @@ func eraseOverlapIntervalsSortByEndTime(intervals [][]int) int {
 		}
 	}
 	return erased
+}
+
+// interval intersections template, Two pointer:
+func intersect(A, B [][]int) [][]int {
+	res := [][]int{}
+	i, j := 0, 0
+
+	for i < len(A) && j < len(B) {
+		// find overlap
+		lo := max(A[i][0], B[j][0])
+		hi := min(A[i][1], B[j][1])
+
+		if lo <= hi {
+			res = append(res, []int{lo, hi})
+		}
+
+		// advance pointer with smaller end
+		if A[i][1] < B[j][1] {
+			i++
+		} else {
+			j++
+		}
+	}
+	return res
+}
+
+/**
+ * 986. Interval List Intersections
+ */
+func intervalIntersection(firstList [][]int, secondList [][]int) [][]int {
+	m, n := len(firstList), len(secondList)
+	res := [][]int{}
+	for i, j := 0, 0; i < m && j < n; {
+		start := max(firstList[i][0], secondList[j][0])
+		end := min(firstList[i][1], secondList[j][1])
+		if start <= end {
+			res = append(res, []int{start, end})
+		}
+
+		if firstList[i][1] < secondList[j][1] {
+			i++
+		} else {
+			j++
+		}
+	}
+
+	return res
 }
 
 /**
