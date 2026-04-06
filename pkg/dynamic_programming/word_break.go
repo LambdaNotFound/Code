@@ -10,27 +10,81 @@ package dynamic_programming
  *     dp[i] stores if substring s[0, i - 1] is a valid sequence
  *     dp[i] == true if (1). s[0, i - 1] in dict OR
  *                      (2). dp[j] == true AND s[j, i - 1] in dict
+ *
+ * Gap index:  0   1   2   3   4   5   6   7   8
+ *             |   |   |   |   |   |   |   |   |
+ * Character:    l   e   e   t   c   o   d   e
+ *
+ * The moment you see dp of size n+1 over a string, anchor your brain: i is a gap, dp[i] is about the prefix s[0:i].
  */
 func wordBreak(s string, wordDict []string) bool {
+	dict := make(map[string]bool)
+	for _, word := range wordDict {
+		dict[word] = true
+	}
+
+	dp := make([]bool, len(s)+1)
+	dp[0] = true
+	for i := 1; i <= len(s); i++ {
+		for j := 0; j < i; j++ {
+			substr := s[j:i] // i is the gap index
+			if _, found := dict[substr]; found && dp[j] {
+				dp[i] = true
+			}
+		}
+	}
+
+	return dp[len(s)]
+}
+
+func wordBreakCharIndex(s string, wordDict []string) bool {
 	wordMap := make(map[string]bool)
 	for _, word := range wordDict {
 		wordMap[word] = true
 	}
 
-	n := len(s)
-	dp := make([]bool, n+1)
+	dp := make([]bool, len(s)+1)
 	dp[0] = true // base case: empty string is always valid
-
-	for i := 1; i <= n; i++ {
-		for j := 0; j < i; j++ {
-			if dp[j] && wordMap[s[j:i]] {
-				dp[i] = true
-				break // dp[i] confirmed — no need to check remaining splits
+	for i := 0; i < len(s); i++ {
+		for j := 0; j <= i; j++ {
+			if dp[j] && wordMap[s[j:i+1]] {
+				dp[i+1] = true
+				break // dp[i+1] confirmed — no need to check remaining splits
 			}
 		}
 	}
 
-	return dp[n]
+	return dp[len(s)]
+}
+
+func wordBreakTrie(s string, wordDict []string) bool {
+	root := NewTrie()
+	for _, word := range wordDict {
+		root.Insert(word)
+	}
+
+	dp := make([]bool, len(s)+1)
+	dp[0] = true // base case: empty string is always valid
+	for i := 0; i < len(s); i++ {
+		if !dp[i] {
+			continue
+		}
+
+		// walk trie from position i character by character
+		node := root
+		for j := i; j < len(s); j++ {
+			if _, found := node.nodes[rune(s[j])]; !found {
+				break
+			}
+			node = node.nodes[rune(s[j])]
+
+			if node.endOfWord {
+				dp[j+1] = true
+			}
+		}
+	}
+
+	return dp[len(s)]
 }
 
 type Trie struct {
@@ -50,46 +104,6 @@ func (t *Trie) Insert(word string) {
 		t = t.nodes[c]
 	}
 	t.endOfWord = true
-}
-
-func wordBreakTrie(s string, wordDict []string) bool {
-	// build trie from dictionary
-	root := NewTrie()
-	for _, word := range wordDict {
-		root.Insert(word)
-	}
-
-	n := len(s)
-	dp := make([]bool, n+1)
-	dp[0] = true // base case: empty string is always valid
-
-	for i := 0; i < n; i++ {
-		// only expand from positions that are reachable
-		if !dp[i] {
-			continue
-		}
-
-		// walk trie from position i character by character
-		// this finds all words in dict that start at position i
-		node := root
-		for j := i; j < n; j++ {
-			c := rune(s[j])
-
-			// no word in dict starts with this prefix — prune
-			if _, found := node.nodes[c]; !found {
-				break
-			}
-			node = node.nodes[c]
-
-			// found a complete word s[i..j] in dictionary
-			// mark dp[j+1] as reachable
-			if node.endOfWord {
-				dp[j+1] = true
-			}
-		}
-	}
-
-	return dp[n]
 }
 
 /**
