@@ -9,6 +9,12 @@ import (
  * 528. Random Pick with Weight
  *
  * prefixSum + binarySearch
+ *
+ * array         [0, 1, 2, 3, ...,   n-1, n]
+ *
+ * prefixSum  [0, 1, 2, 3, ..., n-1, n,   n+1]
+ *            [0, 0, 1, 3, ...,              ]
+ *
  */
 type Solution struct {
 	prefixSum []int
@@ -31,5 +37,11 @@ func (s *Solution) PickIndex() int {
 func upperBound(array []int, target int) int {
 	return sort.Search(len(array), func(i int) bool {
 		return target < array[i] // lower bound, target <= array[i]
+	})
+}
+
+func lowerBound(array []int, target int) int {
+	return sort.Search(len(array), func(i int) bool {
+		return target <= array[i]
 	})
 }
