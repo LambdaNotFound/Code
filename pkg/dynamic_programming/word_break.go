@@ -109,6 +109,7 @@ func (t *Trie) Insert(word string) {
 /**
  * 140. Word Break II
  *
+ * Return all such possible sentences in any order.
  */
 func wordBreak2(s string, wordDict []string) []string {
 	wordMap := make(map[string]bool)
@@ -119,7 +120,7 @@ func wordBreak2(s string, wordDict []string) []string {
 	n := len(s)
 	dp := make([]bool, n+1)
 	table := make([][]string, n+1)
-	for i := 1; i <= n; i += 1 {
+	for i := 1; i <= n; i++ {
 		substr := s[0:i]
 		if _, exist := wordMap[substr]; exist {
 			dp[i] = true
@@ -132,7 +133,7 @@ func wordBreak2(s string, wordDict []string) []string {
 			if _, exist := wordMap[substr]; exist && dp[j] {
 				dp[i] = true
 
-				for _, str := range table[j] {
+				for _, str := range table[j] { // multipe sentences at s[:j]
 					table[i] = append(table[i], str+" "+substr)
 				}
 			}
