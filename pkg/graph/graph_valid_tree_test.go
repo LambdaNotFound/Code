@@ -22,6 +22,9 @@ func Test_validTree(t *testing.T) {
 		{name: "disconnected_forest", n: 4, edges: [][]int{{0, 1}, {2, 3}}, expected: false},
 		{name: "chain", n: 4, edges: [][]int{{0, 1}, {1, 2}, {2, 3}}, expected: true},
 		{name: "star_graph", n: 5, edges: [][]int{{0, 1}, {0, 2}, {0, 3}, {0, 4}}, expected: true},
+		// edge ordering that triggers rank[rootA] < rank[rootB] branch in validTreeUF:
+		// union(1,0) → rank[1]=1; then union(2,0): rootA=2 (rank 0) < rootB=1 (rank 1)
+		{name: "rank_lt_branch", n: 3, edges: [][]int{{1, 0}, {2, 0}}, expected: true},
 	}
 
 	for _, tt := range tests {

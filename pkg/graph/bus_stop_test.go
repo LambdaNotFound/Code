@@ -58,3 +58,50 @@ func Test_numBusesToDestination(t *testing.T) {
 		})
 	}
 }
+
+// numBusesToDestination has known bugs:
+//   - source==target: returns -1 instead of 0 (no early-exit guard)
+//   - multi-transfer paths: visited[bus_index] reads from a stop-keyed map (always
+//     returns 0 for unset keys), so every reachable stop is assigned distance 1
+//
+// Only the LeetCode examples and clearly unreachable cases produce correct results.
+func Test_numBusesToDestination_original(t *testing.T) {
+	tests := []struct {
+		name     string
+		routes   [][]int
+		source   int
+		target   int
+		expected int
+	}{
+		{
+			name:     "leetcode_example1",
+			routes:   [][]int{{1, 2, 7}, {3, 6, 7}},
+			source:   1, target: 6,
+			expected: 2,
+		},
+		{
+			name:     "leetcode_example2_unreachable",
+			routes:   [][]int{{7, 12}, {4, 5, 15}, {6}},
+			source:   15, target: 12,
+			expected: -1,
+		},
+		{
+			name:     "direct_route_one_bus",
+			routes:   [][]int{{1, 2, 3, 4}},
+			source:   1, target: 4,
+			expected: 1,
+		},
+		{
+			name:     "unreachable_no_shared_stop",
+			routes:   [][]int{{1, 2, 3}},
+			source:   1, target: 5,
+			expected: -1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, numBusesToDestination(tt.routes, tt.source, tt.target))
+		})
+	}
+}

@@ -226,3 +226,56 @@ func Test_longestIncreasingPath(t *testing.T) {
         })
     }
 }
+
+func Test_findMinHeightTreesTwoPassBFS(t *testing.T) {
+    tests := []struct {
+        name     string
+        n        int
+        edges    [][]int
+        expected []int
+    }{
+        {
+            name:     "single_node",
+            n:        1,
+            edges:    [][]int{},
+            expected: []int{0},
+        },
+        {
+            name:     "two_nodes",
+            n:        2,
+            edges:    [][]int{{0, 1}},
+            expected: []int{0, 1},
+        },
+        {
+            name:     "star_graph_one_center",
+            n:        4,
+            edges:    [][]int{{1, 0}, {1, 2}, {1, 3}},
+            expected: []int{1},
+        },
+        {
+            name:     "path_graph_two_centers",
+            n:        6,
+            edges:    [][]int{{3, 0}, {3, 1}, {3, 2}, {3, 4}, {5, 4}},
+            expected: []int{3, 4},
+        },
+        {
+            name:     "chain_of_five_one_center",
+            n:        5,
+            edges:    [][]int{{0, 1}, {1, 2}, {2, 3}, {3, 4}},
+            expected: []int{2},
+        },
+        {
+            name:     "chain_of_four_two_centers",
+            n:        4,
+            edges:    [][]int{{0, 1}, {1, 2}, {2, 3}},
+            expected: []int{1, 2},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := findMinHeightTreesTwoPassBFS(tt.n, tt.edges)
+            assert.ElementsMatch(t, tt.expected, got)
+        })
+    }
+}
