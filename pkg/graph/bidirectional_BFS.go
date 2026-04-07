@@ -2,6 +2,10 @@ package graph
 
 /**
  * 127. Word Ladder
+ *
+ * 2 queues, 2 maps for bidirection BFS
+ *
+ * level order BFS, to track the steps
  */
 func ladderLengthBidirectionalBFS(beginWord string, endWord string, wordList []string) int {
 	wordSet := make(map[string]bool)
