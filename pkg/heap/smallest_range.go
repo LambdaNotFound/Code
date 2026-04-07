@@ -14,24 +14,22 @@ func smallestRange(nums [][]int) []int {
 			return a.num < b.num
 		},
 	}
-	upper := math.MinInt
-	for i := range nums {
-		val := nums[i][0]
-		upper = max(upper, val)
+	localmax := math.MinInt
+	for i, list := range nums {
+		localmax = max(localmax, list[0])
 
 		heap.Push(minHeap, NumItem{
-			num:      val,
+			num:      list[0],
 			idx:      0,
 			arrayIdx: i,
 		})
 	}
 
-	res := []int{minHeap.items[0].num, upper}
+	res := []int{minHeap.items[0].num, localmax}
 	for minHeap.Len() > 0 {
-		top := heap.Pop(minHeap).(NumItem)
-
-		if upper-top.num < res[1]-res[0] {
-			res = []int{top.num, upper}
+		top := heap.Pop(minHeap).(NumItem) // min from the min-heap
+		if localmax-top.num < res[1]-res[0] {
+			res = []int{top.num, localmax}
 		}
 
 		if top.idx == len(nums[top.arrayIdx])-1 {
@@ -39,12 +37,13 @@ func smallestRange(nums [][]int) []int {
 		}
 
 		nextNum := nums[top.arrayIdx][top.idx+1]
-		upper = max(upper, nextNum)
 		heap.Push(minHeap, NumItem{
 			num:      nextNum,
 			idx:      top.idx + 1,
 			arrayIdx: top.arrayIdx,
 		})
+
+		localmax = max(localmax, nextNum)
 	}
 
 	return res

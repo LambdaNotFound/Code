@@ -12,13 +12,21 @@ import (
  *    ... return h.less(h.items[i], h.items[j])
  */
 type Heap struct {
-	items []int
+	items []int // items[0] is the MAX or MIN
 	less  func(int, int) bool
 }
 
 func (h *Heap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
 func (h *Heap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
 func (h *Heap) Len() int           { return len(h.items) }
+
+/*
+ * container/heap calls Swap(0, n-1) before calling your Pop()
+ * — so by the time your Pop() runs, the minimum has already been swapped to the last position.
+ * Your Pop() just removes it from there.
+ *
+ * The heap then re-heapifies items[0] downward to restore the invariant.
+ */
 func (h *Heap) Pop() interface{} {
 	v := h.items[h.Len()-1]
 	h.items = h.items[:h.Len()-1]
