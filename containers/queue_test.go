@@ -37,3 +37,20 @@ func Test_Queue(t *testing.T) {
     assert.Equal(t, 0, value)
     assert.Equal(t, false, ok)
 }
+
+func Test_Queue_Peek(t *testing.T) {
+    queue := Queue[int]{}
+
+    // Peek on empty queue returns zero value and false
+    val, ok := queue.Peek()
+    assert.Equal(t, 0, val)
+    assert.Equal(t, false, ok)
+
+    // Peek returns front element without removing it
+    queue.Enqueue(10)
+    queue.Enqueue(20)
+    val, ok = queue.Peek()
+    assert.Equal(t, 10, val)
+    assert.Equal(t, true, ok)
+    assert.Equal(t, 2, queue.Size()) // size unchanged after Peek
+}

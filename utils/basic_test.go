@@ -32,6 +32,13 @@ func Test_slice_nil(t *testing.T) {
 	assert.Equal(t, emptySlice, sliceB)
 }
 
+/**
+ * Golang slice
+ *
+ * slice[0, 1, ..., n-1], len(slice) == n
+ * s = s[n:], s = s[:0] both empty slice
+ *
+ */
 func Test_slice_range(t *testing.T) {
 	slice := []int{1, 2, 3}
 	count := 0
@@ -43,14 +50,18 @@ func Test_slice_range(t *testing.T) {
 	}
 
 	assert.Equal(t, 3, count)
+	assert.Equal(t, 6, len(slice))
 
-	sliceIndexed := slice[len(slice)+1:]
+	sliceIndexed := slice[len(slice):]
 	assert.Equal(t, 0, len(sliceIndexed))
 	assert.Equal(t, []int{}, sliceIndexed)
 
 	sliceIndexed = slice[:0]
 	assert.Equal(t, 0, len(sliceIndexed))
 	assert.Equal(t, []int{}, sliceIndexed)
+
+	sliceIndexed = slice[len(slice)-1:]
+	assert.Equal(t, 1, len(sliceIndexed))
 }
 
 func Test_slice_remove_item(t *testing.T) {

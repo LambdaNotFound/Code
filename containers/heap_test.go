@@ -44,3 +44,30 @@ func Test_MaxHeap(t *testing.T) {
     value = minHeap.Peek()
     assert.Equal(t, "2025/04/21", value)
 }
+
+func Test_Heap_SingleElement(t *testing.T) {
+    h := &Heap[int]{less: func(a, b int) bool { return a < b }}
+    heap.Init(h)
+
+    h.PushItem(42)
+    assert.Equal(t, 1, h.Len())
+    assert.Equal(t, 42, h.Peek())
+
+    val := h.PopItem()
+    assert.Equal(t, 42, val)
+    assert.Equal(t, 0, h.Len())
+}
+
+func Test_Heap_Duplicates(t *testing.T) {
+    h := &Heap[int]{less: func(a, b int) bool { return a < b }}
+    heap.Init(h)
+
+    h.PushItem(5)
+    h.PushItem(5)
+    h.PushItem(5)
+    assert.Equal(t, 3, h.Len())
+    assert.Equal(t, 5, h.PopItem())
+    assert.Equal(t, 5, h.PopItem())
+    assert.Equal(t, 5, h.PopItem())
+    assert.Equal(t, 0, h.Len())
+}
