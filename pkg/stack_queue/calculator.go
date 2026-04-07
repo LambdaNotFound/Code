@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -165,6 +166,9 @@ func calculateIII(s string) int {
 }
 
 func calculateClaude(s string) int {
+	reg := regexp.MustCompile(`[^0-9+\-*/%()]`)
+	s = reg.ReplaceAllString(s, "")
+
 	pos := 0
 
 	var parse func() int

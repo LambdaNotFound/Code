@@ -9,11 +9,16 @@ import (
 )
 
 /**
+ *           Unicode code point
  *    for i, rune := range string {
+ *        byte index
  *
  *    for i := 0; i < len(string); i++ {
  *        byte := string[i]
  *
+ *    num, op := 0, byte('+')  byte
+ *    num, op := 0, '+'        rune literals
+ *    num, op := 0, "+"        string
  */
 
 /**
