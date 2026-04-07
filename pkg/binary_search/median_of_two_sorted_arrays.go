@@ -1,7 +1,6 @@
 package binarysearch
 
 import (
-	. "gocode/utils"
 	"math"
 )
 
@@ -63,9 +62,9 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 
 		if leftToPivotNums1 <= pivotNums2 && leftToPivotNums2 <= pivotNums1 {
 			if (m+n)%2 == 0 {
-				return (float64(Max(leftToPivotNums1, leftToPivotNums2)) + float64(Min(pivotNums1, pivotNums2))) / 2.0
+				return (float64(max(leftToPivotNums1, leftToPivotNums2)) + float64(min(pivotNums1, pivotNums2))) / 2.0
 			}
-			return float64(Max(leftToPivotNums1, leftToPivotNums2))
+			return float64(max(leftToPivotNums1, leftToPivotNums2))
 		} else if leftToPivotNums1 > pivotNums2 { // search on left, drop right half
 			high = pivotIdxNums1 - 1
 		} else {

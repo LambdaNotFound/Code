@@ -58,6 +58,27 @@ func Test_searchRange(t *testing.T) {
     }
 }
 
+// isBadVersion is hardcoded to return true for every version, so firstBadVersion
+// always converges to 0 (the left boundary). The else branch (isBadVersion==false)
+// is structurally unreachable with this stub.
+func Test_firstBadVersion(t *testing.T) {
+    testCases := []struct {
+        name     string
+        n        int
+        expected int
+    }{
+        {"n_1", 1, 0},
+        {"n_5", 5, 0},
+        {"n_100", 100, 0},
+    }
+
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            assert.Equal(t, tc.expected, firstBadVersion(tc.n))
+        })
+    }
+}
+
 func Test_binarySearch(t *testing.T) {
     testCases := []struct {
         name     string

@@ -22,6 +22,10 @@ func Test_searchRotatedSortedArrayII(t *testing.T) {
 		{"single_element_miss", []int{5}, 3, false},
 		{"not_rotated", []int{1, 2, 3, 4, 5}, 4, true},
 		{"duplicate_at_pivot", []int{3, 1, 1}, 3, true},
+		// sorted left half (nums[mid] > nums[right]) branch
+		{"sorted_left_target_in_left_half", []int{3, 4, 5, 1, 2}, 4, true},
+		{"sorted_left_target_in_right_half", []int{3, 4, 5, 1, 2}, 1, true},
+		{"sorted_left_target_not_found", []int{3, 4, 5, 1, 2}, 6, false},
 	}
 
 	for _, tc := range testCases {
