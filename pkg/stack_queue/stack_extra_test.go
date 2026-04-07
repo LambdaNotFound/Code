@@ -138,3 +138,31 @@ func Test_decodeString(t *testing.T) {
 		})
 	}
 }
+
+func Test_longestValidParentheses(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected int
+	}{
+		{"leetcode_1", "(()", 2},
+		{"leetcode_2", ")()())", 4},
+		{"empty", "", 0},
+		{"all_open", "(((", 0},
+		{"all_close", ")))", 0},
+		{"full_match", "()()", 4},
+		{"nested", "(())", 4},
+		{"complex", "()(())", 6},
+		{"trailing_open", "()((", 2},
+		{"single_pair", "()", 2},
+		{"interleaved", "())()(", 2},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, longestValidParentheses(tt.s), "stack")
+			assert.Equal(t, tt.expected, longestValidParenthesesDP(tt.s), "dp")
+			assert.Equal(t, tt.expected, longestValidParenthesesTwoPointers(tt.s), "two_pointers")
+		})
+	}
+}
