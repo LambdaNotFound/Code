@@ -78,6 +78,41 @@ func Test_ShouldSendNotification(t *testing.T) {
 				{"sms", 5, true},    // sms first call
 			},
 		},
+		{
+			name: "large k allows many consecutive days",
+			k:    5,
+			calls: []call{
+				{"email", 1, true},
+				{"email", 2, true},
+				{"email", 3, true},
+				{"email", 4, true},
+				{"email", 5, true},  // streak=5 == k, still allowed
+				{"email", 6, false}, // streak+1=6 > k=5, blocked
+				{"email", 8, true},  // gap → reset
+			},
+		},
+		{
+			name: "blocked day then gap of exactly one triggers reset",
+			k:    2,
+			calls: []call{
+				{"email", 1, true},
+				{"email", 2, true},
+				{"email", 3, false}, // blocked, lastDay stays 2
+				{"email", 4, true},  // day=4, last=2: gap (4 > 2+1) → reset, streak=1
+				{"email", 5, true},  // consecutive, streak=2
+				{"email", 6, false}, // blocked again
+			},
+		},
+		{
+			name: "blocked then called again same consecutive day is still blocked",
+			k:    2,
+			calls: []call{
+				{"email", 1, true},
+				{"email", 2, true},
+				{"email", 3, false}, // blocked
+				{"email", 3, false}, // same consecutive day → blocked again (no state change)
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -157,6 +192,36 @@ func Test_ShouldSendNotification2(t *testing.T) {
 				{"push", 3, false},  // push blocked by its own streak
 				{"email", 7, false}, // email: 7 <= 2+5=7, still cooling
 				{"email", 8, true},  // 8 > 7, cooldown expired, gap → reset
+			},
+		},
+		{
+			name:     "service blocked twice resets cooldown on second block",
+			k:        2,
+			cooldown: map[string]int{"email": 2},
+			calls: []call{
+				{"email", 1, true},
+				{"email", 2, true},
+				{"email", 3, false}, // first block, lastBlockedDay=3, cooldown=2
+				{"email", 6, true},  // 6 > 3+2=5, cooldown expired, gap from lastDay=2 → reset
+				{"email", 7, true},  // consecutive, streak=2
+				{"email", 8, false}, // second block, lastBlockedDay=8
+				{"email", 9, false}, // 9 <= 8+2=10, still cooling
+				{"email", 11, true}, // 11 > 10, cooldown expired, gap → reset
+			},
+		},
+		{
+			name:     "multiple services each with own cooldown",
+			k:        1,
+			cooldown: map[string]int{"email": 1, "sms": 3},
+			calls: []call{
+				{"email", 1, true},
+				{"email", 2, false}, // email blocked, cooldown=1
+				{"sms", 1, true},
+				{"sms", 2, false},   // sms blocked, cooldown=3
+				{"email", 3, false}, // email: 3 <= 2+1=3, still cooling
+				{"email", 4, true},  // email: 4 > 3, cooldown expired, gap → reset
+				{"sms", 5, false},   // sms: 5 <= 2+3=5, still cooling
+				{"sms", 6, true},    // sms: 6 > 5, cooldown expired, gap → reset
 			},
 		},
 	}

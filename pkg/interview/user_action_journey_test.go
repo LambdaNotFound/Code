@@ -58,6 +58,26 @@ func Test_groupLogsByUser(t *testing.T) {
 				100: {{100, 1000, "A"}, {100, 1000, "B"}},
 			},
 		},
+		{
+			name:     "empty logs returns empty groups",
+			logs:     []log{},
+			expected: map[int][]log{},
+		},
+		{
+			name: "three users grouped independently",
+			logs: []log{
+				{100, 1000, "A"},
+				{200, 1100, "B"},
+				{300, 1200, "C"},
+				{100, 1300, "B"},
+				{300, 1400, "A"},
+			},
+			expected: map[int][]log{
+				100: {{100, 1000, "A"}, {100, 1300, "B"}},
+				200: {{200, 1100, "B"}},
+				300: {{300, 1200, "C"}, {300, 1400, "A"}},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -113,6 +133,35 @@ func Test_Trie_Insert(t *testing.T) {
 			},
 			checkAction:  "A",
 			wantCount:    2,
+			wantChildren: []string{"B", "C"},
+		},
+		{
+			name: "three-action sequence builds deep path",
+			logGroups: [][]log{
+				{{100, 1000, "A"}, {100, 1200, "B"}, {100, 1300, "C"}},
+			},
+			checkAction:  "A",
+			wantCount:    1,
+			wantChildren: []string{"B"},
+		},
+		{
+			name: "repeated action in sequence stored as self-child",
+			logGroups: [][]log{
+				{{300, 1500, "B"}, {300, 1550, "B"}},
+			},
+			checkAction:  "B",
+			wantCount:    1,
+			wantChildren: []string{"B"}, // B → B
+		},
+		{
+			name: "count accumulates for three sequences sharing root action",
+			logGroups: [][]log{
+				{{100, 1000, "A"}, {100, 1200, "B"}},
+				{{200, 1100, "A"}, {200, 1200, "B"}},
+				{{300, 1050, "A"}, {300, 1200, "C"}},
+			},
+			checkAction:  "A",
+			wantCount:    3,
 			wantChildren: []string{"B", "C"},
 		},
 	}

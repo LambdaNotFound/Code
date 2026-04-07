@@ -95,6 +95,30 @@ func Test_filterUnsafeWords(t *testing.T) {
 			bannedWords: []string{"hate"},
 			expected:    "",
 		},
+		{
+			name:        "banned word does not match as substring of another word",
+			text:        "hatred is not hate",
+			bannedWords: []string{"hate"},
+			expected:    "hatred is not ****", // "hatred" is a different token
+		},
+		{
+			name:        "banned word repeated multiple times",
+			text:        "hate hate hate",
+			bannedWords: []string{"hate"},
+			expected:    "**** **** ****",
+		},
+		{
+			name:        "all words banned",
+			text:        "spam hate",
+			bannedWords: []string{"spam", "hate"},
+			expected:    "**** ****",
+		},
+		{
+			name:        "banned word with multiple punctuation marks",
+			text:        "this is hate!!! really",
+			bannedWords: []string{"hate"},
+			expected:    "this is **** really",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -166,6 +190,36 @@ func Test_filterUnsafePhrases(t *testing.T) {
 			bannedPhrases: []string{},
 			expected:      "hello world",
 		},
+		{
+			name:          "partial phrase prefix not replaced",
+			text:          "this hate is here",
+			bannedPhrases: []string{"hate speech"},
+			expected:      "this hate is here", // "hate" alone is only a prefix, not a full phrase
+		},
+		{
+			name:          "banned phrase appears twice",
+			text:          "hate speech and hate speech again",
+			bannedPhrases: []string{"hate speech"},
+			expected:      "**** **** and **** **** again",
+		},
+		{
+			name:          "three-word phrase matched entirely",
+			text:          "this very bad indeed behavior",
+			bannedPhrases: []string{"very bad indeed"},
+			expected:      "this **** **** **** behavior",
+		},
+		{
+			name:          "shorter and longer phrase both banned — longer wins",
+			text:          "this very bad indeed today",
+			bannedPhrases: []string{"very bad", "very bad indeed"},
+			expected:      "this **** **** **** today", // greedy: continues after "very bad" to match "very bad indeed"
+		},
+		{
+			name:          "empty text with phrases returns empty",
+			text:          "",
+			bannedPhrases: []string{"hate speech"},
+			expected:      "",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -228,6 +282,41 @@ func Test_PhraseTrie(t *testing.T) {
 				{[]string{"very"}, true},
 				{[]string{"very", "bad"}, true},
 				{[]string{"bad"}, false},
+			},
+		},
+		{
+			name:    "empty trie contains nothing",
+			inserts: []string{},
+			queries: []struct {
+				phrase   string
+				contains bool
+			}{
+				{"anything", false},
+			},
+			prefixQueries: []struct {
+				words    []string
+				isPrefix bool
+			}{
+				{[]string{"hate"}, false},
+			},
+		},
+		{
+			name:    "single-word phrase",
+			inserts: []string{"spam"},
+			queries: []struct {
+				phrase   string
+				contains bool
+			}{
+				{"spam", true},
+				{"spa", false},
+				{"spam extra", false},
+			},
+			prefixQueries: []struct {
+				words    []string
+				isPrefix bool
+			}{
+				{[]string{"spam"}, true},
+				{[]string{"other"}, false},
 			},
 		},
 	}
