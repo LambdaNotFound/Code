@@ -1,6 +1,7 @@
 package heap
 
 import (
+	"container/heap"
 	. "gocode/types"
 	"gocode/utils"
 	"testing"
@@ -176,13 +177,6 @@ func Test_MedianFinder(t *testing.T) {
         },
     }
 
-    // Production bug: Heap.Pop() truncates before reading the value:
-    //   h.items = h.items[:h.Len()-1]   // now length is len-1
-    //   v := h.items[h.Len()-1]          // reads h.items[len-2] instead of the popped element,
-    //                                     // and panics with index [-1] on a single-element heap.
-    // All MedianFinder tests panic at AddNum when the heap has exactly one element.
-    t.Skip("Skipping due to production bug in Heap.Pop(): panics on single-element heap")
-
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
             mf := Constructor()
@@ -193,4 +187,96 @@ func Test_MedianFinder(t *testing.T) {
             }
         })
     }
+}
+
+func Test_ListNodeMinHeap(t *testing.T) {
+    t.Run("push_pop_ordered", func(t *testing.T) {
+        h := &ListNodeMinHeap{}
+        heap.Init(h)
+
+        heap.Push(h, &ListNode{Val: 5})
+        heap.Push(h, &ListNode{Val: 1})
+        heap.Push(h, &ListNode{Val: 3})
+
+        assert.Equal(t, 3, h.Len())
+
+        v1 := heap.Pop(h).(*ListNode)
+        assert.Equal(t, 1, v1.Val)
+        v2 := heap.Pop(h).(*ListNode)
+        assert.Equal(t, 3, v2.Val)
+        v3 := heap.Pop(h).(*ListNode)
+        assert.Equal(t, 5, v3.Val)
+        assert.Equal(t, 0, h.Len())
+    })
+
+    t.Run("swap_and_less_via_heap_ordering", func(t *testing.T) {
+        h := &ListNodeMinHeap{
+            {Val: 10},
+            {Val: 2},
+            {Val: 7},
+        }
+        heap.Init(h) // establishes heap property via Less/Swap
+        assert.Equal(t, 2, (*h)[0].Val)
+    })
+}
+
+func Test_Heap(t *testing.T) {
+    t.Run("min_heap_push_peek_len_pop", func(t *testing.T) {
+        h := NewHeap(func(a, b int) bool { return a < b })
+        assert.Equal(t, 0, h.Len())
+
+        heap.Push(h, 5)
+        heap.Push(h, 2)
+        heap.Push(h, 8)
+        heap.Push(h, 1)
+
+        assert.Equal(t, 4, h.Len())
+        assert.Equal(t, 1, h.Peek()) // min at top
+
+        v := heap.Pop(h).(int)
+        assert.Equal(t, 1, v)
+        assert.Equal(t, 3, h.Len())
+        assert.Equal(t, 2, h.Peek())
+
+        v = heap.Pop(h).(int)
+        assert.Equal(t, 2, v)
+        v = heap.Pop(h).(int)
+        assert.Equal(t, 5, v)
+        v = heap.Pop(h).(int)
+        assert.Equal(t, 8, v)
+        assert.Equal(t, 0, h.Len())
+    })
+
+    t.Run("max_heap_push_peek_pop", func(t *testing.T) {
+        h := NewHeap(func(a, b int) bool { return a > b })
+        heap.Push(h, 3)
+        heap.Push(h, 10)
+        heap.Push(h, 7)
+
+        assert.Equal(t, 10, h.Peek()) // max at top
+
+        v := heap.Pop(h).(int)
+        assert.Equal(t, 10, v)
+        assert.Equal(t, 7, h.Peek())
+    })
+
+    t.Run("single_element_pop", func(t *testing.T) {
+        h := NewHeap(func(a, b int) bool { return a < b })
+        heap.Push(h, 42)
+        assert.Equal(t, 1, h.Len())
+        v := heap.Pop(h).(int)
+        assert.Equal(t, 42, v)
+        assert.Equal(t, 0, h.Len())
+    })
+
+    t.Run("duplicates", func(t *testing.T) {
+        h := NewHeap(func(a, b int) bool { return a < b })
+        heap.Push(h, 3)
+        heap.Push(h, 3)
+        heap.Push(h, 3)
+        assert.Equal(t, 3, h.Len())
+        assert.Equal(t, 3, h.Peek())
+        heap.Pop(h)
+        assert.Equal(t, 2, h.Len())
+    })
 }
