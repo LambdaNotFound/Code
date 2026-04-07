@@ -54,11 +54,11 @@ func Test_slice_range(t *testing.T) {
 
 	sliceIndexed := slice[len(slice):]
 	assert.Equal(t, 0, len(sliceIndexed))
-	assert.Equal(t, []int{}, sliceIndexed)
+	assert.Empty(t, sliceIndexed)
 
 	sliceIndexed = slice[:0]
 	assert.Equal(t, 0, len(sliceIndexed))
-	assert.Equal(t, []int{}, sliceIndexed)
+	assert.Empty(t, sliceIndexed)
 
 	sliceIndexed = slice[len(slice)-1:]
 	assert.Equal(t, 1, len(sliceIndexed))
