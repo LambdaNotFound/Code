@@ -318,9 +318,10 @@ func longestIncreasingPath(matrix [][]int) int {
 		indegree[i] = make([]int, n)
 	}
 
+	dirs := [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}
 	for r := 0; r < m; r++ {
 		for c := 0; c < n; c++ {
-			for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+			for _, dir := range dirs {
 				nextRow := r + dir[0]
 				nextCol := c + dir[1]
 				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
@@ -348,7 +349,7 @@ func longestIncreasingPath(matrix [][]int) int {
 			r, c := queue[0][0], queue[0][1]
 			queue = queue[1:]
 
-			for _, dir := range [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}} {
+			for _, dir := range dirs {
 				nextRow := r + dir[0]
 				nextCol := c + dir[1]
 				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
