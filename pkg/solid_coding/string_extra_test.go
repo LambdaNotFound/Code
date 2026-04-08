@@ -19,6 +19,7 @@ func Test_addBinary(t *testing.T) {
 		{"one_empty_bit", "1", "0", "1"},
 		{"carry_chain", "111", "1", "1000"},
 		{"different_lengths", "1", "111", "1000"},
+		{"sum3_case", "11", "11", "110"}, // bit-1: 1+1+carry(1)=3 → triggers case 3
 	}
 
 	for _, tt := range tests {
@@ -205,6 +206,82 @@ func Test_removeKDuplicates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, removeKDuplicates(tt.s, tt.k))
+		})
+	}
+}
+
+func Test_isPalindrome(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected bool
+	}{
+		{"leetcode_example1", "A man, a plan, a canal: Panama", true},
+		{"leetcode_example2", "race a car", false},
+		{"empty_string", "", true},
+		{"single_char", "a", true},
+		{"spaces_only", "   ", true},
+		{"digits_palindrome", "12321", true},
+		{"mixed_alphanumeric", "0P", false},
+		{"uppercase_lowercase", "AbBa", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isPalindrome(tt.s))
+		})
+	}
+}
+
+func Test_validPalindromeAtMostK(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		k        int
+		expected bool
+	}{
+		{"k0_palindrome", "racecar", 0, true},
+		{"k0_not_palindrome", "abcd", 0, false},
+		{"k1_one_delete", "abca", 1, true},
+		{"k1_not_fixable", "abcd", 1, false},
+		{"k2_two_deletes", "abcda", 2, true},
+		{"k_ge_len_always_true", "xyz", 3, true},
+		{"already_palindrome", "aba", 1, true},
+		{"single_char", "a", 0, true},
+		{"two_chars_same", "aa", 0, true},
+		{"two_chars_diff_k1", "ab", 1, true},
+		// longer string forces memo lookups (overlapping subproblems)
+		{"long_needs_k2", "abcddcba", 0, true},
+		{"long_not_fixable", "abcdefgh", 2, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, validPalindromeAtMostK(tt.s, tt.k))
+		})
+	}
+}
+
+// Test_myAtoi_extra adds cases that exercise the uncovered branches:
+//   - plus sign prefix (s[0]=='+' branch)
+//   - int32 overflow in both directions
+func Test_myAtoi_extra(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected int
+	}{
+		{"plus_sign", "+100", 100},
+		{"empty_string", "", 0},
+		{"only_spaces", "   ", 0},
+		{"int32_max_overflow", "9999999999", 2147483647},
+		{"int32_min_overflow", "-9999999999", -2147483648},
+		{"leading_zeros", "007", 7},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, myAtoi(tt.s))
 		})
 	}
 }

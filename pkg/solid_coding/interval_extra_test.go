@@ -192,3 +192,99 @@ func Test_employeeFreeTime(t *testing.T) {
 		})
 	}
 }
+
+func Test_mergeIntervals(t *testing.T) {
+	tests := []struct {
+		name      string
+		intervals [][]int
+		expected  [][]int
+	}{
+		{
+			name:      "leetcode_example1",
+			intervals: [][]int{{1, 3}, {2, 6}, {8, 10}, {15, 18}},
+			expected:  [][]int{{1, 6}, {8, 10}, {15, 18}},
+		},
+		{
+			name:      "leetcode_example2",
+			intervals: [][]int{{1, 4}, {4, 5}},
+			expected:  [][]int{{1, 5}},
+		},
+		{
+			name:      "no_overlap",
+			intervals: [][]int{{1, 2}, {3, 4}, {5, 6}},
+			expected:  [][]int{{1, 2}, {3, 4}, {5, 6}},
+		},
+		{
+			name:      "all_merge",
+			intervals: [][]int{{1, 10}, {2, 3}, {4, 8}},
+			expected:  [][]int{{1, 10}},
+		},
+		{
+			name:      "single_interval",
+			intervals: [][]int{{1, 5}},
+			expected:  [][]int{{1, 5}},
+		},
+		{
+			name:      "unordered_input",
+			intervals: [][]int{{4, 5}, {1, 3}, {2, 4}},
+			expected:  [][]int{{1, 5}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := mergeIntervals(deepCopyMatrix(tt.intervals))
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func Test_intervalIntersection(t *testing.T) {
+	tests := []struct {
+		name       string
+		firstList  [][]int
+		secondList [][]int
+		expected   [][]int
+	}{
+		{
+			name:       "leetcode_example",
+			firstList:  [][]int{{0, 2}, {5, 10}, {13, 23}, {24, 25}},
+			secondList: [][]int{{1, 5}, {8, 12}, {15, 24}, {25, 26}},
+			expected:   [][]int{{1, 2}, {5, 5}, {8, 10}, {15, 23}, {24, 24}, {25, 25}},
+		},
+		{
+			name:       "no_intersection",
+			firstList:  [][]int{{1, 2}, {5, 6}},
+			secondList: [][]int{{3, 4}, {7, 8}},
+			expected:   [][]int{},
+		},
+		{
+			name:       "one_list_empty",
+			firstList:  [][]int{{1, 5}},
+			secondList: [][]int{},
+			expected:   [][]int{},
+		},
+		{
+			name:       "full_overlap",
+			firstList:  [][]int{{1, 10}},
+			secondList: [][]int{{2, 4}, {6, 8}},
+			expected:   [][]int{{2, 4}, {6, 8}},
+		},
+		{
+			name:       "exact_touch",
+			firstList:  [][]int{{1, 3}},
+			secondList: [][]int{{3, 5}},
+			expected:   [][]int{{3, 3}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := intersect(tt.firstList, tt.secondList)
+			assert.Equal(t, tt.expected, got)
+
+			got2 := intervalIntersection(tt.firstList, tt.secondList)
+			assert.Equal(t, tt.expected, got2)
+		})
+	}
+}

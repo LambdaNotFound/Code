@@ -112,3 +112,64 @@ func Test_firstMissingPositive(t *testing.T) {
 		})
 	}
 }
+
+func Test_removeDuplicatesFromSortedArray(t *testing.T) {
+	tests := []struct {
+		name         string
+		nums         []int
+		expectedLen  int
+		expectedNums []int // first expectedLen elements
+	}{
+		{
+			name:         "no_duplicates",
+			nums:         []int{1, 2, 3, 4},
+			expectedLen:  4,
+			expectedNums: []int{1, 2, 3, 4},
+		},
+		{
+			name:         "all_same",
+			nums:         []int{2, 2, 2, 2},
+			expectedLen:  2,
+			expectedNums: []int{2, 2},
+		},
+		{
+			name:         "each_appears_twice",
+			nums:         []int{1, 1, 2, 2, 3, 3},
+			expectedLen:  6,
+			expectedNums: []int{1, 1, 2, 2, 3, 3},
+		},
+		{
+			name:         "three_duplicates_trimmed",
+			nums:         []int{1, 1, 1, 2, 2, 3},
+			expectedLen:  5,
+			expectedNums: []int{1, 1, 2, 2, 3},
+		},
+		{
+			name:         "single_element",
+			nums:         []int{7},
+			expectedLen:  1,
+			expectedNums: []int{7},
+		},
+		{
+			name:         "two_same",
+			nums:         []int{5, 5},
+			expectedLen:  2,
+			expectedNums: []int{5, 5},
+		},
+		{
+			name:         "three_same_trimmed_to_two",
+			nums:         []int{5, 5, 5},
+			expectedLen:  2,
+			expectedNums: []int{5, 5},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nums := append([]int(nil), tt.nums...)
+			got := removeDuplicatesFromSortedArray(nums)
+			assert.Equal(t, tt.expectedLen, got)
+			assert.Equal(t, tt.expectedNums, nums[:got])
+		})
+	}
+}

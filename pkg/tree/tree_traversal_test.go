@@ -127,6 +127,33 @@ func Test_invertTree(t *testing.T) {
 	}
 }
 
+func Test_invertTreeIterative(t *testing.T) {
+	tests := []struct {
+		name            string
+		root            *TreeNode
+		expectedInorder []int
+	}{
+		{"nil", nil, []int{}},
+		{"single", &TreeNode{Val: 1}, []int{1}},
+		{
+			"three_nodes",
+			node(2, &TreeNode{Val: 1}, &TreeNode{Val: 3}),
+			[]int{3, 2, 1},
+		},
+		{
+			"full_tree",
+			node(4, node(2, &TreeNode{Val: 1}, &TreeNode{Val: 3}), node(7, &TreeNode{Val: 6}, &TreeNode{Val: 9})),
+			[]int{9, 7, 6, 4, 3, 2, 1},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expectedInorder, inorderTraversal(invertTreeIterative(tt.root)))
+		})
+	}
+}
+
 func Test_widthOfBinaryTree(t *testing.T) {
 	tests := []struct {
 		name     string

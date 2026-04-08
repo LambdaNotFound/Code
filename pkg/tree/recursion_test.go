@@ -104,8 +104,27 @@ func Test_isBalanced(t *testing.T) {
 			true,
 		},
 		{
-			"unbalanced",
+			"unbalanced_left",
 			node(1, node(2, node(3, nil, nil), nil), nil),
+			false,
+		},
+		{
+			// left subtree is itself unbalanced (returns -1), triggering the
+			// leftHeight==-1 early exit in parent dfs:
+			//   dfs(node(3,nil,node(4,nil,node(5)))) = -1 because |0-2|>1,
+			//   so dfs(node(1, left=..., right=node(2))) sees leftHeight=-1
+			"unbalanced_left_subtree_bubbles_up",
+			node(1, node(3, nil, node(4, nil, &TreeNode{Val: 5})), &TreeNode{Val: 2}),
+			false,
+		},
+		{
+			// right subtree itself is unbalanced (returns -1), triggering
+			// the rightHeight==-1 early exit in the parent's dfs call:
+			//   node(1) has left=node(2) [balanced, height=1] and
+			//   right=node(3, nil, node(4, nil, node(5))) where
+			//   dfs(3) returns -1 because |0-2|>1 at node(3)
+			"unbalanced_right_subtree",
+			node(1, &TreeNode{Val: 2}, node(3, nil, node(4, nil, &TreeNode{Val: 5}))),
 			false,
 		},
 		{
