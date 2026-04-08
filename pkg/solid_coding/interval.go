@@ -39,7 +39,6 @@ func mergeIntervals(intervals [][]int) [][]int {
 	})
 
 	res := [][]int{intervals[0]}
-
 	for i := 1; i < len(intervals); i++ {
 		last := res[len(res)-1]
 		cur := intervals[i]
@@ -57,26 +56,6 @@ func mergeIntervals(intervals [][]int) [][]int {
  * 57. Insert Interval
  */
 func insert(intervals [][]int, newInterval []int) [][]int {
-	res := make([][]int, 0)
-
-	i := 0
-	for ; i < len(intervals) && intervals[i][1] < newInterval[0]; i++ {
-		res = append(res, intervals[i])
-	}
-	for ; i < len(intervals) && intervals[i][0] <= newInterval[1]; i++ {
-		newInterval[0] = min(intervals[i][0], newInterval[0])
-		newInterval[1] = max(intervals[i][1], newInterval[1])
-	}
-
-	res = append(res, newInterval)
-	for i < len(intervals) {
-		res = append(res, intervals[i])
-		i++
-	}
-	return res
-}
-
-func insertWithSlice(intervals [][]int, newInterval []int) [][]int {
 	before, after := make([][]int, 0), make([][]int, 0)
 	for i := 0; i < len(intervals); i++ {
 		cur := intervals[i]
@@ -106,13 +85,11 @@ func merge(intervals [][]int) [][]int {
 
 	result := [][]int{intervals[0]}
 	for _, interval := range intervals {
-		current := result[len(result)-1]
-		if current[1] < interval[0] {
+		last := result[len(result)-1]
+		if last[1] < interval[0] {
 			result = append(result, interval)
 		} else {
-			if current[1] < interval[1] {
-				current[1] = interval[1]
-			}
+			last[1] = max(last[1], interval[1])
 		}
 	}
 
@@ -162,7 +139,7 @@ func eraseOverlapIntervalsSortByEndTime(intervals [][]int) int {
 	return erased
 }
 
-// interval intersections template, Two pointer:
+// interval intersections template, Two pointers:
 func intersect(A, B [][]int) [][]int {
 	res := [][]int{}
 	i, j := 0, 0
@@ -212,6 +189,7 @@ func intervalIntersection(firstList [][]int, secondList [][]int) [][]int {
 /**
  * Meeting Rooms
  *
+ * check if there's overlap
  */
 func canAttendMeetings(intervals []Interval) bool {
 	sort.Slice(intervals, func(i, j int) bool {
@@ -229,6 +207,8 @@ func canAttendMeetings(intervals []Interval) bool {
 
 /**
  * Meeting Rooms II
+ *
+ * find the minimum number of rooms required to schedule all meetings without any conflicts.
  *
  * whats next earliest start time, next earliest end time?
  */

@@ -2,18 +2,18 @@ package solid_coding
 
 import (
 	"fmt"
-	"strconv"
 )
 
 /**
- * Ranges template
+ * Ranges template, very clean logic (2 branches)
  */
 func linearScan(nums []int) [][]int {
 	res := [][]int{}
-
 	for i := 0; i < len(nums)-1; i++ {
+		// bookmarking
+
 		// check relationship between nums[i] and nums[i+1]
-		if nums[i+1]-nums[i] >= 2 { // gap → missing range
+		if nums[i+1] > nums[i]+1 { // gap → missing range
 			res = append(res, []int{nums[i] + 1, nums[i+1] - 1})
 		}
 		if nums[i+1] == nums[i]+1 { // consecutive → summary range
@@ -31,17 +31,16 @@ func linearScan(nums []int) [][]int {
  */
 func summaryRanges(nums []int) []string {
 	res := []string{}
-	for i := 0; i < len(nums); {
-		j := i + 1
-		for j < len(nums) && nums[j] == nums[j-1]+1 { // reads more naturally as "consecutive"
-			j++
+	for i := 0; i < len(nums); i++ {
+		start := i
+		for i+1 < len(nums) && nums[i+1]-nums[i] == 1 {
+			i++
 		}
-		if j == i+1 { // iff the inner loop never advanced
-			res = append(res, strconv.Itoa(nums[i]))
+		if nums[start] == nums[i] {
+			res = append(res, fmt.Sprintf("%d", nums[start]))
 		} else {
-			res = append(res, fmt.Sprintf("%d->%d", nums[i], nums[j-1]))
+			res = append(res, fmt.Sprintf("%d->%d", nums[start], nums[i]))
 		}
-		i = j
 	}
 	return res
 }
@@ -53,16 +52,14 @@ func summaryRanges(nums []int) []string {
  * Output: [[2,2], [4,49], [51,74], [76,99]]
  */
 func findMissingRanges(nums []int, lower int, upper int) [][]int {
+	nums = append([]int{lower - 1}, nums...)
+	nums = append(nums, upper+1)
+
 	res := [][]int{}
-
-	nums = append([]int{lower - 1}, nums...) // ← lower-1
-	nums = append(nums, upper+1)             // ← upper+1
-
 	for i := 0; i < len(nums)-1; i++ {
-		if nums[i+1]-nums[i] >= 2 { // gap exists
+		if nums[i+1]-nums[i] >= 2 {
 			res = append(res, []int{nums[i] + 1, nums[i+1] - 1})
 		}
 	}
-
 	return res
 }

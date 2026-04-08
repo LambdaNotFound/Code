@@ -59,8 +59,6 @@ func Test_insert(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := insert(tc.intervals, tc.newInterval)
 			assert.Equal(t, tc.expected, result)
-			result = insertWithSlice(tc.intervals, tc.newInterval)
-			assert.Equal(t, tc.expected, result)
 		})
 	}
 }
