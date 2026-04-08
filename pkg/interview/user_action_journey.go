@@ -25,104 +25,135 @@ B (1)
 """
 */
 
+/**
+ * Time Complexity: O(N log N + T × A log A)
+ *
+ * Parse logsO(N): Single pass
+ * Sort each user's logs by time: O(N log N)
+ * Across all usersInsert into trie: O(U × L), Each entry traverses L nodes
+ * Print trie (sort children at each node): O(T × A log A), T = trie nodes, sort up to A children each
+ */
+
 import (
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 )
 
-type log struct {
-	userId, time int
-	action       string
+// --- Types ---
+
+type LogEntry struct {
+	user, time int
+	action     string
 }
 
-type Trie struct {
-	action   string
-	count    int
-	time     int
-	children map[string]*Trie
+type ActionEntry struct {
+	action string
+	time   int
 }
 
-func (t *Trie) Insert(logs []log) {
-	cur := t
-	for _, log := range logs {
-		if _, found := cur.children[log.action]; !found {
-			new := &Trie{log.action, 0, 0, make(map[string]*Trie)}
-			cur.children[log.action] = new
+type TrieNode struct {
+	count     int
+	children  map[string]*TrieNode
+	firstSeen map[string]int // action -> earliest timestamp at this level
+}
+
+func newTrieNode() *TrieNode {
+	return &TrieNode{
+		children:  map[string]*TrieNode{},
+		firstSeen: map[string]int{},
+	}
+}
+
+// pre-processing
+func parseLog(raw string) []LogEntry {
+	var entries []LogEntry
+	for _, line := range strings.Split(strings.TrimSpace(raw), "\n") {
+		var user, time int
+		var action string
+		fmt.Sscanf(strings.TrimSpace(line), "%d %d %s", &user, &time, &action)
+		entries = append(entries, LogEntry{user, time, action})
+	}
+	return entries
+}
+
+func buildUserSequences(entries []LogEntry) map[int][]ActionEntry {
+	userEntries := map[int][]LogEntry{}
+	for _, e := range entries {
+		userEntries[e.user] = append(userEntries[e.user], e)
+	}
+	sequences := map[int][]ActionEntry{}
+	for user, logs := range userEntries {
+		sort.Slice(logs, func(i, j int) bool {
+			return logs[i].time < logs[j].time
+		})
+		for _, log := range logs {
+			sequences[user] = append(sequences[user], ActionEntry{log.action, log.time})
 		}
-		cur.children[log.action].count++
-		cur.children[log.action].time = min(cur.children[log.action].time, log.time)
-		cur = cur.children[log.action]
+	}
+	return sequences
+}
+
+// prefix tree ops
+func (node *TrieNode) insert(seq []ActionEntry) {
+	cur := node
+	for _, e := range seq {
+		if _, ok := cur.children[e.action]; !ok {
+			cur.children[e.action] = newTrieNode()
+			cur.firstSeen[e.action] = e.time
+		} else if e.time < cur.firstSeen[e.action] {
+			cur.firstSeen[e.action] = e.time // always keep earliest
+		}
+		cur = cur.children[e.action]
+		cur.count++
 	}
 }
 
-func (t *Trie) Print(depth int) {
-	children := []*Trie{}
-	for _, v := range t.children {
-		children = append(children, v)
+func printTrie(node *TrieNode, depth int) {
+	type actionTime struct {
+		action string
+		time   int
 	}
-	sort.Slice(children, func(i, j int) bool { // sort keys
-		return children[i].time < children[j].time
+	order := make([]actionTime, 0, len(node.firstSeen))
+	for action, t := range node.firstSeen {
+		order = append(order, actionTime{action, t})
+	}
+	sort.Slice(order, func(i, j int) bool {
+		if order[i].time != order[j].time {
+			return order[i].time < order[j].time
+		}
+		return order[i].action < order[j].action // alphabetical tie-break
 	})
 
-	for _, c := range children {
-		indent := strings.Repeat("  ", depth)
-		if depth == 0 {
-			fmt.Printf("%s%v (%d) \n", indent, c.action, c.count)
-		} else {
-			fmt.Printf("%s-> %v (%d) \n", indent, c.action, c.count)
-		}
-		c.Print(depth + 1)
+	indent := strings.Repeat("   ", depth)
+	arrow := ""
+	if depth > 0 {
+		arrow = "-> "
 	}
-}
-
-func groupLogsByUser(logs []log) [][]log {
-	hashmap := make(map[int][]log)
-	for _, log := range logs {
-		hashmap[log.userId] = append(hashmap[log.userId], log)
+	for _, at := range order {
+		child := node.children[at.action]
+		fmt.Printf("%s%s%s (%d)\n", indent, arrow, at.action, child.count)
+		printTrie(child, depth+1)
 	}
-
-	groupLogs := [][]log{}
-	for _, list := range hashmap {
-		sort.Slice(list, func(i, j int) bool {
-			return list[i].time < list[j].time
-		})
-		groupLogs = append(groupLogs, list)
-	}
-
-	return groupLogs
 }
 
 func main() {
-	input := `USER TIME ACTION
-	100  1000 A
-	200  1100 A
-	200  1200 B
-	100  1200 B
-	100  1300 C
-	200  1400 A
-	300  1500 B
-	300  1550 B`
+	raw := `100  1000 A
+200  1100 A
+200  1200 B
+100  1200 B
+100  1300 C
+200  1400 A
+300  1500 B
+300  1550 B`
 
-	rows := strings.Split(input, "\n")
-	logs := []log{}
-	for _, row := range rows[1:] {
-		fields := strings.Fields(row)
-		userId, _ := strconv.Atoi(fields[0])
-		time, _ := strconv.Atoi(fields[1])
-		logs = append(logs, log{userId, time, fields[2]})
+	entries := parseLog(raw)
+	sequences := buildUserSequences(entries)
+	trie := &TrieNode{children: map[string]*TrieNode{}, firstSeen: map[string]int{}}
+	for _, seq := range sequences {
+		trie.insert(seq)
 	}
 
-	groupLogs := groupLogsByUser(logs)
-	for _, l := range groupLogs {
-		fmt.Printf("%+v\n", l)
-	}
-	fmt.Printf("\n")
-
-	root := &Trie{children: make(map[string]*Trie)}
-	for _, l := range groupLogs {
-		root.Insert(l)
-	}
-	root.Print(0)
+	fmt.Println("Journey summary:")
+	printTrie(trie, 0)
 }

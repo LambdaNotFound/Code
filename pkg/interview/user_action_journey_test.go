@@ -1,189 +1,192 @@
 package interview
 
 import (
-	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_groupLogsByUser(t *testing.T) {
-	testCases := []struct {
+func Test_parseLog(t *testing.T) {
+	tests := []struct {
 		name     string
-		logs     []log
-		expected map[int][]log // userId → sorted logs
+		raw      string
+		expected []LogEntry
 	}{
 		{
-			name: "single user logs sorted by time",
-			logs: []log{
-				{100, 1300, "C"},
-				{100, 1000, "A"},
-				{100, 1200, "B"},
-			},
-			expected: map[int][]log{
-				100: {{100, 1000, "A"}, {100, 1200, "B"}, {100, 1300, "C"}},
+			name: "single_line",
+			raw:  "100 1000 A",
+			expected: []LogEntry{
+				{user: 100, time: 1000, action: "A"},
 			},
 		},
 		{
-			name: "multiple users grouped and sorted independently",
-			logs: []log{
-				{100, 1000, "A"},
-				{200, 1100, "A"},
-				{200, 1200, "B"},
-				{100, 1200, "B"},
-				{100, 1300, "C"},
-				{200, 1400, "A"},
-			},
-			expected: map[int][]log{
-				100: {{100, 1000, "A"}, {100, 1200, "B"}, {100, 1300, "C"}},
-				200: {{200, 1100, "A"}, {200, 1200, "B"}, {200, 1400, "A"}},
+			name: "multi_line",
+			raw: `100 1000 A
+200 1100 B
+300 1200 C`,
+			expected: []LogEntry{
+				{user: 100, time: 1000, action: "A"},
+				{user: 200, time: 1100, action: "B"},
+				{user: 300, time: 1200, action: "C"},
 			},
 		},
 		{
-			name: "single log entry",
-			logs: []log{
-				{300, 1500, "B"},
-			},
-			expected: map[int][]log{
-				300: {{300, 1500, "B"}},
-			},
-		},
-		{
-			name: "same user same-time logs preserved",
-			logs: []log{
-				{100, 1000, "A"},
-				{100, 1000, "B"},
-			},
-			expected: map[int][]log{
-				100: {{100, 1000, "A"}, {100, 1000, "B"}},
-			},
-		},
-		{
-			name:     "empty logs returns empty groups",
-			logs:     []log{},
-			expected: map[int][]log{},
-		},
-		{
-			name: "three users grouped independently",
-			logs: []log{
-				{100, 1000, "A"},
-				{200, 1100, "B"},
-				{300, 1200, "C"},
-				{100, 1300, "B"},
-				{300, 1400, "A"},
-			},
-			expected: map[int][]log{
-				100: {{100, 1000, "A"}, {100, 1300, "B"}},
-				200: {{200, 1100, "B"}},
-				300: {{300, 1200, "C"}, {300, 1400, "A"}},
+			name: "sample_from_comments",
+			raw: `100  1000 A
+200  1100 A
+200  1200 B
+100  1200 B
+100  1300 C
+200  1400 A
+300  1500 B
+300  1550 B`,
+			expected: []LogEntry{
+				{user: 100, time: 1000, action: "A"},
+				{user: 200, time: 1100, action: "A"},
+				{user: 200, time: 1200, action: "B"},
+				{user: 100, time: 1200, action: "B"},
+				{user: 100, time: 1300, action: "C"},
+				{user: 200, time: 1400, action: "A"},
+				{user: 300, time: 1500, action: "B"},
+				{user: 300, time: 1550, action: "B"},
 			},
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result := groupLogsByUser(tc.logs)
-
-			// outer order is non-deterministic (map iteration); index by userId
-			grouped := make(map[int][]log)
-			for _, group := range result {
-				grouped[group[0].userId] = group
-			}
-
-			assert.Equal(t, len(tc.expected), len(grouped))
-			for userId, expectedLogs := range tc.expected {
-				assert.Equal(t, expectedLogs, grouped[userId])
-			}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, parseLog(tt.raw))
 		})
 	}
 }
 
-func Test_Trie_Insert(t *testing.T) {
-	testCases := []struct {
-		name        string
-		logGroups   [][]log
-		checkAction string              // top-level action to inspect
-		wantCount   int                 // expected count at that node
-		wantChildren []string           // expected children of that node
-	}{
-		{
-			name: "single sequence",
-			logGroups: [][]log{
-				{{100, 1000, "A"}, {100, 1200, "B"}},
-			},
-			checkAction:  "A",
-			wantCount:    1,
-			wantChildren: []string{"B"},
-		},
-		{
-			name: "two sequences sharing a prefix increments count",
-			logGroups: [][]log{
-				{{100, 1000, "A"}, {100, 1200, "B"}},
-				{{200, 1100, "A"}, {200, 1200, "B"}, {200, 1400, "A"}},
-			},
-			checkAction:  "A",
-			wantCount:    2,
-			wantChildren: []string{"B"},
-		},
-		{
-			name: "diverging sequences create sibling children",
-			logGroups: [][]log{
-				{{100, 1000, "A"}, {100, 1200, "B"}},
-				{{200, 1100, "A"}, {200, 1200, "C"}},
-			},
-			checkAction:  "A",
-			wantCount:    2,
-			wantChildren: []string{"B", "C"},
-		},
-		{
-			name: "three-action sequence builds deep path",
-			logGroups: [][]log{
-				{{100, 1000, "A"}, {100, 1200, "B"}, {100, 1300, "C"}},
-			},
-			checkAction:  "A",
-			wantCount:    1,
-			wantChildren: []string{"B"},
-		},
-		{
-			name: "repeated action in sequence stored as self-child",
-			logGroups: [][]log{
-				{{300, 1500, "B"}, {300, 1550, "B"}},
-			},
-			checkAction:  "B",
-			wantCount:    1,
-			wantChildren: []string{"B"}, // B → B
-		},
-		{
-			name: "count accumulates for three sequences sharing root action",
-			logGroups: [][]log{
-				{{100, 1000, "A"}, {100, 1200, "B"}},
-				{{200, 1100, "A"}, {200, 1200, "B"}},
-				{{300, 1050, "A"}, {300, 1200, "C"}},
-			},
-			checkAction:  "A",
-			wantCount:    3,
-			wantChildren: []string{"B", "C"},
-		},
-	}
+func Test_buildUserSequences(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		result := buildUserSequences([]LogEntry{})
+		assert.Empty(t, result)
+	})
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			root := &Trie{children: make(map[string]*Trie)}
-			for _, group := range tc.logGroups {
-				root.Insert(group)
-			}
+	t.Run("single_user_already_sorted", func(t *testing.T) {
+		entries := []LogEntry{
+			{user: 1, time: 100, action: "A"},
+			{user: 1, time: 200, action: "B"},
+			{user: 1, time: 300, action: "C"},
+		}
+		result := buildUserSequences(entries)
+		assert.Equal(t, map[int][]ActionEntry{
+			1: {{"A", 100}, {"B", 200}, {"C", 300}},
+		}, result)
+	})
 
-			node, found := root.children[tc.checkAction]
-			assert.True(t, found, "expected action %q at root", tc.checkAction)
-			assert.Equal(t, tc.wantCount, node.count)
+	t.Run("single_user_needs_sort", func(t *testing.T) {
+		entries := []LogEntry{
+			{user: 1, time: 300, action: "C"},
+			{user: 1, time: 100, action: "A"},
+			{user: 1, time: 200, action: "B"},
+		}
+		result := buildUserSequences(entries)
+		assert.Equal(t, map[int][]ActionEntry{
+			1: {{"A", 100}, {"B", 200}, {"C", 300}},
+		}, result)
+	})
 
-			childKeys := make([]string, 0, len(node.children))
-			for k := range node.children {
-				childKeys = append(childKeys, k)
-			}
-			sort.Strings(childKeys)
-			sort.Strings(tc.wantChildren)
-			assert.Equal(t, tc.wantChildren, childKeys)
-		})
-	}
+	t.Run("multi_user", func(t *testing.T) {
+		entries := []LogEntry{
+			{user: 1, time: 200, action: "B"},
+			{user: 2, time: 500, action: "X"},
+			{user: 1, time: 100, action: "A"},
+			{user: 2, time: 400, action: "Y"},
+		}
+		result := buildUserSequences(entries)
+		assert.Equal(t, []ActionEntry{{"A", 100}, {"B", 200}}, result[1])
+		assert.Equal(t, []ActionEntry{{"Y", 400}, {"X", 500}}, result[2])
+	})
+}
+
+func Test_trieInsert(t *testing.T) {
+	t.Run("single_sequence", func(t *testing.T) {
+		root := newTrieNode()
+		root.insert([]ActionEntry{{"A", 1000}, {"B", 1200}, {"C", 1300}})
+
+		assert.Equal(t, 1, root.children["A"].count)
+		assert.Equal(t, 1000, root.firstSeen["A"])
+
+		nodeA := root.children["A"]
+		assert.Equal(t, 1, nodeA.children["B"].count)
+		assert.Equal(t, 1200, nodeA.firstSeen["B"])
+
+		nodeB := nodeA.children["B"]
+		assert.Equal(t, 1, nodeB.children["C"].count)
+		assert.Equal(t, 1300, nodeB.firstSeen["C"])
+	})
+
+	t.Run("two_sequences_shared_prefix", func(t *testing.T) {
+		root := newTrieNode()
+		root.insert([]ActionEntry{{"A", 1000}, {"B", 1200}})
+		root.insert([]ActionEntry{{"A", 1100}, {"B", 1400}})
+
+		// A appears twice at root level
+		assert.Equal(t, 2, root.children["A"].count)
+		// firstSeen should be the earlier timestamp
+		assert.Equal(t, 1000, root.firstSeen["A"])
+
+		nodeA := root.children["A"]
+		assert.Equal(t, 2, nodeA.children["B"].count)
+		assert.Equal(t, 1200, nodeA.firstSeen["B"])
+	})
+
+	t.Run("first_seen_tracks_earliest", func(t *testing.T) {
+		root := newTrieNode()
+		// Insert later timestamp first
+		root.insert([]ActionEntry{{"A", 2000}})
+		root.insert([]ActionEntry{{"A", 1000}})
+
+		assert.Equal(t, 1000, root.firstSeen["A"])
+	})
+
+	t.Run("sample_data_full_trie", func(t *testing.T) {
+		// Sample from file comments:
+		// User 100: A(1000) -> B(1200) -> C(1300)
+		// User 200: A(1100) -> B(1200) -> A(1400)
+		// User 300: B(1500) -> B(1550)
+		sequences := map[int][]ActionEntry{
+			100: {{"A", 1000}, {"B", 1200}, {"C", 1300}},
+			200: {{"A", 1100}, {"B", 1200}, {"A", 1400}},
+			300: {{"B", 1500}, {"B", 1550}},
+		}
+
+		root := newTrieNode()
+		for _, seq := range sequences {
+			root.insert(seq)
+		}
+
+		// Root level: A appears 2x (users 100, 200), B appears 1x (user 300)
+		assert.Equal(t, 2, root.children["A"].count)
+		assert.Equal(t, 1, root.children["B"].count)
+
+		// A -> B: both users 100 and 200 do B after A
+		nodeA := root.children["A"]
+		assert.Equal(t, 2, nodeA.children["B"].count)
+
+		// A -> B -> C: only user 100
+		nodeAB := nodeA.children["B"]
+		assert.Equal(t, 1, nodeAB.children["C"].count)
+
+		// A -> B -> A: only user 200
+		assert.Equal(t, 1, nodeAB.children["A"].count)
+
+		// B -> B: user 300 does B twice
+		nodeB := root.children["B"]
+		assert.Equal(t, 1, nodeB.children["B"].count)
+	})
+}
+
+func Test_newTrieNode(t *testing.T) {
+	node := newTrieNode()
+	assert.NotNil(t, node)
+	assert.NotNil(t, node.children)
+	assert.NotNil(t, node.firstSeen)
+	assert.Equal(t, 0, node.count)
+	assert.Empty(t, node.children)
+	assert.Empty(t, node.firstSeen)
 }
