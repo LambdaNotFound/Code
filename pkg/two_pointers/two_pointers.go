@@ -1,6 +1,7 @@
 package two_pointers
 
 import (
+	"math"
 	"sort"
 	"strings"
 )
@@ -75,43 +76,43 @@ func threeSum(nums []int) [][]int {
 
 /**
  * 16. 3Sum Closest
+ *
+ * Return the sum of the three integers.
+ * Time: O(nlogn)
+ * Space: O(1)
  */
 func threeSumClosest(nums []int, target int) int {
 	sort.Ints(nums)
-	closest := nums[0] + nums[1] + nums[2] // initialise with first triplet
-
-	abs := func(x int) int {
-		if x < 0 {
-			return -x
+	abs := func(a int) int {
+		if a < 0 {
+			return -a
 		}
-		return x
+		return a
 	}
 
-	for i := 0; i < len(nums)-2; i++ {
+	n := len(nums)
+	delta, res := math.MaxInt, 0
+	for i := 0; i < n; i++ {
 		if i > 0 && nums[i] == nums[i-1] {
 			continue
 		}
-
-		j, k := i+1, len(nums)-1
-		for j < k {
+		for j, k := i+1, n-1; j < k; {
 			sum := nums[i] + nums[j] + nums[k]
-
-			// update closest if this sum is nearer to target
-			if abs(sum-target) < abs(closest-target) {
-				closest = sum
-			}
-
 			if sum == target {
-				return sum // can't get closer than exact match
-			} else if sum < target {
+				return target
+			}
+			if abs(target-sum) < delta {
+				delta = abs(target - sum)
+				res = sum
+			}
+			if sum < target {
 				j++
 			} else {
 				k--
 			}
 		}
 	}
-
-	return closest
+	return res
 }
 
 /**
