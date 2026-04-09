@@ -7,50 +7,44 @@ import (
 )
 
 func Test_lengthOfLongestSubstring(t *testing.T) {
-    testCases := []struct {
-        name     string
-        str      string
-        expected int
-    }{
-        {
-            "case 1",
-            "abcabcbb",
-            3,
-        },
-        {
-            "case 2",
-            "bbbbb",
-            1,
-        },
-        {
-            "case 3",
-            "pwwkew",
-            3,
-        },
-        {
-            "case 4",
-            "abc!@#abc",
-            6,
-        },
-        {
-            "case 5",
-            "你好世界",
-            4,
-        },
-    }
+	asciiCases := []struct {
+		name     string
+		str      string
+		expected int
+	}{
+		{"case 1", "abcabcbb", 3},
+		{"case 2", "bbbbb", 1},
+		{"case 3", "pwwkew", 3},
+		{"case 4", "abc!@#abc", 6},
+		{"empty", "", 0},
+	}
 
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            result := lengthOfLongestSubstringRune(tc.str)
-            assert.Equal(t, tc.expected, result)
+	for _, tc := range asciiCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// byte-based version — correct for ASCII input
+			assert.Equal(t, tc.expected, lengthOfLongestSubstring(tc.str))
+		})
+	}
+}
 
-            // result = lengthOfLongestSubstring_optimized(tc.str)
-            // assert.Equal(t, tc.expected, result)
-        
-            // result = lengthOfLongestSubstring(tc.str)
-            // assert.Equal(t, tc.expected, result)
-        })
-    }
+func Test_lengthOfLongestSubstringRune(t *testing.T) {
+	testCases := []struct {
+		name     string
+		str      string
+		expected int
+	}{
+		{"case 1", "abcabcbb", 3},
+		{"case 2", "bbbbb", 1},
+		{"case 3", "pwwkew", 3},
+		{"case 4", "abc!@#abc", 6},
+		{"unicode", "你好世界", 4}, // multi-byte chars — rune version handles correctly
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, lengthOfLongestSubstringRune(tc.str))
+		})
+	}
 }
 
 func Test_minWindow(t *testing.T) {

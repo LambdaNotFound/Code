@@ -23,21 +23,40 @@ import (
  *     Two Pointers: i move if char seen before, otherwise j move
  *
  * Time: O(n)
- * Space: O(1)
+ * Space: O(1) — bounded by alphabet size, not input length
  */
 func lengthOfLongestSubstring(s string) int {
-	res := 0
-	hashmap := make(map[byte]int)
+	freq := make(map[byte]int)
+	size := 0
 	for left, right := 0, 0; right < len(s); right++ {
-		_, exist := hashmap[s[right]]
-		if exist {
-			preIndex := hashmap[s[right]]
-			left = max(left, preIndex+1)
+		c := s[right]
+		freq[c]++
+		for freq[c] > 1 {
+			freq[s[left]]--
+			left++
 		}
-		hashmap[s[right]] = right
-		res = max(res, right-left+1)
+
+		size = max(size, right-left+1)
 	}
-	return res
+	return size
+}
+
+// lengthOfLongestSubstringRune handles multi-byte Unicode characters correctly
+// by operating on runes instead of bytes.
+func lengthOfLongestSubstringRune(s string) int {
+	freq := make(map[rune]int)
+	runes := []rune(s)
+	size := 0
+	for left, right := 0, 0; right < len(runes); right++ {
+		c := runes[right]
+		freq[c]++
+		for freq[c] > 1 {
+			freq[runes[left]]--
+			left++
+		}
+		size = max(size, right-left+1)
+	}
+	return size
 }
 
 /**
@@ -246,4 +265,20 @@ func findHighAccessEmployees(accessTimes [][]string) []string {
 	}
 
 	return highAccess
+}
+
+/**
+ * 219. Contains Duplicate II
+ *
+ * Complexity: O(n)
+ */
+func containsNearbyDuplicate(nums []int, k int) bool {
+	lastSeenAt := make(map[int]int)
+	for i, num := range nums {
+		if idx, found := lastSeenAt[num]; found && i-idx <= k {
+			return true
+		}
+		lastSeenAt[num] = i
+	}
+	return false
 }
