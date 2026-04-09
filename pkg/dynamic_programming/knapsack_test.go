@@ -77,6 +77,7 @@ func Test_coinChange(t *testing.T) {
             assert.Equal(t, tc.expected, coinChange1DDP(tc.coins, tc.amount))
             assert.Equal(t, tc.expected, coinChange2DDP(tc.coins, tc.amount))
             assert.Equal(t, tc.expected, coinChangeRecursionMemoization(tc.coins, tc.amount))
+            assert.Equal(t, tc.expected, coinChangeRecursion(tc.coins, tc.amount))
         })
     }
 }
@@ -102,6 +103,7 @@ func Test_change(t *testing.T) {
             assert.Equal(t, tt.expected, change(tt.amount, tt.coins))
             assert.Equal(t, tt.expected, change2DDP(tt.amount, tt.coins))
             assert.Equal(t, tt.expected, changeRecursionMemoization(tt.amount, tt.coins))
+            assert.Equal(t, tt.expected, changeRecursion(tt.amount, tt.coins))
         })
     }
 }
@@ -120,6 +122,7 @@ func Test_canPartition(t *testing.T) {
         {name: "odd_sum", nums: []int{1, 2, 3, 4, 5}, expected: false},
         {name: "all_same_even_count", nums: []int{2, 2, 2, 2}, expected: true},
         {name: "large_partition", nums: []int{3, 3, 3, 4, 5}, expected: true},
+        {name: "single_large_num_exceeds_target", nums: []int{1, 10}, expected: false},
     }
 
     for _, tc := range testCases {

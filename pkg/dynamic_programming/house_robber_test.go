@@ -42,6 +42,7 @@ func Test_robII(t *testing.T) {
 		{name: "two_pick_larger", nums: []int{3, 8}, expected: 8},
 		{name: "all_same", nums: []int{4, 4, 4, 4}, expected: 8},
 		{name: "large_ring", nums: []int{1, 3, 1, 3, 100}, expected: 103},
+		{name: "single", nums: []int{7}, expected: 7},
 	}
 
 	for _, tt := range tests {

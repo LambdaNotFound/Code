@@ -44,8 +44,8 @@ func countSubstrings(s string) int {
 	count := 0
 	for right := 0; right < n; right++ {
 		for left := 0; left <= right; left++ {
-			isEdgeCase := right-left+1 <= 2     // single char or pair
-			isInnerPalin := dp[left+1][right-1] // inner substring is palindrome
+			isEdgeCase := right-left+1 <= 2 // single char or pair
+			isInnerPalin := !isEdgeCase && dp[left+1][right-1]
 			if s[left] == s[right] && (isEdgeCase || isInnerPalin) {
 				dp[left][right] = true
 				count++

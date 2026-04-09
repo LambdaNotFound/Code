@@ -31,6 +31,23 @@ func Test_longestPalindrome(t *testing.T) {
     }
 }
 
-// countSubstrings is not tested: it panics on all inputs because dp[left+1][right-1]
-// is eagerly evaluated before the short-circuit guard, causing dp[1][-1] on the very
-// first iteration (right=0, left=0) regardless of string length.
+func Test_countSubstrings(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected int
+	}{
+		{name: "single_char", input: "a", expected: 1},
+		{name: "two_same", input: "aa", expected: 3},
+		{name: "two_diff", input: "ab", expected: 2},
+		{name: "leetcode_example1", input: "abc", expected: 3},
+		{name: "leetcode_example2", input: "aaa", expected: 6},
+		{name: "palindrome_in_middle", input: "aba", expected: 4},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, countSubstrings(tc.input))
+		})
+	}
+}

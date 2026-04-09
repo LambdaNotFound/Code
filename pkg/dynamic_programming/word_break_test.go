@@ -47,6 +47,7 @@ func Test_wordBreak(t *testing.T) {
         t.Run(tc.name, func(t *testing.T) {
             assert.Equal(t, tc.expected, wordBreak(tc.input_string, tc.input_wordDict))
             assert.Equal(t, tc.expected, wordBreakTrie(tc.input_string, tc.input_wordDict))
+            assert.Equal(t, tc.expected, wordBreakCharIndex(tc.input_string, tc.input_wordDict))
         })
     }
 }

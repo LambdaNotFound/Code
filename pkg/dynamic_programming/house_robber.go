@@ -24,11 +24,15 @@ func rob(nums []int) int {
  * All houses at this place are arranged in a circle.
  */
 func robII(nums []int) int {
+	if len(nums) == 1 {
+		return nums[0]
+	}
+
 	var rob func([]int) int
 	rob = func(nums []int) int {
-        if len(nums) == 0 {
-            return 0
-        }
+		if len(nums) == 0 {
+			return 0
+		}
 		if len(nums) == 1 {
 			return nums[0]
 		}
