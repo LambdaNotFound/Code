@@ -62,6 +62,49 @@ func swimInWater(grid [][]int) int {
 	return lo
 }
 
+func swimInWaterDFS(grid [][]int) int {
+	n := len(grid)
+	dirs := [][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	visited := make(map[[2]int]bool)
+
+	var dfs func(row, col, t int) bool
+	dfs = func(row, col, t int) bool {
+		if grid[row][col] > t {
+			return false
+		}
+		if row == n-1 && col == n-1 {
+			return true
+		}
+		for _, d := range dirs {
+			r, c := row+d[0], col+d[1]
+			if r < 0 || r >= n || c < 0 || c >= n {
+				continue
+			}
+			if visited[[2]int{r, c}] {
+				continue
+			}
+			visited[[2]int{r, c}] = true
+			if dfs(r, c, t) {
+				return true
+			}
+		}
+		return false
+	}
+
+	left, right := grid[0][0], n*n-1
+	for left < right {
+		mid := left + (right-left)/2
+		visited = make(map[[2]int]bool) // reset each iteration
+		visited[[2]int{0, 0}] = true    // mark start
+		if dfs(0, 0, mid) {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+	return left
+}
+
 // Dijkstra
 func swimInWaterDijkstra(grid [][]int) int {
 	n := len(grid)

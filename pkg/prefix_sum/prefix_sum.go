@@ -14,24 +14,6 @@ import (
  * ANS   [bcd    acd   abd    abc]
  */
 func productExceptSelf(nums []int) []int {
-	res := make([]int, len(nums))
-
-	multiplier := 1
-	for i := 0; i < len(nums); i++ {
-		res[i] = multiplier
-		multiplier *= nums[i]
-	}
-
-	multiplier = 1
-	for i := len(res) - 1; i >= 0; i-- {
-		res[i] *= multiplier
-		multiplier *= nums[i]
-	}
-
-	return res
-}
-
-func productExceptSelfClaude(nums []int) []int {
 	n := len(nums)
 	res := make([]int, n)
 	// forward pass: res[i] = product of all elements to the LEFT of i
@@ -41,9 +23,9 @@ func productExceptSelfClaude(nums []int) []int {
 	}
 	// backward pass: multiply res[i] by product of all elements to the RIGHT of i
 	suffix := 1
-	for i := n - 2; i >= 0; i-- {
-		suffix *= nums[i+1]
-		res[i] *= suffix
+	for i := n - 1; i-1 >= 0; i-- {
+		suffix *= nums[i]
+		res[i-1] *= suffix
 	}
 	return res
 }
@@ -112,10 +94,9 @@ func subarraySum(nums []int, k int) int {
 		prefixSum[i+1] = prefixSum[i] + num
 	}
 
-	// check all pairs (i, j) — O(n²)
 	count := 0
 	for i := 0; i < n; i++ {
-		for j := i + 1; j <= n; j++ {
+		for j := i + 1; j <= n; j++ { // check all pairs (i, j) — O(n²)
 			if prefixSum[j]-prefixSum[i] == k {
 				count++
 			}

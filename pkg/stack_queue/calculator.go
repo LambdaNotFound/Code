@@ -68,7 +68,9 @@ func calculate(s string) int {
  * Output: 7
  */
 func calculateII(s string) int {
-	s = strings.Trim(s, " ")
+	reg := regexp.MustCompile(`[^0-9+\-*/]`)
+	s = reg.ReplaceAllString(s, "")
+
 	stack := []int{}
 	num, op := 0, '+'
 	for i, c := range s {

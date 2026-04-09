@@ -9,6 +9,10 @@ package graph
  * DFS: Time: O(m x n), Space: O(m x n)
  * BFS: Time: O(m x n), Space: O(m x n)
  * UF:  Time: O(m x n), Space: O(m x n)
+ *
+ * Complexity
+ *   Time O(m × n)
+ *   Space O(m × n) — call stack
  */
 func numIslandsDFS(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
