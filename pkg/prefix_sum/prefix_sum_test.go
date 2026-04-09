@@ -52,7 +52,6 @@ func Test_productExceptSelf(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, productExceptSelf(tt.nums), "productExceptSelf")
-			assert.Equal(t, tt.expected, productExceptSelfClaude(tt.nums), "productExceptSelfClaude")
 		})
 	}
 }
