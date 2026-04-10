@@ -84,6 +84,8 @@ func Test_swimInWater(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			assert.Equal(t, tc.expected, swimInWater(deepCopy(tc.grid)))
+			assert.Equal(t, tc.expected, swimInWaterDFS(deepCopy(tc.grid)))
+			assert.Equal(t, tc.expected, swimInWaterDijkstra(deepCopy(tc.grid)))
 		})
 	}
 }
@@ -95,15 +97,4 @@ func deepCopy(grid [][]int) [][]int {
 		copy(cp[i], row)
 	}
 	return cp
-}
-
-// swimInWaterDijkstra has a production bug: the function declares a local named type
-//
-//	type state struct{ maxElev, row, col int }
-//
-// but MinHeap.Push asserts the anonymous struct type struct{ maxElev, row, col int }.
-// Named and anonymous struct types are distinct in Go, so the type assertion panics at runtime.
-// Fix: promote `state` to package level and align MinHeap's element type with it.
-func Test_swimInWaterDijkstra_bug(t *testing.T) {
-	t.Skip("production bug: MinHeap.Push panics — named type 'state' vs anonymous struct mismatch")
 }

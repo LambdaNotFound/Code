@@ -238,6 +238,30 @@ func Test_characterReplacement(t *testing.T) {
 	}
 }
 
+func Test_containsNearbyDuplicate(t *testing.T) {
+	testCases := []struct {
+		name     string
+		nums     []int
+		k        int
+		expected bool
+	}{
+		{"leetcode_example1", []int{1, 2, 3, 1}, 3, true},
+		{"leetcode_example2", []int{1, 0, 1, 1}, 1, true},
+		{"leetcode_example3", []int{1, 2, 3, 1, 2, 3}, 2, false},
+		{"empty", []int{}, 1, false},
+		{"single_element", []int{1}, 0, false},
+		{"k_zero_no_duplicate", []int{1, 1}, 0, false},
+		{"window_exact_k", []int{1, 2, 1}, 2, true},
+		{"window_just_outside_k", []int{1, 2, 3, 1}, 2, false},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, containsNearbyDuplicate(tc.nums, tc.k))
+		})
+	}
+}
+
 func Test_findHighAccessEmployees(t *testing.T) {
 	testCases := []struct {
 		name        string
@@ -279,6 +303,84 @@ func Test_findHighAccessEmployees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result := findHighAccessEmployees(tc.accessTimes)
+			assert.ElementsMatch(t, tc.expected, result)
+		})
+	}
+}
+
+func Test_longestSubstring(t *testing.T) {
+	testCases := []struct {
+		name     string
+		s        string
+		k        int
+		expected int
+	}{
+		{"leetcode_example1", "aaabb", 3, 3},    // "aaa"
+		{"leetcode_example2", "ababbc", 2, 5},   // "ababb"
+		{"all_satisfy", "aaabbb", 1, 6},         // whole string
+		{"none_satisfy", "abcdef", 2, 0},        // every char appears once
+		{"empty_string", "", 1, 0},
+		{"k_zero", "abc", 0, 3},                 // k=0: every char "satisfies"
+		{"single_char_meets_k", "aaaa", 4, 4},
+		{"single_char_short", "aaa", 4, 0},      // "a" only appears 3 times, k=4
+		{"mixed", "ababacb", 3, 0},              // no char appears ≥ 3 in a valid window
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, longestSubstring(tc.s, tc.k))
+		})
+	}
+}
+
+func Test_findSubstring(t *testing.T) {
+	testCases := []struct {
+		name     string
+		s        string
+		words    []string
+		expected []int
+	}{
+		{
+			"leetcode_example1",
+			"barfoothefoobarman",
+			[]string{"foo", "bar"},
+			[]int{0, 9},
+		},
+		{
+			"leetcode_example2",
+			"wordgoodgoodgoodbestword",
+			[]string{"word", "good", "best", "word"},
+			[]int{},
+		},
+		{
+			"leetcode_example3",
+			"barfoofoobarthefoobarman",
+			[]string{"bar", "foo", "the"},
+			[]int{6, 9, 12},
+		},
+		{
+			"single_word",
+			"aaa",
+			[]string{"a"},
+			[]int{0, 1, 2},
+		},
+		{
+			"duplicate_words",
+			"aaaa",
+			[]string{"aa", "aa"},
+			[]int{0},
+		},
+		{
+			"no_match",
+			"lingmindraboofooowingdrabo",
+			[]string{"fooo", "barr", "wing", "ding", "wing"},
+			[]int{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := findSubstring(tc.s, tc.words)
 			assert.ElementsMatch(t, tc.expected, result)
 		})
 	}

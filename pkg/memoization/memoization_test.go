@@ -6,6 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_climbStairs_zero(t *testing.T) {
+	// n=0: 1 way (take no steps). climbStairs3 is excluded — it panics
+	// when n=0 because it tries memo[1] on a length-1 slice.
+	assert.Equal(t, 1, climbStairs1(0))
+	assert.Equal(t, 1, climbStairs2(0))
+	assert.Equal(t, 1, climbStairs4(0))
+}
+
 func TestClimbStairs(t *testing.T) {
     tests := []struct {
         name     string

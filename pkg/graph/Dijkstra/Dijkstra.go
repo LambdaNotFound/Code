@@ -28,11 +28,9 @@ func dijkstra(graph [][][2]int, src int) []int {
 	}
 
 	// minHeap: [cost, node]
-	h := &Heap[Item]{
-		less: func(a, b Item) bool {
-			return a.cost < b.cost
-		},
-	}
+	h := NewHeap(func(a, b Item) bool {
+		return a.cost < b.cost
+	})
 	heap.Push(h, Item{0, src})
 
 	for h.Len() > 0 {

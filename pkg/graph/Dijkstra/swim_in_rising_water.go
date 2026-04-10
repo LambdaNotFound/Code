@@ -105,15 +105,17 @@ func swimInWaterDFS(grid [][]int) int {
 	return left
 }
 
+// swimState is the element type for MinHeap used by swimInWaterDijkstra.
+type swimState struct{ maxElev, row, col int }
+
 // Dijkstra
 func swimInWaterDijkstra(grid [][]int) int {
 	n := len(grid)
 	dirs := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
 
 	// minHeap: [maxElevation, row, col]
-	type state struct{ maxElev, row, col int }
 	h := &MinHeap{}
-	heap.Push(h, state{grid[0][0], 0, 0})
+	heap.Push(h, swimState{grid[0][0], 0, 0})
 
 	visited := make([][]bool, n)
 	for i := range visited {
@@ -122,7 +124,7 @@ func swimInWaterDijkstra(grid [][]int) int {
 	visited[0][0] = true
 
 	for h.Len() > 0 {
-		cur := heap.Pop(h).(state)
+		cur := heap.Pop(h).(swimState)
 		t, row, col := cur.maxElev, cur.row, cur.col
 
 		if row == n-1 && col == n-1 {
@@ -139,18 +141,18 @@ func swimInWaterDijkstra(grid [][]int) int {
 			}
 			visited[nr][nc] = true
 			nextT := max(t, grid[nr][nc]) // bottleneck = max elevation
-			heap.Push(h, state{nextT, nr, nc})
+			heap.Push(h, swimState{nextT, nr, nc})
 		}
 	}
 	return -1
 }
 
-type MinHeap []struct{ maxElev, row, col int }
+type MinHeap []swimState
 
 func (h MinHeap) Len() int            { return len(h) }
 func (h MinHeap) Less(i, j int) bool  { return h[i].maxElev < h[j].maxElev }
 func (h MinHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *MinHeap) Push(x interface{}) { *h = append(*h, x.(struct{ maxElev, row, col int })) }
+func (h *MinHeap) Push(x interface{}) { *h = append(*h, x.(swimState)) }
 func (h *MinHeap) Pop() interface{} {
 	x := (*h)[len(*h)-1]
 	*h = (*h)[:len(*h)-1]

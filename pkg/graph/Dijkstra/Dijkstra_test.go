@@ -58,6 +58,15 @@ func Test_findCheapestPrice(t *testing.T) {
 			// 0→1→2→3 needs 2 stops (k=1 allows 1 stop), only 0→3=100 works
 			expected: 100,
 		},
+		{
+			name: "pruning_same_node_same_stops",
+			// Two parallel 0→1 flights (costs 1 and 2). When the second pops,
+			// visited[1] <= cur.stops triggers the pruning branch.
+			n:       3,
+			flights: [][]int{{0, 1, 1}, {0, 1, 2}, {1, 2, 1}},
+			src:     0, dst: 2, k: 2,
+			expected: 2, // 0→1 (cost 1) → 2 (cost 1) = 2
+		},
 	}
 
 	for _, tt := range tests {
