@@ -1,4 +1,4 @@
-package two_pointers
+package slidingwindow
 
 import (
 	"math"
@@ -198,34 +198,6 @@ func minSubArrayLen(target int, nums []int) int {
 		return 0
 	}
 	return res
-}
-
-/**
- * 340. Longest Substring with At Most K Distinct Characters
- */
-func lengthOfLongestSubstringKDistinct(s string, k int) int {
-	if k == 0 || len(s) == 0 {
-		return 0
-	}
-
-	maxLen := math.MinInt
-	freq := make(map[byte]int)
-	for left, right := 0, 0; right < len(s); right++ {
-		freq[s[right]]++
-
-		// shrink window if too many distinct chars
-		for len(freq) > k { // len(map[byte]int)
-			freq[s[left]]--
-			if freq[s[left]] == 0 {
-				delete(freq, s[left])
-			}
-			left++
-		}
-
-		maxLen = max(maxLen, right-left+1)
-	}
-
-	return maxLen
 }
 
 /**
