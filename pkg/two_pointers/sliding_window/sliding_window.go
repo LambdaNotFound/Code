@@ -104,46 +104,22 @@ func minWindow(s string, t string) string {
  * change it to any other uppercase English character. You can perform this operation at most k times.
  */
 func characterReplacement(s string, k int) int {
-	freqMap := make(map[byte]int)
-	res := 0
-	for left, right := 0, 0; right < len(s); right++ {
-		freqMap[s[right]]++
-		maxFreq := 0
-		for i := left; i <= right; i++ {
-			maxFreq = max(maxFreq, freqMap[s[i]])
-		}
+	freq := [26]int{}
+	maxFreq, size := 0, 0
+	left := 0
+	for right := 0; right < len(s); right++ {
+		freq[s[right]-'A']++
+		maxFreq = max(maxFreq, freq[s[right]-'A'])
 
+		// window is invalid: shrink by exactly one step
 		if right-left+1 > k+maxFreq {
-			freqMap[s[left]]--
-			left++
-		}
-		res = max(res, right-left+1)
-	}
-	return res
-}
-
-func characterReplacementClaude(s string, k int) int {
-	freqMap := make(map[byte]int)
-	res := 0
-
-	for left, right := 0, 0; right < len(s); right++ {
-		freqMap[s[right]]++
-
-		// scan freqMap — always O(26), not O(window size)
-		maxFreq := 0
-		for _, freq := range freqMap {
-			maxFreq = max(maxFreq, freq)
-		}
-
-		if right-left+1 > k+maxFreq {
-			freqMap[s[left]]--
+			freq[s[left]-'A']--
 			left++
 		}
 
-		res = max(res, right-left+1)
+		size = max(size, right-left+1)
 	}
-
-	return res
+	return size
 }
 
 /**
@@ -156,14 +132,14 @@ func characterReplacementClaude(s string, k int) int {
 func findAnagrams(s string, p string) []int {
 	freqMap := make(map[byte]int)
 	for i := range p {
-		freqMap[p[i]]++ // ← fix 1: p[i] not s[i]
+		freqMap[p[i]]++
 	}
 
 	res := []int{}
 	for left, right := 0, 0; right < len(s); right++ {
 		freqMap[s[right]]--
 		// shrink until window is valid again
-		for freqMap[s[right]] < 0 { // ← fix 2: targeted shrink
+		for freqMap[s[right]] < 0 {
 			freqMap[s[left]]++
 			left++
 		}

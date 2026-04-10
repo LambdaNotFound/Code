@@ -1,10 +1,78 @@
 package dijkstra
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func Test_dijkstra(t *testing.T) {
+	tests := []struct {
+		name     string
+		graph    [][][2]int
+		src      int
+		expected []int
+	}{
+		{
+			name: "single_node",
+			graph: [][][2]int{
+				{}, // node 0: no edges
+			},
+			src:      0,
+			expected: []int{0},
+		},
+		{
+			name: "two_nodes_direct",
+			graph: [][][2]int{
+				{{1, 5}}, // 0→1 cost 5
+				{},       // 1: no outgoing
+			},
+			src:      0,
+			expected: []int{0, 5},
+		},
+		{
+			name: "diamond_graph",
+			// 0→1 cost 1, 0→2 cost 4, 1→3 cost 2, 2→3 cost 1
+			// shortest: 0→1→3 = 3
+			graph: [][][2]int{
+				{{1, 1}, {2, 4}}, // 0
+				{{3, 2}},         // 1
+				{{3, 1}},         // 2
+				{},               // 3
+			},
+			src:      0,
+			expected: []int{0, 1, 4, 3},
+		},
+		{
+			name: "stale_entry_pruned",
+			// 0→1 via two paths: cost 1 and cost 10
+			// stale entry (cost 10) should be skipped
+			graph: [][][2]int{
+				{{1, 1}, {1, 10}}, // 0→1 twice
+				{},
+			},
+			src:      0,
+			expected: []int{0, 1},
+		},
+		{
+			name: "unreachable_node",
+			graph: [][][2]int{
+				{{1, 3}}, // 0→1
+				{},       // 1
+				{},       // 2: unreachable
+			},
+			src:      0,
+			expected: []int{0, 3, math.MaxInt},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, dijkstra(tt.graph, tt.src))
+		})
+	}
+}
 
 func Test_findCheapestPrice(t *testing.T) {
 	tests := []struct {
