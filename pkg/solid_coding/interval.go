@@ -38,18 +38,18 @@ func mergeIntervals(intervals [][]int) [][]int {
 		return intervals[i][0] < intervals[j][0]
 	})
 
-	res := [][]int{intervals[0]}
+	merged := [][]int{intervals[0]}
 	for i := 1; i < len(intervals); i++ {
-		last := res[len(res)-1]
-		cur := intervals[i]
+		last := merged[len(merged)-1]
+		interval := intervals[i]
 
-		if cur[0] <= last[1] { // overlap: merge
-			last[1] = max(last[1], cur[1])
+		if interval[0] <= last[1] { // overlap: merge
+			last[1] = max(last[1], interval[1])
 		} else { // no overlap: append
-			res = append(res, cur)
+			merged = append(merged, interval)
 		}
 	}
-	return res
+	return merged
 }
 
 /**
@@ -58,14 +58,14 @@ func mergeIntervals(intervals [][]int) [][]int {
 func insert(intervals [][]int, newInterval []int) [][]int {
 	before, after := make([][]int, 0), make([][]int, 0)
 	for i := 0; i < len(intervals); i++ {
-		cur := intervals[i]
-		if cur[1] < newInterval[0] {
-			before = append(before, cur)
-		} else if newInterval[1] < cur[0] {
-			after = append(after, cur)
+		interval := intervals[i]
+		if interval[1] < newInterval[0] {
+			before = append(before, interval)
+		} else if newInterval[1] < interval[0] {
+			after = append(after, interval)
 		} else {
-			newInterval[0] = min(newInterval[0], cur[0])
-			newInterval[1] = max(newInterval[1], cur[1])
+			newInterval[0] = min(newInterval[0], interval[0])
+			newInterval[1] = max(newInterval[1], interval[1])
 		}
 	}
 	res := append(before, newInterval)
@@ -111,13 +111,13 @@ func eraseOverlapIntervals(intervals [][]int) int {
 		return intervals[i][0] < intervals[j][0]
 	})
 	erased := 0
-	for i, j := 0, 1; j < len(intervals); j++ {
-		if intervals[i][1] <= intervals[j][0] {
-			i = j
-		} else if intervals[i][1] > intervals[j][1] {
+	for prev, j := 0, 1; j < len(intervals); j++ {
+		if intervals[prev][1] <= intervals[j][0] {
+			prev = j
+		} else if intervals[prev][1] > intervals[j][1] {
 			erased++
-			i = j
-		} else if intervals[i][1] <= intervals[j][1] {
+			prev = j
+		} else if intervals[prev][1] <= intervals[j][1] {
 			erased++
 		}
 	}
@@ -129,51 +129,50 @@ func eraseOverlapIntervalsSortByEndTime(intervals [][]int) int {
 		return intervals[i][1] < intervals[j][1]
 	})
 	erased := 0
-	for i, j := 0, 1; j < len(intervals); j++ {
-		if intervals[j][0] < intervals[i][1] {
+	for prev, j := 0, 1; j < len(intervals); j++ {
+		if intervals[j][0] < intervals[prev][1] {
 			erased++
 		} else {
-			i = j
+			prev = j
 		}
 	}
 	return erased
 }
 
 // interval intersections template, Two pointers:
-func intersect(A, B [][]int) [][]int {
-	res := [][]int{}
+func intersect(listA, listB [][]int) [][]int {
+	intersections := [][]int{}
 	i, j := 0, 0
 
-	for i < len(A) && j < len(B) {
+	for i < len(listA) && j < len(listB) {
 		// find overlap
-		lo := max(A[i][0], B[j][0])
-		hi := min(A[i][1], B[j][1])
+		overlapStart := max(listA[i][0], listB[j][0])
+		overlapEnd := min(listA[i][1], listB[j][1])
 
-		if lo <= hi {
-			res = append(res, []int{lo, hi})
+		if overlapStart <= overlapEnd {
+			intersections = append(intersections, []int{overlapStart, overlapEnd})
 		}
 
 		// advance pointer with smaller end
-		if A[i][1] < B[j][1] {
+		if listA[i][1] < listB[j][1] {
 			i++
 		} else {
 			j++
 		}
 	}
-	return res
+	return intersections
 }
 
 /**
  * 986. Interval List Intersections
  */
 func intervalIntersection(firstList [][]int, secondList [][]int) [][]int {
-	m, n := len(firstList), len(secondList)
-	res := [][]int{}
-	for i, j := 0, 0; i < m && j < n; {
+	intersections := [][]int{}
+	for i, j := 0, 0; i < len(firstList) && j < len(secondList); {
 		start := max(firstList[i][0], secondList[j][0])
 		end := min(firstList[i][1], secondList[j][1])
 		if start <= end {
-			res = append(res, []int{start, end})
+			intersections = append(intersections, []int{start, end})
 		}
 
 		if firstList[i][1] < secondList[j][1] {
@@ -183,7 +182,7 @@ func intervalIntersection(firstList [][]int, secondList [][]int) [][]int {
 		}
 	}
 
-	return res
+	return intersections
 }
 
 /**
@@ -221,39 +220,39 @@ func minMeetingRooms(intervals []Interval) int {
 	sort.Ints(start)
 	sort.Ints(end)
 
-	res := 0
-	for i, j, cnt := 0, 0, 0; i < len(start) && j < len(end); {
+	maxRooms := 0
+	for i, j, rooms := 0, 0, 0; i < len(start) && j < len(end); {
 		if start[i] < end[j] {
 			i += 1
-			cnt += 1
+			rooms += 1
 		} else {
 			j += 1
-			cnt -= 1
+			rooms -= 1
 		}
-		res = max(res, cnt)
+		maxRooms = max(maxRooms, rooms)
 	}
-	return res
+	return maxRooms
 }
 
 func minMeetingRoomsSweepLine(intervals []Interval) int {
-	hashmap := make(map[int]int) // time <> start++, end--
-	for _, i := range intervals {
-		hashmap[i.Start]++
-		hashmap[i.End]--
+	timeline := make(map[int]int) // time point → room delta (start: +1, end: -1)
+	for _, meeting := range intervals {
+		timeline[meeting.Start]++
+		timeline[meeting.End]--
 	}
 
-	keys := make([]int, 0, len(hashmap))
-	for k := range hashmap {
-		keys = append(keys, k)
+	timePoints := make([]int, 0, len(timeline))
+	for timePoint := range timeline {
+		timePoints = append(timePoints, timePoint)
 	}
-	sort.Ints(keys)
+	sort.Ints(timePoints)
 
-	prev, res := 0, 0
-	for _, k := range keys {
-		prev += hashmap[k]
-		res = max(res, prev)
+	rooms, maxRooms := 0, 0
+	for _, timePoint := range timePoints {
+		rooms += timeline[timePoint]
+		maxRooms = max(maxRooms, rooms)
 	}
-	return res
+	return maxRooms
 }
 
 func minMeetingRoomsMinHeap(intervals [][]int) int {

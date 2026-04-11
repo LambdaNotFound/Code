@@ -8,19 +8,19 @@ import (
  * Ranges template, very clean logic (2 branches)
  */
 func linearScan(nums []int) [][]int {
-	res := [][]int{}
+	gaps := [][]int{}
 	for i := 0; i < len(nums)-1; i++ {
 		// bookmarking
 
 		// check relationship between nums[i] and nums[i+1]
 		if nums[i+1] > nums[i]+1 { // gap → missing range
-			res = append(res, []int{nums[i] + 1, nums[i+1] - 1})
+			gaps = append(gaps, []int{nums[i] + 1, nums[i+1] - 1})
 		}
 		if nums[i+1] == nums[i]+1 { // consecutive → summary range
 			// extend current range
 		}
 	}
-	return res
+	return gaps
 }
 
 /**
@@ -30,19 +30,19 @@ func linearScan(nums []int) [][]int {
  * Output: ["0","2->4","6","8->9"]
  */
 func summaryRanges(nums []int) []string {
-	res := []string{}
+	ranges := []string{}
 	for i := 0; i < len(nums); i++ {
 		start := i
 		for i+1 < len(nums) && nums[i+1]-nums[i] == 1 {
 			i++
 		}
 		if nums[start] == nums[i] {
-			res = append(res, fmt.Sprintf("%d", nums[start]))
+			ranges = append(ranges, fmt.Sprintf("%d", nums[start]))
 		} else {
-			res = append(res, fmt.Sprintf("%d->%d", nums[start], nums[i]))
+			ranges = append(ranges, fmt.Sprintf("%d->%d", nums[start], nums[i]))
 		}
 	}
-	return res
+	return ranges
 }
 
 /**
@@ -55,11 +55,11 @@ func findMissingRanges(nums []int, lower int, upper int) [][]int {
 	nums = append([]int{lower - 1}, nums...)
 	nums = append(nums, upper+1)
 
-	res := [][]int{}
+	missing := [][]int{}
 	for i := 0; i < len(nums)-1; i++ {
 		if nums[i+1]-nums[i] >= 2 {
-			res = append(res, []int{nums[i] + 1, nums[i+1] - 1})
+			missing = append(missing, []int{nums[i] + 1, nums[i+1] - 1})
 		}
 	}
-	return res
+	return missing
 }
