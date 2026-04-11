@@ -67,43 +67,43 @@ func longestSubarray(nums []int, limit int) int {
 		index, val int
 	}
 
-	res := 1
+	maxLen := 1
 	maxDeque := []pair{} // decreasing → front is max
 	minDeque := []pair{} // increasing → front is min
-	l := 0
+	left := 0
 
-	for r := 0; r < len(nums); r++ {
+	for right := 0; right < len(nums); right++ {
 		// maintain max deque: pop smaller from back
-		for len(maxDeque) > 0 && maxDeque[len(maxDeque)-1].val < nums[r] {
+		for len(maxDeque) > 0 && maxDeque[len(maxDeque)-1].val < nums[right] {
 			maxDeque = maxDeque[:len(maxDeque)-1]
 		}
 		// maintain min deque: pop larger from back
-		for len(minDeque) > 0 && minDeque[len(minDeque)-1].val > nums[r] {
+		for len(minDeque) > 0 && minDeque[len(minDeque)-1].val > nums[right] {
 			minDeque = minDeque[:len(minDeque)-1]
 		}
-		maxDeque = append(maxDeque, pair{r, nums[r]})
-		minDeque = append(minDeque, pair{r, nums[r]})
+		maxDeque = append(maxDeque, pair{right, nums[right]})
+		minDeque = append(minDeque, pair{right, nums[right]})
 
 		// shrink window from left until valid
 		for maxDeque[0].val-minDeque[0].val > limit {
-			l++
-			if maxDeque[0].index < l {
+			left++
+			if maxDeque[0].index < left {
 				maxDeque = maxDeque[1:]
 			}
-			if minDeque[0].index < l {
+			if minDeque[0].index < left {
 				minDeque = minDeque[1:]
 			}
 		}
 
-		res = max(res, r-l+1)
+		maxLen = max(maxLen, right-left+1)
 	}
 
-	return res
+	return maxLen
 }
 
 // Time: O(n^2)
 func longestSubarrayBruteForce(nums []int, limit int) int {
-	res := 1
+	maxLen := 1
 	for i := 0; i < len(nums); i++ {
 		minVal, maxVal := nums[i], nums[i]
 		for j := i + 1; j < len(nums); j++ {
@@ -111,9 +111,9 @@ func longestSubarrayBruteForce(nums []int, limit int) int {
 			maxVal = max(maxVal, nums[j])
 
 			if maxVal-minVal <= limit {
-				res = max(res, j-i+1)
+				maxLen = max(maxLen, j-i+1)
 			}
 		}
 	}
-	return res
+	return maxLen
 }
