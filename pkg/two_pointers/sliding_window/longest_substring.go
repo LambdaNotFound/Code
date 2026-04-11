@@ -7,7 +7,7 @@ package slidingwindow
  * Space: O(1) — fixed size [26]int array
  */
 func longestSubstring(s string, k int) int {
-	res := 0
+	maxLen := 0
 	// fix the number of unique characters in the window
 	for uniqueTarget := 1; uniqueTarget <= 26; uniqueTarget++ {
 		freq := [26]int{}
@@ -17,23 +17,23 @@ func longestSubstring(s string, k int) int {
 
 		for right := 0; right < len(s); right++ {
 			// expand: add s[right]
-			rc := s[right] - 'a'
-			if freq[rc] == 0 {
+			rightIdx := s[right] - 'a'
+			if freq[rightIdx] == 0 {
 				unique++
 			}
-			freq[rc]++
-			if freq[rc] == k {
+			freq[rightIdx]++
+			if freq[rightIdx] == k {
 				satisfying++
 			}
 
 			// shrink: too many unique chars in window
 			for unique > uniqueTarget {
-				lc := s[left] - 'a'
-				if freq[lc] == k {
+				leftIdx := s[left] - 'a'
+				if freq[leftIdx] == k {
 					satisfying--
 				}
-				freq[lc]--
-				if freq[lc] == 0 {
+				freq[leftIdx]--
+				if freq[leftIdx] == 0 {
 					unique--
 				}
 				left++
@@ -41,11 +41,11 @@ func longestSubstring(s string, k int) int {
 
 			// record: window has exactly uniqueTarget chars, all satisfying
 			if unique == uniqueTarget && satisfying == uniqueTarget {
-				res = max(res, right-left+1)
+				maxLen = max(maxLen, right-left+1)
 			}
 		}
 	}
-	return res
+	return maxLen
 }
 
 /**
@@ -64,7 +64,7 @@ func longestSubstring(s string, k int) int {
  */
 func lengthOfLongestSubstringKDistinct(s string, k int) int {
 	freq := make(map[byte]int)
-	res := 0
+	maxLen := 0
 	for left, right := 0, 0; right < len(s); right++ {
 		freq[s[right]]++
 		for len(freq) > k {
@@ -74,7 +74,7 @@ func lengthOfLongestSubstringKDistinct(s string, k int) int {
 			}
 			left++
 		}
-		res = max(res, right-left+1)
+		maxLen = max(maxLen, right-left+1)
 	}
-	return res
+	return maxLen
 }
