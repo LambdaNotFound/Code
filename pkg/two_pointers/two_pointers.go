@@ -26,9 +26,9 @@ import (
 func maxArea(height []int) int {
 	area := 0
 	for left, right := 0, len(height)-1; left < right; {
-		h := min(height[left], height[right])
-		w := right - left
-		area = max(area, h*w)
+		currHeight := min(height[left], height[right])
+		width := right - left
+		area = max(area, currHeight*width)
 		if height[left] > height[right] {
 			right--
 		} else {
@@ -54,20 +54,20 @@ func threeSum(nums []int) [][]int {
 			continue
 		}
 
-		for j, k := i+1, len(nums)-1; j < k; {
-			sum := nums[i] + nums[j] + nums[k]
+		for left, right := i+1, len(nums)-1; left < right; {
+			sum := nums[i] + nums[left] + nums[right]
 			if sum == 0 {
-				res = append(res, []int{nums[i], nums[j], nums[k]})
-				j++
-				k--
-				for ; j < k && nums[j] == nums[j-1]; j++ {
-				} // j - 1 >= 0 unnecessary, j is incremented BEFORE the duplicate check
-				for ; j < k && nums[k] == nums[k+1]; k-- {
-				} // k + 1 <= len(nums)-1 unnecessary, k is decremented BEFORE the duplicate check
+				res = append(res, []int{nums[i], nums[left], nums[right]})
+				left++
+				right--
+				for ; left < right && nums[left] == nums[left-1]; left++ {
+				} // left - 1 >= 0 unnecessary, left is incremented BEFORE the duplicate check
+				for ; left < right && nums[right] == nums[right+1]; right-- {
+				} // right + 1 <= len(nums)-1 unnecessary, right is decremented BEFORE the duplicate check
 			} else if sum > 0 {
-				k--
+				right--
 			} else {
-				j++
+				left++
 			}
 		}
 	}
@@ -90,25 +90,24 @@ func threeSumClosest(nums []int, target int) int {
 		return a
 	}
 
-	n := len(nums)
-	delta, res := math.MaxInt, 0
-	for i := 0; i < n; i++ {
+	minDelta, res := math.MaxInt, 0
+	for i := 0; i < len(nums); i++ {
 		if i > 0 && nums[i] == nums[i-1] {
 			continue
 		}
-		for j, k := i+1, n-1; j < k; {
-			sum := nums[i] + nums[j] + nums[k]
+		for left, right := i+1, len(nums)-1; left < right; {
+			sum := nums[i] + nums[left] + nums[right]
 			if sum == target {
 				return target
 			}
-			if abs(target-sum) < delta {
-				delta = abs(target - sum)
+			if abs(target-sum) < minDelta {
+				minDelta = abs(target - sum)
 				res = sum
 			}
 			if sum < target {
-				j++
+				left++
 			} else {
-				k--
+				right--
 			}
 		}
 	}
@@ -175,12 +174,12 @@ func sortColors(nums []int) {
 func sortedSquares(nums []int) []int {
 	res := make([]int, len(nums))
 	for left, right, i := 0, len(nums)-1, len(nums)-1; left <= right; i-- {
-		a, b := nums[left]*nums[left], nums[right]*nums[right]
-		if a > b {
-			res[i] = a
+		leftSq, rightSq := nums[left]*nums[left], nums[right]*nums[right]
+		if leftSq > rightSq {
+			res[i] = leftSq
 			left++
 		} else {
-			res[i] = b
+			res[i] = rightSq
 			right--
 		}
 	}
@@ -203,15 +202,15 @@ func moveZeroes(nums []int) {
  * 283. Remove Element
  */
 func removeElement(nums []int, val int) int {
-	pos := 0
+	writePos := 0
 	for i := 0; i < len(nums); i++ {
 		if nums[i] != val {
-			nums[pos] = nums[i]
-			pos += 1
+			nums[writePos] = nums[i]
+			writePos += 1
 		}
 	}
 
-	return pos
+	return writePos
 }
 
 /**
@@ -227,18 +226,18 @@ func isPalindrome(s string) bool {
 		return false
 	}
 
-	for idx, jdx := 0, len(s)-1; idx <= jdx; {
-		left, right := string(s[idx]), string(s[jdx])
-		if isValidChar(left) && isValidChar(right) {
-			if !strings.EqualFold(left, right) {
+	for left, right := 0, len(s)-1; left <= right; {
+		leftChar, rightChar := string(s[left]), string(s[right])
+		if isValidChar(leftChar) && isValidChar(rightChar) {
+			if !strings.EqualFold(leftChar, rightChar) {
 				return false
 			}
-			idx++
-			jdx--
-		} else if !isValidChar(left) {
-			idx++
-		} else if !isValidChar(right) {
-			jdx--
+			left++
+			right--
+		} else if !isValidChar(leftChar) {
+			left++
+		} else if !isValidChar(rightChar) {
+			right--
 		}
 	}
 	return true
