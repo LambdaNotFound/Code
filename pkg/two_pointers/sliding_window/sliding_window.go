@@ -27,18 +27,18 @@ import (
  */
 func lengthOfLongestSubstring(s string) int {
 	freq := make(map[byte]int)
-	size := 0
+	maxLen := 0
 	for left, right := 0, 0; right < len(s); right++ {
-		c := s[right]
-		freq[c]++
-		for freq[c] > 1 {
+		char := s[right]
+		freq[char]++
+		for freq[char] > 1 {
 			freq[s[left]]--
 			left++
 		}
 
-		size = max(size, right-left+1)
+		maxLen = max(maxLen, right-left+1)
 	}
-	return size
+	return maxLen
 }
 
 // lengthOfLongestSubstringRune handles multi-byte Unicode characters correctly
@@ -46,17 +46,17 @@ func lengthOfLongestSubstring(s string) int {
 func lengthOfLongestSubstringRune(s string) int {
 	freq := make(map[rune]int)
 	runes := []rune(s)
-	size := 0
+	maxLen := 0
 	for left, right := 0, 0; right < len(runes); right++ {
-		c := runes[right]
-		freq[c]++
-		for freq[c] > 1 {
+		char := runes[right]
+		freq[char]++
+		for freq[char] > 1 {
 			freq[runes[left]]--
 			left++
 		}
-		size = max(size, right-left+1)
+		maxLen = max(maxLen, right-left+1)
 	}
-	return size
+	return maxLen
 }
 
 /**
@@ -71,26 +71,26 @@ func minWindow(s string, t string) string {
 		freqMap[t[i]]++
 	}
 
-	res, size, count := "", math.MaxInt, len(t)
+	res, minLen, needed := "", math.MaxInt, len(t)
 	for left, right := 0, 0; right < len(s); right++ {
 		freqMap[s[right]]--
 		if freqMap[s[right]] >= 0 {
-			count--
+			needed--
 		}
-		for count == 0 {
+		for needed == 0 {
 			// shrink past non-required chars first
 			for freqMap[s[left]] < 0 {
 				freqMap[s[left]]++
 				left++
 			}
 			// now s[left] is a required char — record window
-			if right-left+1 < size {
-				size = right - left + 1
-				res = s[left : left+size]
+			if right-left+1 < minLen {
+				minLen = right - left + 1
+				res = s[left : left+minLen]
 			}
 			// invalidate window by removing s[left]
 			freqMap[s[left]]++
-			count++
+			needed++
 			left++
 		}
 	}
@@ -105,7 +105,7 @@ func minWindow(s string, t string) string {
  */
 func characterReplacement(s string, k int) int {
 	freq := [26]int{}
-	maxFreq, size := 0, 0
+	maxFreq, maxLen := 0, 0
 	left := 0
 	for right := 0; right < len(s); right++ {
 		freq[s[right]-'A']++
@@ -117,9 +117,9 @@ func characterReplacement(s string, k int) int {
 			left++
 		}
 
-		size = max(size, right-left+1)
+		maxLen = max(maxLen, right-left+1)
 	}
-	return size
+	return maxLen
 }
 
 /**
@@ -158,22 +158,22 @@ func findAnagrams(s string, p string) []int {
  * return the minimal length of a subarray whose sum is greater than or equal to target
  */
 func minSubArrayLen(target int, nums []int) int {
-	res, sum := math.MaxInt32, 0
+	minLen, sum := math.MaxInt32, 0
 	for left, right := 0, 0; right < len(nums); right++ {
 		sum += nums[right]
 
 		for sum >= target {
-			res = min(res, right-left+1)
+			minLen = min(minLen, right-left+1)
 
 			sum -= nums[left]
 			left += 1
 		}
 	}
 
-	if res == math.MaxInt32 {
+	if minLen == math.MaxInt32 {
 		return 0
 	}
-	return res
+	return minLen
 }
 
 /**
@@ -191,8 +191,8 @@ func findHighAccessEmployees(accessTimes [][]string) []string {
 	timesByEmployee := make(map[string][]int)
 	for _, entry := range accessTimes {
 		name := entry[0]
-		t, _ := strconv.Atoi(entry[1])
-		timesByEmployee[name] = append(timesByEmployee[name], t)
+		timeVal, _ := strconv.Atoi(entry[1])
+		timesByEmployee[name] = append(timesByEmployee[name], timeVal)
 	}
 
 	highAccess := make([]string, 0)
@@ -223,7 +223,7 @@ func findHighAccessEmployees(accessTimes [][]string) []string {
 func containsNearbyDuplicate(nums []int, k int) bool {
 	lastSeenAt := make(map[int]int)
 	for i, num := range nums {
-		if idx, found := lastSeenAt[num]; found && i-idx <= k {
+		if lastIdx, found := lastSeenAt[num]; found && i-lastIdx <= k {
 			return true
 		}
 		lastSeenAt[num] = i
