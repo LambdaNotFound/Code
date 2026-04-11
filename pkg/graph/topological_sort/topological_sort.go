@@ -1,4 +1,4 @@
-package graph
+package topologicalsort
 
 import (
 	"container/heap"
@@ -70,50 +70,39 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
  * Return the topological ordering
  */
 func findOrder(numCourses int, prerequisites [][]int) []int {
-	// Store the indegree of each course
 	indegree := make([]int, numCourses)
-	for _, pre := range prerequisites {
-		indegree[pre[0]]++
+	adjList := make([][]int, numCourses)
+	for _, prereq := range prerequisites {
+		prereqCourse, course := prereq[1], prereq[0]
+		indegree[course]++
+		adjList[prereqCourse] = append(adjList[prereqCourse], course)
 	}
 
-	// Store the courses that can be completed (indegree == 0) in queue
-	var queue []int
-	for course, degree := range indegree {
-		if degree == 0 {
-			queue = append(queue, course)
+	queue := []int{}
+	for i := range indegree {
+		if indegree[i] == 0 {
+			queue = append(queue, i)
 		}
 	}
 
-	// These are the number of courses that can be completed
-	completeCount := len(queue)
-	res := []int{}
-	for len(queue) != 0 {
-		leaf := queue[0]
+	order := []int{}
+	for len(queue) > 0 {
+		course := queue[0]
 		queue = queue[1:]
-		res = append(res, leaf)
-
-		for _, pre := range prerequisites {
-			// If course is the prerequite of any other course?
-			if leaf == pre[1] {
-				// If yes, then reduce the indegree of that course
-				indegree[pre[0]]--
-				// Is there a cycle?
-				if indegree[pre[0]] < 0 {
-					return []int{}
-				}
-				// Can this course be completed now?
-				if indegree[pre[0]] == 0 {
-					queue = append(queue, pre[0])
-					completeCount++
-				}
+		order = append(order, course)
+		for _, nextCourse := range adjList[course] {
+			indegree[nextCourse]--
+			if indegree[nextCourse] == 0 {
+				queue = append(queue, nextCourse)
 			}
 		}
 	}
 
-	if completeCount == numCourses {
-		return res
+	if len(order) != numCourses {
+		return []int{}
 	}
-	return []int{}
+
+	return order
 }
 
 /**
@@ -301,111 +290,4 @@ func findMinHeightTreesTwoPassBFS(n int, edges [][]int) []int {
 		return []int{path[m/2]}
 	}
 	return []int{path[m/2-1], path[m/2]}
-}
-
-/**
- * 329. Longest Increasing Path in a Matrix
- *
- * 1. DFS + memo: dp[curr] = max(dp[curr], dp[neighbor] + 1)
- * 2. BFS w/ in-degrees (Kahn’s algo)
- */
-func longestIncreasingPath(matrix [][]int) int {
-	m := len(matrix)
-	n := len(matrix[0])
-
-	indegree := make([][]int, m)
-	for i := 0; i < m; i++ {
-		indegree[i] = make([]int, n)
-	}
-
-	dirs := [][]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}
-	for r := 0; r < m; r++ {
-		for c := 0; c < n; c++ {
-			for _, dir := range dirs {
-				nextRow := r + dir[0]
-				nextCol := c + dir[1]
-				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
-					matrix[nextRow][nextCol] <= matrix[r][c] { // increasing
-					continue
-				}
-				indegree[r][c]++
-			}
-		}
-	}
-
-	queue := [][]int{}
-	for r := 0; r < m; r++ {
-		for c := 0; c < n; c++ {
-			if indegree[r][c] == 0 {
-				queue = append(queue, []int{r, c})
-			}
-		}
-	}
-
-	level := 0
-	for len(queue) > 0 {
-		l := len(queue)
-		for i := 0; i < l; i++ {
-			r, c := queue[0][0], queue[0][1]
-			queue = queue[1:]
-
-			for _, dir := range dirs {
-				nextRow := r + dir[0]
-				nextCol := c + dir[1]
-				if nextRow < 0 || nextCol < 0 || nextRow == m || nextCol == n ||
-					matrix[nextRow][nextCol] >= matrix[r][c] {
-					continue
-				}
-				indegree[nextRow][nextCol]--
-				if indegree[nextRow][nextCol] == 0 {
-					queue = append(queue, []int{nextRow, nextCol})
-				}
-			}
-		}
-		level++
-	}
-
-	return level
-}
-
-func longestIncreasingPathMemoization(matrix [][]int) int {
-	if len(matrix) == 0 || len(matrix[0]) == 0 {
-		return 0
-	}
-
-	m, n := len(matrix), len(matrix[0])
-	memo := make([][]int, m)
-	for i := range memo {
-		memo[i] = make([]int, n)
-	}
-
-	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-
-	var dfs func(int, int) int
-	dfs = func(x, y int) int {
-		if memo[x][y] != 0 {
-			return memo[x][y]
-		}
-		maxLen := 1
-		for _, dir := range dirs {
-			nx, ny := x+dir[0], y+dir[1]
-			if nx >= 0 && nx < m && ny >= 0 && ny < n &&
-				matrix[nx][ny] > matrix[x][y] {
-				length := 1 + dfs(nx, ny)
-				if length > maxLen {
-					maxLen = length
-				}
-			}
-		}
-		memo[x][y] = maxLen
-		return maxLen
-	}
-
-	res := 0
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			res = max(res, dfs(i, j))
-		}
-	}
-	return res
 }
