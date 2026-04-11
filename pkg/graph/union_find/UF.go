@@ -9,21 +9,97 @@ func unionFind(n int, graph [][2]int) {
 		parent[i] = i
 	}
 
-	var find func(a int) int
-	find = func(a int) int {
-		if a != parent[a] {
-			parent[a] = find(parent[a])
+	var find func(x int) int
+	find = func(x int) int {
+		if x != parent[x] {
+			parent[x] = find(parent[x])
 		}
-		return parent[a]
+		return parent[x]
 	}
 
-	union := func(a, b int) bool {
-		rootA, rootB := find(a), find(b)
-		if rootA != rootB {
-			parent[rootA] = rootB
-			return true
+	union := func(x, y int) bool {
+		rootX, rootY := find(x), find(y)
+		if rootX == rootY {
+			return false
 		}
-		return false
+		parent[rootX] = rootY
+		return true
+	}
+
+	for _, edge := range graph {
+		union(edge[0], edge[1])
+	}
+}
+
+func unionFindByRank(n int, graph [][2]int) {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+
+	rank := make([]int, n)
+
+	var find func(x int) int
+	find = func(x int) int {
+		if x != parent[x] {
+			parent[x] = find(parent[x])
+		}
+		return parent[x]
+	}
+
+	union := func(x, y int) bool {
+		rootX, rootY := find(x), find(y)
+		if rootX == rootY {
+			return false
+		}
+		if rank[rootX] < rank[rootY] {
+			parent[rootX] = rootY
+		} else if rank[rootX] > rank[rootY] {
+			parent[rootY] = rootX
+		} else {
+			parent[rootY] = rootX
+			rank[rootX]++
+		}
+		return true
+	}
+
+	for _, edge := range graph {
+		union(edge[0], edge[1])
+	}
+}
+
+func unionFindBySize(n int, graph [][2]int) {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+
+	size := make([]int, n)
+	for i := range size {
+		size[i] = 1
+	}
+
+	var find func(x int) int
+	find = func(x int) int {
+		if x != parent[x] {
+			parent[x] = find(parent[x])
+		}
+		return parent[x]
+	}
+
+	union := func(x, y int) bool {
+		rootX, rootY := find(x), find(y)
+		if rootX == rootY {
+			return false
+		}
+		if size[rootX] < size[rootY] {
+			parent[rootX] = rootY
+			size[rootY] += size[rootX]
+		} else {
+			parent[rootY] = rootX
+			size[rootX] += size[rootY]
+		}
+		return true
 	}
 
 	for _, edge := range graph {
