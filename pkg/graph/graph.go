@@ -53,7 +53,7 @@ func DFS(start *Node, visited map[*Node]bool) {
  * BFS + HashMap: queue, map[*Node]*Node
  */
 func cloneGraphDFS(node *Node) *Node {
-	visited := make(map[*Node]*Node) // map[ptr]ptr
+	cloned := make(map[*Node]*Node)
 
 	var dfs func(*Node) *Node
 	dfs = func(node *Node) *Node {
@@ -61,22 +61,17 @@ func cloneGraphDFS(node *Node) *Node {
 			return nil
 		}
 
-		// If the node is already cloned, return it
-		if copy, exist := visited[node]; exist {
-			return copy
+		if clone, exists := cloned[node]; exists {
+			return clone
 		}
 
-		// Create a new clone
-		copy := &Node{Val: node.Val}
-		visited[node] = copy // mark as cloned before visiting neighbors
+		clone := &Node{Val: node.Val}
+		cloned[node] = clone
 
-		// Recurse on neighbors
 		for _, neighbor := range node.Neighbors {
-			neighborClone := dfs(neighbor)
-			copy.Neighbors = append(copy.Neighbors, neighborClone)
-			// clone.Neighbors = append(clone.Neighbors, dfs(neighbor))
+			clone.Neighbors = append(clone.Neighbors, dfs(neighbor))
 		}
-		return copy
+		return clone
 	}
 
 	return dfs(node)
@@ -88,24 +83,22 @@ func cloneGraphBFS(node *Node) *Node {
 	}
 
 	queue := []*Node{node}
-	mapToCopy := make(map[*Node]*Node)
-	mapToCopy[node] = &Node{Val: node.Val} // tracks visited nodes
+	cloned := make(map[*Node]*Node)
+	cloned[node] = &Node{Val: node.Val}
 
 	for len(queue) > 0 {
-		currNode := queue[0]
+		original := queue[0]
 		queue = queue[1:]
-		currNodeCopy := mapToCopy[currNode]
+		clone := cloned[original]
 
-		for _, neighbor := range currNode.Neighbors {
-			if _, exist := mapToCopy[neighbor]; !exist {
-				mapToCopy[neighbor] = &Node{Val: neighbor.Val}
-				queue = append(queue, neighbor) // only enqueue un-visited
+		for _, neighbor := range original.Neighbors {
+			if _, exists := cloned[neighbor]; !exists {
+				cloned[neighbor] = &Node{Val: neighbor.Val}
+				queue = append(queue, neighbor)
 			}
-
-			neighborCopy := mapToCopy[neighbor]
-			currNodeCopy.Neighbors = append(currNodeCopy.Neighbors, neighborCopy)
+			clone.Neighbors = append(clone.Neighbors, cloned[neighbor])
 		}
 	}
 
-	return mapToCopy[node]
+	return cloned[node]
 }
