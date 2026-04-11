@@ -1,5 +1,36 @@
 package unionfind
 
+/**
+ * Union Find Template
+ */
+func unionFind(n int, graph [][2]int) {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+
+	var find func(a int) int
+	find = func(a int) int {
+		if a != parent[a] {
+			parent[a] = find(parent[a])
+		}
+		return parent[a]
+	}
+
+	union := func(a, b int) bool {
+		rootA, rootB := find(a), find(b)
+		if rootA != rootB {
+			parent[rootA] = rootB
+			return true
+		}
+		return false
+	}
+
+	for _, edge := range graph {
+		union(edge[0], edge[1])
+	}
+}
+
 /*
  * 323. Number of Connected Components in an Undirected Graph
  *
