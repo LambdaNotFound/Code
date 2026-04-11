@@ -13,44 +13,44 @@ package slidingwindow
  *
  */
 func findSubstring(s string, words []string) []int {
-	res := []int{}
+	starts := []int{}
 	wordCount := make(map[string]int)
-	for _, w := range words {
-		wordCount[w]++
+	for _, word := range words {
+		wordCount[word]++
 	}
 
 	wordLen, windowLen := len(words[0]), len(words[0])*len(words)
 
 	for offset := 0; offset < wordLen; offset++ {
-		count := len(words)
-		window := make(map[string]int)
-		for k, v := range wordCount {
-			window[k] = v // copy wordCount for this offset's window
+		needed := len(words)
+		windowFreq := make(map[string]int)
+		for word, cnt := range wordCount {
+			windowFreq[word] = cnt // copy wordCount for this offset's window
 		}
 
 		for i := offset; i+wordLen <= len(s); i += wordLen {
 			// add incoming word on the right
-			current := s[i : i+wordLen]
-			if window[current] > 0 {
-				count--
+			rightWord := s[i : i+wordLen]
+			if windowFreq[rightWord] > 0 {
+				needed--
 			}
-			window[current]--
+			windowFreq[rightWord]--
 
 			// remove outgoing word on the left (once window is full)
-			start := i - windowLen // left edge of the window
-			if start >= offset {
-				previous := s[start : start+wordLen]
-				window[previous]++
-				if window[previous] > 0 {
-					count++
+			dropPos := i - windowLen // one wordLen before the window's actual start
+			if dropPos >= offset {
+				leftWord := s[dropPos : dropPos+wordLen]
+				windowFreq[leftWord]++
+				if windowFreq[leftWord] > 0 {
+					needed++
 				}
 			}
 
-			if count == 0 {
-				res = append(res, start+wordLen)
+			if needed == 0 {
+				starts = append(starts, dropPos+wordLen)
 			}
 		}
 	}
 
-	return res
+	return starts
 }
