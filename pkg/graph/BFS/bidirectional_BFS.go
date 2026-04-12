@@ -1,4 +1,4 @@
-package graph
+package bfs
 
 /**
  * 127. Word Ladder
