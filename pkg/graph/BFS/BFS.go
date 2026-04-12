@@ -77,11 +77,11 @@ func orangesRottingSlice(grid [][]int) int {
 	for len(queue) > 0 {
 		size := len(queue)
 		for i := 0; i < size; i++ {
-			front := queue[0]
+			cell := queue[0]
 			queue = queue[1:]
 
-			for _, d := range dirs {
-				r, c := front[0]+d[0], front[1]+d[1]
+			for _, dir := range dirs {
+				r, c := cell[0]+dir[0], cell[1]+dir[1]
 				if r >= 0 && r < m && c >= 0 && c < n && grid[r][c] == 1 {
 					grid[r][c] = 2
 					queue = append(queue, []int{r, c})
@@ -120,11 +120,11 @@ func orangesRottingSlice2(grid [][]int) int {
 	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 	minute := 0
 	for len(queue) > 0 {
-		for _, i := range queue {
+		for _, cell := range queue {
 			queue = queue[1:]
 
-			for _, d := range dirs {
-				r, c := i[0]+d[0], i[1]+d[1]
+			for _, dir := range dirs {
+				r, c := cell[0]+dir[0], cell[1]+dir[1]
 				if r >= 0 && r < m && c >= 0 && c < n && grid[r][c] == 1 {
 					grid[r][c] = 2
 					queue = append(queue, []int{r, c})
@@ -150,9 +150,9 @@ func orangesRottingSlice2(grid [][]int) int {
  * 199. Binary Tree Right Side View
  */
 func rightSideView(root *TreeNode) []int {
-	res := make([]int, 0)
+	rightSide := make([]int, 0)
 	if root == nil {
-		return res
+		return rightSide
 	}
 
 	queue := []*TreeNode{root}
@@ -165,7 +165,7 @@ func rightSideView(root *TreeNode) []int {
 
 			// last node in level is visible from right side
 			if i == levelSize-1 {
-				res = append(res, node.Val)
+				rightSide = append(rightSide, node.Val)
 			}
 
 			if node.Left != nil {
@@ -177,7 +177,7 @@ func rightSideView(root *TreeNode) []int {
 		}
 	}
 
-	return res
+	return rightSide
 }
 
 /**
@@ -188,12 +188,12 @@ func levelOrder(root *TreeNode) [][]int {
 		return [][]int{}
 	}
 
-	var res [][]int
+	var levels [][]int
 	queue := []*TreeNode{root}
 	for len(queue) > 0 {
-		qlen := len(queue)
+		levelSize := len(queue)
 		var level []int
-		for i := 0; i < qlen; i++ {
+		for i := 0; i < levelSize; i++ {
 			node := queue[0]
 			queue = queue[1:]
 
@@ -205,9 +205,9 @@ func levelOrder(root *TreeNode) [][]int {
 				queue = append(queue, node.Right)
 			}
 		}
-		res = append(res, level)
+		levels = append(levels, level)
 	}
-	return res
+	return levels
 }
 
 /**
@@ -219,28 +219,28 @@ func zigzagLevelOrder(root *TreeNode) [][]int {
 	}
 
 	queue := []*TreeNode{root}
-	res := [][]int{}
+	levels := [][]int{}
 	for len(queue) > 0 {
 		size := len(queue)
 		level := []int{}
 		for i := 0; i < size; i++ {
-			f := queue[0]
+			node := queue[0]
 			queue = queue[1:]
-			level = append(level, f.Val)
-			if f.Left != nil {
-				queue = append(queue, f.Left)
+			level = append(level, node.Val)
+			if node.Left != nil {
+				queue = append(queue, node.Left)
 			}
-			if f.Right != nil {
-				queue = append(queue, f.Right)
+			if node.Right != nil {
+				queue = append(queue, node.Right)
 			}
 		}
 
-		if len(res)%2 == 1 {
+		if len(levels)%2 == 1 {
 			slices.Reverse(level)
 		}
-		res = append(res, level)
+		levels = append(levels, level)
 	}
-	return res
+	return levels
 }
 
 /**
@@ -264,37 +264,37 @@ func distanceK(root *TreeNode, target *TreeNode, k int) []int {
 
 	queue := []*TreeNode{target}
 	visited := map[*TreeNode]bool{target: true}
-	dist := 0
-	res := []int{}
+	steps := 0
+	result := []int{}
 	for len(queue) > 0 {
 		size := len(queue)
 		for i := 0; i < size; i++ {
-			f := queue[0]
+			node := queue[0]
 			queue = queue[1:]
 
-			if f.Left != nil && !visited[f.Left] {
-				visited[f] = true
-				queue = append(queue, f.Left)
+			if node.Left != nil && !visited[node.Left] {
+				visited[node] = true
+				queue = append(queue, node.Left)
 			}
-			if f.Right != nil && !visited[f.Right] {
-				visited[f] = true
-				queue = append(queue, f.Right)
+			if node.Right != nil && !visited[node.Right] {
+				visited[node] = true
+				queue = append(queue, node.Right)
 			}
 
-			if parent[f] != nil && !visited[parent[f]] {
-				visited[f] = true
-				queue = append(queue, parent[f])
+			if parent[node] != nil && !visited[parent[node]] {
+				visited[node] = true
+				queue = append(queue, parent[node])
 			}
 		}
-		dist++
+		steps++
 
-		if dist == k {
+		if steps == k {
 			for _, node := range queue {
-				res = append(res, node.Val)
+				result = append(result, node.Val)
 			}
 		}
 	}
-	return res
+	return result
 }
 
 func distanceKClaude(root *TreeNode, target *TreeNode, k int) []int {
@@ -326,10 +326,10 @@ func distanceKClaude(root *TreeNode, target *TreeNode, k int) []int {
 
 		next := []*TreeNode{}
 		for _, node := range queue {
-			for _, nei := range []*TreeNode{node.Left, node.Right, parent[node]} {
-				if nei != nil && !visited[nei] {
-					visited[nei] = true
-					next = append(next, nei)
+			for _, neighbor := range []*TreeNode{node.Left, node.Right, parent[node]} {
+				if neighbor != nil && !visited[neighbor] {
+					visited[neighbor] = true
+					next = append(next, neighbor)
 				}
 			}
 		}

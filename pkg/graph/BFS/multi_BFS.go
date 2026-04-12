@@ -31,18 +31,18 @@ func updateMatrix(mat [][]int) [][]int {
 
 	// BFS outward from all zero cells
 	for len(queue) > 0 {
-		cur := queue[0]
+		cell := queue[0]
 		queue = queue[1:]
 
 		for _, dir := range dirs {
-			r, c := cur[0]+dir[0], cur[1]+dir[1]
+			r, c := cell[0]+dir[0], cell[1]+dir[1]
 			if r < 0 || r >= m || c < 0 || c >= n {
 				continue
 			}
 
 			// only update if we found a shorter distance
-			if dist[cur[0]][cur[1]]+1 < dist[r][c] {
-				dist[r][c] = dist[cur[0]][cur[1]] + 1
+			if dist[cell[0]][cell[1]]+1 < dist[r][c] {
+				dist[r][c] = dist[cell[0]][cell[1]] + 1
 				queue = append(queue, []int{r, c})
 			}
 		}

@@ -9,8 +9,8 @@ package bfs
  */
 func ladderLengthBidirectionalBFS(beginWord string, endWord string, wordList []string) int {
 	wordSet := make(map[string]bool)
-	for _, str := range wordList {
-		wordSet[str] = true
+	for _, word := range wordList {
+		wordSet[word] = true
 	}
 	if _, found := wordSet[endWord]; !found {
 		return 0
@@ -101,8 +101,8 @@ func minKnightMoves(x, y int) int {
 
 		nextFront := map[[2]int]int{}
 		for pos := range frontF {
-			for _, d := range dirs {
-				next := [2]int{pos[0] + d[0], pos[1] + d[1]}
+			for _, dir := range dirs {
+				next := [2]int{pos[0] + dir[0], pos[1] + dir[1]}
 
 				if _, seen := visitF[next]; seen {
 					continue
