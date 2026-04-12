@@ -7,6 +7,9 @@ package slidingwindow
  * Space: O(1) — fixed size [26]int array
  */
 func longestSubstring(s string, k int) int {
+	if k == 0 {
+		return len(s) // every char trivially appears >= 0 times
+	}
 	maxLen := 0
 	// fix the number of unique characters in the window
 	for uniqueTarget := 1; uniqueTarget <= 26; uniqueTarget++ {
