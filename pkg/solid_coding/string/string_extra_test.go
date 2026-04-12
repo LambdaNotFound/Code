@@ -262,6 +262,31 @@ func Test_validPalindromeAtMostK(t *testing.T) {
 	}
 }
 
+func Test_romanToInt(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected int
+	}{
+		{"III", "III", 3},
+		{"LVIII", "LVIII", 58},
+		{"MCMXCIV", "MCMXCIV", 1994},
+		{"IV", "IV", 4},
+		{"IX", "IX", 9},
+		{"XL", "XL", 40},
+		{"XC", "XC", 90},
+		{"CD", "CD", 400},
+		{"CM", "CM", 900},
+		{"single_M", "M", 1000},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, romanToInt(tt.s))
+		})
+	}
+}
+
 // Test_myAtoi_extra adds cases that exercise the uncovered branches:
 //   - plus sign prefix (s[0]=='+' branch)
 //   - int32 overflow in both directions
