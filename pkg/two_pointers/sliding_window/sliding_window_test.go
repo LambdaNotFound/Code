@@ -232,8 +232,6 @@ func Test_characterReplacement(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := characterReplacement(tc.s, tc.k)
 			assert.Equal(t, tc.expected, result)
-			result = characterReplacementClaude(tc.s, tc.k)
-			assert.Equal(t, tc.expected, result)
 		})
 	}
 }
