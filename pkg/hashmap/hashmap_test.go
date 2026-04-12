@@ -21,6 +21,7 @@ func Test_twoSum(t *testing.T) {
         {name: "target_zero", nums: []int{-3, 3, 1}, target: 0, expected: []int{0, 1}},
         {name: "answer_at_end", nums: []int{1, 2, 3, 4}, target: 7, expected: []int{2, 3}},
         {name: "zero_and_value", nums: []int{0, 4, 3, 0}, target: 0, expected: []int{0, 3}},
+        {name: "no_solution", nums: []int{1, 2, 3}, target: 10, expected: nil},
     }
 
     for _, tt := range tests {

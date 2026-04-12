@@ -79,6 +79,14 @@ func Test_palindromePairs(t *testing.T) {
 			words:    []string{"abc"},
 			expected: [][]int{},
 		},
+		{
+			// Case 4: suffix is palindrome, reverse(prefix) found in list
+			// "abcxyx": suffix "xyx" is palindrome, prefix "abc" → reverse is "cba" (index 1)
+			// → "abcxyx"+"cba" = "abcxyxcba" ✓
+			name:     "case4_palindrome_suffix",
+			words:    []string{"abcxyx", "cba"},
+			expected: [][]int{{0, 1}},
+		},
 	}
 
 	for _, tt := range tests {
