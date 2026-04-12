@@ -21,7 +21,7 @@ func accountsMerge(accounts [][]string) [][]string {
 		}
 	}
 
-	res := make([][]string, 0)
+	result := make([][]string, 0)
 	visited := make([]bool, len(accounts))
 
 	for idx, account := range accounts {
@@ -35,11 +35,11 @@ func accountsMerge(accounts [][]string) [][]string {
 		emails := make(map[string]bool)
 
 		for len(queue) > 0 {
-			cur := queue[0]
+			accountIdx := queue[0]
 			queue = queue[1:]
 
 			// traverse all emails of current account
-			for _, email := range accounts[cur][1:] {
+			for _, email := range accounts[accountIdx][1:] {
 				if emails[email] {
 					continue // skip already collected emails
 				}
@@ -62,10 +62,10 @@ func accountsMerge(accounts [][]string) [][]string {
 		}
 		sort.Strings(merged)
 		merged = append([]string{account[0]}, merged...)
-		res = append(res, merged)
+		result = append(result, merged)
 	}
 
-	return res
+	return result
 }
 
 /**
@@ -118,12 +118,12 @@ func accountsMergeUF(accounts [][]string) [][]string {
 		emailGroups[root] = append(emailGroups[root], email)
 	}
 
-	res := make([][]string, 0, len(emailGroups))
+	result := make([][]string, 0, len(emailGroups))
 	for rootID, emails := range emailGroups {
 		sort.Strings(emails)
 		merged := append([]string{accounts[rootID][0]}, emails...)
-		res = append(res, merged)
+		result = append(result, merged)
 	}
 
-	return res
+	return result
 }

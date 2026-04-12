@@ -44,8 +44,8 @@ func foreignDictionary(words []string) string {
 	// Step 3: compute indegree for each character
 	indegree := make(map[byte]int)
 	for _, neighbors := range adjList {
-		for _, dst := range neighbors {
-			indegree[dst]++
+		for _, neighbor := range neighbors {
+			indegree[neighbor]++
 		}
 	}
 
@@ -60,11 +60,11 @@ func foreignDictionary(words []string) string {
 
 	result := make([]byte, 0, len(charSet))
 	for len(queue) > 0 {
-		cur := queue[0]
+		char := queue[0]
 		queue = queue[1:]
-		result = append(result, cur)
+		result = append(result, char)
 
-		for _, neighbor := range adjList[cur] {
+		for _, neighbor := range adjList[char] {
 			indegree[neighbor]--
 			if indegree[neighbor] == 0 {
 				queue = append(queue, neighbor)
