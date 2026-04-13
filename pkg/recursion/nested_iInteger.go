@@ -1,4 +1,4 @@
-package solid_coding
+package recursion
 
 /*
  * 339. Nested List Weight Sum
@@ -55,4 +55,41 @@ func depthSumDFS(nestedList []*NestedInteger) int {
 	}
 
 	return dfs(nestedList, 1)
+}
+
+/**
+ * 341. Flatten Nested List Iterator
+ */
+type NestedIterator struct {
+	items   []int
+	current int
+}
+
+func Constructor(nestedList []*NestedInteger) *NestedIterator {
+	items := []int{}
+	var dfs func(list []*NestedInteger)
+	dfs = func(list []*NestedInteger) {
+		for _, item := range list {
+			if item.IsInteger() {
+				items = append(items, item.GetInteger())
+			} else {
+				dfs(item.GetList())
+			}
+		}
+	}
+	dfs(nestedList)
+
+	return &NestedIterator{
+		items: items,
+	}
+}
+
+func (it *NestedIterator) Next() int {
+	val := it.items[it.current]
+	it.current++
+	return val
+}
+
+func (it *NestedIterator) HasNext() bool {
+	return it.current < len(it.items)
 }
