@@ -1,4 +1,4 @@
-package graph
+package topologicalsort
 
 /**
  * Alien Dictionary
@@ -10,6 +10,27 @@ package graph
  * invalid lex order: words=["aaa", "aa", "a"]
  *
  * append res string when popping from queue
+ *
+ * Time:
+ * Step 1 - collect chars:     O(C)    iterate every character in every word
+ * Step 2 - extract rules:     O(C)    compare adjacent words, total chars compared ≤ C
+ * Step 3 - compute indegree:  O(U)    U = unique chars ≤ 26, edges ≤ U²
+ * Step 4 - Kahn's BFS:        O(V+E)  V = unique chars ≤ 26, E = edges ≤ U²
+ * ─────────────────────────────────────────────────────
+ * total:                      O(C)    dominated by word scanning
+ *
+ * Space:
+ * charSet:    O(U) ≤ O(26)
+ * adjList:    O(U + E) ≤ O(26 + 26²)
+ * indegree:   O(U) ≤ O(26)
+ * queue:      O(U) ≤ O(26)
+ * result:     O(U) ≤ O(26)
+ *
+ *
+ *       Complexity    Bottleneck
+ * Time  O(C)          scanning input words
+ * Space O(1)          bounded by alphabet size 26
+ *
  */
 func foreignDictionary(words []string) string {
 	// Step 1: collect all unique characters
@@ -25,19 +46,18 @@ func foreignDictionary(words []string) string {
 	for i := 0; i+1 < len(words); i++ {
 		w1, w2 := words[i], words[i+1]
 		minLen := min(len(w1), len(w2))
-		isPrefixCase := len(w1) > len(w2)
 
 		for j := 0; j < minLen; j++ {
 			if w1[j] == w2[j] {
-				// invalid: "apple" before "app" is impossible
-				if j == minLen-1 && isPrefixCase {
+				if j == minLen-1 && len(w1) > len(w2) { // prefix w1 len > w2 len, invalid
 					return ""
 				}
 				continue
+			} else {
+				src, dst := w1[j], w2[j]
+				adjList[src] = append(adjList[src], dst)
+				break
 			}
-			// first differing char reveals ordering rule
-			adjList[w1[j]] = append(adjList[w1[j]], w2[j])
-			break
 		}
 	}
 
@@ -72,14 +92,27 @@ func foreignDictionary(words []string) string {
 		}
 	}
 
-	// cycle detected if not all characters are in result
 	if len(result) != len(charSet) {
 		return ""
 	}
-
 	return string(result)
 }
 
+/*
+ * Step 1 - collect chars:     O(C)    iterate every character in every word
+ * Step 2 - extract rules:     O(C)    compare adjacent words, total chars compared ≤ C
+ * Step 3 - DFS topo sort:     O(V+E)  V ≤ 26, E ≤ 26² → effectively O(1)
+ * reverse result:             O(U)    ≤ O(26) → effectively O(1)
+ * ─────────────────────────────────────────────────────
+ * total:                      O(C)    dominated by word scanning
+ *
+ * Space Complexity: O(1)
+ * charSet:        O(U) ≤ O(26)
+ * adjList:        O(U + E) ≤ O(26 + 26²)
+ * state map:      O(U) ≤ O(26)
+ * result:         O(U) ≤ O(26)
+ * call stack:     O(U) ≤ O(26)   DFS depth bounded by number of unique chars
+ */
 func foreignDictionaryDFS(words []string) string {
 	// Step 1: collect all unique characters
 	charSet := make(map[byte]bool)
