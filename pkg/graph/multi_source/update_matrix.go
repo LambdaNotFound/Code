@@ -1,10 +1,16 @@
-package bfs
+package multisource
 
 import "math"
 
 /**
  * 542. 01 Matrix
  * a multi-source BFS approach
+ *
+ * start BFS from zero cells
+ *
+ * Complexity
+ * Time O(m × n) — each cell enqueued once
+ * Space O(m × n) — queue + dist matrix
  */
 func updateMatrix(mat [][]int) [][]int {
 	m, n := len(mat), len(mat[0])
@@ -17,11 +23,11 @@ func updateMatrix(mat [][]int) [][]int {
 
 	// seed queue with ALL zero cells simultaneously
 	// mark non-zero cells as unvisited with sentinel value
-	queue := make([][]int, 0)
+	queue := make([][2]int, 0)
 	for row := 0; row < m; row++ {
 		for col := 0; col < n; col++ {
 			if mat[row][col] == 0 {
-				queue = append(queue, []int{row, col}) // seed
+				queue = append(queue, [2]int{row, col}) // seed
 				dist[row][col] = 0
 			} else {
 				dist[row][col] = math.MaxInt // unvisited sentinel
@@ -31,19 +37,19 @@ func updateMatrix(mat [][]int) [][]int {
 
 	// BFS outward from all zero cells
 	for len(queue) > 0 {
-		cell := queue[0]
+		row, col := queue[0][0], queue[0][1]
 		queue = queue[1:]
 
 		for _, dir := range dirs {
-			r, c := cell[0]+dir[0], cell[1]+dir[1]
+			r, c := row+dir[0], col+dir[1]
 			if r < 0 || r >= m || c < 0 || c >= n {
 				continue
 			}
 
 			// only update if we found a shorter distance
-			if dist[cell[0]][cell[1]]+1 < dist[r][c] {
-				dist[r][c] = dist[cell[0]][cell[1]] + 1
-				queue = append(queue, []int{r, c})
+			if dist[row][col]+1 < dist[r][c] {
+				dist[r][c] = dist[row][col] + 1
+				queue = append(queue, [2]int{r, c})
 			}
 		}
 	}

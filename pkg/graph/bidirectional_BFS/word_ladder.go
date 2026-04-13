@@ -1,4 +1,4 @@
-package graph
+package bidirectional
 
 import (
 	"container/list"

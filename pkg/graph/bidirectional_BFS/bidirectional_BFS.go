@@ -1,4 +1,4 @@
-package bfs
+package bidirectional
 
 /**
  * 127. Word Ladder
