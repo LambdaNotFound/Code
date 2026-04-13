@@ -110,16 +110,25 @@ func unionFindBySize(n int, graph [][2]int) {
 /*
  * 323. Number of Connected Components in an Undirected Graph
  *
- * Time: O(n + m * α(n)) w/ path compression
  * Space: O(n)
+ * initialize parent/size:   O(n)
+ * process each edge:        O(e · α(n))   ← e unions, each costs α(n) amortized
+ *
+ * total:                    O(n + e · α(n)), in practice this is O(n + e).
+ *
+ * Amortized find cost, union by rank/size onlyO(log n)
  */
 func countComponents(n int, edges [][]int) int {
 	parent := make([]int, n)
-	for i := 0; i < n; i++ {
+	for i := range parent {
 		parent[i] = i
 	}
+	size := make([]int, n)
+	for i := range size {
+		size[i] = 1
+	}
 
-	var find func(int) int
+	var find func(x int) int
 	find = func(x int) int {
 		if parent[x] != x {
 			parent[x] = find(parent[x])
@@ -132,18 +141,23 @@ func countComponents(n int, edges [][]int) int {
 		if rootX == rootY {
 			return false
 		}
-		// the union operation must update the root of one set to point to the root of the other set
-		parent[rootX] = rootY
+		if size[rootX] < size[rootY] {
+			parent[rootX] = rootY
+			size[rootY] += size[rootX]
+		} else {
+			parent[rootY] = rootX
+			size[rootX] += size[rootY]
+		}
 		return true
 	}
 
-	count := n
-	for _, e := range edges {
-		if union(e[0], e[1]) { // connect all the vertices via edges
-			count--
+	components := n
+	for _, edge := range edges {
+		if union(edge[0], edge[1]) {
+			components--
 		}
 	}
-	return count
+	return components
 }
 
 func countComponentsBFS(n int, edges [][]int) int {
