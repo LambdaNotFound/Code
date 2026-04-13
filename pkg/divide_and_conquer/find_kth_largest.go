@@ -27,6 +27,24 @@ func findKthLargest(nums []int, k int) int {
 	return nums[target]
 }
 
+func findKthLargestAlt(nums []int, k int) int {
+	left, right := 0, len(nums)-1
+
+	for left < right {
+		pivot := partition(nums, left, right)
+		rank := len(nums) - pivot // pivot's rank from largest: 1-indexed
+
+		if rank == k {
+			return nums[pivot] // found exactly
+		} else if rank < k {
+			right = pivot - 1 // need something smaller, go left
+		} else {
+			left = pivot + 1 // need something larger, go right
+		}
+	}
+	return nums[left]
+}
+
 func partition(nums []int, left, right int) int {
 	pivot := nums[right] // choose rightmost as pivot
 	store := left        // store index for elements <= pivot

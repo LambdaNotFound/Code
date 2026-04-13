@@ -1,4 +1,4 @@
-package bidirectional
+package bfs
 
 import (
 	"testing"

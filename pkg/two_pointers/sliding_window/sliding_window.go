@@ -132,7 +132,7 @@ func characterReplacement(s string, k int) int {
 func findAnagrams(s string, p string) []int {
 	freqMap := make(map[byte]int)
 	for i := range p {
-		freqMap[p[i]]++
+		freqMap[p[i]]++ // tracks char within the window
 	}
 
 	res := []int{}
