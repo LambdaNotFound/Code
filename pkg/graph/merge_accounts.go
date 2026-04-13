@@ -1,6 +1,9 @@
 package graph
 
-import "sort"
+import (
+	"slices"
+	"sort"
+)
 
 /**
  * 721. Accounts Merge
@@ -71,59 +74,56 @@ func accountsMerge(accounts [][]string) [][]string {
 /**
  * Union-Find
  */
-type UnionFind struct {
-	parent []int
-}
-
-func NewUnionFind(n int) *UnionFind {
+func accountsMergeUF(accounts [][]string) [][]string {
+	n := len(accounts)
 	parent := make([]int, n)
 	for i := range parent {
 		parent[i] = i
 	}
-	return &UnionFind{parent: parent}
-}
 
-func (uf *UnionFind) Find(node int) int {
-	if uf.parent[node] != node {
-		uf.parent[node] = uf.Find(uf.parent[node]) // path compression
+	var find func(x int) int
+	find = func(x int) int {
+		if parent[x] != x {
+			parent[x] = find(parent[x])
+		}
+		return parent[x]
 	}
-	return uf.parent[node]
-}
 
-func (uf *UnionFind) Union(p, q int) {
-	rootP, rootQ := uf.Find(p), uf.Find(q)
-	if rootP == rootQ {
-		return
-	}
-	uf.parent[rootP] = rootQ
-}
-
-func accountsMergeUF(accounts [][]string) [][]string {
-	uf := NewUnionFind(len(accounts))
-
-	emailToAccount := make(map[string]int)
-	for i, account := range accounts {
-		for _, email := range account[1:] {
-			if ownerID, exists := emailToAccount[email]; exists {
-				uf.Union(i, ownerID)
-			} else {
-				emailToAccount[email] = i
-			}
+	union := func(x, y int) {
+		rootX, rootY := find(x), find(y)
+		if rootX != rootY {
+			parent[rootX] = rootY
 		}
 	}
 
-	emailGroups := make(map[int][]string)
-	for email, accountID := range emailToAccount {
-		root := uf.Find(accountID)
-		emailGroups[root] = append(emailGroups[root], email)
+	// map each email to all account indices that contain it
+	emailToAccounts := make(map[string][]int)
+	for i, account := range accounts {
+		for _, email := range account[1:] {
+			emailToAccounts[email] = append(emailToAccounts[email], i)
+		}
 	}
 
-	result := make([][]string, 0, len(emailGroups))
-	for rootID, emails := range emailGroups {
+	// union all accounts sharing an email
+	for _, indices := range emailToAccounts {
+		for k := 1; k < len(indices); k++ {
+			union(indices[0], indices[k])
+		}
+	}
+
+	// group emails by root account index
+	merged := make(map[int][]string)
+	for i, account := range accounts {
+		root := find(i)
+		merged[root] = append(merged[root], account[1:]...)
+	}
+
+	res := [][]string{}
+	for root, emails := range merged {
 		sort.Strings(emails)
-		merged := append([]string{accounts[rootID][0]}, emails...)
-		result = append(result, merged)
+		emails = slices.Compact(emails)
+		name := accounts[root][0]
+		res = append(res, append([]string{name}, emails...))
 	}
-
-	return result
+	return res
 }

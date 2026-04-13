@@ -3,6 +3,21 @@ package multisource
 import "math"
 
 /**
+ *  Reverse multi-source BFS
+ *
+ * If you run BFS forward (from each query cell toward the targets):
+ *     each cell needs its own BFS → O(m×n) BFS runs → O(m²×n²) total, no shared work between cells
+ *
+ * If you run BFS backward (from the targets outward):
+ *     one BFS from all targets simultaneously → O(m×n) total all cells get answered in a single pass
+ *     shared work — wavefront reaches every cell exactly once
+ *
+ * Whenever you have multiple sources and multiple queries, reverse the direction
+ * so the sources become the BFS seeds. Each query cell gets answered the moment the wavefront reaches it.
+ *
+ */
+
+/**
  * 542. 01 Matrix
  * a multi-source BFS approach
  *
