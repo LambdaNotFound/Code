@@ -69,10 +69,10 @@ func Test_dijkstra(t *testing.T) {
 			name: "non_zero_src",
 			// src=2, shortest from node 2: 2→0=10, 2→1=4, 2→2=0, 2→3=6
 			graph: [][][2]int{
-				{{1, 7}},         // 0→1
-				{{3, 2}},         // 1→3
+				{{1, 7}},          // 0→1
+				{{3, 2}},          // 1→3
 				{{0, 10}, {1, 4}}, // 2→0, 2→1
-				{},               // 3
+				{},                // 3
 			},
 			src:      2,
 			expected: []int{10, 4, 0, 6},
@@ -262,14 +262,6 @@ func Test_findCheapestPrice(t *testing.T) {
 	}
 }
 
-// ---------------------------------------------------------------------------
-// 743. Network Delay Time (TDD — tests intentionally fail until implemented)
-//
-// Given a network of n nodes (1-indexed) and directed weighted edges in
-// `times` ([src, dst, weight]), find the minimum time for a signal sent
-// from node k to reach ALL nodes. Return -1 if any node is unreachable.
-// ---------------------------------------------------------------------------
-
 func Test_networkDelayTime(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -313,11 +305,11 @@ func Test_networkDelayTime(t *testing.T) {
 			expected: -1, // k=1 has no outgoing edges; nodes 2 and 3 unreachable
 		},
 		{
-			name:  "star_topology",
+			name: "star_topology",
 			// k=1 broadcasts directly to 2,3,4 with different delays
-			times: [][]int{{1, 2, 5}, {1, 3, 3}, {1, 4, 8}},
-			n:     4,
-			k:     1,
+			times:    [][]int{{1, 2, 5}, {1, 3, 3}, {1, 4, 8}},
+			n:        4,
+			k:        1,
 			expected: 8, // bottleneck is node 4 at delay 8
 		},
 		{

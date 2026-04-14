@@ -27,7 +27,7 @@ func dijkstra(graph [][][2]int, src int) []int {
 	for i := range dist {
 		dist[i] = math.MaxInt
 	}
-	dist[src] = 0
+	dist[src] = 0 // initialize dist[k] = 0 explicitly
 
 	type Item struct {
 		cost, node int
@@ -65,6 +65,7 @@ func dijkstra(graph [][][2]int, src int) []int {
 
 /**
  * 787. Cheapest Flights Within K Stops
+ *
  */
 func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	graph := make([][][2]int, n)
@@ -117,4 +118,73 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 		}
 	}
 	return -1
+}
+
+/**
+ * 743. Network Delay Time
+ *
+ * Given a network of n nodes (1-indexed) and directed weighted edges in
+ * `times` ([src, dst, weight]), find the minimum time for a signal sent
+ * from node k to reach ALL nodes. Return -1 if any node is unreachable.
+ *
+ * Time:
+ *   build adjList:    O(E)
+ *   heap operations:  each edge can trigger at most one push → at most E items in heap
+ *   each push/pop:    O(log E)
+ *   ─────────────────────────────────────────
+ *   total:            O(E log E)
+ *
+ *
+ * Space:
+ *   dist array:    O(V)
+ *   adjList:       O(V + E)
+ *   heap:          O(E)   — at most E entries
+ *   ─────────────────────────────────────────
+ *   total:         O(V + E)
+ */
+func networkDelayTime(times [][]int, n int, k int) int {
+	dist := make([]int, n+1)
+	for i := range dist {
+		dist[i] = math.MaxInt
+	}
+	dist[k] = 0
+
+	adjList := make([][][2]int, n+1)
+	for _, time := range times {
+		src, dst, weight := time[0], time[1], time[2]
+		adjList[src] = append(adjList[src], [2]int{dst, weight})
+	}
+
+	type state struct{ node, cost int }
+	minHeap := &Heap[state]{
+		less: func(a, b state) bool { return a.cost < b.cost },
+	}
+	heap.Push(minHeap, state{k, 0})
+
+	for minHeap.Len() > 0 {
+		top := heap.Pop(minHeap).(state)
+
+		if top.cost > dist[top.node] {
+			continue
+		}
+
+		for _, edge := range adjList[top.node] {
+			nei, weight := edge[0], edge[1]
+			newCost := top.cost + weight
+
+			if newCost < dist[nei] {
+				dist[nei] = newCost
+				heap.Push(minHeap, state{nei, newCost})
+			}
+		}
+	}
+
+	res := 0
+	for _, d := range dist[1:] {
+		if d == math.MaxInt {
+			return -1
+		}
+		res = max(res, d)
+	}
+	return res
 }
