@@ -89,6 +89,10 @@ func generateParenthesisCalude(n int) []string {
 
 /**
  * 46. Permutations (ordered)
+ *
+ * Input: nums = [1,2,3]
+ * Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+ *
  */
 func permute(nums []int) [][]int {
 	res := make([][]int, 0)
@@ -385,14 +389,17 @@ func combinationSum4RecursionMemoization(nums []int, target int) int {
  *  │   │   └── i=2: path=[1,2,3]
  *  │   │           record [1,2,3]
  *  │   │           return
+ *  |   |
  *  │   └── i=2: path=[1,3]
  *  │           record [1,3]
  *  │           return
+ *  |
  *  ├── i=1: path=[2]
  *  │   │   record [2]
  *  │   └── i=2: path=[2,3]
  *  │           record [2,3]
  *  │           return
+ *  |
  *  └── i=2: path=[3]
  *          record [3]
  *          return
@@ -409,6 +416,32 @@ func subsets(nums []int) [][]int {
 			path = append(path, nums[i]) // make choice
 			backtrack(i+1, path)
 			path = path[:len(path)-1] // undo choice
+		}
+	}
+
+	backtrack(0, []int{})
+	return res
+}
+
+/**
+ * 90. Subsets II
+ */
+func subsetsWithDup(nums []int) [][]int {
+	sort.Ints(nums) // must sort first so duplicates are adjacent
+	res := [][]int{}
+
+	var backtrack func(start int, current []int)
+	backtrack = func(start int, current []int) {
+		res = append(res, append([]int{}, current...))
+
+		for i := start; i < len(nums); i++ {
+			// skip duplicate at the same recursion level
+			if i > start && nums[i] == nums[i-1] {
+				continue
+			}
+			current = append(current, nums[i])
+			backtrack(i+1, current)
+			current = current[:len(current)-1]
 		}
 	}
 

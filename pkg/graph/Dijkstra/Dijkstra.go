@@ -14,6 +14,12 @@ import (
  *    Path With Maximum Minimum Value (LC 1102)
  *    Maximum Probability Path (LC 1514)
  *
+ * In standard Dijkstra, the state is just node —
+ *    once the optimal cost to a node is finalized,
+ *    any other entry for that node is guaranteed stale.
+ *
+ * prune both before & after push
+ *
  */
 func dijkstra(graph [][][2]int, src int) []int {
 	n := len(graph)
@@ -28,16 +34,18 @@ func dijkstra(graph [][][2]int, src int) []int {
 	}
 
 	// minHeap: [cost, node]
-	h := NewHeap(func(a, b Item) bool {
-		return a.cost < b.cost
-	})
+	h := &Heap[Item]{
+		less: func(a, b Item) bool {
+			return a.cost < b.cost
+		},
+	}
 	heap.Push(h, Item{0, src})
 
 	for h.Len() > 0 {
 		cur := heap.Pop(h).(Item)
 		cost, node := cur.cost, cur.node
 
-		// stale entry — already found better path
+		// prune on pop: stale entry — already found better path
 		if cost > dist[node] {
 			continue
 		}
@@ -46,7 +54,7 @@ func dijkstra(graph [][][2]int, src int) []int {
 			nei, weight := edge[0], edge[1]
 			newCost := dist[node] + weight // ← sum of weights
 
-			if newCost < dist[nei] {
+			if newCost < dist[nei] { // prune on push: only push if improvement found
 				dist[nei] = newCost
 				heap.Push(h, Item{newCost, nei})
 			}
@@ -91,18 +99,20 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 			continue
 		}
 
-		// pruning: already visited with fewer stops
-		if visited[cur.node] <= cur.stops {
-			continue
-		}
 		visited[cur.node] = cur.stops
 
 		for _, nei := range graph[cur.node] {
 			nextNode, nextPrice := nei[0], nei[1]
+			newPrice, newStops := cur.cost+nextPrice, cur.stops+1
+
+			if visited[nextNode] <= newStops {
+				continue // pruning: already visited with fewer stops
+			}
+
 			heap.Push(h, Flight{
-				cost:  cur.cost + nextPrice,
+				cost:  newPrice,
 				node:  nextNode,
-				stops: cur.stops + 1,
+				stops: newStops,
 			})
 		}
 	}

@@ -21,9 +21,13 @@ import (
  * Input: s = "(1+(4+5+2)-3)+(6+8)"
  * Output: 23
  *
- * stack stores stores result + sign before each '('
+ * stack stores [..., result,  sign] before each '('
+ *    when process ')', res = outerResult + outerSign * result
  */
 func calculate(s string) int {
+	reg := regexp.MustCompile(`[^0-9+\-()]`)
+	s = reg.ReplaceAllString(s, "")
+
 	stack := []int{} // stores result + sign before each '('
 	result, num, sign := 0, 0, 1
 	for i, ch := range s {

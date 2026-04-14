@@ -1,16 +1,8 @@
 package dijkstra
 
-import "container/heap"
-
 type Heap[T any] struct {
 	items []T
 	less  func(a, b T) bool
-}
-
-func NewHeap[T any](less func(a, b T) bool) *Heap[T] {
-	h := &Heap[T]{less: less}
-	heap.Init(h)
-	return h
 }
 
 // container/heap interface
@@ -23,3 +15,11 @@ func (h *Heap[T]) Pop() any {
 	h.items = h.items[:len(h.items)-1]
 	return x
 }
+
+/*
+func NewHeap[T any](less func(a, b T) bool) *Heap[T] {
+	h := &Heap[T]{less: less}
+	heap.Init(h)
+	return h
+}
+*/

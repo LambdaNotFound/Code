@@ -114,7 +114,11 @@ func swimInWaterDijkstra(grid [][]int) int {
 	dirs := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
 
 	// minHeap: [maxElevation, row, col]
-	h := &MinHeap{}
+	h := &Heap[swimState]{
+		less: func(a, b swimState) bool {
+			return a.maxElev < b.maxElev
+		},
+	}
 	heap.Push(h, swimState{grid[0][0], 0, 0})
 
 	visited := make([][]bool, n)
@@ -145,16 +149,4 @@ func swimInWaterDijkstra(grid [][]int) int {
 		}
 	}
 	return -1
-}
-
-type MinHeap []swimState
-
-func (h MinHeap) Len() int            { return len(h) }
-func (h MinHeap) Less(i, j int) bool  { return h[i].maxElev < h[j].maxElev }
-func (h MinHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *MinHeap) Push(x interface{}) { *h = append(*h, x.(swimState)) }
-func (h *MinHeap) Pop() interface{} {
-	x := (*h)[len(*h)-1]
-	*h = (*h)[:len(*h)-1]
-	return x
 }
