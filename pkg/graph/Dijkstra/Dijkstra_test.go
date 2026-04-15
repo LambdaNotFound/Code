@@ -353,3 +353,123 @@ func Test_networkDelayTime(t *testing.T) {
 		})
 	}
 }
+
+// ---------------------------------------------------------------------------
+// 1631. Path With Minimum Effort  (TDD — implementation has a bug)
+//
+// Effort of a path = max absolute difference between adjacent cells' heights.
+// Find the minimum effort path from (0,0) to (m-1,n-1).
+//
+// Cost function must be: max(cur.effort, abs(heights[nr][nc] - heights[r][c]))
+// NOT a sum — the current implementation sums differences and skips abs, so
+// all tests except the trivial ones are expected to fail until it is fixed.
+// ---------------------------------------------------------------------------
+
+func Test_minimumEffortPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		heights  [][]int
+		expected int
+	}{
+		{
+			// Single cell — already at destination.
+			name:     "single_cell",
+			heights:  [][]int{{5}},
+			expected: 0,
+		},
+		{
+			// 1×2: only one path, effort = |1-5| = 4.
+			name:     "one_row_two_cols",
+			heights:  [][]int{{1, 5}},
+			expected: 4,
+		},
+		{
+			// 2×1: only one path, effort = |1-5| = 4.
+			name:     "two_rows_one_col",
+			heights:  [][]int{{1}, {5}},
+			expected: 4,
+		},
+		{
+			// All cells same height — zero effort regardless of path.
+			name:     "all_same_height",
+			heights:  [][]int{{3, 3, 3}, {3, 3, 3}, {3, 3, 3}},
+			expected: 0,
+		},
+		{
+			// LeetCode example 1.
+			// Optimal: (0,0)→(1,0)→(2,0)→(2,1)→(2,2)
+			// diffs: |1-3|=2, |3-5|=2, |5-3|=2, |3-5|=2 → max = 2.
+			name:     "leetcode_example1",
+			heights:  [][]int{{1, 2, 2}, {3, 8, 2}, {5, 3, 5}},
+			expected: 2,
+		},
+		{
+			// LeetCode example 2.
+			// Optimal: (0,0)→(0,1)→(0,2)→(1,2)→(2,2)
+			// diffs: 1,1,1,1 → max = 1.
+			name:     "leetcode_example2",
+			heights:  [][]int{{1, 2, 3}, {3, 8, 4}, {5, 3, 5}},
+			expected: 1,
+		},
+		{
+			// LeetCode example 3.
+			// A flat corridor exists along the bottom — effort = 0.
+			name:    "leetcode_example3",
+			heights: [][]int{{1, 2, 1, 1, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 1, 1, 2, 1}},
+			expected: 0,
+		},
+		{
+			// Two candidate paths; going down-then-right beats right-then-down.
+			// heights = [[1,10],[2,3]]
+			// Path A: (0,0)→(0,1)→(1,1): max(|1-10|,|10-3|) = max(9,7) = 9
+			// Path B: (0,0)→(1,0)→(1,1): max(|1-2|,|2-3|)  = max(1,1)  = 1
+			name:     "two_paths_pick_lower_effort",
+			heights:  [][]int{{1, 10}, {2, 3}},
+			expected: 1,
+		},
+		{
+			// Effort is the max of the path, not the sum.
+			// heights = [[1,2,10],[1,1,1]]
+			// Path A (top row): max(1,8) = 8
+			// Path B (down, across, up): (0,0)→(1,0)→(1,1)→(1,2)→(0,2)?
+			//   Not allowed to go up to (0,2) from (1,2) then... actually can.
+			//   diffs: 0,0,0,9 → max=9. Worse.
+			// Path C: (0,0)→(1,0)→(1,1)→(1,2): diffs 0,0,1 → max=1. But doesn't reach (0,2).
+			//   Destination is (1,2) for a 2-row grid. So path C is optimal with effort 1.
+			name:     "effort_is_max_not_sum",
+			heights:  [][]int{{1, 2, 10}, {1, 1, 1}},
+			expected: 1,
+		},
+		{
+			// 1×n strip — only one path, effort = max diff between any two adjacent cells.
+			// heights = [1, 3, 1, 4]
+			// diffs: 2, 2, 3 → max = 3.
+			name:     "single_row_strip",
+			heights:  [][]int{{1, 3, 1, 4}},
+			expected: 3,
+		},
+		{
+			// Uniform increase along the direct path, but a flat detour exists.
+			// heights = [[1,1,1],[5,5,1],[5,5,1]]
+			// Top row then right column: diffs 0,0,0,0,0 → effort 0.
+			name:     "flat_detour_exists",
+			heights:  [][]int{{1, 1, 1}, {5, 5, 1}, {5, 5, 1}},
+			expected: 0,
+		},
+		{
+			// Large cliff in every direction — can't avoid it, effort = cliff height.
+			// heights = [[1,100],[100,1]]
+			// Path A: (0,0)→(0,1)→(1,1): max(99, 99) = 99
+			// Path B: (0,0)→(1,0)→(1,1): max(99, 99) = 99
+			name:     "unavoidable_cliff",
+			heights:  [][]int{{1, 100}, {100, 1}},
+			expected: 99,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, minimumEffortPath(tt.heights))
+		})
+	}
+}
