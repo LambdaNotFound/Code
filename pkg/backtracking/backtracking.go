@@ -29,34 +29,32 @@ import "sort"
  *
  * Given n pairs of parentheses, write a function to generate
  * all combinations of well-formed parentheses.
+ *
+ * backtrack(0, 0, "")
+ * ├── backtrack(1, 0, "(")
+ * │   ├── backtrack(2, 0, "((")
+ * │   │   ├── backtrack(3, 0, "(((")
+ * │   │   │   └── backtrack(3, 1, "((()")
+ * │   │   │       └── backtrack(3, 2, "((())")
+ * │   │   │           └── backtrack(3, 3, "((()))") ✓ append
+ * │   │   └── backtrack(2, 1, "(()")
+ * │   │       ├── backtrack(3, 1, "(()(")
+ * │   │       │   └── backtrack(3, 2, "(()()")
+ * │   │       │       └── backtrack(3, 3, "(()())") ✓ append
+ * │   │       └── backtrack(2, 2, "(())")
+ * │   │           └── backtrack(3, 2, "(())(")
+ * │   │               └── backtrack(3, 3, "(())()") ✓ append
+ * │   └── backtrack(1, 1, "()")
+ * │       └── backtrack(2, 1, "()(")  ← right < left allows ) only after (
+ * │           ├── backtrack(3, 1, "()((")
+ * │           │   └── backtrack(3, 2, "()(()")
+ * │           │       └── backtrack(3, 3, "()(())") ✓ append
+ * │           └── backtrack(2, 2, "()()")
+ * │               └── backtrack(3, 2, "()()(")
+ * │                   └── backtrack(3, 3, "()()()") ✓ append
+ *
  */
 func generateParenthesis(n int) []string {
-	res := []string{}
-	var backtrack func(int, int, string)
-	backtrack = func(left, right int, str string) {
-		if left+right == n*2 {
-			res = append(res, str)
-			return
-		}
-
-		if left < n {
-			str = str + "("
-			backtrack(left+1, right, str)
-			str = str[:len(str)-1]
-		}
-
-		if right < left {
-			str = str + ")"
-			backtrack(left, right+1, str)
-			str = str[:len(str)-1]
-		}
-	}
-
-	backtrack(0, 0, "")
-	return res
-}
-
-func generateParenthesisCalude(n int) []string {
 	result := make([]string, 0)
 	path := make([]byte, 0, n*2) // pre-allocate exact capacity
 
