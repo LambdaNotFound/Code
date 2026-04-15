@@ -414,8 +414,8 @@ func Test_minimumEffortPath(t *testing.T) {
 		{
 			// LeetCode example 3.
 			// A flat corridor exists along the bottom — effort = 0.
-			name:    "leetcode_example3",
-			heights: [][]int{{1, 2, 1, 1, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 1, 1, 2, 1}},
+			name:     "leetcode_example3",
+			heights:  [][]int{{1, 2, 1, 1, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 2, 1, 2, 1}, {1, 1, 1, 2, 1}},
 			expected: 0,
 		},
 		{
@@ -430,15 +430,9 @@ func Test_minimumEffortPath(t *testing.T) {
 		{
 			// Effort is the max of the path, not the sum.
 			// heights = [[1,2,10],[1,1,1]]
-			// Path A (top row): max(1,8) = 8
-			// Path B (down, across, up): (0,0)→(1,0)→(1,1)→(1,2)→(0,2)?
-			//   Not allowed to go up to (0,2) from (1,2) then... actually can.
-			//   diffs: 0,0,0,9 → max=9. Worse.
-			// Path C: (0,0)→(1,0)→(1,1)→(1,2): diffs 0,0,1 → max=1. But doesn't reach (0,2).
-			//   Destination is (1,2) for a 2-row grid. So path C is optimal with effort 1.
 			name:     "effort_is_max_not_sum",
 			heights:  [][]int{{1, 2, 10}, {1, 1, 1}},
-			expected: 1,
+			expected: 0, // bottom row is flat: 1→1→1, all diffs = 0
 		},
 		{
 			// 1×n strip — only one path, effort = max diff between any two adjacent cells.

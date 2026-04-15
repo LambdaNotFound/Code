@@ -20,6 +20,10 @@ import (
  *
  * prune both before & after push
  *
+ * Space complexity:
+ *    In the standard lazy deletion implementation (push duplicates, skip stale on pop),
+ *    nodes can be pushed multiple times — once per incoming edge — giving O(E log E).
+ *
  */
 func dijkstra(graph [][][2]int, src int) []int {
 	n := len(graph)
@@ -29,24 +33,24 @@ func dijkstra(graph [][][2]int, src int) []int {
 	}
 	dist[src] = 0 // initialize dist[k] = 0 explicitly
 
-	type Item struct {
+	type state struct {
 		cost, node int
 	}
 
 	// minHeap: [cost, node]
-	h := &Heap[Item]{
-		less: func(a, b Item) bool {
+	h := &Heap[state]{
+		less: func(a, b state) bool {
 			return a.cost < b.cost
 		},
 	}
-	heap.Push(h, Item{0, src})
+	heap.Push(h, state{0, src})
 
 	for h.Len() > 0 {
-		cur := heap.Pop(h).(Item)
+		cur := heap.Pop(h).(state)
 		cost, node := cur.cost, cur.node
 
 		// prune on pop: stale entry — already found better path
-		if cost > dist[node] {
+		if cost > dist[node] { // strict >, to include first edge
 			continue
 		}
 
@@ -56,7 +60,7 @@ func dijkstra(graph [][][2]int, src int) []int {
 
 			if newCost < dist[nei] { // prune on push: only push if improvement found
 				dist[nei] = newCost
-				heap.Push(h, Item{newCost, nei})
+				heap.Push(h, state{newCost, nei})
 			}
 		}
 	}
@@ -74,14 +78,14 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 		graph[from] = append(graph[from], [2]int{to, price})
 	}
 
-	type Flight struct{ cost, node, stops int }
+	type state struct{ cost, node, stops int }
 
-	h := &Heap[Flight]{
-		less: func(a, b Flight) bool {
+	h := &Heap[state]{
+		less: func(a, b state) bool {
 			return a.cost < b.cost
 		},
 	}
-	heap.Push(h, Flight{0, src, 0})
+	heap.Push(h, state{0, src, 0})
 
 	// visited[node] = minimum stops to reach node at lowest cost
 	visited := make([]int, n)
@@ -90,7 +94,7 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	}
 
 	for h.Len() > 0 {
-		cur := heap.Pop(h).(Flight)
+		cur := heap.Pop(h).(state)
 
 		if cur.node == dst {
 			return cur.cost
@@ -110,7 +114,7 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 				continue // pruning: already visited with fewer stops
 			}
 
-			heap.Push(h, Flight{
+			heap.Push(h, state{
 				cost:  newPrice,
 				node:  nextNode,
 				stops: newStops,
@@ -187,4 +191,65 @@ func networkDelayTime(times [][]int, n int, k int) int {
 		res = max(res, d)
 	}
 	return res
+}
+
+/**
+ * 1631. Path With Minimum Effort
+ *
+ * A route's effort is the maximum absolute difference in heights between two consecutive cells of the route.
+ *
+ * 1. adjGrid [][]int
+ * 2. dist[]
+ *
+ */
+func minimumEffortPath(heights [][]int) int {
+	m, n := len(heights), len(heights[0])
+	dist := make([][]int, m)
+	for i := range dist {
+		dist[i] = make([]int, n)
+
+		for j := range dist[i] {
+			dist[i][j] = math.MaxInt
+		}
+	}
+	dist[0][0] = 0
+
+	type state struct{ row, col, cost int }
+	minHeap := &Heap[state]{
+		less: func(a, b state) bool {
+			return a.cost < b.cost
+		},
+	}
+	heap.Push(minHeap, state{0, 0, 0})
+
+	abs := func(a int) int {
+		if a < 0 {
+			return -a
+		}
+		return a
+	}
+	dirs := [][2]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}
+	for minHeap.Len() > 0 {
+		cur := heap.Pop(minHeap).(state)
+		row, col := cur.row, cur.col
+
+		if cur.cost > dist[cur.row][cur.col] {
+			continue
+		}
+
+		for _, dir := range dirs {
+			r, c := row+dir[0], col+dir[1]
+			if r < 0 || c < 0 || r >= m || c >= n {
+				continue
+			}
+
+			newCost := max(cur.cost, abs(heights[r][c]-heights[row][col]))
+			if newCost < dist[r][c] {
+				dist[r][c] = newCost
+				heap.Push(minHeap, state{r, c, newCost})
+			}
+		}
+	}
+
+	return dist[m-1][n-1]
 }
