@@ -354,17 +354,6 @@ func Test_networkDelayTime(t *testing.T) {
 	}
 }
 
-// ---------------------------------------------------------------------------
-// 1631. Path With Minimum Effort  (TDD — implementation has a bug)
-//
-// Effort of a path = max absolute difference between adjacent cells' heights.
-// Find the minimum effort path from (0,0) to (m-1,n-1).
-//
-// Cost function must be: max(cur.effort, abs(heights[nr][nc] - heights[r][c]))
-// NOT a sum — the current implementation sums differences and skips abs, so
-// all tests except the trivial ones are expected to fail until it is fixed.
-// ---------------------------------------------------------------------------
-
 func Test_minimumEffortPath(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -464,6 +453,342 @@ func Test_minimumEffortPath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, minimumEffortPath(tt.heights))
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// 1514. Path with Maximum Probability
+//
+// Undirected weighted graph where each edge has a success probability.
+// Find the path from start to end that maximises the product of probabilities.
+// If no path exists return 0.  Uses a max-heap (Dijkstra on probability).
+// ---------------------------------------------------------------------------
+
+func Test_maxProbability(t *testing.T) {
+	tests := []struct {
+		name     string
+		n        int
+		edges    [][]int
+		succProb []float64
+		start    int
+		end      int
+		expected float64
+	}{
+		{
+			// LeetCode example 1.
+			// 0→1→2: 0.5×0.5 = 0.25, direct 0→2: 0.2 → pick 0.25.
+			name:     "leetcode_example1",
+			n:        3,
+			edges:    [][]int{{0, 1}, {1, 2}, {0, 2}},
+			succProb: []float64{0.5, 0.5, 0.2},
+			start:    0, end: 2,
+			expected: 0.25,
+		},
+		{
+			// LeetCode example 2.
+			// 0→1→2: 0.25, direct 0→2: 0.3 → direct wins.
+			name:     "leetcode_example2",
+			n:        3,
+			edges:    [][]int{{0, 1}, {1, 2}, {0, 2}},
+			succProb: []float64{0.5, 0.5, 0.3},
+			start:    0, end: 2,
+			expected: 0.3,
+		},
+		{
+			// LeetCode example 3.
+			// Node 2 is reachable from 0 only through 1, but no edge from 1 to 2.
+			name:     "leetcode_example3_no_path",
+			n:        3,
+			edges:    [][]int{{0, 1}},
+			succProb: []float64{0.5},
+			start:    0, end: 2,
+			expected: 0.0,
+		},
+		{
+			// Single direct edge — answer equals the edge probability.
+			name:     "direct_single_edge",
+			n:        2,
+			edges:    [][]int{{0, 1}},
+			succProb: []float64{0.8},
+			start:    0, end: 1,
+			expected: 0.8,
+		},
+		{
+			// start == end: already at destination, probability = 1.
+			name:     "start_equals_end",
+			n:        2,
+			edges:    [][]int{{0, 1}},
+			succProb: []float64{0.5},
+			start:    1, end: 1,
+			expected: 1.0,
+		},
+		{
+			// Indirect path beats direct.
+			// 0→1→2: 0.9×0.9 = 0.81 vs direct 0→2: 0.5 → 0.81 wins.
+			name:     "indirect_beats_direct",
+			n:        3,
+			edges:    [][]int{{0, 1}, {1, 2}, {0, 2}},
+			succProb: []float64{0.9, 0.9, 0.5},
+			start:    0, end: 2,
+			expected: 0.81,
+		},
+		{
+			// Disconnected graph: {0,1} and {2,3} are separate components.
+			name:     "disconnected_components",
+			n:        4,
+			edges:    [][]int{{0, 1}, {2, 3}},
+			succProb: []float64{0.5, 0.5},
+			start:    0, end: 3,
+			expected: 0.0,
+		},
+		{
+			// Single node, no edges: start == end, probability = 1.
+			name:     "single_node",
+			n:        1,
+			edges:    [][]int{},
+			succProb: []float64{},
+			start:    0, end: 0,
+			expected: 1.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := maxProbability(tt.n, tt.edges, tt.succProb, tt.start, tt.end)
+			assert.InDelta(t, tt.expected, got, 1e-5)
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// 505. The Maze II
+//
+// A ball rolls in one of four directions until it hits a wall or the boundary.
+// The distance is the number of cells traversed.  Find the minimum distance
+// to reach destination (a cell where the ball stops).  Return -1 if impossible.
+// ---------------------------------------------------------------------------
+
+func Test_shortestDistance(t *testing.T) {
+	tests := []struct {
+		name        string
+		maze        [][]int
+		start       []int
+		destination []int
+		expected    int
+	}{
+		{
+			// LeetCode example 1.
+			// Ball navigates from (0,4) to (4,4); minimum distance is 12.
+			name: "leetcode_example1",
+			maze: [][]int{
+				{0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0},
+				{1, 1, 0, 1, 1},
+				{0, 0, 0, 0, 0},
+			},
+			start: []int{0, 4}, destination: []int{4, 4},
+			expected: 12,
+		},
+		{
+			// LeetCode example 2.
+			// (3,2) is not a valid stopping point — ball always rolls through it.
+			name: "leetcode_example2",
+			maze: [][]int{
+				{0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 0},
+				{0, 0, 0, 1, 0},
+				{1, 1, 0, 1, 1},
+				{0, 0, 0, 0, 0},
+			},
+			start: []int{0, 4}, destination: []int{3, 2},
+			expected: -1,
+		},
+		{
+			// Ball is already at the destination — no movement needed.
+			name:        "start_equals_destination",
+			maze:        [][]int{{0, 0, 0}},
+			start:       []int{0, 1},
+			destination: []int{0, 1},
+			expected:    0,
+		},
+		{
+			// 1×5 corridor: ball rolls right from col 0 to col 4 in one move.
+			// Distance = 4 cells traversed.
+			name:        "single_row_roll_to_boundary",
+			maze:        [][]int{{0, 0, 0, 0, 0}},
+			start:       []int{0, 0},
+			destination: []int{0, 4},
+			expected:    4,
+		},
+		{
+			// Destination (1,2) lies in an interior cell with open cells on both
+			// sides (row 0 and row 2).  The ball always rolls through it without
+			// stopping, so the destination is unreachable.
+			//
+			//   [0, 0, 0]
+			//   [0, 1, 0]   ← (1,2) is open but never a stop point
+			//   [0, 0, 0]
+			name: "destination_never_a_stop_point",
+			maze: [][]int{
+				{0, 0, 0},
+				{0, 1, 0},
+				{0, 0, 0},
+			},
+			start:       []int{0, 0},
+			destination: []int{1, 2},
+			expected:    -1,
+		},
+		{
+			// Two symmetric paths to the destination; both have distance 4.
+			// Verifies that the algorithm finds the optimal (= only) answer
+			// without getting trapped in cycles.
+			//
+			//   [0, 0, 0]   (0,0) → right (2) → (0,2) → down (2) → (2,2)
+			//   [0, 1, 0]   (0,0) → down  (2) → (2,0) → right (2) → (2,2)
+			//   [0, 0, 0]
+			name: "two_symmetric_paths",
+			maze: [][]int{
+				{0, 0, 0},
+				{0, 1, 0},
+				{0, 0, 0},
+			},
+			start:       []int{0, 0},
+			destination: []int{2, 2},
+			expected:    4,
+		},
+		{
+			// Interior walls force the ball to use the perimeter.
+			// Both perimeter routes (top-right then down, or down then bottom-right)
+			// cost 6, which is the minimum.
+			//
+			//   [0, 0, 0, 0, 0]   row 0
+			//   [0, 1, 1, 1, 0]   row 1 — walls at cols 1-3
+			//   [0, 0, 0, 0, 0]   row 2
+			//
+			// (0,0) → right (4) → (0,4) → down (2) → (2,4): total 6.
+			// (0,0) → down  (2) → (2,0) → right (4) → (2,4): total 6.
+			name: "walls_force_perimeter_path",
+			maze: [][]int{
+				{0, 0, 0, 0, 0},
+				{0, 1, 1, 1, 0},
+				{0, 0, 0, 0, 0},
+			},
+			start:       []int{0, 0},
+			destination: []int{2, 4},
+			expected:    6,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, shortestDistance(tt.maze, tt.start, tt.destination))
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// 499. The Maze III
+//
+// Same rolling mechanic as Maze II, but the ball drops into a hole if it
+// passes through or lands on it during a roll.  Return the lexicographically
+// smallest path string (using 'd','l','r','u') that minimises total distance,
+// or "impossible" if the hole can never be reached.
+// ---------------------------------------------------------------------------
+
+func Test_findShortestWay(t *testing.T) {
+	tests := []struct {
+		name     string
+		maze     [][]int
+		ball     []int
+		hole     []int
+		expected string
+	}{
+		{
+			// LeetCode example 1.
+			// ball=[4,3], hole=[0,1] → "lul"
+			name: "leetcode_example1",
+			maze: [][]int{
+				{0, 0, 0, 0, 0},
+				{1, 1, 0, 0, 1},
+				{0, 0, 0, 0, 0},
+				{0, 1, 0, 0, 1},
+				{0, 1, 0, 0, 0},
+			},
+			ball: []int{4, 3}, hole: []int{0, 1},
+			expected: "lul",
+		},
+		{
+			// LeetCode example 2.
+			// hole=[3,0]: every path from [4,3] that heads left is blocked by
+			// walls at col 1 in row 4; the hole is unreachable.
+			name: "leetcode_example2",
+			maze: [][]int{
+				{0, 0, 0, 0, 0},
+				{1, 1, 0, 0, 1},
+				{0, 0, 0, 0, 0},
+				{0, 1, 0, 0, 1},
+				{0, 1, 0, 0, 0},
+			},
+			ball: []int{4, 3}, hole: []int{3, 0},
+			expected: "impossible",
+		},
+		{
+			// Ball rolls right in a 1×5 corridor and falls into the hole
+			// at (0,2) before reaching the far wall.
+			// Only valid move: "r", distance 2.
+			name:     "hole_caught_mid_roll",
+			maze:     [][]int{{0, 0, 0, 0, 0}},
+			ball:     []int{0, 0},
+			hole:     []int{0, 2},
+			expected: "r",
+		},
+		{
+			// Two paths of equal distance (4); lexicographically smaller wins.
+			//
+			//   [0, 0, 0]
+			//   [0, 1, 0]
+			//   [0, 0, 0]
+			//
+			// ball=[2,0], hole=[0,2].
+			//
+			// Path "ru": roll right (2,0)→(2,2), then up (2,2)→passes (0,2)=hole. dist=4.
+			// Path "ur": roll up   (2,0)→(0,0), then right (0,0)→passes (0,2)=hole. dist=4.
+			//
+			// 'r' < 'u', so "ru" < "ur" → answer = "ru".
+			name:     "lexicographic_tiebreak",
+			maze:     [][]int{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}},
+			ball:     []int{2, 0},
+			hole:     []int{0, 2},
+			expected: "ru",
+		},
+		{
+			// Ball must roll right then down to reach the hole; only one reachable path.
+			//
+			//   [0, 0, 0]
+			//   [1, 0, 0]   ← (1,0) is a wall; blocks downward roll from (0,0)
+			//   [0, 0, 0]
+			//
+			// ball=[0,0], hole=[2,2].
+			// (0,0) → right (dist 2) → (0,2) → down (dist 2) → passes (2,2)=hole.
+			// Downward roll from (0,0) is blocked immediately by the wall at (1,0).
+			// Only valid path: "rd", distance 4.
+			name: "single_valid_path",
+			maze: [][]int{
+				{0, 0, 0},
+				{1, 0, 0},
+				{0, 0, 0},
+			},
+			ball:     []int{0, 0},
+			hole:     []int{2, 2},
+			expected: "rd",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, findShortestWay(tt.maze, tt.ball, tt.hole))
 		})
 	}
 }
