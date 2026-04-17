@@ -1,4 +1,4 @@
-package dynamic_programming
+package knapsack
 
 /**
  * 0/1 Knapsack, Unbounded Knapsack

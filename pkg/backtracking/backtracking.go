@@ -331,47 +331,36 @@ func combinationSum(candidates []int, target int) [][]int {
 /**
  * 377. Combination Sum IV
  *
+ * Given an array of distinct integers nums and a target integer target, return the number of possible combinations that add up to target.
+ *
  * dp[amount] += dp[amount - num]
  */
 func combinationSum4(nums []int, target int) int {
-	dp := make([]int, target+1)
-	dp[0] = 1 // base case: one way to sum to 0 — pick nothing
-
-	// outer loop: amounts — counts permutations (order matters)
-	for amount := 1; amount <= target; amount++ {
-		for _, num := range nums {
-			if num <= amount {
-				dp[amount] += dp[amount-num]
-			}
-		}
-	}
-
-	return dp[target]
-}
-
-func combinationSum4RecursionMemoization(nums []int, target int) int {
 	memo := make([]int, target+1)
 	for i := range memo {
 		memo[i] = -1
 	}
-	var dfs func(t int) int
-	dfs = func(t int) int {
-		if t < 0 {
+
+	var dfs func(remaining int) int
+	dfs = func(remaining int) int {
+		if remaining < 0 {
 			return 0
 		}
-		if t == 0 {
+		if remaining == 0 {
 			return 1
 		}
-		if memo[t] != -1 {
-			return memo[t]
+		if memo[remaining] != -1 {
+			return memo[remaining]
 		}
-		noc := 0
-		for _, n := range nums {
-			noc += dfs(t - n)
+
+		count := 0
+		for _, num := range nums {
+			count += dfs(remaining - num)
 		}
-		memo[t] = noc
-		return noc
+		memo[remaining] = count
+		return count
 	}
+
 	return dfs(target)
 }
 
@@ -455,28 +444,28 @@ func letterCombinations(digits string) []string {
 		return []string{}
 	}
 
-	dict := []string{"", "", "abc", "def", "ghi",
-		"jkl", "mno", "pqrs", "tuv", "wxyz",
+	phoneMap := map[byte]string{
+		'2': "abc", '3': "def", '4': "ghi", '5': "jkl",
+		'6': "mno", '7': "pqrs", '8': "tuv", '9': "wxyz",
 	}
-	out := ""
-	res := []string{}
 
-	var backtrack func(string, string)
-	backtrack = func(str string, out string) {
-		if len(str) == 0 {
-			res = append(res, out)
-		} else {
-			keys := dict[str[0]-'0']
-			next := str[1:]
-			for i := 0; i < len(keys); i++ {
-				out = out + string(keys[i])
-				backtrack(next, out)
-				out = out[:len(out)-1]
-			}
+	res := []string{}
+	var backtrack func(pos int, current []byte)
+	backtrack = func(pos int, current []byte) {
+		if pos == len(digits) {
+			res = append(res, string(current))
+			return
+		}
+
+		letters := phoneMap[digits[pos]]
+		for i := range letters {
+			current = append(current, letters[i])
+			backtrack(pos+1, current)
+			current = current[:len(current)-1]
 		}
 	}
-	backtrack(digits, out)
 
+	backtrack(0, []byte{})
 	return res
 }
 
