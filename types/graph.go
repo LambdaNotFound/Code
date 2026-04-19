@@ -11,6 +11,9 @@ package types
 type Node struct {
 	Val       int
 	Neighbors []*Node
-	Next      *Node
-	Random    *Node
+
+	Next *Node
+	Prev *Node
+
+	Random *Node
 }
