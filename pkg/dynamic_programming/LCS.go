@@ -4,6 +4,13 @@ package dynamic_programming
  * 1143. Longest Common Subsequence
  *
  * dp[i][j] = length of LCS of text1[0..i-1] and text2[0..j-1]
+ *
+ * if s1[i] == s2[j]:
+ *   dp[i][j] = dp[i-1][j-1] + 1
+ * else:
+ *   dp[i][j] = max(dp[i-1][j],   // skip s1[i]
+ *                  dp[i][j-1])   // skip s2[j]
+ *
  */
 func longestCommonSubsequence(text1, text2 string) int {
 	m, n := len(text1), len(text2)
@@ -34,6 +41,12 @@ func longestCommonSubsequence(text1, text2 string) int {
  *
  * dp[i][j] where dp[i][j] represents the length of the longest common suffix of A[0...i-1] and B[0...j-1]
  *                                                                      ending at i, j
+ *
+ * if nums1[i] == nums2[j]:
+ *    dp[i][j] = dp[i-1][j-1] + 1   // extend the streak
+ * else:
+ *    dp[i][j] = 0                  // streak broken — reset
+ *
  */
 func findLength(nums1 []int, nums2 []int) int {
 	m, n := len(nums1), len(nums2)
