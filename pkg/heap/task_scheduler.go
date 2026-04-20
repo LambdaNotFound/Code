@@ -15,6 +15,44 @@ package heap
 import "container/heap"
 
 func leastInterval(tasks []byte, n int) int {
+	freq := make(map[byte]int)
+	for _, t := range tasks {
+		freq[t]++
+	}
+
+	maxHeap := &TaskHeap{
+		less: func(a, b Task) bool { return a.freq > b.freq },
+	}
+	for name, count := range freq {
+		heap.Push(maxHeap, Task{name: name, freq: count})
+	}
+
+	cooldown := []Task{}
+	elapsed := 0
+	for len(cooldown) > 0 || maxHeap.Len() > 0 {
+		for len(cooldown) > 0 && cooldown[0].availableAt <= elapsed {
+			heap.Push(maxHeap, cooldown[0])
+			cooldown = cooldown[1:]
+		}
+
+		if maxHeap.Len() > 0 {
+			cur := heap.Pop(maxHeap).(Task)
+			if cur.freq > 1 {
+				cooldown = append(cooldown, Task{
+					name:        cur.name,
+					freq:        cur.freq - 1,
+					availableAt: elapsed + n + 1,
+				})
+			}
+		}
+
+		elapsed++
+	}
+
+	return elapsed
+}
+
+func leastIntervalCalude(tasks []byte, n int) int {
 	freqMap := make(map[byte]int)
 	for _, t := range tasks {
 		freqMap[t]++

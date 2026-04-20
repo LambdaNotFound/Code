@@ -27,6 +27,9 @@ func Test_leastInterval(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := leastInterval(tt.tasks, tt.n)
 			assert.Equal(t, tt.expected, result)
+
+			result = leastIntervalCalude(tt.tasks, tt.n)
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
