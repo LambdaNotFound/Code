@@ -1,5 +1,7 @@
 package dynamic_programming
 
+import "sort"
+
 /**
  * 1143. Longest Common Subsequence
  *
@@ -65,5 +67,33 @@ func findLength(nums1 []int, nums2 []int) int {
 		}
 	}
 
+	return res
+}
+
+/**
+ * 1048. Longest String Chain
+ *
+ * Input: words = ["a","b","ba","bca","bda","bdca"]
+ * Output: 4
+ * Explanation: One of the longest word chains is ["a","ba","bda","bdca"].
+ *
+ */
+func longestStrChain(words []string) int {
+	sort.Slice(words, func(i, j int) bool {
+		return len(words[i]) < len(words[j])
+	})
+
+	dp := make(map[string]int)
+	res := 0
+	for _, word := range words {
+		dp[word] = 1
+		for i := 0; i < len(word); i++ {
+			prev_word := word[:i] + word[i+1:]
+			if val, exists := dp[prev_word]; exists {
+				dp[word] = max(dp[word], val+1)
+			}
+		}
+		res = max(res, dp[word])
+	}
 	return res
 }
