@@ -52,3 +52,157 @@ func Test_findLength(t *testing.T) {
 		})
 	}
 }
+
+/**
+ * 1048. Longest String Chain
+ *
+ * A word A is a predecessor of B if you can insert exactly one letter anywhere
+ * in A (without reordering existing letters) to make B. The chain length is the
+ * number of words in the longest chain w1 → w2 → … → wk where each word is a
+ * predecessor of the next.
+ *
+ * Algorithm: sort by word length, then for each word try removing every single
+ * character to find a shorter predecessor already seen in dp[].
+ *
+ * Test strategy:
+ *   - LeetCode canonical examples (including the "no chain possible" case).
+ *   - Degenerate inputs: single word, all same length, all length-1 words.
+ *   - Prefix chains (trivially recognisable) and non-prefix chains (predecessor
+ *     is found by removing a middle or leading character).
+ *   - Input given in reverse-length order to verify the sort is load-bearing.
+ *   - Multiple chains of different depths to confirm the max is taken.
+ *   - Length gap: words separated by 2+ characters cannot form a chain even
+ *     though they overlap in content.
+ */
+func Test_longestStrChain(t *testing.T) {
+	tests := []struct {
+		name     string
+		words    []string
+		expected int
+	}{
+		// -----------------------------------------------------------------------
+		// LeetCode canonical examples
+		// -----------------------------------------------------------------------
+		{
+			// chain: "a" → "ba" → "bda" → "bdca"
+			name:     "leetcode_example1",
+			words:    []string{"a", "b", "ba", "bca", "bda", "bdca"},
+			expected: 4,
+		},
+		{
+			// chain: "xb" → "xbc" → "cxbc" → "pcxbc" → "pcxbcf"
+			name:     "leetcode_example2",
+			words:    []string{"xbc", "pcxbcf", "xb", "cxbc", "pcxbc"},
+			expected: 5,
+		},
+		{
+			// "abcd" and "dbqca" differ by more than one insertion — no chain.
+			name:     "leetcode_example3_no_chain",
+			words:    []string{"abcd", "dbqca"},
+			expected: 1,
+		},
+
+		// -----------------------------------------------------------------------
+		// Degenerate / edge inputs
+		// -----------------------------------------------------------------------
+		{
+			// A single word has a trivial chain of length 1.
+			name:     "single_word",
+			words:    []string{"a"},
+			expected: 1,
+		},
+		{
+			// Words of the same length can never be predecessors of each other.
+			name:     "all_same_length_no_chain",
+			words:    []string{"ab", "cd", "ef"},
+			expected: 1,
+		},
+		{
+			// Multiple length-1 words: no word has a shorter predecessor, so the
+			// longest chain is 1.
+			name:     "length_1_words_only",
+			words:    []string{"a", "b", "c"},
+			expected: 1,
+		},
+		{
+			// Words exist at lengths 1, 3, 5 — the length gap of 2 means no word
+			// can be a direct predecessor of another.
+			name:     "length_gap_prevents_chain",
+			words:    []string{"a", "abc", "abcde"},
+			expected: 1,
+		},
+		{
+			// No predecessor relationships across completely disjoint character sets.
+			name:     "no_chain_across_disjoint_words",
+			words:    []string{"abc", "def", "ghij"},
+			expected: 1,
+		},
+
+		// -----------------------------------------------------------------------
+		// Predecessor found by removing different positions
+		// -----------------------------------------------------------------------
+		{
+			// Predecessor found by removing the first character each time:
+			// "a" → "ba" → "cba" → "dcba"
+			name:     "remove_leading_char",
+			words:    []string{"a", "ba", "cba", "dcba"},
+			expected: 4,
+		},
+		{
+			// Predecessor found by removing the middle character:
+			// "ab" → "aXb" (remove index 1 of "aXb" gives "ab")
+			//        "aXb" → "aXYb" (remove index 2 of "aXYb" gives "aXb")
+			name:     "remove_middle_char",
+			words:    []string{"ab", "aXb", "aXYb"},
+			expected: 3,
+		},
+
+		// -----------------------------------------------------------------------
+		// Sorting is load-bearing
+		// -----------------------------------------------------------------------
+		{
+			// Identical to leetcode_example1 but supplied in reverse length order.
+			// The sort-by-length step must fire before dp is computed.
+			name:     "input_in_reverse_length_order",
+			words:    []string{"bdca", "bda", "ba", "a"},
+			expected: 4,
+		},
+
+		// -----------------------------------------------------------------------
+		// Linear prefix chain
+		// -----------------------------------------------------------------------
+		{
+			// Simplest possible chain: each word extends the previous by one char.
+			// "a" → "ab" → "abc" → "abcd"
+			name:     "linear_chain_by_prefix",
+			words:    []string{"a", "ab", "abc", "abcd"},
+			expected: 4,
+		},
+
+		// -----------------------------------------------------------------------
+		// Multiple chains — the longest must be returned
+		// -----------------------------------------------------------------------
+		{
+			// Two chains share the root "a":
+			//   "a" → "ab" → "abc"          (length 3)
+			//   "a" → "ab" → "abc" → "abcd" (length 4)  ← winner
+			// Also "b" → "bc" → "bcd" → "bcde" (length 4, tied).
+			name:     "multiple_chains_pick_longest",
+			words:    []string{"a", "ab", "abc", "b", "bc", "bcd", "bcde"},
+			expected: 4,
+		},
+		{
+			// The chain "a" → "ab" → "abc" → "abcd" reaches length 4.
+			// "ac" is a dead-end side branch of depth 2.
+			name:     "chain_through_branching_paths",
+			words:    []string{"a", "ab", "ac", "abc", "abcd"},
+			expected: 4,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, longestStrChain(tt.words))
+		})
+	}
+}
