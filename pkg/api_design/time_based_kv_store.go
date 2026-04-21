@@ -18,68 +18,59 @@ import "sort"
  *
  */
 type TimeMap struct {
-	KeyMap map[string][]Pair
+	store map[string][]entry // Map → store: lowercase, descriptive
 }
 
-type Pair struct {
-	val       string
-	timeStamp int
+type entry struct { // Pair → entry: domain-specific name
+	timestamp int    // Time → timestamp: matches the problem's language
+	value     string // Val → value: full word
 }
 
 func ConstructorTimeMap() TimeMap {
 	return TimeMap{
-		KeyMap: make(map[string][]Pair),
+		store: make(map[string][]entry),
 	}
 }
 
-func (t *TimeMap) Set(key string, value string, timestamp int) {
-	pair := Pair{
-		val:       value,
-		timeStamp: timestamp,
-	}
-
-	t.KeyMap[key] = append(t.KeyMap[key], pair)
+func (tm *TimeMap) Set(key string, value string, timestamp int) {
+	tm.store[key] = append(tm.store[key], entry{timestamp: timestamp, value: value})
 }
 
-func (t *TimeMap) Get(key string, timestamp int) string {
-	if _, ok := t.KeyMap[key]; !ok {
-		return ""
-	}
-	arr := t.KeyMap[key]
-	if arr[0].timeStamp > timestamp {
+func (tm *TimeMap) Get(key string, timestamp int) string {
+	entries, found := tm.store[key]
+	if !found {
 		return ""
 	}
 
-	left, right := 0, len(arr)
+	left, right := 0, len(entries)
 	for left < right {
 		mid := left + (right-left)/2
-		if arr[mid].timeStamp < timestamp { // lower_bound(), left is the first element <= target
-			left = mid + 1
-		} else {
+		if timestamp < entries[mid].timestamp {
 			right = mid
+		} else {
+			left = mid + 1
 		}
 	}
-	if left < len(arr) && arr[left].timeStamp == timestamp {
-		return arr[left].val
+
+	// left is now the insertion point — the answer is at left-1
+	if left == 0 {
+		return "" // all timestamps are greater than query
 	}
-	return arr[left-1].val
+	return entries[left-1].value
 }
 
-func (t *TimeMap) GetByLowerBound(key string, timestamp int) string {
-	if _, ok := t.KeyMap[key]; !ok {
+func (tm *TimeMap) GetByUpperBound(key string, timestamp int) string {
+	if _, found := tm.store[key]; !found {
 		return ""
 	}
 
-	arr := t.KeyMap[key]
+	arr := tm.store[key]
 	index := sort.Search(len(arr), func(i int) bool {
-		return timestamp <= arr[i].timeStamp
+		return arr[i].timestamp > timestamp
 	})
-	if index < len(arr) && arr[index].timeStamp == timestamp {
-		return arr[index].val
-	}
 
 	if index == 0 {
 		return "" // target < all timestamps
 	}
-	return arr[index-1].val // index-1 is the floor
+	return arr[index-1].value // index-1 is the floor
 }
