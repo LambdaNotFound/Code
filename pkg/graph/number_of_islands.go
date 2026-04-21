@@ -138,3 +138,75 @@ func numIslandsUF(grid [][]byte) int {
 	}
 	return count
 }
+
+/**
+ * 463. Island Perimeter
+ */
+func islandPerimeter(grid [][]int) int {
+	directions := [][2]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
+	rows, cols := len(grid), len(grid[0])
+
+	const (
+		water   = 0
+		land    = 1
+		visited = 2
+	)
+
+	var dfs func(row, col int) int
+	dfs = func(row, col int) int {
+		// Out of bounds → this edge is on the grid boundary, contributes 1 to perimeter
+		if row < 0 || row >= rows || col < 0 || col >= cols {
+			return 1
+		}
+		// Water → this edge borders water, contributes 1 to perimeter
+		if grid[row][col] == water {
+			return 1
+		}
+		// Already counted this land cell's contributions
+		if grid[row][col] == visited {
+			return 0
+		}
+
+		grid[row][col] = visited
+
+		perimeter := 0
+		for _, dir := range directions {
+			nextRow, nextCol := row+dir[0], col+dir[1]
+			perimeter += dfs(nextRow, nextCol)
+		}
+		return perimeter
+	}
+
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			if grid[row][col] == land {
+				return dfs(row, col)
+			}
+		}
+	}
+	return 0
+}
+
+func islandPerimeterClaude(grid [][]int) int {
+	dirs := [][2]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
+	m, n := len(grid), len(grid[0])
+	perimeter := 0
+
+	for row := 0; row < m; row++ {
+		for col := 0; col < n; col++ {
+			if grid[row][col] != 1 {
+				continue
+			}
+			for _, dir := range dirs {
+				nextRow, nextCol := row+dir[0], col+dir[1]
+				// Out of bounds OR water → this side contributes to perimeter
+				if nextRow < 0 || nextRow >= m ||
+					nextCol < 0 || nextCol >= n ||
+					grid[nextRow][nextCol] == 0 {
+					perimeter++
+				}
+			}
+		}
+	}
+	return perimeter
+}

@@ -59,6 +59,18 @@ func (tm *TimeMap) Get(key string, timestamp int) string {
 	return entries[left-1].value
 }
 
+/*
+ * // lower bound (original sort.Search)
+ * sort.Search(len(arr), func(i int) bool {
+ *    return arr[i].timestamp >= timestamp  // lands ON target
+ * })
+ *
+ * // upper bound (your version)
+ * sort.Search(len(arr), func(i int) bool {
+ *    return arr[i].timestamp > timestamp   // lands PAST target
+ * })
+ */
+
 func (tm *TimeMap) GetByUpperBound(key string, timestamp int) string {
 	if _, found := tm.store[key]; !found {
 		return ""

@@ -178,6 +178,7 @@ func largestRectangleArea(heights []int) int {
 /**
  * 739. Daily Temperatures
  *
+ * days to wait until next *warmer* day
  * Input: temperatures = [73,74,75,71,69,72,76,73]
  * Output: [1,1,4,2,1,1,0,0]
  */
