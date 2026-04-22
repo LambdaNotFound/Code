@@ -253,3 +253,60 @@ func minimumEffortPath(heights [][]int) int {
 
 	return dist[m-1][n-1]
 }
+
+/**
+ * 1514. Path with Maximum Probability
+ *
+ * 1. adjList [][]edge
+ * 2. prob[]
+ *
+ * Time: O((V + E) log V) — standard Dijkstra with a heap.
+ * Space: O(V + E) — graph adjacency list + prob array + heap.
+ *
+ */
+func maxProbability(n int, edges [][]int, succProb []float64, start_node int, end_node int) float64 {
+	prob := make([]float64, n)
+	prob[start_node] = 1
+
+	type State struct {
+		node int
+		cost float64
+	}
+
+	maxHeap := &Heap[State]{
+		less: func(a, b State) bool {
+			return a.cost > b.cost
+		},
+	}
+	heap.Push(maxHeap, State{node: start_node, cost: 1})
+
+	type edge struct {
+		node int
+		cost float64
+	}
+	graph := make([][]edge, n)
+	for i, e := range edges {
+		v1, v2 := e[0], e[1]
+		cost := succProb[i]
+		graph[v1] = append(graph[v1], edge{v2, cost})
+		graph[v2] = append(graph[v2], edge{v1, cost})
+	}
+
+	for maxHeap.Len() > 0 {
+		cur := heap.Pop(maxHeap).(State)
+
+		if cur.cost < prob[cur.node] {
+			continue
+		}
+		prob[cur.node] = cur.cost
+
+		for _, edge := range graph[cur.node] {
+			newCost := cur.cost * edge.cost
+			if newCost > prob[edge.node] {
+				heap.Push(maxHeap, State{node: edge.node, cost: newCost})
+			}
+		}
+	}
+
+	return prob[end_node]
+}
