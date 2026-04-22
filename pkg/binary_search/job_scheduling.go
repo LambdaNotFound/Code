@@ -10,18 +10,19 @@ import "sort"
  * top-down DFS needs start-time order, bottom-up DP needs end-time order.
  */
 func jobScheduling(startTime []int, endTime []int, profit []int) int {
-	type job struct {
+	n := len(startTime)
+	type Job struct {
 		start, end, profit int
 	}
-	jobs := make([]job, len(startTime))
+	jobs := make([]Job, n)
 	for i := range startTime {
-		jobs[i] = job{startTime[i], endTime[i], profit[i]}
+		jobs[i] = Job{start: startTime[i], end: endTime[i], profit: profit[i]}
 	}
+
 	sort.Slice(jobs, func(i, j int) bool {
 		return jobs[i].end < jobs[j].end
 	})
 
-	// find last job index in [0, pos) where end <= jobs[pos].start
 	findPrevJob := func(pos int) int {
 		left, right := 0, pos
 		for left < right {
@@ -32,22 +33,21 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
 				right = mid
 			}
 		}
-		return left - 1 // -1 means no valid previous job
+		return left - 1
 	}
 
-	dp := make([]int, len(jobs))
-	dp[0] = jobs[0].profit // base case
-
-	for i := 1; i < len(jobs); i++ {
+	dp := make([]int, n)
+	dp[0] = jobs[0].profit
+	for i := 1; i < n; i++ {
 		prev := findPrevJob(i)
 		prevProfit := 0
 		if prev >= 0 {
 			prevProfit = dp[prev]
 		}
-		dp[i] = max(dp[i-1], jobs[i].profit+prevProfit)
+		dp[i] = max(dp[i-1], prevProfit+jobs[i].profit)
 	}
 
-	return dp[len(jobs)-1]
+	return dp[n-1]
 }
 
 func jobSchedulingTopDown(startTime []int, endTime []int, profit []int) int {
