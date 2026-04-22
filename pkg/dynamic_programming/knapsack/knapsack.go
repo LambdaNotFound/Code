@@ -55,18 +55,6 @@ func maxSubArrayAlt(nums []int) int {
  *              nums[i]
  */
 func maxProduct(nums []int) int {
-	preMax, preMin, res := nums[0], nums[0], nums[0]
-	for i := 1; i < len(nums); i++ {
-		curMax := max(max(preMax*nums[i], preMin*nums[i]), nums[i]) // use previous max/min
-		curMin := min(min(preMax*nums[i], preMin*nums[i]), nums[i])
-		res = max(res, curMax)
-
-		preMax, preMin = curMax, curMin
-	}
-	return res
-}
-
-func maxProduct2(nums []int) int {
 	res := nums[0]
 	for preMin, preMax, i := nums[0], nums[0], 1; i < len(nums); i++ {
 		curMin := min(min(preMin*nums[i], preMax*nums[i]), nums[i])

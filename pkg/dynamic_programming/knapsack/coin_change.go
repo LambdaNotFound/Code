@@ -1,4 +1,4 @@
-package dynamic_programming
+package knapsack
 
 import "math"
 

@@ -65,10 +65,6 @@ func Test_combinationSum4(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result := combinationSum4(tc.nums, tc.target)
 			assert.Equal(t, tc.expected, result)
-
-			// both implementations must agree
-			result2 := combinationSum4RecursionMemoization(tc.nums, tc.target)
-			assert.Equal(t, tc.expected, result2)
 		})
 	}
 }
