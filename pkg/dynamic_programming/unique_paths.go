@@ -47,24 +47,29 @@ func uniquePathsNaive(m int, n int) int {
 
 /**
  * 64. Minimum Path Sum
+ *
+ * "What if the bug can also move diagonally?"
+ * "What if we want max candies with K obstacles we can break?"
+ *  - LeetCode 1293: Shortest Path in a Grid with Obstacles Elimination
+ * "What if the grid contains negagive numbers?"
+ *
  */
-func minPathSumBottomUp(grid [][]int) int {
+func minPathSum(grid [][]int) int {
 	m, n := len(grid), len(grid[0])
-	for r := 0; r < m; r++ {
-		for c := 0; c < n; c++ {
-			switch {
-			case r == 0 && c == 0:
-				continue
-			case r == 0:
-				grid[r][c] += grid[r][c-1]
-			case c == 0:
-				grid[r][c] += grid[r-1][c]
-			default:
-				grid[r][c] += min(grid[r][c-1], grid[r-1][c])
-			}
+	dp := make([]int, n)
+
+	dp[0] = grid[0][0]
+	for col := 1; col < n; col++ {
+		dp[col] = dp[col-1] + grid[0][col]
+	}
+
+	for i := 1; i < m; i++ {
+		dp[0] = dp[0] + grid[i][0]
+		for j := 1; j < n; j++ {
+			dp[j] = min(dp[j-1], dp[j]) + grid[i][j]
 		}
 	}
-	return grid[m-1][n-1]
+	return dp[n-1]
 }
 
 func minPathSumTopDown(grid [][]int) int {
@@ -82,4 +87,25 @@ func minPathSumTopDown(grid [][]int) int {
 	}
 
 	return dfs(0, 0)
+}
+
+func minPathSumDiagonally(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	dp := make([]int, n)
+
+	dp[0] = grid[0][0]
+	for col := 1; col < n; col++ {
+		dp[col] = dp[col-1] + grid[0][col]
+	}
+
+	for i := 1; i < m; i++ {
+		prevDiag := dp[0]
+		dp[0] += grid[i][0]
+		for j := 1; j < n; j++ {
+			temp := dp[j] // save previous row's dp[j] for next iteration's diagonal
+			dp[j] = min(dp[j], min(dp[j-1], prevDiag)) + grid[i][j]
+			prevDiag = temp
+		}
+	}
+	return dp[n-1]
 }

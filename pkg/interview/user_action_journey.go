@@ -32,6 +32,9 @@ B (1)
  * Sort each user's logs by time: O(N log N)
  * Across all usersInsert into trie: O(U × L), Each entry traverses L nodes
  * Print trie (sort children at each node): O(T × A log A), T = trie nodes, sort up to A children each
+ *
+ * Streaming version: maintain a pointer to the user's current position
+ *
  */
 
 import (
@@ -137,7 +140,7 @@ func printTrie(node *TrieNode, depth int) {
 	}
 }
 
-func main() {
+func testUserActions() {
 	raw := `100  1000 A
 200  1100 A
 200  1200 B
