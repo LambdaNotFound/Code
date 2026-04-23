@@ -12,7 +12,7 @@ func numBusesToDestination(routes [][]int, source int, target int) int {
 	}
 
 	queue := []int{source}
-	visited := map[int]int{source: 1}
+	visited := map[int]int{source: 1} // visited + tracking num of stops
 	for len(queue) > 0 {
 		f := queue[0]
 		queue = queue[1:]

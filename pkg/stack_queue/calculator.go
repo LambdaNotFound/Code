@@ -243,8 +243,7 @@ func calculateT(s string) int {
 			}
 
 			// commit on operator, end, or closing paren
-			if pos == len(s) || ch == '+' || ch == '-' ||
-				ch == '*' || ch == '/' || ch == ')' {
+			if pos == len(s) || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')' {
 				switch op {
 				case '+':
 					stk = append(stk, num)
