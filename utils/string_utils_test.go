@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,6 +27,33 @@ func foo(str string) string {
 func substr(str string, start, end int) string {
 	runes := []rune(str) // convert to rune slice
 	return string(runes[start:end])
+}
+
+func versionSort(strs []string) {
+	sort.Slice(strs, func(i, j int) bool {
+		// find where digits start in each string
+		splitIdx := func(s string) int {
+			for k := 0; k < len(s); k++ {
+				if s[k] >= '0' && s[k] <= '9' {
+					return k
+				}
+			}
+			return len(s) // no digits
+		}
+
+		a, b := strs[i], strs[j]
+		ai, bi := splitIdx(a), splitIdx(b)
+
+		// compare alpha prefix first
+		if a[:ai] != b[:bi] {
+			return a[:ai] < b[:bi]
+		}
+
+		// same prefix → compare numeric suffix as integers
+		numA, _ := strconv.Atoi(a[ai:])
+		numB, _ := strconv.Atoi(b[bi:])
+		return numA < numB
+	})
 }
 
 func Test_string_rune(t *testing.T) {
