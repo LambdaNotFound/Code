@@ -105,13 +105,13 @@ func swimInWaterDFS(grid [][]int) int {
 	return left
 }
 
-// swimState is the element type for MinHeap used by swimInWaterDijkstra.
-type swimState struct{ maxElev, row, col int }
-
 // Dijkstra
 func swimInWaterDijkstra(grid [][]int) int {
 	n := len(grid)
 	dirs := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
+
+	// swimState is the element type for MinHeap used by swimInWaterDijkstra.
+	type swimState struct{ maxElev, row, col int }
 
 	// minHeap: [maxElevation, row, col]
 	h := &Heap[swimState]{
