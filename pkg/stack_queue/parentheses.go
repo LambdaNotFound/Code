@@ -170,6 +170,30 @@ func minRemoveToMakeValidClaude(s string) string {
 }
 
 /**
+ * 921. Minimum Add to Make Parentheses Valid
+ *
+ * "()))((" => 4
+ */
+func minAddToMakeValid(s string) int {
+	unmatchedOpen := 0  // '(' seen with no matching ')' yet
+	unmatchedClose := 0 // ')' seen with no matching '(' available
+
+	for _, ch := range s {
+		if ch == '(' {
+			unmatchedOpen++
+		} else if ch == ')' {
+			if unmatchedOpen > 0 {
+				unmatchedOpen-- // matched with a prior '('
+			} else {
+				unmatchedClose++ // no '(' available to match
+			}
+		}
+	}
+	// each unmatched '(' needs a ')' added, each unmatched ')' needs a '(' added
+	return unmatchedOpen + unmatchedClose
+}
+
+/**
  * 20. Valid Parentheses
  */
 func isValid(s string) bool {
