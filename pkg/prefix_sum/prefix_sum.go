@@ -211,3 +211,27 @@ func pathSum(root *TreeNode, targetSum int) int {
 	dfs(root, 0)
 	return res
 }
+
+/**
+ * 523. Continuous Subarray Sum
+ *
+ * its length is at least two, and
+ * the sum of the elements of the subarray is a multiple of k.
+ */
+func checkSubarraySum(nums []int, k int) bool {
+	remainderToIndex := map[int]int{0: -1} // remainder -> earliest index where this remainder was seen
+	prefixSum := 0
+
+	for i, num := range nums {
+		prefixSum += num
+		remainder := prefixSum % k
+		if firstIdx, found := remainderToIndex[remainder]; found { // subarray nums[firstIdx+1 .. i] has length i - firstIdx
+			if i-firstIdx >= 2 {
+				return true
+			}
+		} else {
+			remainderToIndex[remainder] = i
+		}
+	}
+	return false
+}
