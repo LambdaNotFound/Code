@@ -58,7 +58,10 @@ func maxSlidingWindow(nums []int, k int) []int {
 /**
  * 1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
  *
- * 1. deque x2, 2. heap x2, 3. sorted set
+ * 1. deque x2
+ * 2. heap x2
+ * 3. sorted set
+ *
  * Time: O(n)
  * Space: O(n)
  */
