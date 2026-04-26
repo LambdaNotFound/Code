@@ -107,6 +107,51 @@ func calculateII(s string) int {
 }
 
 /**
+ * 227. Basic Calculator II variant
+ *
+ * Addition, Subtraction, Multiplication, Division
+ *
+ * Input: s = "3add2mul2"
+ * Output: 7
+ */
+func calculateIIVariant(s string) int {
+	s = strings.ReplaceAll(s, " ", "")
+
+	stack := []int{}
+	num, preOp, curOp := 0, "add", ""
+	for i, ch := range s {
+		if ch >= '0' && ch <= '9' {
+			num = num*10 + int(ch-'0')
+		} else {
+			curOp += string(ch)
+		}
+
+		if i == len(s)-1 || curOp == "add" || curOp == "sub" || curOp == "mul" || curOp == "div" {
+			switch {
+			case preOp == "add":
+				stack = append(stack, num)
+			case preOp == "sub":
+				stack = append(stack, -num)
+			case preOp == "mul":
+				stack[len(stack)-1] = stack[len(stack)-1] * num
+			case preOp == "div":
+				stack[len(stack)-1] = stack[len(stack)-1] / num
+			}
+
+			num = 0
+			preOp = curOp
+			curOp = ""
+		}
+	}
+
+	res := 0
+	for i := range stack {
+		res = res + stack[i]
+	}
+	return res
+}
+
+/**
  * 772. Basic Calculator III
  *
  * Input:  "1+1"

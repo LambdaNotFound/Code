@@ -94,6 +94,51 @@ func Test_calculateII(t *testing.T) {
 	}
 }
 
+func Test_calculateIIVariant(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected int
+	}{
+		// LeetCode examples
+		{"add_mul", "3add2mul2", 7},
+		{"div_only", "3div2", 1},
+		{"add_div", "3add5div2", 5}, // 3 + 2 = 5 (5/2=2 integer division)
+
+		// Operator precedence
+		{"mul_before_add", "2add3mul4", 14},
+		{"div_before_sub", "10sub6div3", 8},
+		{"mul_and_div", "6mul2div4", 3},
+		{"all_four_ops", "14sub3div2mul4add5", 15}, // 14 - (3/2)*4 + 5 = 14 - 1*4 + 5 = 15
+
+		// Single operations
+		{"single_add", "1add2", 3},
+		{"single_sub", "5sub3", 2},
+		{"single_mul", "4mul3", 12},
+		{"single_div", "10div3", 3},
+		{"single_number", "42", 42},
+
+		// Spaces
+		{"spaces_around_ops", " 3 div 2 ", 1},
+		{"leading_trailing_spaces", " 3add5 div 2 ", 5},
+
+		// Chain same operation
+		{"chain_add", "1add2add3add4", 10},
+		{"chain_mul", "2mul3mul4", 24},
+		{"chain_div", "100div10div2", 5},
+
+		// Negative results
+		{"negative_result", "1sub5", -4},
+		{"negative_intermediate", "3mul2sub10", -4},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, calculateIIVariant(tt.input))
+		})
+	}
+}
+
 func Test_calculateIII(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -102,7 +147,7 @@ func Test_calculateIII(t *testing.T) {
 	}{
 		// LeetCode 772 examples
 		{"leetcode_1", "1+1", 2},
-		{"leetcode_2", "6-4/2", 4},   // 6 - 2 = 4
+		{"leetcode_2", "6-4/2", 4}, // 6 - 2 = 4
 		{"leetcode_3", "2*(5+5*2)/3+(6/2+8)", 21},
 		{"leetcode_4", "(2+6*3+5-(3*14/7+2)*5)+3", -12},
 		{"leetcode_5", "2*(3+4)-1", 13},
@@ -110,13 +155,13 @@ func Test_calculateIII(t *testing.T) {
 		// Operator precedence (* and / before + and -)
 		{"mul_before_add", "2+3*4", 14},
 		{"div_before_sub", "10-6/3", 8},
-		{"chain_mul_div", "6*2/4", 3},    // left-to-right: (6*2)/4 = 3
-		{"chain_div_mul", "8/2*3", 12},   // left-to-right: (8/2)*3 = 12
+		{"chain_mul_div", "6*2/4", 3},  // left-to-right: (6*2)/4 = 3
+		{"chain_div_mul", "8/2*3", 12}, // left-to-right: (8/2)*3 = 12
 
 		// Parentheses override precedence
 		{"parens_add_first", "(1+2)*3", 9},
 		{"parens_vs_mul", "(2+3)*(4+5)", 45},
-		{"parens_in_div", "10/(2+3)", 2},     // 10/5 = 2
+		{"parens_in_div", "10/(2+3)", 2}, // 10/5 = 2
 		{"deep_parens", "((1+2))", 3},
 		{"nested_mul", "((3+2)*2)", 10},
 
