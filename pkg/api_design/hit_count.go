@@ -6,7 +6,10 @@ package apidesign
  * Design a hit counter that records timestamps of incoming hits and efficiently queries
  * the number of hits within the past 5 minutes (300 seconds) using a sliding window.
  *
- * circular buffer
+ * 1. circular buffer
+ *
+ * follow up: accessed by multi-thread
+ *
  */
 
 type HitCounter struct {
