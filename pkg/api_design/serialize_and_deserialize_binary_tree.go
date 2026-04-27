@@ -75,6 +75,62 @@ func (this *Codec) deserialize(data string) *TreeNode {
 	return head
 }
 
+func (this *Codec) serializeClaude(root *TreeNode) string {
+	tokens := []string{}
+	queue := []*TreeNode{root}
+
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+
+		if node != nil {
+			tokens = append(tokens, strconv.Itoa(node.Val))
+			queue = append(queue, node.Left)
+			queue = append(queue, node.Right)
+		} else {
+			tokens = append(tokens, "null")
+		}
+	}
+	return strings.Join(tokens, ",")
+}
+
+func (this *Codec) deserializeClaude(data string) *TreeNode {
+	tokens := strings.Split(data, ",")
+	idx := 0
+
+	readNext := func() *TreeNode {
+		if idx >= len(tokens) || tokens[idx] == "null" {
+			idx++
+			return nil
+		}
+		val, _ := strconv.Atoi(tokens[idx])
+		idx++
+		return &TreeNode{Val: val}
+	}
+
+	root := readNext()
+	if root == nil {
+		return nil
+	}
+
+	queue := []*TreeNode{root}
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+
+		node.Left = readNext()
+		node.Right = readNext()
+
+		if node.Left != nil {
+			queue = append(queue, node.Left)
+		}
+		if node.Right != nil {
+			queue = append(queue, node.Right)
+		}
+	}
+	return root
+}
+
 /**
  * 105. Construct Binary Tree from Preorder and Inorder Traversal
  *

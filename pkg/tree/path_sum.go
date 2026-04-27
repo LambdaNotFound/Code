@@ -13,6 +13,8 @@ import (
  * 3. root.Val + rightMaxSum (as a right branch)
  *
  * need to compute leftMaxSum and rightMaxSum first => Postorder traversal
+ *
+ * note that the path does not need to pass through the root
  */
 func maxPathSum(root *TreeNode) int {
 	maxSum := math.MinInt
@@ -23,8 +25,8 @@ func maxPathSum(root *TreeNode) int {
 			return 0
 		}
 
-		leftMaxSum := max(postOrderTraversal(root.Left), 0)
-		rightMaxSum := max(postOrderTraversal(root.Right), 0)
+		leftMaxSum := max(postOrderTraversal(root.Left), 0)   // exclude negative sum
+		rightMaxSum := max(postOrderTraversal(root.Right), 0) // exclude negative sum
 		pathSum := leftMaxSum + rightMaxSum + root.Val
 		maxSum = max(maxSum, pathSum)
 
@@ -59,7 +61,7 @@ func pathSum(root *TreeNode, targetSum int) [][]int {
 
 		// leaf node with exact sum — record path
 		if node.Left == nil && node.Right == nil && remaining == 0 {
-			res = append(res, append([]int{}, path...))
+			res = append(res, append([]int{}, path...)) // deep copy
 		} else {
 			dfs(node.Left, remaining)
 			dfs(node.Right, remaining)
