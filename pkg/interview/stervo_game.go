@@ -1,11 +1,12 @@
 package interview
 
+import "sync"
+
 /**
  * Game: Stervo
  *
  * Players collect colored gems (B/W/G/R/Y) and buy cards using gems
  * Each card has a cost (gems required) and a color (the gem color it represents)
- *
  */
 
 type Color int
@@ -22,11 +23,6 @@ func (c Color) String() string {
 	return []string{"B", "W", "G", "R", "Y"}[c]
 }
 
-// "I'm modeling the card cost as a map from Color to int because not every card uses every color
-// — a sparse map is cleaner than a fixed-size array.
-// The player's gem inventory is the same shape. canPurchase is just a check that for every required color,
-// the player has at least that many gems."
-
 type Card struct {
 	color Color         // the card's own color (for discounts later)
 	cost  map[Color]int // gems required to buy
@@ -35,12 +31,11 @@ type Card struct {
 type Player struct {
 	gems map[Color]int // current gems
 	hand []*Card       // owned cards
+	// Part 4: Concurrency
+	mu sync.Mutex
 }
 
-// "I'm checking canPurchase first, then mutating.
-// In a single-threaded context this is fine. Once we add concurrency in part 4,
-// this becomes a check-then-act race condition we'll need to fix."
-
+// Part 1: Data model + can_purchase
 /*
 // canPurchase: does player have enough gems for every required color?
 func canPurchase(p *Player, c *Card) bool {
@@ -51,7 +46,10 @@ func canPurchase(p *Player, c *Card) bool {
 	}
 	return true
 }
+*/
 
+// Part 2: purchase()
+/*
 func purchase(p *Player, c *Card) bool {
 	if !canPurchase(p, c) {
 		return false
@@ -66,6 +64,7 @@ func purchase(p *Player, c *Card) bool {
 }
 */
 
+// Part 3: Discounts
 // discounts: how many gems player saves per color, based on owned cards
 func discountsOf(p *Player) map[Color]int {
 	d := map[Color]int{}
@@ -102,6 +101,9 @@ func canPurchase(p *Player, c *Card) bool {
 
 // updated purchase
 func purchase(p *Player, c *Card) bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if !canPurchase(p, c) {
 		return false
 	}
@@ -112,3 +114,36 @@ func purchase(p *Player, c *Card) bool {
 	p.hand = append(p.hand, c)
 	return true
 }
+
+// Part 4: Concurrency
+// This is where the question gets interesting.
+// Multiple goroutines may call purchase() for the same player concurrently — classic check-then-act race.
+
+// Option 2: Per-player request queue
+
+/*
+type Player struct {
+    gems    map[Color]int
+    hand    []*Card
+    reqCh   chan purchaseReq
+}
+
+type purchaseReq struct {
+    card    *Card
+    resultCh chan bool
+}
+
+// single goroutine processes all requests for this player
+func (p *Player) run() {
+    for req := range p.reqCh {
+        result := doPurchase(p, req.card)
+        req.resultCh <- result
+    }
+}
+
+func purchase(p *Player, c *Card) bool {
+    resultCh := make(chan bool, 1)
+    p.reqCh <- purchaseReq{c, resultCh}
+    return <-resultCh
+}
+*/
