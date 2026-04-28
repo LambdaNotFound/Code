@@ -19,7 +19,9 @@ func Test_topKFrequent(t *testing.T) {
 		{name: "k_equals_len", nums: []int{1, 2, 3}, k: 3, expected: []int{1, 2, 3}},
 		{name: "negatives", nums: []int{-1, -1, -2, -2, -2}, k: 1, expected: []int{-2}},
 		{name: "two_tied_pick_both", nums: []int{1, 1, 2, 2}, k: 2, expected: []int{1, 2}},
-		{name: "large_k", nums: []int{4, 4, 4, 3, 3, 2, 1}, k: 3, expected: []int{4, 3, 2}},
+		// Distinct frequencies for every element so the result is deterministic:
+		// 4→freq3, 3→freq2, 2→freq1. No ties at the k-th boundary.
+		{name: "large_k", nums: []int{4, 4, 4, 3, 3, 2}, k: 3, expected: []int{4, 3, 2}},
 	}
 
 	for _, tt := range tests {

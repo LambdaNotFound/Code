@@ -93,6 +93,137 @@ func Test_UnionFind_map(t *testing.T) {
 	})
 }
 
+// ---------------------------------------------------------------------------
+// Template functions (unionFind / unionFindByRank / unionFindBySize)
+//
+// These three functions are pedagogical templates — they don't return a value.
+// The tests below call each one with graphs that exercise every internal branch:
+//   • a simple path (exercises the basic union + path-compression find)
+//   • a triangle (exercises the "already same root" early-return in union)
+//   • a chain that forces rank promotions (unionFindByRank equal-rank branch)
+//   • a skewed tree (unionFindBySize both size-comparison branches)
+// ---------------------------------------------------------------------------
+func Test_unionFind_templates(t *testing.T) {
+	t.Run("basic_path_graph", func(t *testing.T) {
+		// 0-1-2-3: each union merges two new components
+		unionFind(4, [][2]int{{0, 1}, {1, 2}, {2, 3}})
+	})
+
+	t.Run("triangle_has_redundant_edge", func(t *testing.T) {
+		// 0-1, 1-2, 0-2: the third edge hits the "already same root" branch
+		unionFind(3, [][2]int{{0, 1}, {1, 2}, {0, 2}})
+	})
+
+	t.Run("isolated_nodes_no_edges", func(t *testing.T) {
+		unionFind(5, [][2]int{})
+	})
+}
+
+func Test_unionFindByRank_templates(t *testing.T) {
+	t.Run("chain_promotes_rank", func(t *testing.T) {
+		// 0-1 → rank[root]=1; 2-3 → rank[root]=1; then union of both subtrees
+		// triggers the rank[rootX]==rank[rootY] branch and increments rank.
+		unionFindByRank(4, [][2]int{{0, 1}, {2, 3}, {0, 2}})
+	})
+
+	t.Run("deep_chain_path_compression", func(t *testing.T) {
+		// Linear chain: 0-1-2-3-4 exercises path compression through several levels.
+		unionFindByRank(5, [][2]int{{0, 1}, {1, 2}, {2, 3}, {3, 4}})
+	})
+
+	t.Run("redundant_edge_same_root", func(t *testing.T) {
+		// The last edge 0-3 finds both nodes already in the same component.
+		unionFindByRank(4, [][2]int{{0, 1}, {1, 2}, {2, 3}, {0, 3}})
+	})
+}
+
+func Test_unionFindBySize_templates(t *testing.T) {
+	t.Run("size_guided_merge_large_into_small", func(t *testing.T) {
+		// Build a 3-node component {0,1,2} then attach isolated node 3.
+		// size[root of {0,1,2}]=3 > size[3]=1: exercises the else-branch
+		// (parent[rootY]=rootX, size[rootX]+=size[rootY]).
+		unionFindBySize(4, [][2]int{{0, 1}, {0, 2}, {0, 3}})
+	})
+
+	t.Run("size_guided_merge_equal_sizes", func(t *testing.T) {
+		// {0,1} and {2,3} both have size 2 — equal sizes exercise the else-branch.
+		unionFindBySize(4, [][2]int{{0, 1}, {2, 3}, {0, 2}})
+	})
+
+	t.Run("redundant_union_same_component", func(t *testing.T) {
+		// After 0-1-2 are merged, unioning 0-2 again hits "rootX==rootY" return false.
+		unionFindBySize(3, [][2]int{{0, 1}, {1, 2}, {0, 2}})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// 1061. Lexicographically Smallest Equivalent String
+// ---------------------------------------------------------------------------
+func Test_smallestEquivalentString(t *testing.T) {
+	tests := []struct {
+		name     string
+		s1       string
+		s2       string
+		baseStr  string
+		expected string
+	}{
+		{
+			// LeetCode example 1.
+			// Equivalence classes after pairing parker/morris:
+			//   {m,p}, {a,o}, {k,r,s}, {e,i}
+			// baseStr "parser" → p→m, a→a, r→k, s→k, e→e, r→k → "makkek"
+			name: "leetcode_example1",
+			s1: "parker", s2: "morris", baseStr: "parser",
+			expected: "makkek",
+		},
+		{
+			// LeetCode example 2.
+			// Classes after pairing hello/world: {h,w}, {d,e,o}, {l,r}
+			// "hold" → h→h, o→d, l→l, d→d → "hdld"
+			name: "leetcode_example2",
+			s1: "hello", s2: "world", baseStr: "hold",
+			expected: "hdld",
+		},
+		{
+			// Single pair: a↔b. Any 'b' in baseStr maps to 'a'.
+			name: "single_pair_maps_to_smaller",
+			s1: "a", s2: "b", baseStr: "b",
+			expected: "a",
+		},
+		{
+			// Pair maps a character to itself — no-op union, identity result.
+			name: "identity_pair_no_change",
+			s1: "a", s2: "a", baseStr: "a",
+			expected: "a",
+		},
+		{
+			// Transitive chain: a=b (pair 1), b=c (pair 2) → {a,b,c}, all map to 'a'.
+			name: "transitive_chain_all_map_to_smallest",
+			s1: "ab", s2: "bc", baseStr: "abc",
+			expected: "aaa",
+		},
+		{
+			// baseStr contains a character not involved in any pair — returned unchanged.
+			name: "baseStr_char_not_in_any_pair",
+			s1: "a", s2: "b", baseStr: "c",
+			expected: "c",
+		},
+		{
+			// All three input chars are pairwise equivalent:
+			// a=b (pair 1), b=c (pair 2), c=a (pair 3, redundant). "xyz" unchanged.
+			name: "three_way_equivalence_baseStr_unrelated",
+			s1: "abc", s2: "bca", baseStr: "xyz",
+			expected: "xyz",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, smallestEquivalentString(tt.s1, tt.s2, tt.baseStr))
+		})
+	}
+}
+
 func Test_countComponents(t *testing.T) {
 	tests := []struct {
 		name     string
