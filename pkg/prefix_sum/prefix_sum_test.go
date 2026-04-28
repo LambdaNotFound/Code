@@ -123,7 +123,85 @@ func Test_numSubarraysWithSum(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, numSubarraysWithSum(tt.nums, tt.goal))
+			assert.Equal(t, tt.expected, numSubarraysWithSum(tt.nums, tt.goal), "hashmap")
+			assert.Equal(t, tt.expected, numSubarraysWithSumPrefixSum(tt.nums, tt.goal), "prefix sum O(n²)")
+		})
+	}
+}
+
+/**
+ * 523. Continuous Subarray Sum
+ *
+ * Returns true when there is a subarray of length ≥ 2 whose sum is a multiple
+ * of k. Uses a remainder map: equal remainders at indices i and j (j-i ≥ 2)
+ * mean the subarray between them has sum divisible by k.
+ *
+ * Test strategy:
+ *   - LeetCode canonical examples (true / true / false).
+ *   - Minimum-length subarray (exactly 2 elements).
+ *   - Single element — never valid regardless of value.
+ *   - Two zeros — sum is 0, which is a multiple of any k.
+ *   - length_1_gap_blocked: remainder repeats but the two occurrences are only
+ *     one index apart (i-firstIdx == 1 < 2), so the function must return false.
+ */
+func Test_checkSubarraySum(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		k        int
+		expected bool
+	}{
+		{
+			// [2,4] sums to 6 = 1×6.
+			name: "leetcode_example1",
+			nums: []int{23, 2, 4, 6, 7}, k: 6, expected: true,
+		},
+		{
+			// Entire array sums to 42 = 7×6.
+			name: "leetcode_example2",
+			nums: []int{23, 2, 6, 4, 7}, k: 6, expected: true,
+		},
+		{
+			// No subarray of length ≥ 2 sums to a multiple of 13.
+			name: "leetcode_example3_false",
+			nums: []int{23, 2, 6, 4, 7}, k: 13, expected: false,
+		},
+		{
+			// [0,0] → sum=0, multiple of any k; length=2 ≥ 2.
+			name: "two_zeros_multiple_of_any_k",
+			nums: []int{0, 0}, k: 7, expected: true,
+		},
+		{
+			// Exactly two elements summing to a multiple: 3+3=6=2×3.
+			name: "exact_two_elements_multiple",
+			nums: []int{3, 3}, k: 3, expected: true,
+		},
+		{
+			// Single element can never form a length-2 subarray.
+			name: "single_element_never_valid",
+			nums: []int{6}, k: 6, expected: false,
+		},
+		{
+			// 1+2=3, not a multiple of 5.
+			name: "two_elements_not_multiple",
+			nums: []int{1, 2}, k: 5, expected: false,
+		},
+		{
+			// Remainder 1 appears at index 1 and index 2 (gap = 1 < 2).
+			// The guard i-firstIdx >= 2 must block the early return.
+			name: "length_1_gap_blocked",
+			nums: []int{5, 1, 5}, k: 5, expected: false,
+		},
+		{
+			// [1,2] sums to 3 = 1×3; length=2 ≥ 2.
+			name: "sum_equals_k",
+			nums: []int{1, 2, 3}, k: 3, expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, checkSubarraySum(tt.nums, tt.k))
 		})
 	}
 }

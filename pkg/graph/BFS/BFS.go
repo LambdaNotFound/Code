@@ -249,50 +249,56 @@ func zigzagLevelOrder(root *TreeNode) [][]int {
  * parentMap
  */
 func distanceK(root *TreeNode, target *TreeNode, k int) []int {
-	parent := make(map[*TreeNode]*TreeNode)
-	var dfs func(*TreeNode, *TreeNode)
-	dfs = func(node, p *TreeNode) {
+	nodeToParent := make(map[*TreeNode]*TreeNode)
+
+	var dfs func(node *TreeNode)
+	dfs = func(node *TreeNode) {
 		if node == nil {
 			return
 		}
-		parent[node] = p
-
-		dfs(node.Left, node)
-		dfs(node.Right, node)
+		if node.Left != nil {
+			nodeToParent[node.Left] = node
+			dfs(node.Left)
+		}
+		if node.Right != nil {
+			nodeToParent[node.Right] = node
+			dfs(node.Right)
+		}
 	}
-	dfs(root, nil)
+	dfs(root)
 
 	queue := []*TreeNode{target}
 	visited := map[*TreeNode]bool{target: true}
-	steps := 0
-	result := []int{}
+	stepsFromTarget := 0
+
 	for len(queue) > 0 {
+		if stepsFromTarget == k {
+			break
+		}
 		size := len(queue)
 		for i := 0; i < size; i++ {
-			node := queue[0]
+			curNode := queue[0]
 			queue = queue[1:]
 
-			if node.Left != nil && !visited[node.Left] {
-				visited[node] = true
-				queue = append(queue, node.Left)
+			if curNode.Left != nil && !visited[curNode.Left] {
+				visited[curNode.Left] = true
+				queue = append(queue, curNode.Left)
 			}
-			if node.Right != nil && !visited[node.Right] {
-				visited[node] = true
-				queue = append(queue, node.Right)
+			if curNode.Right != nil && !visited[curNode.Right] {
+				visited[curNode.Right] = true
+				queue = append(queue, curNode.Right)
 			}
-
-			if parent[node] != nil && !visited[parent[node]] {
-				visited[node] = true
-				queue = append(queue, parent[node])
-			}
-		}
-		steps++
-
-		if steps == k {
-			for _, node := range queue {
-				result = append(result, node.Val)
+			if parentNode, found := nodeToParent[curNode]; found && !visited[parentNode] {
+				visited[parentNode] = true
+				queue = append(queue, parentNode)
 			}
 		}
+		stepsFromTarget++
+	}
+
+	result := make([]int, 0, len(queue))
+	for _, node := range queue {
+		result = append(result, node.Val)
 	}
 	return result
 }

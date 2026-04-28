@@ -55,11 +55,9 @@ func pathSum(root *TreeNode, targetSum int) [][]int {
 			return
 		}
 
-		// make choice
 		path = append(path, node.Val)
 		remaining -= node.Val
 
-		// leaf node with exact sum — record path
 		if node.Left == nil && node.Right == nil && remaining == 0 {
 			res = append(res, append([]int{}, path...)) // deep copy
 		} else {
@@ -67,7 +65,6 @@ func pathSum(root *TreeNode, targetSum int) [][]int {
 			dfs(node.Right, remaining)
 		}
 
-		// undo choice
 		path = path[:len(path)-1]
 	}
 

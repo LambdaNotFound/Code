@@ -30,6 +30,40 @@ func Test_upperBound(t *testing.T) {
 	}
 }
 
+// Test_lowerBound covers the lowerBound helper (first index i where target ≤ array[i]).
+// This is the "lower bound" in the classic binary-search sense: the first element
+// that is ≥ target. It differs from upperBound (first element strictly > target)
+// by one position when target equals an element in the array.
+func Test_lowerBound(t *testing.T) {
+	tests := []struct {
+		name     string
+		array    []int
+		target   int
+		expected int
+	}{
+		// target exactly equals the first element → index 0.
+		{name: "target_equals_first",   array: []int{0, 1, 3, 6, 10}, target: 0,  expected: 0},
+		// target exactly equals an interior element → that element's index.
+		{name: "target_equals_second",  array: []int{0, 1, 3, 6, 10}, target: 1,  expected: 1},
+		{name: "target_equals_third",   array: []int{0, 1, 3, 6, 10}, target: 3,  expected: 2},
+		// target falls between two elements → index of the first element > target.
+		{name: "target_between_1_and_3", array: []int{0, 1, 3, 6, 10}, target: 2, expected: 2},
+		{name: "target_between_3_and_6", array: []int{0, 1, 3, 6, 10}, target: 5, expected: 3},
+		// target equals the last element.
+		{name: "target_equals_last",    array: []int{0, 1, 3, 6, 10}, target: 10, expected: 4},
+		// target beyond every element → returns len(array).
+		{name: "target_beyond_last",    array: []int{0, 1, 3, 6, 10}, target: 11, expected: 5},
+		// two-element array.
+		{name: "two_elements_between",  array: []int{0, 3},            target: 1,  expected: 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, lowerBound(tt.array, tt.target))
+		})
+	}
+}
+
 func Test_PickIndex(t *testing.T) {
 	t.Run("single_weight_always_zero", func(t *testing.T) {
 		s := Constructor([]int{10})
