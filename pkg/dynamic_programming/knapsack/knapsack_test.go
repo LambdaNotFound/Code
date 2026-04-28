@@ -1,10 +1,129 @@
 package knapsack
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// normCombos sorts each inner slice then the outer slice for deterministic comparison.
+func normCombos(combos [][]int) [][]int {
+	for _, c := range combos {
+		sort.Ints(c)
+	}
+	sort.Slice(combos, func(i, j int) bool {
+		for k := 0; k < len(combos[i]) && k < len(combos[j]); k++ {
+			if combos[i][k] != combos[j][k] {
+				return combos[i][k] < combos[j][k]
+			}
+		}
+		return len(combos[i]) < len(combos[j])
+	})
+	return combos
+}
+
+// Test_combinationSum covers LeetCode 39 (combinations, order doesn't matter).
+//
+// Branch coverage:
+//   - multi-candidate, multi-combo output (leetcode_example1, leetcode_example2)
+//   - impossible target — no coin divides the target (impossible_target)
+//   - single candidate used repeatedly (single_candidate)
+//   - target reachable by exactly one combination (exact_single_combo)
+func Test_combinationSum(t *testing.T) {
+	tests := []struct {
+		name       string
+		candidates []int
+		target     int
+		expected   [][]int
+	}{
+		{
+			// dp walk: 2→[2,2,3], 7→[7]
+			name:       "leetcode_example1",
+			candidates: []int{2, 3, 6, 7},
+			target:     7,
+			expected:   [][]int{{2, 2, 3}, {7}},
+		},
+		{
+			// dp walk: 2→[2,2,2], 3→[3,3]
+			name:       "leetcode_example2",
+			candidates: []int{2, 3},
+			target:     6,
+			expected:   [][]int{{2, 2, 2}, {3, 3}},
+		},
+		{
+			// candidate=2 can never reach an odd target
+			name:       "impossible_target",
+			candidates: []int{2},
+			target:     3,
+			expected:   nil,
+		},
+		{
+			// only one way: [3,3,3]
+			name:       "single_candidate_repeated",
+			candidates: []int{3},
+			target:     9,
+			expected:   [][]int{{3, 3, 3}},
+		},
+		{
+			// candidates=[1,2], target=3: [1,1,1] and [1,2]
+			name:       "two_candidates_two_combos",
+			candidates: []int{1, 2},
+			target:     3,
+			expected:   [][]int{{1, 1, 1}, {1, 2}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := combinationSum(tt.candidates, tt.target)
+			assert.Equal(t, normCombos(tt.expected), normCombos(got))
+		})
+	}
+}
+
+// Test_combinationSum4 covers LeetCode 377 (ordered sequences / permutations).
+//
+// Branch coverage:
+//   - canonical multi-num example (leetcode_example)
+//   - no solution exists (no_solution)
+//   - single coin used one way (single_coin_single_way)
+//   - num > amount guard (num_exceeds_amount)
+func Test_combinationSum4(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		target   int
+		expected int
+	}{
+		{
+			// dp[4]: 1→dp[3]=4, 2→dp[2]=2, 3→dp[1]=1 → 7
+			name: "leetcode_example", nums: []int{1, 2, 3}, target: 4, expected: 7,
+		},
+		{
+			// 9 > 3 for every amount, so dp stays 0 except dp[0]=1
+			name: "no_solution", nums: []int{9}, target: 3, expected: 0,
+		},
+		{
+			// only [1,1,1]
+			name: "single_coin_single_way", nums: []int{1}, target: 3, expected: 1,
+		},
+		{
+			// [1,2], target=3: [1,1,1],[1,2],[2,1] → 3
+			name: "two_nums_three_orders", nums: []int{1, 2}, target: 3, expected: 3,
+		},
+		{
+			// target=0 → dp[0]=1 (one empty sequence)
+			name: "zero_target", nums: []int{1, 2}, target: 0, expected: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, combinationSum4(tt.nums, tt.target))
+		})
+	}
+}
 
 func Test_maxSubArray(t *testing.T) {
 	testCases := []struct {
@@ -130,6 +249,16 @@ func Test_canPartition(t *testing.T) {
 			assert.Equal(t, tc.expected, canPartitionMemoization(tc.nums))
 		})
 	}
+}
+
+// canPartitionMemoization_cacheHit verifies the memoization cache-hit path.
+// To trigger it we need overlapping subproblems: two distinct recursion paths
+// must reach the same (target, idx) pair.  With nums=[3,3,3,3,4]:
+//   VP(8,3) evaluates VP(5,4) and caches it as false.
+//   VP(5,3), called when VP(8,3) returns false, immediately hits VP(5,4) in cache.
+// The overall answer is false (no subset of [3,3,3,3,4] sums to 8).
+func Test_canPartitionMemoization_cacheHit(t *testing.T) {
+	assert.False(t, canPartitionMemoization([]int{3, 3, 3, 3, 4}))
 }
 
 func Test_findTargetSumWays(t *testing.T) {
