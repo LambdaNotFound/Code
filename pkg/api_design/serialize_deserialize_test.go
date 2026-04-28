@@ -73,6 +73,52 @@ func Test_Codec(t *testing.T) {
 	}
 }
 
+// Test_CodecClaude exercises serializeClaude / deserializeClaude (BFS with "null" sentinel).
+// Uses the same tree shapes as Test_Codec so round-trip correctness is consistent.
+func Test_CodecClaude(t *testing.T) {
+	testCases := []struct {
+		name string
+		root *TreeNode
+	}{
+		{name: "nil_tree", root: nil},
+		{name: "single_node", root: &TreeNode{Val: 1}},
+		{
+			name: "complete_tree",
+			root: &TreeNode{Val: 1, Left: &TreeNode{Val: 2}, Right: &TreeNode{Val: 3}},
+		},
+		{
+			name: "left_skewed",
+			root: &TreeNode{Val: 1, Left: &TreeNode{Val: 2, Left: &TreeNode{Val: 3}}},
+		},
+		{
+			name: "right_skewed",
+			root: &TreeNode{Val: 1, Right: &TreeNode{Val: 2, Right: &TreeNode{Val: 3}}},
+		},
+		{
+			name: "leetcode_example",
+			root: &TreeNode{
+				Val:   1,
+				Left:  &TreeNode{Val: 2},
+				Right: &TreeNode{Val: 3, Left: &TreeNode{Val: 4}, Right: &TreeNode{Val: 5}},
+			},
+		},
+		{
+			// negative values exercise strconv paths
+			name: "negative_values",
+			root: &TreeNode{Val: -1, Left: &TreeNode{Val: -2}, Right: &TreeNode{Val: -3}},
+		},
+	}
+
+	codec := Constructor()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			serialized := codec.serializeClaude(tc.root)
+			deserialized := codec.deserializeClaude(serialized)
+			assert.True(t, treeEqual(tc.root, deserialized))
+		})
+	}
+}
+
 func Test_buildTree(t *testing.T) {
 	testCases := []struct {
 		name     string
