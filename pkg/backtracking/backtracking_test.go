@@ -187,6 +187,18 @@ func Test_letterCombinations(t *testing.T) {
             "2",
             []string{"a", "b", "c"},
         },
+        // Empty input triggers the early-return branch in both implementations.
+        {
+            "empty_digits",
+            "",
+            []string{},
+        },
+        // '7' maps to "pqrs" (4 letters) — exercises the 4-letter phoneMap entry.
+        {
+            "four_letter_key",
+            "7",
+            []string{"p", "q", "r", "s"},
+        },
     }
 
     for _, tc := range testCases {
@@ -196,6 +208,58 @@ func Test_letterCombinations(t *testing.T) {
 
             result = letterCombinationsBacktrack(tc.digits)
             assert.Equal(t, tc.expected, result)
+        })
+    }
+}
+
+// Test_subsetsWithDup covers LeetCode 90 — subsets with duplicate elements.
+//
+// Branch coverage:
+//   - duplicate-skip guard (i > start && nums[i] == nums[i-1])
+//   - no duplicates: all elements distinct, guard never fires
+//   - all-same: only one element at each recursion level survives
+//   - single element: trivially two subsets — {} and {n}
+func Test_subsetsWithDup(t *testing.T) {
+    tests := []struct {
+        name     string
+        nums     []int
+        expected [][]int
+    }{
+        {
+            // LeetCode example: sort → [1,2,2]; second 2 skipped at top level.
+            name:     "leetcode_example",
+            nums:     []int{1, 2, 2},
+            expected: [][]int{{}, {1}, {1, 2}, {1, 2, 2}, {2}, {2, 2}},
+        },
+        {
+            // No duplicates — guard never fires; result equals plain subsets.
+            name:     "no_duplicates",
+            nums:     []int{1, 2, 3},
+            expected: [][]int{{}, {1}, {1, 2}, {1, 2, 3}, {1, 3}, {2}, {2, 3}, {3}},
+        },
+        {
+            // All same: [2,2,2] → only length-based subsets survive.
+            name:     "all_same",
+            nums:     []int{2, 2, 2},
+            expected: [][]int{{}, {2}, {2, 2}, {2, 2, 2}},
+        },
+        {
+            // Single element — no duplicates possible.
+            name:     "single_element",
+            nums:     []int{5},
+            expected: [][]int{{}, {5}},
+        },
+        {
+            // Two identical elements.
+            name:     "two_same",
+            nums:     []int{3, 3},
+            expected: [][]int{{}, {3}, {3, 3}},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            assert.ElementsMatch(t, tt.expected, subsetsWithDup(tt.nums))
         })
     }
 }
