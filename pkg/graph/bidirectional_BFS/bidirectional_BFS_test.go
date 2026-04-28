@@ -45,10 +45,21 @@ func Test_ladderLengthBidirectionalBFS(t *testing.T) {
 			5,
 		},
 		{
-			"case 2",
+			// endWord not in wordList — hits the early guard (line 15), not the BFS loop.
+			"endword_not_in_list",
 			"hit",
 			"cog",
 			[]string{"hot", "dot", "dog", "lot", "log"},
+			0,
+		},
+		{
+			// endWord IS in wordList but no single-letter-change path connects it
+			// to beginWord.  "abc"→"xyz" requires 3 simultaneous changes; with only
+			// "xyz" in the list, forward BFS drains to empty → hits the final return 0.
+			"endword_in_list_but_unreachable",
+			"abc",
+			"xyz",
+			[]string{"xyz"},
 			0,
 		},
 		{
