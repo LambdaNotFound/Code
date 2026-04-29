@@ -135,6 +135,13 @@ func Test_unionFindByRank_templates(t *testing.T) {
 		// The last edge 0-3 finds both nodes already in the same component.
 		unionFindByRank(4, [][2]int{{0, 1}, {1, 2}, {2, 3}, {0, 3}})
 	})
+
+	t.Run("lower_rank_rootX_attaches_to_higher_rank_rootY", func(t *testing.T) {
+		// After union(0,1): root=0 gets rank 1.
+		// union(2,0): find(2)=2 (rank 0) < find(0)=0 (rank 1)
+		// → hits the rank[rootX] < rank[rootY] branch → parent[2] = 0.
+		unionFindByRank(3, [][2]int{{0, 1}, {2, 0}})
+	})
 }
 
 func Test_unionFindBySize_templates(t *testing.T) {
@@ -154,6 +161,81 @@ func Test_unionFindBySize_templates(t *testing.T) {
 		// After 0-1-2 are merged, unioning 0-2 again hits "rootX==rootY" return false.
 		unionFindBySize(3, [][2]int{{0, 1}, {1, 2}, {0, 2}})
 	})
+
+	t.Run("small_rootX_merges_into_large_rootY", func(t *testing.T) {
+		// Build {0,1,2} (size 3 at root 0), then union(3,1):
+		// find(3)=3 (size 1), find(1)=0 (size 3) → size[rootX=3] < size[rootY=0]
+		// → hits the if-branch: parent[3]=0, size[0]+=size[3].
+		unionFindBySize(4, [][2]int{{0, 1}, {0, 2}, {3, 1}})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// 839. Similar String Groups
+// ---------------------------------------------------------------------------
+func Test_numSimilarGroups(t *testing.T) {
+	tests := []struct {
+		name     string
+		strs     []string
+		expected int
+	}{
+		{
+			// LeetCode example 1.
+			// tars↔rats (pos 0,2 swap), rats↔arts (pos 0,1 swap) → {tars,rats,arts}, {star}
+			name: "leetcode_example1",
+			strs: []string{"tars", "rats", "arts", "star"},
+			expected: 2,
+		},
+		{
+			// LeetCode example 2.
+			// omv↔ovm: positions 1,2 differ (2 diffs) → similar → 1 group.
+			name: "leetcode_example2",
+			strs: []string{"omv", "ovm"},
+			expected: 1,
+		},
+		{
+			// Single string — trivially one group.
+			name:     "single_string",
+			strs:     []string{"abc"},
+			expected: 1,
+		},
+		{
+			// All identical: diffs==0 for every pair → all similar → 1 group.
+			// Exercises the diffs==0 branch of isSimilar.
+			name:     "all_identical",
+			strs:     []string{"abc", "abc", "abc"},
+			expected: 1,
+		},
+		{
+			// abcd vs dcba: positions 0,1,2,3 all differ — isSimilar exits early
+			// at diffs>2, returns false → 2 separate groups.
+			// Exercises the early-exit (diffs > 2) branch.
+			name:     "four_diffs_triggers_early_exit",
+			strs:     []string{"abcd", "dcba"},
+			expected: 2,
+		},
+		{
+			// Transitive chain: abc↔bac (2 diffs), bac↔bca (2 diffs), abc↔bca (3 diffs).
+			// abc and bca are not directly similar but are connected via bac → 1 group.
+			// Exercises BFS queue re-entry and the visited[i] skip branch.
+			name:     "transitive_chain_one_group",
+			strs:     []string{"abc", "bac", "bca"},
+			expected: 1,
+		},
+		{
+			// Two completely disjoint similar pairs — no cross-pair similarity.
+			name:     "two_disjoint_groups",
+			strs:     []string{"abc", "bac", "xyz", "yxz"},
+			expected: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, numSimilarGroups(tt.strs))
+			assert.Equal(t, tt.expected, numSimilarGroupsUF(tt.strs))
+		})
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -239,6 +321,11 @@ func Test_countComponents(t *testing.T) {
 		{name: "two_nodes_connected", n: 2, edges: [][]int{{0, 1}}, expected: 1},
 		{name: "two_nodes_disconnected", n: 2, edges: [][]int{}, expected: 2},
 		{name: "star_plus_isolated", n: 5, edges: [][]int{{0, 1}, {0, 2}, {0, 3}}, expected: 2},
+		{
+			// Build {0,1,2} (size 3), then union(3,1): find(3)=3 (size 1) < find(1)=0 (size 3)
+			// → hits the size[rootX] < size[rootY] if-branch in countComponents.
+			name: "small_component_merges_into_large", n: 4, edges: [][]int{{0, 1}, {1, 2}, {3, 1}}, expected: 1,
+		},
 	}
 
 	for _, tt := range tests {

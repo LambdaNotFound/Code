@@ -11,6 +11,7 @@ package recursion
  *
  */
 
+/*
 type NestedInteger struct{}
 
 func (n NestedInteger) IsInteger() bool
@@ -57,9 +58,8 @@ func depthSumDFS(nestedList []*NestedInteger) int {
 	return dfs(nestedList, 1)
 }
 
-/**
- * 341. Flatten Nested List Iterator
- */
+// 341. Flatten Nested List Iterator
+
 type NestedIterator struct {
 	items   []int
 	current int
@@ -93,3 +93,4 @@ func (it *NestedIterator) Next() int {
 func (it *NestedIterator) HasNext() bool {
 	return it.current < len(it.items)
 }
+*/
