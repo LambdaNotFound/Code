@@ -1,5 +1,6 @@
 package interview
 
+/*
 import (
 	"sort"
 	"strconv"
@@ -268,7 +269,7 @@ func (fs *ProgressiveFS) DecompressFile(name string) bool {
 	return true
 }
 
-/*
+
 type File struct {
 	name     string
 	size     int
