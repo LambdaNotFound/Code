@@ -40,11 +40,11 @@ func NewTaskScheduler() *TaskScheduler {
 func (s *TaskScheduler) Add(t ITask) {
 	// count how many of t's dependencies are not yet completed
 	pending := 0
-	for _, dep := range t.Dependencies() {
-		if !dep.IsCompleted() {
+	for _, dependency := range t.Dependencies() {
+		if !dependency.IsCompleted() {
 			pending++
 			// register t as a dependent of d so we can notify on completion
-			s.dependents[dep] = append(s.dependents[dep], t)
+			s.dependents[dependency] = append(s.dependents[dependency], t)
 		}
 	}
 	s.indegree[t] = pending
