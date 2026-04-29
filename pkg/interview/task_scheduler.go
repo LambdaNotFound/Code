@@ -2,49 +2,49 @@ package interview
 
 import "fmt"
 
-type Task interface {
+type ITask interface {
 	ID() string
 	Complete()
 	IsCompleted() bool
-	Dependencies() []Task
+	Dependencies() []ITask
 }
 
-type SimpleTask struct {
+type Task struct {
 	id        string
 	completed bool
-	deps      []Task
+	deps      []ITask
 }
 
-func NewTask(id string, deps ...Task) *SimpleTask {
-	return &SimpleTask{id: id, deps: deps}
+func NewTask(id string, deps ...ITask) *Task {
+	return &Task{id: id, deps: deps}
 }
 
-func (t *SimpleTask) ID() string           { return t.id }
-func (t *SimpleTask) Complete()            { t.completed = true }
-func (t *SimpleTask) IsCompleted() bool    { return t.completed }
-func (t *SimpleTask) Dependencies() []Task { return t.deps }
+func (t *Task) ID() string            { return t.id }
+func (t *Task) Complete()             { t.completed = true }
+func (t *Task) IsCompleted() bool     { return t.completed }
+func (t *Task) Dependencies() []ITask { return t.deps }
 
 type TaskScheduler struct {
-	indegree   map[Task]int
-	dependents map[Task][]Task
-	ready      []Task
+	indegree   map[ITask]int
+	dependents map[ITask][]ITask
+	ready      []ITask
 }
 
 func NewTaskScheduler() *TaskScheduler {
 	return &TaskScheduler{
-		indegree:   map[Task]int{},
-		dependents: map[Task][]Task{},
+		indegree:   make(map[ITask]int),
+		dependents: make(map[ITask][]ITask),
 	}
 }
 
-func (s *TaskScheduler) Add(t Task) {
+func (s *TaskScheduler) Add(t ITask) {
 	// count how many of t's dependencies are not yet completed
 	pending := 0
-	for _, d := range t.Dependencies() {
-		if !d.IsCompleted() {
+	for _, dep := range t.Dependencies() {
+		if !dep.IsCompleted() {
 			pending++
 			// register t as a dependent of d so we can notify on completion
-			s.dependents[d] = append(s.dependents[d], t)
+			s.dependents[dep] = append(s.dependents[dep], t)
 		}
 	}
 	s.indegree[t] = pending
@@ -55,7 +55,7 @@ func (s *TaskScheduler) Add(t Task) {
 }
 
 // Next pops a ready task
-func (s *TaskScheduler) Next() Task {
+func (s *TaskScheduler) Next() ITask {
 	for len(s.ready) > 0 {
 		t := s.ready[0]
 		s.ready = s.ready[1:]
@@ -68,7 +68,7 @@ func (s *TaskScheduler) Next() Task {
 
 // Notify is called by the caller after completing a task
 // It decrements indegree of dependents and moves them to ready
-func (s *TaskScheduler) Notify(completed Task) {
+func (s *TaskScheduler) Notify(completed ITask) {
 	for _, dependent := range s.dependents[completed] {
 		s.indegree[dependent]--
 		if s.indegree[dependent] == 0 {
@@ -79,10 +79,10 @@ func (s *TaskScheduler) Notify(completed Task) {
 }
 
 // PrintOrder returns all tasks in topological order
-func (s *TaskScheduler) PrintOrder(tasks []Task) ([]Task, error) {
+func (s *TaskScheduler) PrintOrder(tasks []ITask) ([]ITask, error) {
 	// build indegree map
-	indegree := map[Task]int{}
-	dependents := map[Task][]Task{}
+	indegree := map[ITask]int{}
+	dependents := map[ITask][]ITask{}
 	for _, t := range tasks {
 		indegree[t] = 0
 	}
@@ -94,7 +94,7 @@ func (s *TaskScheduler) PrintOrder(tasks []Task) ([]Task, error) {
 	}
 
 	// seed queue with indegree-0 tasks
-	ready := []Task{}
+	ready := []ITask{}
 	for _, t := range tasks {
 		if indegree[t] == 0 {
 			ready = append(ready, t)
@@ -102,7 +102,7 @@ func (s *TaskScheduler) PrintOrder(tasks []Task) ([]Task, error) {
 	}
 
 	// Kahn's algorithm
-	order := []Task{}
+	order := []ITask{}
 	for len(ready) > 0 {
 		t := ready[0]
 		ready = ready[1:]
@@ -122,28 +122,4 @@ func (s *TaskScheduler) PrintOrder(tasks []Task) ([]Task, error) {
 	}
 
 	return order, nil
-}
-
-func testTaskScheduler() {
-	s := NewTaskScheduler()
-
-	a := NewTask("A")
-	b := NewTask("B")
-	c := NewTask("C", a, b)
-	d := NewTask("D", c)
-
-	s.Add(a)
-	s.Add(b)
-	s.Add(c)
-	s.Add(d)
-
-	for {
-		t := s.Next()
-		if t == nil {
-			break
-		}
-		fmt.Printf("Processing %s\n", t.ID())
-		t.Complete()
-		s.Notify(t) // tell scheduler this task finished
-	}
 }
