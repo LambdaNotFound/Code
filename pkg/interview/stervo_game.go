@@ -5,9 +5,42 @@ import "sync"
 /**
  * Game: Stervo
  *
- * Players collect colored gems (B/W/G/R/Y) and buy cards using gems
- * Each card has a cost (gems required) and a color (the gem color it represents)
- */
+# Stervo is a card-based board game where players buy cards in exchange for colored gems. In this game, today, we care about two things, gems and cards.
+
+# Players can have any number of gems of five different colors: (B)lue, (W)hite, (G)reen, (R)ed, and (Y)ellow.
+
+# Players can exchange gems for cards. A card appears as such:
+
+# +----------+
+# |        G |
+# |          |
+# |          |
+# |  3W      |
+# |  2G      |
+# |  1R      |
+# +----------+
+
+# This indicates that the card costs 3 (W)hite gems, 2 (G)reen gems, and 1 (R)ed. The “G” in the upper right indicates the color of the card (this will be useful later)
+
+# For this entire problem, we want to keep things simple by assuming that there is only one player.
+
+# The data model and structure of the program is up to you.
+
+
+Task 1:
+# We want to write a can_purchase() function such that, given a card and the player's gem collection, it returns true if the player can afford the card, and false otherwise.
+
+Task 2:
+# Let's create a function called purchase() that takes as input a card and a player's collection of gems and checks if the player has enough gems to afford the card. If the player can afford the card,
+# the function will add it to the player's hand and deduct the card’s cost from the player's gem collection. The function should return "true" if the player can afford the card, and "false" if the player can't afford it.
+
+Task 3:
+# Now, we want to introduce the concept of discounts. The color of each card in the player's hand will be used to give a discount in the respective price of that gem’s color when purchasing a new card.
+# For example, if the player has 2 white cards and 1 red card in their hand and wants to buy a card that costs 4 white gems and 1 red gem, the discounted price of the card would be 2 white gems.
+
+# Imagine, now, that we are running this code in parallel where there may be multiple requests from the same player to purchase cards at the same time. How would your design change to accommodate this?
+*
+*/
 
 type Color int
 

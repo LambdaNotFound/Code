@@ -46,10 +46,21 @@ func Test_findSuspiciousActivities(t *testing.T) {
 		},
 	}
 
+	impls := []struct {
+		name string
+		fn   func([][]string, [][]string, int) [][]string
+	}{
+		{"BFS_quadratic", findSuspiciousActivities},
+		{"BFS_inverted_index", findSuspiciousActivitiesOpt},
+		{"union_find", findSuspiciousActivitiesUF},
+	}
+
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result := findSuspiciousActivities(tc.suspiciousActivities, tc.newActivities, tc.k)
-			assert.ElementsMatch(t, tc.expected, result)
-		})
+		for _, impl := range impls {
+			t.Run(tc.name+"/"+impl.name, func(t *testing.T) {
+				result := impl.fn(tc.suspiciousActivities, tc.newActivities, tc.k)
+				assert.ElementsMatch(t, tc.expected, result)
+			})
+		}
 	}
 }
