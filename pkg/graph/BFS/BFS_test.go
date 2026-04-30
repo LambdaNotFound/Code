@@ -54,14 +54,6 @@ func Test_orangesRotting(t *testing.T) {
 			grid := deepCopy2D(tc.grid)
 			result := orangesRotting(grid)
 			assert.Equal(t, tc.expected, result)
-
-			grid = deepCopy2D(tc.grid)
-			result = orangesRottingSlice(grid)
-			assert.Equal(t, tc.expected, result)
-
-			grid = deepCopy2D(tc.grid)
-			result = orangesRottingSlice2(grid)
-			assert.Equal(t, tc.expected, result)
 		})
 	}
 }

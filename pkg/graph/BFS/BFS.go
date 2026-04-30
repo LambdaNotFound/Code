@@ -1,7 +1,6 @@
 package bfs
 
 import (
-	. "gocode/containers"
 	. "gocode/types"
 	"slices"
 )
@@ -15,135 +14,61 @@ import (
  *
  */
 func orangesRotting(grid [][]int) int {
-	m, n := len(grid), len(grid[0])
-	queue := Queue[[2]int]{} // queue of [row, col]
-	for r := 0; r < m; r++ {
-		for c := 0; c < n; c++ {
-			if grid[r][c] == 2 {
-				queue.Enqueue([2]int{r, c})
+	const (
+		fresh   = 1
+		rotten  = 2
+		visited = -1
+	)
+
+	type cell struct{ row, col int }
+
+	rows, cols := len(grid), len(grid[0])
+	queue := []cell{}
+
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			if grid[row][col] == rotten {
+				queue = append(queue, cell{row, col})
+				grid[row][col] = visited
 			}
 		}
 	}
 
-	directions := [][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+	dirs := [][2]int{{0, 1}, {1, 0}, {-1, 0}, {0, -1}}
+	minutesElapsed := 0
 
-	minutes := 0
-	for !queue.IsEmpty() {
-		for i := 0; i < queue.Size(); i++ {
-			orange, _ := queue.Peek()
-			queue.Dequeue()
-			for _, dir := range directions {
-				r, c := orange[0]+dir[0], orange[1]+dir[1]
-				if r < 0 || r >= m || c < 0 || c >= n {
-					continue
-				}
-				if grid[r][c] != 1 {
-					continue
-				}
-				grid[r][c] = 2
-				queue.Enqueue([2]int{r, c})
-			}
-		}
-		if !queue.IsEmpty() {
-			minutes++
-		}
-	}
-
-	for r := 0; r < m; r++ {
-		for c := 0; c < n; c++ {
-			if grid[r][c] == 1 {
-				return -1
-			}
-		}
-	}
-	return minutes
-}
-
-func orangesRottingSlice(grid [][]int) int {
-	m, n := len(grid), len(grid[0])
-	queue := [][]int{}
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if grid[i][j] == 2 {
-				queue = append(queue, []int{i, j})
-			}
-			if grid[i][j] == 1 {
-			}
-		}
-	}
-
-	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-	minute := 0
 	for len(queue) > 0 {
 		size := len(queue)
 		for i := 0; i < size; i++ {
-			cell := queue[0]
+			cur := queue[0]
 			queue = queue[1:]
 
 			for _, dir := range dirs {
-				r, c := cell[0]+dir[0], cell[1]+dir[1]
-				if r >= 0 && r < m && c >= 0 && c < n && grid[r][c] == 1 {
-					grid[r][c] = 2
-					queue = append(queue, []int{r, c})
-
+				nextRow, nextCol := cur.row+dir[0], cur.col+dir[1]
+				if nextRow < 0 || nextRow >= rows || nextCol < 0 || nextCol >= cols {
+					continue
 				}
+				if grid[nextRow][nextCol] != fresh {
+					continue
+				}
+				queue = append(queue, cell{nextRow, nextCol})
+				grid[nextRow][nextCol] = visited
 			}
 		}
 		if len(queue) > 0 {
-			minute++
+			minutesElapsed++
 		}
 	}
 
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if grid[i][j] == 1 {
+	for row := 0; row < rows; row++ {
+		for col := 0; col < cols; col++ {
+			if grid[row][col] == fresh {
 				return -1
 			}
 		}
 	}
-	return minute
-}
 
-func orangesRottingSlice2(grid [][]int) int {
-	m, n := len(grid), len(grid[0])
-	queue := [][]int{}
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if grid[i][j] == 2 {
-				queue = append(queue, []int{i, j})
-			}
-			if grid[i][j] == 1 {
-			}
-		}
-	}
-
-	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-	minute := 0
-	for len(queue) > 0 {
-		for _, cell := range queue {
-			queue = queue[1:]
-
-			for _, dir := range dirs {
-				r, c := cell[0]+dir[0], cell[1]+dir[1]
-				if r >= 0 && r < m && c >= 0 && c < n && grid[r][c] == 1 {
-					grid[r][c] = 2
-					queue = append(queue, []int{r, c})
-				}
-			}
-		}
-		if len(queue) > 0 {
-			minute++
-		}
-	}
-
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			if grid[i][j] == 1 {
-				return -1
-			}
-		}
-	}
-	return minute
+	return minutesElapsed
 }
 
 /**
@@ -342,4 +267,31 @@ func distanceKClaude(root *TreeNode, target *TreeNode, k int) []int {
 		queue = next
 	}
 	return []int{}
+}
+
+/**
+ * 958. Check Completeness of a Binary Tree
+ *
+ * Given the root of a binary tree, determine if it is a complete binary tree.
+ */
+func isCompleteTree(root *TreeNode) bool {
+	queue := []*TreeNode{root}
+	foundNil := false
+
+	for len(queue) > 0 {
+		curNode := queue[0]
+		queue = queue[1:]
+
+		if curNode == nil {
+			foundNil = true
+		} else {
+			if foundNil {
+				return false
+			}
+			queue = append(queue, curNode.Left)
+			queue = append(queue, curNode.Right)
+		}
+	}
+
+	return true
 }
