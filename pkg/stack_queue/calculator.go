@@ -225,8 +225,8 @@ func calculateT(s string) int {
 
 	var dfs func() int
 	dfs = func() int {
-		stk := []int{}
-		num, op := 0, '+'
+		stack := []int{}
+		num, preOp := 0, '+'
 
 		for pos < len(s) {
 			ch := s[pos]
@@ -240,19 +240,19 @@ func calculateT(s string) int {
 
 			// commit on operator, end, or closing paren
 			if pos == len(s) || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')' {
-				switch op {
+				switch preOp {
 				case '+':
-					stk = append(stk, num)
+					stack = append(stack, num)
 				case '-':
-					stk = append(stk, -num)
+					stack = append(stack, -num)
 				case '*':
-					stk[len(stk)-1] *= num
+					stack[len(stack)-1] *= num
 				case '/':
-					stk[len(stk)-1] /= num
+					stack[len(stack)-1] /= num
 				}
 				num = 0
 				if ch == '+' || ch == '-' || ch == '*' || ch == '/' {
-					op = rune(ch) // ← only update for real operators
+					preOp = rune(ch) // ← only update for real operators
 				}
 				if ch == ')' {
 					break
@@ -261,7 +261,7 @@ func calculateT(s string) int {
 		}
 
 		res := 0
-		for _, v := range stk {
+		for _, v := range stack {
 			res += v
 		}
 		return res

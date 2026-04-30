@@ -15,6 +15,17 @@ type Task struct {
 	deps      []ITask
 }
 
+/*
+ * // variadic — caller passes args directly
+ * NewTask("A")                        // deps = []ITask{}
+ * NewTask("B", taskA)                 // deps = []ITask{taskA}
+ * NewTask("C", taskA, taskB, taskC)   // deps = []ITask{taskA, taskB, taskC}
+ *
+ * // slice — caller must construct the slice explicitly
+ * NewTask("A", []ITask{})
+ * NewTask("B", []ITask{taskA})
+ * NewTask("C", []ITask{taskA, taskB, taskC})
+ */
 func NewTask(id string, deps ...ITask) *Task {
 	return &Task{id: id, deps: deps}
 }
@@ -25,6 +36,9 @@ func (t *Task) IsCompleted() bool     { return t.completed }
 func (t *Task) Dependencies() []ITask { return t.deps }
 
 type TaskScheduler struct {
+	taskList []ITask
+
+	// Version III
 	indegree   map[ITask]int
 	dependents map[ITask][]ITask
 	ready      []ITask
@@ -37,7 +51,7 @@ func NewTaskScheduler() *TaskScheduler {
 	}
 }
 
-func (s *TaskScheduler) Add(t ITask) {
+func (s *TaskScheduler) Add(t ITask) ITask {
 	// count how many of t's dependencies are not yet completed
 	pending := 0
 	for _, dependency := range t.Dependencies() {
@@ -52,6 +66,8 @@ func (s *TaskScheduler) Add(t ITask) {
 	if pending == 0 {
 		s.ready = append(s.ready, t)
 	}
+
+	return t
 }
 
 // Next pops a ready task
@@ -87,7 +103,7 @@ func (s *TaskScheduler) PrintOrder(tasks []ITask) ([]ITask, error) {
 		indegree[t] = 0
 	}
 	for _, t := range tasks {
-		for _, d := range t.Dependencies() {
+		for _, d := range t.Dependencies() { // d -> t
 			indegree[t]++
 			dependents[d] = append(dependents[d], t)
 		}
