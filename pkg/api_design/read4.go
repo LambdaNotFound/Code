@@ -33,7 +33,7 @@ func (r *Read4) read(buf []byte, n int) int {
 			}
 		}
 
-		// copy from internal buffer into buf
+		// drain from internal buffer into buf
 		buf[charsRead] = r.buf4[r.buf4Idx]
 		charsRead++
 		r.buf4Idx++

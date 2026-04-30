@@ -4,7 +4,31 @@ import "strconv"
 
 /**
  * 91. Decode Ways
+ *
+ * dp[i] is the number of decode ways for string of length == i
+ * goal: dp[len(s)]
+ *
+ * dp[i] = dp[i-1] if one digit > 0 + dp[i-2] if two digit >= 10 && <= 26
+ *
+ * strconv.Atoi(s[i-2 : i])
  */
+func numDecodings(s string) int {
+	dp := make([]int, len(s)+1)
+	dp[0] = 1
+	if s[0] != '0' {
+		dp[1] = 1
+	}
+	for i := 2; i <= len(s); i++ {
+		if oneDigit, _ := strconv.Atoi(s[i-1 : i]); oneDigit > 0 {
+			dp[i] += dp[i-1]
+		}
+		if twoDigits, _ := strconv.Atoi(s[i-2 : i]); twoDigits >= 10 && twoDigits <= 26 {
+			dp[i] += dp[i-2]
+		}
+	}
+	return dp[len(s)]
+}
+
 func numDecodingsTopDown(s string) int {
 	var dfs func(pos int) int
 	dfs = func(pos int) int {
@@ -52,21 +76,4 @@ func numDecodingsTopDownMemo(s string) int {
 		return numWays
 	}
 	return dfs(0)
-}
-
-func numDecodings(s string) int {
-	dp := make([]int, len(s)+1)
-	dp[0] = 1
-	if s[0] != '0' {
-		dp[1] = 1
-	}
-	for i := 2; i <= len(s); i++ {
-		if oneDigit, _ := strconv.Atoi(s[i-1 : i]); oneDigit > 0 {
-			dp[i] += dp[i-1]
-		}
-		if twoDigits, _ := strconv.Atoi(s[i-2 : i]); twoDigits >= 10 && twoDigits <= 26 {
-			dp[i] += dp[i-2]
-		}
-	}
-	return dp[len(s)]
 }
