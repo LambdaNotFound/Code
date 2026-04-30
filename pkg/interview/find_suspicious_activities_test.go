@@ -25,6 +25,13 @@ func Test_findSuspiciousActivities(t *testing.T) {
 		expected             [][]string
 	}{
 		{
+			name:                 "empty_new_activities_returns_nil",
+			suspiciousActivities: [][]string{{"Brad", "San Francisco", "withdraw"}},
+			newActivities:        [][]string{},
+			k:                    2,
+			expected:             nil,
+		},
+		{
 			name: "example_from_spec",
 			suspiciousActivities: [][]string{
 				{"Brad", "San Francisco", "withdraw"},

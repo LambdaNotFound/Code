@@ -190,3 +190,40 @@ func Test_newTrieNode(t *testing.T) {
 	assert.Empty(t, node.children)
 	assert.Empty(t, node.firstSeen)
 }
+
+// ── printTrie (coverage) ──────────────────────────────────────────────────────
+
+func Test_printTrie(t *testing.T) {
+	t.Run("empty_trie_prints_nothing", func(t *testing.T) {
+		// Should not panic on empty root
+		printTrie(newTrieNode(), 0)
+	})
+
+	t.Run("single_level_trie", func(t *testing.T) {
+		root := newTrieNode()
+		root.insert([]ActionEntry{{"A", 1000}})
+		printTrie(root, 0)
+	})
+
+	t.Run("nested_trie_with_indent", func(t *testing.T) {
+		root := newTrieNode()
+		root.insert([]ActionEntry{{"A", 1000}, {"B", 1200}, {"C", 1300}})
+		root.insert([]ActionEntry{{"A", 1100}, {"B", 1200}, {"A", 1400}})
+		printTrie(root, 0)
+	})
+
+	t.Run("tie_break_by_action_name", func(t *testing.T) {
+		// Two actions at the same timestamp — alphabetical tie-break
+		root := newTrieNode()
+		root.insert([]ActionEntry{{"Z", 1000}})
+		root.insert([]ActionEntry{{"A", 1000}})
+		printTrie(root, 0)
+	})
+}
+
+// ── testUserActions (demo function coverage) ──────────────────────────────────
+
+func Test_testUserActions(t *testing.T) {
+	// testUserActions() prints to stdout; calling it exercises its branches.
+	testUserActions()
+}
