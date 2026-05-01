@@ -26,3 +26,12 @@ go.work.sum
 
 # macOS
 *.DS_Store*
+
+# Python test cache
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.coverage
+htmlcov/
