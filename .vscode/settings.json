@@ -10,5 +10,10 @@
     },
     "[sql]": {
         "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-    }
+    },
+    "python.testing.pytestArgs": [
+        "python"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
