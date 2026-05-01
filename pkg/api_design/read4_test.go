@@ -23,6 +23,131 @@ func mockFile(src string) (restore func()) {
 	return func() { read4 = func(buf4 []byte) int { return 0 } }
 }
 
+// ── ReadBuffer mock ───────────────────────────────────────────────────────────
+
+// mockPaginator replaces the global fetchPage with a closure that simulates a
+// paginated integer source backed by pages (a slice of slices). Page indices are
+// used directly as cursors, matching ReadBuffer.cursor semantics. Returns a
+// restore func that resets fetchPage to a no-op so tests don't bleed state.
+func mockPaginator(pages [][]int) (restore func()) {
+	fetchPage = func(page int) Result {
+		if page >= len(pages) {
+			return Result{nextPage: nil, results: nil}
+		}
+		var next *int
+		if page+1 < len(pages) {
+			n := page + 1
+			next = &n
+		}
+		return Result{nextPage: next, results: pages[page]}
+	}
+	return func() { fetchPage = func(page int) Result { return Result{} } }
+}
+
+// ── ReadBuffer.fetch ──────────────────────────────────────────────────────────
+
+func Test_ReadBuffer_fetch(t *testing.T) {
+	testCases := []struct {
+		name     string
+		pages    [][]int // simulated paginated source
+		requests []int   // successive fetch(n) calls
+		want     [][]int // expected result per call
+	}{
+		{
+			// Single page, fetch less than available.
+			name:     "single_page_fetch_partial",
+			pages:    [][]int{{1, 2, 3, 4, 5}},
+			requests: []int{3},
+			want:     [][]int{{1, 2, 3}},
+		},
+		{
+			// Single page, fetch exactly all available.
+			name:     "single_page_fetch_exact",
+			pages:    [][]int{{10, 20, 30}},
+			requests: []int{3},
+			want:     [][]int{{10, 20, 30}},
+		},
+		{
+			// Single page, request more than available → returns what exists.
+			name:     "single_page_fetch_over",
+			pages:    [][]int{{7, 8}},
+			requests: []int{10},
+			want:     [][]int{{7, 8}},
+		},
+		{
+			// Two pages, single fetch spanning both.
+			name:     "two_pages_single_fetch",
+			pages:    [][]int{{1, 2, 3}, {4, 5, 6}},
+			requests: []int{6},
+			want:     [][]int{{1, 2, 3, 4, 5, 6}},
+		},
+		{
+			// Two pages, fetch stops mid-first-page; second fetch drains rest + page2.
+			name:     "two_pages_two_fetches",
+			pages:    [][]int{{1, 2, 3}, {4, 5, 6}},
+			requests: []int{2, 4},
+			want:     [][]int{{1, 2}, {3, 4, 5, 6}},
+		},
+		{
+			// Three pages, multiple fetches crossing all boundaries.
+			name:     "three_pages_multiple_fetches",
+			pages:    [][]int{{10, 20}, {30, 40}, {50, 60}},
+			requests: []int{1, 3, 2},
+			want:     [][]int{{10}, {20, 30, 40}, {50, 60}},
+		},
+		{
+			// Empty source: every fetch returns nothing.
+			name:     "empty_source",
+			pages:    [][]int{},
+			requests: []int{5, 5},
+			want:     [][]int{{}, {}},
+		},
+		{
+			// Fetch after exhaustion returns empty.
+			name:     "fetch_after_exhaustion",
+			pages:    [][]int{{1, 2}},
+			requests: []int{2, 3},
+			want:     [][]int{{1, 2}, {}},
+		},
+		{
+			// One item at a time across multiple pages.
+			name:     "one_item_at_a_time",
+			pages:    [][]int{{1, 2}, {3}},
+			requests: []int{1, 1, 1, 1},
+			want:     [][]int{{1}, {2}, {3}, {}},
+		},
+		{
+			// Page with zero items followed by a page with items.
+			// The empty page causes fetchedOffset==0, so the loop re-enters the
+			// refill branch immediately and fetches the next page.
+			name:     "empty_page_then_data",
+			pages:    [][]int{{}, {9, 8, 7}},
+			requests: []int{2},
+			want:     [][]int{{9, 8}},
+		},
+		{
+			// Large request across many small pages.
+			name:     "many_small_pages",
+			pages:    [][]int{{1}, {2}, {3}, {4}, {5}},
+			requests: []int{5},
+			want:     [][]int{{1, 2, 3, 4, 5}},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			restore := mockPaginator(tc.pages)
+			defer restore()
+
+			rb := &ReadBuffer{}
+			for i, n := range tc.requests {
+				got := rb.fetch(n)
+				assert.Equal(t, tc.want[i], got, "fetch[%d](n=%d)", i, n)
+			}
+		})
+	}
+}
+
 // ── 157: Read N Characters Given Read4 (single call) ─────────────────────────
 
 func Test_read157(t *testing.T) {
