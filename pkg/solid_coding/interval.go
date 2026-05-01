@@ -210,31 +210,10 @@ func canAttendMeetings(intervals []Interval) bool {
  * find the minimum number of rooms required to schedule all meetings without any conflicts.
  *
  * whats next earliest start time, next earliest end time?
+ *
+ * 1. Sweep line
  */
 func minMeetingRooms(intervals []Interval) int {
-	start, end := make([]int, len(intervals)), make([]int, len(intervals))
-	for i := range intervals {
-		start[i] = intervals[i].Start
-		end[i] = intervals[i].End
-	}
-	sort.Ints(start)
-	sort.Ints(end)
-
-	maxRooms := 0
-	for i, j, rooms := 0, 0, 0; i < len(start) && j < len(end); {
-		if start[i] < end[j] {
-			i += 1
-			rooms += 1
-		} else {
-			j += 1
-			rooms -= 1
-		}
-		maxRooms = max(maxRooms, rooms)
-	}
-	return maxRooms
-}
-
-func minMeetingRoomsSweepLine(intervals []Interval) int {
 	timeline := make(map[int]int) // time point → room delta (start: +1, end: -1)
 	for _, meeting := range intervals {
 		timeline[meeting.Start]++
@@ -295,6 +274,41 @@ func (h *EndTimeHeap) Pop() interface{} {
 	item := old[len(old)-1]
 	*h = old[:len(old)-1]
 	return item
+}
+
+/**
+ * 1094. Car Pooling
+ */
+func carPooling(trips [][]int, capacity int) bool {
+	type event struct {
+		pos, delta int
+	}
+
+	// each trip generates a board and alight event
+	events := make([]event, 0, len(trips)*2)
+	for _, trip := range trips {
+		numPassengers, from, to := trip[0], trip[1], trip[2]
+		events = append(events, event{pos: from, delta: +numPassengers}) // board
+		events = append(events, event{pos: to, delta: -numPassengers})   // off-board
+	}
+
+	// sort by position; alight before board at same position
+	// (passengers leave before new ones board at the same stop)
+	sort.Slice(events, func(i, j int) bool {
+		if events[i].pos != events[j].pos {
+			return events[i].pos < events[j].pos
+		}
+		return events[i].delta < events[j].delta // negative delta first
+	})
+
+	currentPassengers := 0
+	for _, e := range events {
+		currentPassengers += e.delta
+		if currentPassengers > capacity {
+			return false
+		}
+	}
+	return true
 }
 
 /**

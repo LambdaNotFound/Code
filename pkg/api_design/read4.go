@@ -1,9 +1,71 @@
 package apidesign
 
-// Provided API — reads up to 4 chars from file into buf4
-// Returns number of characters actually read (0-4)
-// Has its own internal file pointer that advances on each call
-func read4(buf4 []byte) int
+/**
+ * The Stateful Buffer Pattern
+ *
+ * "An external source delivers data in chunks I don't control, but my caller wants a different amount each time."
+ *
+ * state = {
+ *     buf      // leftover from last external call
+ *     cursor   // where are we in the external source
+ * }
+ *
+ * Get(n):
+ *     1. drain buf first
+ *     2. if still need more AND source not exhausted → fetch externally
+ *     3. stage fetch into buf (never directly into result)
+ *     4. repeat
+ */
+type ReadBuffer struct {
+	buffer        []int
+	fetchedOffset int
+	readOffset    int
+
+	exhausted bool
+	cursor    int
+}
+
+type Result struct {
+	nextPage *int
+	results  []int
+}
+
+var fetchPage = func(page int) Result { return Result{} }
+
+func (r *ReadBuffer) fetch(numResult int) []int {
+	result := []int{}
+
+	writeCount := 0
+	for writeCount < numResult {
+		if r.readOffset < r.fetchedOffset { // 1. drain bufffer first
+			result = append(result, r.buffer[r.readOffset])
+			writeCount++
+			r.readOffset++
+		} else { // 2. buffer exhausted, refill
+			if r.exhausted {
+				break
+			}
+
+			res := fetchPage(r.cursor)
+			if res.nextPage == nil {
+				r.exhausted = true
+			} else {
+				r.cursor = *res.nextPage
+			}
+			// 3. stage fetch into buf (never directly into result)
+			r.buffer = res.results
+			r.fetchedOffset = len(res.results)
+			r.readOffset = 0
+		}
+	}
+
+	return result
+}
+
+// read4 is the provided API — reads up to 4 chars from the file into buf4
+// and returns the number of characters actually read (0-4).
+// Declared as a variable so tests can swap in a mock without build-time linkage.
+var read4 = func(buf4 []byte) int { return 0 }
 
 /**
  * 158: Read N Characters Given read4 II — Call Multiple Times
@@ -14,32 +76,31 @@ func read4(buf4 []byte) int
  *
  */
 type Read4 struct {
-	buf4     [4]byte // internal buffer from read4
-	buf4Idx  int     // next unread position in buf4
-	buf4Size int     // how many chars read4 returned last fill
+	buffer        [4]byte
+	fetchedOffset int
+	readOffset    int
 }
 
 func (r *Read4) read(buf []byte, n int) int {
-	charsRead := 0
+	writeCount := 0
 
-	for charsRead < n {
-		// refill internal buffer only when fully consumed
-		if r.buf4Idx == r.buf4Size {
-			r.buf4Size = read4(r.buf4[:]) // [:] converts an array to a slice.
-			r.buf4Idx = 0
+	for writeCount < n {
+		if r.readOffset < r.fetchedOffset { // 1. drain bufffer first
+			buf[writeCount] = r.buffer[r.readOffset]
+			writeCount++
+			r.readOffset++
+		} else { // 2. buffer exhausted, refill
+			// 3. stage fetch into buf (never directly into result)
+			r.fetchedOffset = read4(r.buffer[:]) // [:] converts an array to a slice.
+			r.readOffset = 0
 
-			if r.buf4Size == 0 {
+			if r.fetchedOffset == 0 {
 				break // EOF
 			}
 		}
-
-		// drain from internal buffer into buf
-		buf[charsRead] = r.buf4[r.buf4Idx]
-		charsRead++
-		r.buf4Idx++
 	}
 
-	return charsRead
+	return writeCount
 }
 
 /**
