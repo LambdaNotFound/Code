@@ -1,5 +1,7 @@
 package monoqueue
 
+import "math"
+
 /**
  * Increasing Monotonic Queue: It only keeps elements in increasing order,
  *    and any element that is smaller than the current minimum is removed.
@@ -59,6 +61,8 @@ func maxSlidingWindow(nums []int, k int) []int {
  * 1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
  *
  * 1. deque x2
+ *     maxDeque[0] tracks the max number in the window
+ *     minDeque[0] tracks the min number in the window
  * 2. heap x2
  * 3. sorted set
  *
@@ -66,42 +70,35 @@ func maxSlidingWindow(nums []int, k int) []int {
  * Space: O(n)
  */
 func longestSubarray(nums []int, limit int) int {
-	type pair struct {
-		index, val int
-	}
-
-	maxLen := 1
-	maxDeque := []pair{} // decreasing → front is max
-	minDeque := []pair{} // increasing → front is min
-	left := 0
-
-	for right := 0; right < len(nums); right++ {
-		// maintain max deque: pop smaller from back
-		for len(maxDeque) > 0 && maxDeque[len(maxDeque)-1].val < nums[right] {
+	maxDeque, minDeque := []int{}, []int{}
+	res := math.MinInt
+	for left, right := 0, 0; right < len(nums); right++ {
+		for len(maxDeque) > 0 && maxDeque[len(maxDeque)-1] < nums[right] {
 			maxDeque = maxDeque[:len(maxDeque)-1]
 		}
-		// maintain min deque: pop larger from back
-		for len(minDeque) > 0 && minDeque[len(minDeque)-1].val > nums[right] {
+		maxDeque = append(maxDeque, nums[right])
+
+		for len(minDeque) > 0 && minDeque[len(minDeque)-1] > nums[right] {
 			minDeque = minDeque[:len(minDeque)-1]
 		}
-		maxDeque = append(maxDeque, pair{right, nums[right]})
-		minDeque = append(minDeque, pair{right, nums[right]})
+		minDeque = append(minDeque, nums[right])
 
-		// shrink window from left until valid
-		for maxDeque[0].val-minDeque[0].val > limit {
+		for maxDeque[0]-minDeque[0] > limit {
+			num := nums[left]
 			left++
-			if maxDeque[0].index < left {
+
+			if num == maxDeque[0] {
 				maxDeque = maxDeque[1:]
 			}
-			if minDeque[0].index < left {
+			if num == minDeque[0] {
 				minDeque = minDeque[1:]
 			}
 		}
 
-		maxLen = max(maxLen, right-left+1)
+		res = max(res, right-left+1)
 	}
 
-	return maxLen
+	return res
 }
 
 // Time: O(n^2)
