@@ -212,3 +212,39 @@ func dailyTemperaturesRightToLeft(temperatures []int) []int {
 	}
 	return res
 }
+
+/**
+ * 316. Remove Duplicate Letters
+ */
+func removeDuplicateLetters(s string) string {
+	// lastIndex[ch] = last position ch appears in s
+	lastIndex := make([]int, 26)
+	for i, ch := range s {
+		lastIndex[ch-'a'] = i
+	}
+
+	inStack := make([]bool, 26)
+	stack := []byte{}
+
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+
+		// skip if already in stack — it's already placed optimally
+		if inStack[ch-'a'] {
+			continue
+		}
+
+		// pop larger characters that appear later in s
+		for len(stack) > 0 &&
+			stack[len(stack)-1] > ch &&
+			lastIndex[stack[len(stack)-1]-'a'] > i {
+			inStack[stack[len(stack)-1]-'a'] = false
+			stack = stack[:len(stack)-1]
+		}
+
+		stack = append(stack, ch)
+		inStack[ch-'a'] = true
+	}
+
+	return string(stack)
+}
