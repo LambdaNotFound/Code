@@ -17,10 +17,6 @@ package graph
  *
  */
 func validTree(n int, edges [][]int) bool {
-	if len(edges) != n-1 {
-		return false
-	}
-
 	parent := make([]int, n)
 	for i := 0; i < n; i++ {
 		parent[i] = i
@@ -34,21 +30,23 @@ func validTree(n int, edges [][]int) bool {
 		return parent[a]
 	}
 
-	union := func(a, b int) bool {
-		rootA, rootB := find(a), find(b)
+	for _, edge := range edges {
+		rootA, rootB := find(edge[0]), find(edge[1])
 		if rootA == rootB {
 			return false
 		}
 
 		parent[rootA] = rootB
-		return true
 	}
 
-	for _, edge := range edges {
-		if !union(edge[0], edge[1]) {
-			return false
+	// confirm all nodes share the same root
+	root := find(0)
+	for i := 1; i < n; i++ {
+		if find(i) != root {
+			return false // disconnected
 		}
 	}
+
 	return true
 }
 
