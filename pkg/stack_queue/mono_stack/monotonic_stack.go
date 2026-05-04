@@ -215,35 +215,37 @@ func dailyTemperaturesRightToLeft(temperatures []int) []int {
 
 /**
  * 316. Remove Duplicate Letters
+ *
+ * smallest in lexicographical order:
+ *     A string a is lexicographically smaller than a string b if in the first position where a and b differ,
+ *     string a has a letter that appears earlier in the alphabet than the corresponding letter in b.
+ *     If the first min(a.length, b.length) characters do not differ, then the shorter string is the lexicographically smaller one.
+ *
+ * Input: s = "cbacdcbc"
+ * Output: "acdb"
+ *
  */
 func removeDuplicateLetters(s string) string {
-	// lastIndex[ch] = last position ch appears in s
-	lastIndex := make([]int, 26)
-	for i, ch := range s {
-		lastIndex[ch-'a'] = i
+	lastIndex := map[byte]int{}
+	for i := range s {
+		lastIndex[s[i]] = i
 	}
 
-	inStack := make([]bool, 26)
 	stack := []byte{}
-
-	for i := 0; i < len(s); i++ {
-		ch := s[i]
-
-		// skip if already in stack — it's already placed optimally
-		if inStack[ch-'a'] {
+	inStack := map[byte]bool{}
+	for i := range s {
+		if inStack[s[i]] {
 			continue
 		}
 
-		// pop larger characters that appear later in s
-		for len(stack) > 0 &&
-			stack[len(stack)-1] > ch &&
-			lastIndex[stack[len(stack)-1]-'a'] > i {
-			inStack[stack[len(stack)-1]-'a'] = false
+		for len(stack) > 0 && stack[len(stack)-1] > s[i] && lastIndex[stack[len(stack)-1]] > i {
+			inStack[stack[len(stack)-1]] = false
 			stack = stack[:len(stack)-1]
 		}
 
-		stack = append(stack, ch)
-		inStack[ch-'a'] = true
+		stack = append(stack, s[i])
+		inStack[s[i]] = true
+
 	}
 
 	return string(stack)
