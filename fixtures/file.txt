@@ -1,0 +1,5 @@
+color    date        number
+green    2001/02/23  8
+purple   2006/05/11  1
+white    2019/02/17  200
+green    2002/02/23  28
