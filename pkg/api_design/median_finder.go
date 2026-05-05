@@ -8,8 +8,8 @@ import "container/heap"
  * Min Heap + Max Heap
  */
 type MedianFinder struct {
-	minHeap *IntHeap
-	maxHeap *IntHeap
+	minHeap *IntHeap // half of smaller numbers
+	maxHeap *IntHeap // half of larger numbers
 }
 
 func ConstructorMedianFinder() MedianFinder {
@@ -24,7 +24,7 @@ func ConstructorMedianFinder() MedianFinder {
 }
 
 func (mf *MedianFinder) AddNum(num int) {
-	if (mf.minHeap.Len()+mf.maxHeap.Len())%2 == 0 {
+	if (mf.minHeap.Len()+mf.maxHeap.Len())%2 == 0 { // balance the size of two heaps
 		heap.Push(mf.maxHeap, num)
 		heap.Push(mf.minHeap, heap.Pop(mf.maxHeap))
 	} else {

@@ -50,6 +50,56 @@ func validTree(n int, edges [][]int) bool {
 	return true
 }
 
+func validTreeDFS(n int, edges [][]int) bool {
+	if len(edges) != n-1 {
+		return false
+	}
+
+	// build undirected adjacency list
+	adjList := make(map[int][]int)
+	for _, edge := range edges {
+		src, dst := edge[0], edge[1]
+		adjList[src] = append(adjList[src], dst)
+		adjList[dst] = append(adjList[dst], src)
+	}
+
+	visited := make([]bool, n)
+
+	var dfs func(node, parent int) bool
+	dfs = func(node, parent int) bool {
+		visited[node] = true
+
+		for _, neighbor := range adjList[node] {
+			if neighbor == parent {
+				// skip parent edge — not a cycle in undirected graph
+				continue
+			}
+			if visited[neighbor] {
+				// visited non-parent node = cycle detected
+				return false
+			}
+			if !dfs(neighbor, node) {
+				return false
+			}
+		}
+		return true
+	}
+
+	// check no cycle from node 0
+	if !dfs(0, -1) {
+		return false
+	}
+
+	// check full connectivity
+	for _, wasVisited := range visited {
+		if !wasVisited {
+			return false
+		}
+	}
+
+	return true
+}
+
 func validTreeBFS(n int, edges [][]int) bool {
 	// a valid tree must have exactly n-1 edges
 	// more edges = cycle, fewer edges = disconnected
@@ -96,56 +146,6 @@ func validTreeBFS(n int, edges [][]int) bool {
 	}
 
 	// check all nodes were visited — ensures full connectivity
-	for _, wasVisited := range visited {
-		if !wasVisited {
-			return false
-		}
-	}
-
-	return true
-}
-
-func validTreeDFS(n int, edges [][]int) bool {
-	if len(edges) != n-1 {
-		return false
-	}
-
-	// build undirected adjacency list
-	adjList := make(map[int][]int)
-	for _, edge := range edges {
-		src, dst := edge[0], edge[1]
-		adjList[src] = append(adjList[src], dst)
-		adjList[dst] = append(adjList[dst], src)
-	}
-
-	visited := make([]bool, n)
-
-	var dfs func(node, parent int) bool
-	dfs = func(node, parent int) bool {
-		visited[node] = true
-
-		for _, neighbor := range adjList[node] {
-			if neighbor == parent {
-				// skip parent edge — not a cycle in undirected graph
-				continue
-			}
-			if visited[neighbor] {
-				// visited non-parent node = cycle detected
-				return false
-			}
-			if !dfs(neighbor, node) {
-				return false
-			}
-		}
-		return true
-	}
-
-	// check no cycle from node 0
-	if !dfs(0, -1) {
-		return false
-	}
-
-	// check full connectivity
 	for _, wasVisited := range visited {
 		if !wasVisited {
 			return false

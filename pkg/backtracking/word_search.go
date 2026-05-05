@@ -167,3 +167,47 @@ func findWords(board [][]byte, words []string) []string {
 
 	return res
 }
+
+// naive approach
+func findWordsNaive(board [][]byte, words []string) []string {
+	wordSet := map[string]bool{}
+	for _, word := range words {
+		wordSet[word] = true
+	}
+
+	m, n := len(board), len(board[0])
+	dirs := [][2]int{{-1, 0}, {0, -1}, {1, 0}, {0, 1}}
+	var result []string
+
+	var dfs func(row, col int, prefix string)
+	dfs = func(row, col int, prefix string) {
+		if board[row][col] == '.' {
+			return
+		}
+
+		current := prefix + string(board[row][col])
+		if wordSet[current] {
+			result = append(result, current)
+			delete(wordSet, current)
+		}
+
+		original := board[row][col]
+		board[row][col] = '.'
+		for _, d := range dirs {
+			neiRow, neiCol := row+d[0], col+d[1]
+			if neiRow < 0 || neiRow >= m || neiCol < 0 || neiCol >= n {
+				continue
+			}
+			dfs(neiRow, neiCol, current)
+		}
+		board[row][col] = original
+	}
+
+	for row := 0; row < m; row++ {
+		for col := 0; col < n; col++ {
+			dfs(row, col, "")
+		}
+	}
+
+	return result
+}
