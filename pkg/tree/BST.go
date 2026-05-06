@@ -142,3 +142,63 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 	}
 	return right
 }
+
+/**
+ * 450. Delete Node in a BST
+ */
+func deleteNode(root *TreeNode, key int) *TreeNode {
+	if root == nil {
+		return nil
+	}
+
+	var getMin func(root *TreeNode) *TreeNode
+	getMin = func(root *TreeNode) *TreeNode {
+		if root == nil {
+			return nil
+		}
+
+		if root.Left == nil {
+			return root
+		}
+
+		return getMin(root.Left)
+	}
+
+	if root.Val == key {
+		// do delete operation
+
+		// case 1: this is a leaf node, directly delete
+		if root.Left == nil && root.Right == nil {
+			return nil
+		}
+
+		// case 2: it has only one child, let the one child to replace it
+		if root.Left == nil && root.Right != nil {
+			return root.Right
+		}
+		if root.Left != nil && root.Right == nil {
+			return root.Left
+		}
+
+		// case 3: it has both left and right child
+		if root.Left != nil && root.Right != nil {
+			// Found the smallest node on the right to replace it
+			minSubTreeNode := getMin(root.Right)
+			leftSubTree := root.Left
+			rightSubTree := deleteNode(root.Right, minSubTreeNode.Val)
+			minSubTreeNode.Left = leftSubTree
+			minSubTreeNode.Right = rightSubTree
+			return minSubTreeNode
+		}
+	}
+
+	if root.Val > key {
+		root.Left = deleteNode(root.Left, key)
+	}
+
+	if root.Val < key {
+		root.Right = deleteNode(root.Right, key)
+	}
+
+	return root
+}
