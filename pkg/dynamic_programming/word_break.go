@@ -18,9 +18,9 @@ package dynamic_programming
  * The moment you see dp of size n+1 over a string, anchor your brain: i is a gap, dp[i] is about the prefix s[0:i].
  */
 func wordBreak(s string, wordDict []string) bool {
-	dict := make(map[string]bool)
+	wordMap := make(map[string]bool)
 	for _, word := range wordDict {
-		dict[word] = true
+		wordMap[word] = true
 	}
 
 	dp := make([]bool, len(s)+1)
@@ -28,8 +28,9 @@ func wordBreak(s string, wordDict []string) bool {
 	for i := 1; i <= len(s); i++ {
 		for j := 0; j < i; j++ {
 			substr := s[j:i] // i is the gap index
-			if _, found := dict[substr]; found && dp[j] {
+			if wordMap[substr] && dp[j] {
 				dp[i] = true
+				break // no need to check remaining splits
 			}
 		}
 	}
@@ -47,9 +48,10 @@ func wordBreakCharIndex(s string, wordDict []string) bool {
 	dp[0] = true // base case: empty string is always valid
 	for i := 0; i < len(s); i++ {
 		for j := 0; j <= i; j++ {
-			if dp[j] && wordMap[s[j:i+1]] {
+			substr := s[j : i+1] // i is the char index
+			if wordMap[substr] && dp[j] {
 				dp[i+1] = true
-				break // dp[i+1] confirmed — no need to check remaining splits
+				break // no need to check remaining splits
 			}
 		}
 	}
