@@ -171,3 +171,32 @@ func deleteNode(root *TreeNode, key int) *TreeNode {
 	}
 	return root
 }
+
+/**
+ * 1026. Maximum Difference Between Node and Ancestor
+ */
+func maxAncestorDiff(root *TreeNode) int {
+	res := 0
+	if root == nil {
+		return res
+	}
+
+	var dfs func(node *TreeNode, minVal, maxVal int)
+	dfs = func(node *TreeNode, minVal, maxVal int) {
+		if node == nil {
+			return
+		}
+
+		res = max(res, node.Val-minVal)
+		res = max(res, maxVal-node.Val)
+
+		minVal = min(minVal, node.Val)
+		maxVal = max(maxVal, node.Val)
+
+		dfs(node.Left, minVal, maxVal)
+		dfs(node.Right, minVal, maxVal)
+	}
+
+	dfs(root, root.Val, root.Val)
+	return res
+}
