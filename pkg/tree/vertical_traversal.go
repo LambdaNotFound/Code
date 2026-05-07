@@ -13,41 +13,44 @@ func verticalTraversal(root *TreeNode) [][]int {
 		return nil
 	}
 
-	type pair struct {
+	type entry struct {
+		node     *TreeNode
 		val, row, col int
 	}
-	pairs := []pair{}
 
-	queue := []*TreeNode{root}
-	pairMap := map[*TreeNode]pair{root: pair{root.Val, 0, 0}}
-	columns := map[int][]int{}
+	var items []entry
+	queue := []entry{{root, root.Val, 0, 0}}
 	for len(queue) > 0 {
-		cur := queue[0]
+		e := queue[0]
 		queue = queue[1:]
-
-		r, c := pairMap[cur].row, pairMap[cur].col
-		pairs = append(pairs, pair{cur.Val, r, c})
-		columns[c] = append(columns[c], cur.Val)
-
-		if cur.Left != nil {
-			pairMap[cur.Left] = pair{cur.Left.Val, r + 1, c - 1}
-			queue = append(queue, cur.Left)
+		items = append(items, e)
+		if e.node.Left != nil {
+			queue = append(queue, entry{e.node.Left, e.node.Left.Val, e.row + 1, e.col - 1})
 		}
-		if cur.Right != nil {
-			pairMap[cur.Right] = pair{cur.Right.Val, r + 1, c + 1}
-			queue = append(queue, cur.Right)
+		if e.node.Right != nil {
+			queue = append(queue, entry{e.node.Right, e.node.Right.Val, e.row + 1, e.col + 1})
 		}
 	}
 
-	columnKeys := make([]int, 0, len(columns))
-	for key := range columns {
-		columnKeys = append(columnKeys, key)
-	}
-	sort.Ints(columnKeys)
+	sort.Slice(items, func(i, j int) bool {
+		if items[i].col != items[j].col {
+			return items[i].col < items[j].col
+		}
+		if items[i].row != items[j].row {
+			return items[i].row < items[j].row
+		}
+		return items[i].val < items[j].val
+	})
 
-	res := make([][]int, len(columnKeys))
-	for i, k := range columnKeys {
-		res[i] = columns[k]
+	var res [][]int
+	for i := 0; i < len(items); {
+		col := items[i].col
+		var group []int
+		for i < len(items) && items[i].col == col {
+			group = append(group, items[i].val)
+			i++
+		}
+		res = append(res, group)
 	}
 	return res
 }
