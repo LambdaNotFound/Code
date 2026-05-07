@@ -16,6 +16,9 @@ package dynamic_programming
  * Character:    l   e   e   t   c   o   d   e
  *
  * The moment you see dp of size n+1 over a string, anchor your brain: i is a gap, dp[i] is about the prefix s[0:i].
+ *
+ *
+ * Naive (HashMap) TimeO(n² · L) <- Hash Computation: O(L)
  */
 func wordBreak(s string, wordDict []string) bool {
 	wordMap := make(map[string]bool)
@@ -24,7 +27,7 @@ func wordBreak(s string, wordDict []string) bool {
 	}
 
 	dp := make([]bool, len(s)+1)
-	dp[0] = true
+	dp[0] = true // base case: empty string, dp[length]
 	for i := 1; i <= len(s); i++ {
 		for j := 0; j < i; j++ {
 			substr := s[j:i] // i is the gap index
@@ -45,7 +48,7 @@ func wordBreakCharIndex(s string, wordDict []string) bool {
 	}
 
 	dp := make([]bool, len(s)+1)
-	dp[0] = true // base case: empty string is always valid
+	dp[0] = true // base case: empty string, dp[length]
 	for i := 0; i < len(s); i++ {
 		for j := 0; j <= i; j++ {
 			substr := s[j : i+1] // i is the char index
@@ -66,7 +69,7 @@ func wordBreakTrie(s string, wordDict []string) bool {
 	}
 
 	dp := make([]bool, len(s)+1)
-	dp[0] = true // base case: empty string is always valid
+	dp[0] = true // dp[length]
 	for i := 0; i < len(s); i++ {
 		if !dp[i] {
 			continue

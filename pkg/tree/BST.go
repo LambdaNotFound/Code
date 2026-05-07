@@ -150,55 +150,24 @@ func deleteNode(root *TreeNode, key int) *TreeNode {
 	if root == nil {
 		return nil
 	}
-
-	var getMin func(root *TreeNode) *TreeNode
-	getMin = func(root *TreeNode) *TreeNode {
-		if root == nil {
-			return nil
-		}
-
+	if key < root.Val {
+		root.Left = deleteNode(root.Left, key)
+	} else if key > root.Val {
+		root.Right = deleteNode(root.Right, key)
+	} else {
 		if root.Left == nil {
-			return root
-		}
-
-		return getMin(root.Left)
-	}
-
-	if root.Val == key {
-		// do delete operation
-
-		// case 1: this is a leaf node, directly delete
-		if root.Left == nil && root.Right == nil {
-			return nil
-		}
-
-		// case 2: it has only one child, let the one child to replace it
-		if root.Left == nil && root.Right != nil {
 			return root.Right
 		}
-		if root.Left != nil && root.Right == nil {
+		if root.Right == nil {
 			return root.Left
 		}
-
-		// case 3: it has both left and right child
-		if root.Left != nil && root.Right != nil {
-			// Found the smallest node on the right to replace it
-			minSubTreeNode := getMin(root.Right)
-			leftSubTree := root.Left
-			rightSubTree := deleteNode(root.Right, minSubTreeNode.Val)
-			minSubTreeNode.Left = leftSubTree
-			minSubTreeNode.Right = rightSubTree
-			return minSubTreeNode
+		// swap in-order successor's value, then delete it from right subtree
+		min := root.Right
+		for min.Left != nil {
+			min = min.Left
 		}
+		root.Val = min.Val
+		root.Right = deleteNode(root.Right, min.Val)
 	}
-
-	if root.Val > key {
-		root.Left = deleteNode(root.Left, key)
-	}
-
-	if root.Val < key {
-		root.Right = deleteNode(root.Right, key)
-	}
-
 	return root
 }
