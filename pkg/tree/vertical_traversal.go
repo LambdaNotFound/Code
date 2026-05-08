@@ -8,13 +8,58 @@ import (
 /**
  * 987. Vertical Order Traversal of a Binary Tree
  */
-func verticalTraversal(root *TreeNode) [][]int {
+func verticalTraversalDFS(root *TreeNode) [][]int {
 	if root == nil {
 		return nil
 	}
 
 	type entry struct {
-		node     *TreeNode
+		row, val int
+	}
+
+	columns := map[int][]entry{}
+	var dfs func(node *TreeNode, row, col int)
+	dfs = func(node *TreeNode, row, col int) {
+		if node == nil {
+			return
+		}
+		columns[col] = append(columns[col], entry{row, node.Val})
+		dfs(node.Left, row+1, col-1)
+		dfs(node.Right, row+1, col+1)
+	}
+	dfs(root, 0, 0)
+
+	columnKeys := make([]int, 0, len(columns))
+	for key := range columns {
+		columnKeys = append(columnKeys, key)
+	}
+	sort.Ints(columnKeys)
+
+	var res [][]int
+	for _, key := range columnKeys {
+		entries := columns[key]
+		sort.Slice(entries, func(i, j int) bool {
+			if entries[i].row != entries[j].row {
+				return entries[i].row < entries[j].row
+			}
+			return entries[i].val < entries[j].val
+		})
+		vals := make([]int, len(entries))
+		for i, e := range entries {
+			vals[i] = e.val
+		}
+		res = append(res, vals)
+	}
+	return res
+}
+
+func verticalTraversalBFS(root *TreeNode) [][]int {
+	if root == nil {
+		return nil
+	}
+
+	type entry struct {
+		node          *TreeNode
 		val, row, col int
 	}
 

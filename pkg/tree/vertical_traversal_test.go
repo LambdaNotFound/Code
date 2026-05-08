@@ -64,7 +64,8 @@ func TestVerticalTraversal(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, verticalTraversal(tt.root))
+			assert.Equal(t, tt.expected, verticalTraversalBFS(tt.root))
+			assert.Equal(t, tt.expected, verticalTraversalDFS(tt.root))
 		})
 	}
 }
