@@ -44,6 +44,15 @@ func combinationSum(candidates []int, target int) [][]int {
  * 377. Combination Sum IV
  *
  * dp[amount] += dp[amount - num]
+ *
+ * The possible combination ways are:
+ * (1, 1, 1, 1)
+ * (1, 1, 2)
+ * (1, 2, 1)
+ * (1, 3)
+ * (2, 1, 1)
+ * (2, 2)
+ * (3, 1)
  */
 func combinationSum4(nums []int, target int) int {
 	dp := make([]int, target+1)

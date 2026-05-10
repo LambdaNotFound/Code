@@ -176,25 +176,23 @@ func isPalindrome(s string) bool {
  * substr[l+1, r] or substr[l, r-1]
  */
 func validPalindrome(s string) bool {
-	l, r := 0, len(s)-1
-
-	for l < r {
-		if s[l] != s[r] {
-			return isPalindromeHelper(s, l+1, r) || isPalindromeHelper(s, l, r-1)
+	isValid := func(t string) bool {
+		for i, j := 0, len(t)-1; i < j; {
+			if t[i] != t[j] {
+				return false
+			}
+			i++
+			j--
 		}
-		l++
-		r--
+		return true
 	}
-	return true
-}
 
-func isPalindromeHelper(s string, l, r int) bool {
-	for l < r { // covers both cases: odd/even length
-		if s[l] != s[r] {
-			return false
+	for i, j := 0, len(s)-1; i < j; {
+		if s[i] != s[j] {
+			return isValid(s[i+1:j+1]) || isValid(s[i:j])
 		}
-		l++
-		r--
+		i++
+		j--
 	}
 	return true
 }
