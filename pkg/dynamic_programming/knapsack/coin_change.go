@@ -16,24 +16,24 @@ import "math"
  *     dp[i] = min(dp[i], dp[i - coins[j]] + 1) if (i - coins[j] >= 0)
  *         base case: dp[0] = 0
  */
-func coinChange(coins []int, amount int) int {
-	dp := make([]int, amount+1)
-	for i := 1; i < amount+1; i++ {
+func coinChange(coins []int, target int) int {
+	dp := make([]int, target+1)
+	for i := 1; i < target+1; i++ {
 		dp[i] = math.MaxInt
 	}
 
-	for _, c := range coins { //
-		for a := 1; a < amount+1; a++ {
-			if a-c >= 0 && dp[a-c] != math.MaxInt {
-				dp[a] = min(dp[a], 1+dp[a-c])
+	for amount := 1; amount < target+1; amount++ { // loop order can be swapped
+		for _, coin := range coins {
+			if amount-coin >= 0 && dp[amount-coin] != math.MaxInt {
+				dp[amount] = min(dp[amount], 1+dp[amount-coin])
 			}
 		}
 	}
 
-	if dp[amount] == math.MaxInt {
+	if dp[target] == math.MaxInt {
 		return -1
 	} else {
-		return dp[amount]
+		return dp[target]
 	}
 }
 
@@ -138,7 +138,7 @@ func coinChange1DDP(coins []int, amount int) int {
 }
 
 /**
- * 518. Coin Change II
+ * 518. Coin Change II => 39. Combination Sum
  *
  * Return the number of combinations that make up that amount.
  * If that amount of money cannot be made up by any combination of the coins, return 0.

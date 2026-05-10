@@ -31,6 +31,7 @@ func combinationSum(candidates []int, target int) [][]int {
 			for _, combo := range dp[amount-candidate] {
 				// deep copy existing combo, append current candidate
 				newCombo := append([]int{}, combo...)
+
 				newCombo = append(newCombo, candidate)
 				dp[amount] = append(dp[amount], newCombo)
 			}
@@ -41,7 +42,7 @@ func combinationSum(candidates []int, target int) [][]int {
 }
 
 /**
- * 377. Combination Sum IV
+ * 377. Combination Sum IV <- permutations
  *
  * dp[amount] += dp[amount - num]
  *
