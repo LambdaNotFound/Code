@@ -1,5 +1,7 @@
 package dynamic_programming
 
+import "math"
+
 /**
  * 55. Jump Game
  *
@@ -23,4 +25,24 @@ func canJump(nums []int) bool {
 		}
 	}
 	return table[len(nums)-1]
+}
+
+/**
+ * 45. Jump Game II
+ */
+func jump(nums []int) int {
+	n := len(nums)
+	dp := make([]int, n)
+	for i := range dp {
+		dp[i] = math.MaxInt
+	}
+	dp[0] = 0
+
+	for i := 0; i < n; i++ {
+		for j := 1; j <= nums[i] && i+j < n; j++ {
+			dp[i+j] = min(dp[i+j], dp[i]+1)
+
+		}
+	}
+	return dp[n-1]
 }

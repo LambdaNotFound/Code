@@ -215,22 +215,40 @@ func pathSum(root *TreeNode, targetSum int) int {
 /**
  * 523. Continuous Subarray Sum
  *
- * its length is at least two, and
- * the sum of the elements of the subarray is a multiple of k.
+ * its length is at least two, and the sum of the elements of the subarray is a multiple of k.
+ *
+ * Math: (a - b) % k == 0  ↔  a % k == b % k
  */
 func checkSubarraySum(nums []int, k int) bool {
-	remainderToIndex := map[int]int{0: -1} // remainder -> earliest index where this remainder was seen
 	prefixSum := 0
+	remainderToIndex := map[int]int{0: -1} // remainder -> earliest index where this remainder was seen
 
 	for i, num := range nums {
 		prefixSum += num
 		remainder := prefixSum % k
-		if firstIdx, found := remainderToIndex[remainder]; found { // subarray nums[firstIdx+1 .. i] has length i - firstIdx
-			if i-firstIdx >= 2 {
+		if firstIdx, found := remainderToIndex[remainder]; found {
+			if i-firstIdx >= 2 { // subarray nums[firstIdx+1 .. i] has length i - firstIdx
 				return true
 			}
 		} else {
 			remainderToIndex[remainder] = i
+		}
+	}
+	return false
+}
+
+func checkSubarraySumNaive(nums []int, k int) bool {
+	n := len(nums)
+	prefixSum := make([]int, n+1)
+	for i := 1; i <= n; i++ {
+		prefixSum[i] = prefixSum[i-1] + nums[i-1]
+	}
+
+	for i := 0; i <= n; i++ {
+		for j := i + 2; j <= n; j++ {
+			if (prefixSum[j]-prefixSum[i])%k == 0 {
+				return true
+			}
 		}
 	}
 	return false
