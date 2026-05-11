@@ -2,6 +2,7 @@ package interview
 
 import "fmt"
 
+// interface defines behaviors
 type ITask interface {
 	ID() string
 	Complete()

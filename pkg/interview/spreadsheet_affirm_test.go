@@ -3,10 +3,8 @@ package interview
 import (
 	"os"
 	"testing"
-	"time"
 )
 
-// helper to create a temp CSV file for testing
 func createTempFile(t *testing.T, content string) string {
 	t.Helper()
 	f, err := os.CreateTemp("", "spreadsheet_test_*.txt")
@@ -26,11 +24,6 @@ purple	2006/05/11	1
 white	2019/02/17	200
 green	2002/02/23	28`
 
-func mustDate(s string) time.Time {
-	t, _ := time.Parse("2006/01/02", s)
-	return t
-}
-
 func TestFilter(t *testing.T) {
 	filename := createTempFile(t, sampleCSV)
 	defer os.Remove(filename)
@@ -41,94 +34,106 @@ func TestFilter(t *testing.T) {
 	}
 
 	tests := []struct {
-		name      string
-		condition Condition
-		want      []Row
+		name string
+		pred Predicate
+		want []Row
 	}{
 		{
-			name:      "color equals green",
-			condition: Condition{"color", "=", "green"},
+			name: "color equals green",
+			pred: NewPredicate("color", "=", "green"),
 			want: []Row{
-				{Color: "green", Date: mustDate("2001/02/23"), Number: 8},
-				{Color: "green", Date: mustDate("2002/02/23"), Number: 28},
+				{"color": "green", "date": "2001/02/23", "number": "8"},
+				{"color": "green", "date": "2002/02/23", "number": "28"},
 			},
 		},
 		{
-			name:      "color not equals green",
-			condition: Condition{"color", "!=", "green"},
+			name: "color not equals green",
+			pred: NewPredicate("color", "!=", "green"),
 			want: []Row{
-				{Color: "purple", Date: mustDate("2006/05/11"), Number: 1},
-				{Color: "white", Date: mustDate("2019/02/17"), Number: 200},
+				{"color": "purple", "date": "2006/05/11", "number": "1"},
+				{"color": "white", "date": "2019/02/17", "number": "200"},
 			},
 		},
 		{
-			name:      "number less than 5",
-			condition: Condition{"number", "<", "5"},
+			name: "number less than 5",
+			pred: NewPredicate("number", "<", "5"),
 			want: []Row{
-				{Color: "purple", Date: mustDate("2006/05/11"), Number: 1},
+				{"color": "purple", "date": "2006/05/11", "number": "1"},
 			},
 		},
 		{
-			name:      "number greater than or equal to 8",
-			condition: Condition{"number", ">=", "8"},
+			name: "number greater than or equal to 8",
+			pred: NewPredicate("number", ">=", "8"),
 			want: []Row{
-				{Color: "green", Date: mustDate("2001/02/23"), Number: 8},
-				{Color: "white", Date: mustDate("2019/02/17"), Number: 200},
-				{Color: "green", Date: mustDate("2002/02/23"), Number: 28},
+				{"color": "green", "date": "2001/02/23", "number": "8"},
+				{"color": "white", "date": "2019/02/17", "number": "200"},
+				{"color": "green", "date": "2002/02/23", "number": "28"},
 			},
 		},
 		{
-			name:      "date after 2005",
-			condition: Condition{"date", ">", "2005/01/01"},
+			name: "date equals specific date",
+			pred: NewPredicate("date", "=", "2019/02/17"),
 			want: []Row{
-				{Color: "purple", Date: mustDate("2006/05/11"), Number: 1},
-				{Color: "white", Date: mustDate("2019/02/17"), Number: 200},
+				{"color": "white", "date": "2019/02/17", "number": "200"},
 			},
 		},
 		{
-			name:      "date equals specific date",
-			condition: Condition{"date", "=", "2019/02/17"},
+			name: "no match returns nil",
+			pred: NewPredicate("color", "=", "blue"),
+			want: nil,
+		},
+		{
+			name: "unknown column returns nil",
+			pred: NewPredicate("unknown", "=", "foo"),
+			want: nil,
+		},
+		{
+			name: "AND: green and number > 5",
+			pred: AndPredicate{[]Predicate{
+				NewPredicate("color", "=", "green"),
+				NewPredicate("number", ">", "5"),
+			}},
 			want: []Row{
-				{Color: "white", Date: mustDate("2019/02/17"), Number: 200},
+				{"color": "green", "date": "2001/02/23", "number": "8"},
+				{"color": "green", "date": "2002/02/23", "number": "28"},
 			},
 		},
 		{
-			name:      "no match returns empty",
-			condition: Condition{"color", "=", "blue"},
-			want:      nil,
-		},
-		{
-			name:      "unknown column returns empty",
-			condition: Condition{"unknown", "=", "foo"},
-			want:      nil,
-		},
-		{
-			name:      "invalid date value returns empty",
-			condition: Condition{"date", ">", "not-a-date"},
-			want:      nil,
+			name: "OR: green or white",
+			pred: OrPredicate{[]Predicate{
+				NewPredicate("color", "=", "green"),
+				NewPredicate("color", "=", "white"),
+			}},
+			want: []Row{
+				{"color": "green", "date": "2001/02/23", "number": "8"},
+				{"color": "white", "date": "2019/02/17", "number": "200"},
+				{"color": "green", "date": "2002/02/23", "number": "28"},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := sheet.Filter(tt.condition)
+			got := sheet.Filter(tt.pred)
 			if !rowsEqual(got, tt.want) {
-				t.Errorf("\ncondition: %+v\ngot:  %+v\nwant: %+v", tt.condition, got, tt.want)
+				t.Errorf("\npred: %+v\ngot:  %+v\nwant: %+v", tt.pred, got, tt.want)
 			}
 		})
 	}
 }
 
-// rowsEqual compares two Row slices for deep equality
 func rowsEqual(a, b []Row) bool {
 	if len(a) != len(b) {
 		return false
 	}
 	for i := range a {
-		if a[i].Color != b[i].Color ||
-			!a[i].Date.Equal(b[i].Date) ||
-			a[i].Number != b[i].Number {
+		if len(a[i]) != len(b[i]) {
 			return false
+		}
+		for k, v := range a[i] {
+			if b[i][k] != v {
+				return false
+			}
 		}
 	}
 	return true

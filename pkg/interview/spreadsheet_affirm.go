@@ -7,22 +7,119 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
-// -------- Typed Row Struct --------
+/**
+ *
+ * The Strategy Pattern
+ *
+ * The core idea: define an interface for a behavior, then swap in different implementations without changing the caller.
+ *
+ * In this code, the "behavior" is filtering a row:
+ *
+ *
+ * Predicate interface        ← the strategy contract
+ *    Match(row Row) bool
+ *
+ * EqualPredicate             ← concrete strategy A
+ * NumericPredicate           ← concrete strategy B
+ * AndPredicate               ← concrete strategy C (composes others)
+ * SpreadSheet.Filter only knows about Predicate — it never asks "are you an EqualPredicate or a NumericPredicate?" It just calls Match. This means:
+ *
+ *
+ * // These three lines look identical to Filter — it doesn't care which strategy is used
+ * sheet.Filter(NewPredicate("color", "=", "green"))
+ * sheet.Filter(NewPredicate("number", ">", "5"))
+ * sheet.Filter(AndPredicate{...})
+ *
+ */
 
-type Row struct {
-	Color  string
-	Date   time.Time
-	Number float64
-}
+// -------- Row --------
+
+type Row map[string]string
 
 type SpreadSheet struct {
-	Rows []Row
+	Headers []string
+	Rows    []Row
 }
 
-// -------- Constructor --------
+// -------- Predicate (Strategy + Composite) --------
+
+type Predicate interface {
+	Match(row Row) bool
+}
+
+type EqualPredicate struct{ Col, Val string }
+
+func (p EqualPredicate) Match(row Row) bool { return row[p.Col] == p.Val }
+
+type NotEqualPredicate struct{ Col, Val string }
+
+func (p NotEqualPredicate) Match(row Row) bool { return row[p.Col] != p.Val }
+
+// NumericPredicate handles ordering comparisons for numeric columns.
+type NumericPredicate struct {
+	Col string
+	Op  string
+	Val float64
+}
+
+func (p NumericPredicate) Match(row Row) bool {
+	v, err := strconv.ParseFloat(row[p.Col], 64)
+	if err != nil {
+		return false
+	}
+	switch p.Op {
+	case "<":
+		return v < p.Val
+	case "<=":
+		return v <= p.Val
+	case ">":
+		return v > p.Val
+	case ">=":
+		return v >= p.Val
+	}
+	return false
+}
+
+// AndPredicate / OrPredicate compose any predicates without touching existing code.
+type AndPredicate struct{ Preds []Predicate }
+
+func (p AndPredicate) Match(row Row) bool {
+	for _, pred := range p.Preds {
+		if !pred.Match(row) {
+			return false
+		}
+	}
+	return true
+}
+
+type OrPredicate struct{ Preds []Predicate }
+
+func (p OrPredicate) Match(row Row) bool {
+	for _, pred := range p.Preds {
+		if pred.Match(row) {
+			return true
+		}
+	}
+	return false
+}
+
+// NewPredicate is a factory that builds a predicate from a [col, op, val] triple.
+func NewPredicate(col, op, val string) Predicate {
+	switch op {
+	case "=":
+		return EqualPredicate{col, val}
+	case "!=":
+		return NotEqualPredicate{col, val}
+	case "<", "<=", ">", ">=":
+		v, _ := strconv.ParseFloat(val, 64)
+		return NumericPredicate{col, op, v}
+	}
+	return nil
+}
+
+// -------- SpreadSheet --------
 
 func NewSpreadSheet(filename string) (*SpreadSheet, error) {
 	f, err := os.Open(filename)
@@ -33,146 +130,58 @@ func NewSpreadSheet(filename string) (*SpreadSheet, error) {
 
 	scanner := bufio.NewScanner(f)
 
-	// Skip header line
 	if !scanner.Scan() {
 		return nil, fmt.Errorf("empty file")
 	}
+	headers := strings.Fields(scanner.Text())
 
 	var rows []Row
 	for scanner.Scan() {
-		line := scanner.Text()
-		fields := strings.Fields(line) // splits on any whitespace
-		if len(fields) < 3 {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) != len(headers) {
 			continue
 		}
-
-		date, err := time.Parse("2006/01/02", fields[1])
-		if err != nil {
-			return nil, fmt.Errorf("invalid date %q: %w", fields[1], err)
+		row := Row{}
+		for i, h := range headers {
+			row[h] = fields[i]
 		}
-
-		number, err := strconv.ParseFloat(fields[2], 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid number %q: %w", fields[2], err)
-		}
-
-		rows = append(rows, Row{
-			Color:  fields[0],
-			Date:   date,
-			Number: number,
-		})
+		rows = append(rows, row)
 	}
 
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
 
-	return &SpreadSheet{Rows: rows}, nil
+	return &SpreadSheet{Headers: headers, Rows: rows}, nil
 }
 
-// -------- Filter --------
-
-type Condition struct {
-	Column string
-	Op     string
-	Value  string
-}
-
-func (s *SpreadSheet) Filter(cond Condition) []Row {
+func (s *SpreadSheet) Filter(pred Predicate) []Row {
 	var result []Row
 	for _, row := range s.Rows {
-		if rowMatches(row, cond) {
+		if pred.Match(row) {
 			result = append(result, row)
 		}
 	}
 	return result
 }
 
-func rowMatches(row Row, cond Condition) bool {
-	switch cond.Column {
-	case "color":
-		return compareString(row.Color, cond.Op, cond.Value)
-
-	case "date":
-		filterDate, err := time.Parse("2006/01/02", cond.Value)
-		if err != nil {
-			return false
-		}
-		return compareDate(row.Date, cond.Op, filterDate)
-
-	case "number":
-		filterNum, err := strconv.ParseFloat(cond.Value, 64)
-		if err != nil {
-			return false
-		}
-		return compareFloat(row.Number, cond.Op, filterNum)
-	}
-	return false
-}
-
-// -------- Comparators --------
-
-func compareString(a, op, b string) bool {
-	switch op {
-	case "=":
-		return a == b
-	case "!=":
-		return a != b
-	}
-	return false
-}
-
-func compareDate(a time.Time, op string, b time.Time) bool {
-	switch op {
-	case "=":
-		return a.Equal(b)
-	case "!=":
-		return !a.Equal(b)
-	case "<":
-		return a.Before(b)
-	case "<=":
-		return a.Before(b) || a.Equal(b)
-	case ">":
-		return a.After(b)
-	case ">=":
-		return a.After(b) || a.Equal(b)
-	}
-	return false
-}
-
-func compareFloat(a float64, op string, b float64) bool {
-	switch op {
-	case "=":
-		return a == b
-	case "!=":
-		return a != b
-	case "<":
-		return a < b
-	case "<=":
-		return a <= b
-	case ">":
-		return a > b
-	case ">=":
-		return a >= b
-	}
-	return false
-}
-
 // -------- Pretty Print --------
 
-func printRows(rows []Row) {
-	fmt.Printf("%-12s %-12s %-8s\n", "color", "date", "number")
-	fmt.Println(strings.Repeat("-", 34))
+func printRows(rows []Row, headers []string) {
+	for _, h := range headers {
+		fmt.Printf("%-14s", h)
+	}
+	fmt.Println()
+	fmt.Println(strings.Repeat("-", 14*len(headers)))
 	for _, row := range rows {
-		fmt.Printf("%-12s %-12s %-8.0f\n",
-			row.Color,
-			row.Date.Format("2006/01/02"),
-			row.Number,
-		)
+		for _, h := range headers {
+			fmt.Printf("%-14s", row[h])
+		}
+		fmt.Println()
 	}
 }
 
-// -------- Main --------
+// -------- Demo --------
 
 func main() {
 	sheet, err := NewSpreadSheet("../fixtures/file.txt")
@@ -181,11 +190,20 @@ func main() {
 	}
 
 	fmt.Println("=== color = green ===")
-	printRows(sheet.Filter(Condition{"color", "=", "green"}))
+	printRows(sheet.Filter(NewPredicate("color", "=", "green")), sheet.Headers)
 
 	fmt.Println("\n=== number < 5 ===")
-	printRows(sheet.Filter(Condition{"number", "<", "5"}))
+	printRows(sheet.Filter(NewPredicate("number", "<", "5")), sheet.Headers)
 
-	fmt.Println("\n=== date > 2005/01/01 ===")
-	printRows(sheet.Filter(Condition{"date", ">", "2005/01/01"}))
+	fmt.Println("\n=== color = green AND number > 5 ===")
+	printRows(sheet.Filter(AndPredicate{[]Predicate{
+		NewPredicate("color", "=", "green"),
+		NewPredicate("number", ">", "5"),
+	}}), sheet.Headers)
+
+	fmt.Println("\n=== color = green OR color = white ===")
+	printRows(sheet.Filter(OrPredicate{[]Predicate{
+		NewPredicate("color", "=", "green"),
+		NewPredicate("color", "=", "white"),
+	}}), sheet.Headers)
 }
