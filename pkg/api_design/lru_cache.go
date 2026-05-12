@@ -4,6 +4,7 @@ package apidesign
  * 146. LRU Cache
  *
  * 1. hashmap + doubly linked list
+ *     dummy node for head & tail
  * 2. container/list
  */
 type DoublyLinkedList struct {
@@ -21,7 +22,7 @@ type LRUCache struct {
 }
 
 func ConstructorLRUCache(capacity int) LRUCache {
-	head := &DoublyLinkedList{key: 0, val: 0}
+	head := &DoublyLinkedList{key: 0, val: 0} // dummy node
 	tail := &DoublyLinkedList{key: 0, val: 0}
 	head.next = tail
 	tail.prev = head
@@ -34,18 +35,16 @@ func ConstructorLRUCache(capacity int) LRUCache {
 }
 
 func (l *LRUCache) remove(node *DoublyLinkedList) {
-	prev := node.prev
-	next := node.next
-	prev.next = next
-	next.prev = prev
+	prev, next := node.prev, node.next
+	prev.next, next.prev = next, prev
 }
 
 func (l *LRUCache) insert(node *DoublyLinkedList) {
-	headNext := l.head.next
+	oldHead := l.head.next
 	l.head.next = node
 	node.prev = l.head
-	node.next = headNext
-	headNext.prev = node
+	node.next = oldHead
+	oldHead.prev = node
 }
 
 func (l *LRUCache) Get(key int) int {
@@ -59,17 +58,17 @@ func (l *LRUCache) Get(key int) int {
 
 func (l *LRUCache) Put(key int, value int) {
 	if node, ok := l.cache[key]; ok {
-		l.remove(node)
 		node.val = value
+		l.remove(node)
 		l.insert(node)
 	} else {
 		newNode := &DoublyLinkedList{key: key, val: value}
 		l.cache[key] = newNode
 		l.insert(newNode)
 		if len(l.cache) > l.capacity {
-			lru := l.tail.prev
-			l.remove(lru)
-			delete(l.cache, lru.key)
+			tail := l.tail.prev
+			l.remove(tail)
+			delete(l.cache, tail.key)
 		}
 	}
 }
