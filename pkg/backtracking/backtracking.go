@@ -496,3 +496,36 @@ func letterCombinationsHelper(digits string, out string, res *[]string, dict []s
 		}
 	}
 }
+
+/**
+ * 1593. Split a String Into the Max Number of Unique Substrings
+ *
+ * Given a string s, return the maximum number of unique substrings that the given string can be split into.
+ *
+ */
+func maxUniqueSplit(s string) int {
+	used := make(map[string]bool)
+	res := 0
+
+	var backtrack func(str string, count int)
+	backtrack = func(str string, count int) {
+		if len(str) == 0 {
+			res = max(res, count)
+			return
+		}
+
+		for i := 1; i <= len(str); i++ {
+			substr := str[:i]
+			if used[substr] {
+				continue
+			}
+
+			used[substr] = true
+			backtrack(str[i:], count+1)
+			used[substr] = false
+		}
+	}
+	backtrack(s, 0)
+
+	return res
+}
