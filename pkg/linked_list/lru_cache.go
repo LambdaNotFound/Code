@@ -11,16 +11,16 @@ import "container/list"
  *        FILO stack  PushBack(), Back(), Remove()
  */
 type LRUCache struct {
-	capcity int
-	hashmap map[int]*list.Element
 	list    *list.List
+	capcity int
+	cache   map[int]*list.Element
 }
 
 func Constructor(capacity int) LRUCache {
 	return LRUCache{
-		capcity: capacity,
-		hashmap: make(map[int]*list.Element),
 		list:    list.New(),
+		capcity: capacity,
+		cache:   make(map[int]*list.Element),
 	}
 }
 
@@ -29,31 +29,29 @@ type entry struct {
 }
 
 func (l *LRUCache) Get(key int) int {
-	e, found := l.hashmap[key]
-	if !found {
+	if e, found := l.cache[key]; found {
+		l.list.Remove(e)
+		newElem := l.list.PushFront(e.Value) // new element, new pointer
+		l.cache[key] = newElem               // must! Remove + PushFront destroy ptr
+		return e.Value.(entry).val
+	} else {
 		return -1
 	}
-
-	l.list.Remove(e)
-	newElem := l.list.PushFront(e.Value) // new element, new pointer
-	l.hashmap[key] = newElem             // ← must update hashmap!
-	return e.Value.(entry).val
 }
 
 func (l *LRUCache) Put(key int, value int) {
-	if e, found := l.hashmap[key]; found {
+	if e, found := l.cache[key]; found {
 		l.list.Remove(e)
 		newElem := l.list.PushFront(entry{key: key, val: value})
-		l.hashmap[key] = newElem
-		return
-	}
+		l.cache[key] = newElem
+	} else {
+		item := l.list.PushFront(entry{key: key, val: value})
+		l.cache[key] = item
 
-	if l.list.Len() == l.capcity {
-		last := l.list.Back()
-		l.list.Remove(last)
-		delete(l.hashmap, last.Value.(entry).key)
+		if l.list.Len() > l.capcity {
+			last := l.list.Back()
+			l.list.Remove(last)
+			delete(l.cache, last.Value.(entry).key)
+		}
 	}
-
-	item := l.list.PushFront(entry{key: key, val: value})
-	l.hashmap[key] = item
 }
