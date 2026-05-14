@@ -305,10 +305,15 @@ func largestNumber(nums []int) string {
 func removeDuplicates(s string) string {
 	stack := []rune{}
 	for _, c := range s {
-		if len(stack) > 0 && stack[len(stack)-1] == c {
-			stack = stack[:len(stack)-1]
-		} else {
-			stack = append(stack, c)
+		stack = append(stack, c)
+		if len(stack) >= 2 {
+			i := len(stack) - 2
+			for i < len(stack) && stack[i] == stack[len(stack)-1] {
+				i++
+			}
+			if i == len(stack) {
+				stack = stack[:len(stack)-2]
+			}
 		}
 	}
 	return string(stack)
