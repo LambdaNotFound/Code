@@ -83,3 +83,13 @@ func (g *Game) playRound() {
 	}
 	winner.WinPile = append(winner.WinPile, roundCards...)
 }
+
+// Works for N=2 and N=any — just loops over g.players
+func (g *Game) allHaveCards() bool {
+	for _, p := range g.players {
+		if len(p.Hand) == 0 {
+			return false
+		}
+	}
+	return true
+}
