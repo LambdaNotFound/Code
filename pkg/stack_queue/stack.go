@@ -149,14 +149,13 @@ func removeDuplicateLetters(s string) string {
 func removeDuplicates(s string, k int) string {
 	stack := []rune{}
 	for _, r := range s {
-		stack = append(stack, r)
+		stack = append(stack, r) // must push first, ("aaaa", 2) => ""
 		if len(stack) >= k {
 			i := len(stack) - k
 			// check if last k runes from the stack are the same
 			for i < len(stack) && stack[i] == stack[len(stack)-1] {
 				i++
 			}
-			// if so, remove them
 			if i == len(stack) {
 				stack = stack[:len(stack)-k]
 			}

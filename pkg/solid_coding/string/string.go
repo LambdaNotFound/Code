@@ -125,8 +125,7 @@ func longestPalindromeLength(s string) int {
  * 49. Group Anagrams
  */
 func groupAnagrams(strs []string) [][]string {
-	var sortRunes func(string) string
-	sortRunes = func(s string) string {
+	sortRunes := func(s string) string { // sortBytes = func(s string) string {
 		runes := []rune(s)
 		sort.Slice(runes, func(i, j int) bool {
 			return runes[i] < runes[j]
@@ -263,17 +262,18 @@ func longestPalindrome(s string) int {
  * 14. Longest Common Prefix
  */
 func longestCommonPrefix(strs []string) string {
-	res := ""
-	for i := 0; i < len(strs[0]); i++ {
-		char := strs[0][i]
-		for j := 1; j < len(strs); j++ {
-			if i >= len(strs[j]) || strs[j][i] != char {
-				return res // ← return immediately on mismatch
+	if len(strs) == 0 {
+		return ""
+	}
+	for pos := 0; pos < len(strs[0]); pos++ {
+		ch := strs[0][pos]
+		for _, str := range strs[1:] {
+			if pos >= len(str) || str[pos] != ch {
+				return strs[0][:pos]
 			}
 		}
-		res += string(char)
 	}
-	return res
+	return strs[0]
 }
 
 /**

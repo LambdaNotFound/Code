@@ -242,3 +242,36 @@ func isPalindrome(s string) bool {
 	}
 	return true
 }
+
+/**
+ * 408. Valid Word Abbreviation
+ *
+ * For example, "substitution" could be abbreviated as:
+ *
+ * "s10n" → s + ubstitutio + n
+ * "sub4u4" → sub + stit + u + tion
+ *
+ * Time O(n) — single pass over abbr
+ * Space O(1)
+ */
+func validWordAbbreviation(word string, abbr string) bool {
+	wordPtr, num := 0, 0
+
+	for _, ch := range abbr {
+		if ch >= '0' && ch <= '9' {
+			if num == 0 && ch == '0' {
+				return false // leading zero
+			}
+			num = num*10 + int(ch-'0')
+		} else {
+			wordPtr += num
+			num = 0
+			if wordPtr >= len(word) || word[wordPtr] != byte(ch) {
+				return false
+			}
+			wordPtr++
+		}
+	}
+
+	return wordPtr+num == len(word)
+}

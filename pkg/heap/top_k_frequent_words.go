@@ -22,7 +22,6 @@ func topKFrequentWords(words []string, k int) []string {
 			if a.freq == b.freq {
 				return a.str > b.str
 			}
-
 			return a.freq < b.freq
 		},
 	}
