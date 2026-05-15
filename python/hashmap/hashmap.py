@@ -1,3 +1,5 @@
+from typing import List
+
 """
 1. Two Sum
 """

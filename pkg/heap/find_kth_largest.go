@@ -31,10 +31,10 @@ func (h *IntHeap) Len() int           { return len(h.items) }
 func (h *IntHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
 func (h *IntHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
 
-func (h *IntHeap) Push(i interface{}) {
+func (h *IntHeap) Push(i any) {
 	h.items = append(h.items, i.(int))
 }
-func (h *IntHeap) Pop() interface{} {
+func (h *IntHeap) Pop() any {
 	item := h.items[len(h.items)-1]
 	h.items = h.items[:len(h.items)-1]
 	return item
