@@ -1,6 +1,44 @@
 package unionfind
 
 /**
+ * Union Find Template (string nodes)
+ *
+ * To finalize the map, call find on every node after all unions:
+ *
+ * for x := range parent {
+ *     find(x)
+ * }
+ *
+ */
+func unionFindString(graph [][2]string) {
+	parent := map[string]string{}
+
+	var find func(x string) string
+	find = func(x string) string {
+		if _, ok := parent[x]; !ok {
+			parent[x] = x
+		}
+		if x != parent[x] {
+			parent[x] = find(parent[x])
+		}
+		return parent[x]
+	}
+
+	union := func(x, y string) bool {
+		rootX, rootY := find(x), find(y)
+		if rootX == rootY {
+			return false
+		}
+		parent[rootX] = rootY
+		return true
+	}
+
+	for _, edge := range graph {
+		union(edge[0], edge[1])
+	}
+}
+
+/**
  * Union Find Template
  */
 func unionFind(n int, graph [][2]int) {
