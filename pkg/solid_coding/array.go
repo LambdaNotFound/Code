@@ -16,8 +16,9 @@ package solid_coding
  *
  */
 func firstMissingPositive(nums []int) int {
+	n := len(nums)
 	for i := range nums { // nums[i] != nums[nums[i]-1], Input: [1,1] => infinite loop
-		for nums[i]-1 >= 0 && nums[i]-1 < len(nums) && nums[i] != i+1 && nums[i] != nums[nums[i]-1] {
+		for nums[i]-1 >= 0 && nums[i]-1 < n && nums[i] != nums[nums[i]-1] {
 			nums[i], nums[nums[i]-1] = nums[nums[i]-1], nums[i]
 		}
 	}
@@ -27,7 +28,7 @@ func firstMissingPositive(nums []int) int {
 			return i + 1
 		}
 	}
-	return len(nums) + 1
+	return n + 1
 }
 
 /**

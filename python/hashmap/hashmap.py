@@ -16,24 +16,15 @@ class Solution:
 """
 383. Ransom Note
 """
-from collections import Counter
+from collections import defaultdict
 class Solution:
     def canConstruct(self, ransomNote: str, magazine: str) -> bool:
-        counts = Counter(magazine)
+        counts = defaultdict(int)
+        for ch in magazine:
+            counts[ch] += 1
+
         for ch in ransomNote:
             if counts[ch] > 0:
-                counts[ch] -= 1
-            else:
-                return False
-        return True
-
-    def canConstruct2(self, ransomNote: str, magazine: str) -> bool:
-        counts: dict[str, int] = {}
-        for ch in magazine:
-            counts[ch] = counts.get(ch, 0) + 1
-
-        for ch in ransomNote:
-            if counts.get(ch, 0) > 0:
                 counts[ch] -= 1
             else:
                 return False
