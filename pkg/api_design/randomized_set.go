@@ -9,28 +9,28 @@ import "math/rand"
  */
 
 type RandomizedSet struct {
-	nums     []int
-	indexMap map[int]int // val → index in nums
+	nums    []int
+	indices map[int]int // val → index in nums
 }
 
 func ConstructorRandomizedSet() RandomizedSet {
 	return RandomizedSet{
-		nums:     make([]int, 0),
-		indexMap: make(map[int]int),
+		nums:    make([]int, 0),
+		indices: make(map[int]int),
 	}
 }
 
 func (rs *RandomizedSet) Insert(val int) bool {
-	if _, exists := rs.indexMap[val]; exists {
+	if _, exists := rs.indices[val]; exists {
 		return false
 	}
 	rs.nums = append(rs.nums, val)
-	rs.indexMap[val] = len(rs.nums) - 1
+	rs.indices[val] = len(rs.nums) - 1
 	return true
 }
 
 func (rs *RandomizedSet) Remove(val int) bool {
-	idx, exists := rs.indexMap[val]
+	idx, exists := rs.indices[val]
 	if !exists {
 		return false
 	}
@@ -38,11 +38,11 @@ func (rs *RandomizedSet) Remove(val int) bool {
 	// swap val with last element
 	last := rs.nums[len(rs.nums)-1]
 	rs.nums[idx] = last
-	rs.indexMap[last] = idx
+	rs.indices[last] = idx
 
 	// remove last element
 	rs.nums = rs.nums[:len(rs.nums)-1]
-	delete(rs.indexMap, val)
+	delete(rs.indices, val)
 
 	return true
 }

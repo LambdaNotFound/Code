@@ -1,4 +1,4 @@
-package interview
+package oodesign
 
 import "sync"
 

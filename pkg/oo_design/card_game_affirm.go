@@ -1,5 +1,7 @@
 package oodesign
 
+import "math/rand/v2"
+
 /** Card Game
 
 Game
@@ -47,6 +49,22 @@ func (g *Game) Play() string {
 		g.playRound()
 	}
 	return g.winner()
+}
+
+func deal(numCards int, players []*Player) {
+	// Create and shuffle deck
+	deck := make([]int, numCards)
+	for i := range deck {
+		deck[i] = i + 1
+	}
+	rand.Shuffle(len(deck), func(i, j int) {
+		deck[i], deck[j] = deck[j], deck[i]
+	})
+
+	// Deal cards round-robin
+	for i, card := range deck {
+		players[i%len(players)].Hand = append(players[i%len(players)].Hand, card)
+	}
 }
 
 // Single responsibility: Each method does one thing: deal, play a round, find winner

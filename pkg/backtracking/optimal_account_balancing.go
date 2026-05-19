@@ -58,7 +58,7 @@ func minTransfers(transactions [][]int) int {
 			return 0
 		}
 
-		minTx := math.MaxInt
+		result := math.MaxInt
 		for j := start + 1; j < len(balances); j++ {
 			// pruning: skip same sign — can't settle debt with debt
 			if balances[start]*balances[j] > 0 {
@@ -67,11 +67,16 @@ func minTransfers(transactions [][]int) int {
 
 			// settle balances[start] against balances[j]
 			balances[j] += balances[start] // apply
-			minTx = min(minTx, 1+dfs(start+1))
+			result = min(result, 1+dfs(start+1))
 			balances[j] -= balances[start] // undo
+
+			// perfect cancellation — can't do better
+			if balances[j]+balances[start] == 0 {
+				break
+			}
 		}
 
-		return minTx
+		return result
 	}
 
 	return dfs(0)

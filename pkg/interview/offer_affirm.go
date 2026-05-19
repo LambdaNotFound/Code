@@ -87,19 +87,19 @@ func testOffer() {
 
 	events := []RedeemEvent{
 		// user1: redeemed o1 twice → 1 left, redeemed o2 twice → at limit
-		{UserID: "user1", OfferID: "o1"},
-		{UserID: "user1", OfferID: "o1"},
-		{UserID: "user1", OfferID: "o2"},
-		{UserID: "user1", OfferID: "o2"},
+		{UserID: "user1", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
+		{UserID: "user1", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
+		{UserID: "user1", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o2"},
+		{UserID: "user1", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o2"},
 
 		// user2: redeemed o1 three times then unredeemed once → count=2, 1 left
-		{UserID: "user2", OfferID: "o1"},
-		{UserID: "user2", OfferID: "o1"},
-		{UserID: "user2", OfferID: "o1"},
-		{UserID: "user2", OfferID: "o1"},
+		{UserID: "user2", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
+		{UserID: "user2", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
+		{UserID: "user2", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
+		{UserID: "user2", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o1"},
 
 		// user1: redeemed o3 but it's expired → should not appear
-		{UserID: "user1", OfferID: "o3"},
+		{UserID: "user1", Time: time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC), OfferID: "o3"},
 	}
 
 	userCounts := buildRedeemCounts(events)

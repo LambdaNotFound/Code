@@ -1,4 +1,4 @@
-package interview
+package oodesign
 
 import (
 	"sync"
@@ -190,7 +190,7 @@ func Test_canPurchase(t *testing.T) {
 			name:     "discount_makes_purchase_possible",
 			gems:     map[Color]int{Blue: 1, Red: 2},
 			hand:     []*Card{newCard(Blue, nil), newCard(Blue, nil)}, // 2 Blue discount
-			cardCost: map[Color]int{Blue: 3, Red: 2},                 // effective Blue: 1
+			cardCost: map[Color]int{Blue: 3, Red: 2},                  // effective Blue: 1
 			expected: true,
 		},
 		{
@@ -222,14 +222,14 @@ func Test_canPurchase(t *testing.T) {
 
 func Test_purchase(t *testing.T) {
 	testCases := []struct {
-		name          string
-		startGems     map[Color]int
-		hand          []*Card
-		cardCost      map[Color]int
-		cardColor     Color
-		wantOk        bool
-		wantGems      map[Color]int // gems after the call
-		wantHandLen   int
+		name        string
+		startGems   map[Color]int
+		hand        []*Card
+		cardCost    map[Color]int
+		cardColor   Color
+		wantOk      bool
+		wantGems    map[Color]int // gems after the call
+		wantHandLen int
 	}{
 		{
 			name:        "successful_purchase_deducts_gems",
@@ -308,10 +308,10 @@ func Test_purchase(t *testing.T) {
 
 func Test_purchase_concurrent(t *testing.T) {
 	testCases := []struct {
-		name        string
-		gems        map[Color]int   // enough for exactly one purchase
-		cardCost    map[Color]int
-		goroutines  int
+		name       string
+		gems       map[Color]int // enough for exactly one purchase
+		cardCost   map[Color]int
+		goroutines int
 	}{
 		{
 			name:       "only_one_of_ten_succeeds",
