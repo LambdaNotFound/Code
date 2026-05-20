@@ -19,7 +19,7 @@ class Solution:
 from collections import defaultdict
 class Solution:
     def canConstruct(self, ransomNote: str, magazine: str) -> bool:
-        counts = defaultdict(int)
+        counts: defaultdict[int] = defaultdict(int)
         for ch in magazine:
             counts[ch] += 1
 

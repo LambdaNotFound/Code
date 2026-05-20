@@ -8,7 +8,7 @@ its own namespace to test both independently without touching the source.
 
 import os
 from typing import List, Optional
-from collections import Counter
+from collections import defaultdict
 
 import pytest
 
@@ -25,8 +25,8 @@ _ns1: dict = {"List": List}
 exec("\n".join(_lines[_class_starts[0] : _class_starts[1]]), _ns1)
 TwoSum = _ns1["Solution"]
 
-# Second Solution — canConstruct / canConstruct2; needs Counter
-_ns2: dict = {"Counter": Counter}
+# Second Solution — canConstruct; needs defaultdict
+_ns2: dict = {"defaultdict": defaultdict}
 exec("\n".join(_lines[_class_starts[1] :]), _ns2)
 RansomNote = _ns2["Solution"]
 
@@ -60,10 +60,10 @@ def test_two_sum(nums, target, want):
 
 # ── 383. Ransom Note ──────────────────────────────────────────────────────────
 
-# Both canConstruct (Counter-based) and canConstruct2 (manual dict) must behave
+# Both canConstruct (Counter-based) must behave
 # identically. We parametrize over the method name so every case runs twice.
 
-@pytest.mark.parametrize("method", ["canConstruct", "canConstruct2"])
+@pytest.mark.parametrize("method", ["canConstruct"])
 @pytest.mark.parametrize("ransom_note, magazine, want", [
     # name                          ransom_note     magazine        want
     # letter missing from magazine entirely
