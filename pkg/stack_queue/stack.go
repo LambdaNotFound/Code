@@ -113,33 +113,6 @@ func asteroidCollisionCalude(asteroids []int) []int {
 }
 
 /**
- * 316. Remove Duplicate Letters
- *
- * You must make sure your result is the smallest in lexicographical order among all possible results.
- */
-func removeDuplicateLetters(s string) string {
-	lastIndex := make(map[rune]int)
-	for i, c := range s {
-		lastIndex[c] = i
-	}
-
-	stk := []rune{}
-	seen := make(map[rune]bool)
-	for i, c := range s {
-		if !seen[c] {
-			for len(stk) > 0 && stk[len(stk)-1] > c && lastIndex[stk[len(stk)-1]] > i {
-				seen[stk[len(stk)-1]] = false
-				stk = stk[:len(stk)-1]
-			}
-			stk = append(stk, c)
-			seen[c] = true
-		}
-	}
-
-	return string(stk)
-}
-
-/**
  * 1209. Remove All Adjacent Duplicates in String II
  *
  * a k duplicate removal consists of choosing k adjacent and equal letters from s

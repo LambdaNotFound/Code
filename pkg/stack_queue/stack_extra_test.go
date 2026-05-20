@@ -54,22 +54,29 @@ func Test_asteroidCollision(t *testing.T) {
 	}
 }
 
-func Test_removeDuplicateLetters(t *testing.T) {
+func Test_minAddToMakeValid(t *testing.T) {
 	tests := []struct {
 		name     string
 		s        string
-		expected string
+		expected int
 	}{
-		{"leetcode_1", "bcabc", "abc"},
-		{"leetcode_2", "cbacdcbc", "acdb"},
-		{"single_char", "a", "a"},
-		{"all_same", "aaaa", "a"},
-		{"already_lex", "abc", "abc"},
+		{"already_valid", "()", 0},
+		{"already_valid_nested", "(())", 0},
+		{"missing_close", "(", 1},
+		{"missing_open", ")", 1},
+		{"both_missing", "())((", 3},
+		{"leetcode_1", "())", 1},
+		{"leetcode_2", "(()", 1},
+		{"empty", "", 0},
+		{"all_open", "((((", 4},
+		{"all_close", "))))", 4},
+		{"interleaved_invalid", "))((", 4},
+		{"mixed", "()))((", 4},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, removeDuplicateLetters(tt.s))
+			assert.Equal(t, tt.expected, minAddToMakeValid(tt.s))
 		})
 	}
 }
@@ -115,7 +122,7 @@ func Test_decodeString(t *testing.T) {
 
 		// Nesting
 		{"nested_repeat", "2[3[a]]", "aaaaaa"},
-		{"triple_nested", "2[3[2[a]]]", "aaaaaaaaaaaa"},  // 2*3*2 = 12 a's
+		{"triple_nested", "2[3[2[a]]]", "aaaaaaaaaaaa"}, // 2*3*2 = 12 a's
 		{"nested_diff", "2[a3[b]]", "abbbabbb"},
 
 		// Multiple adjacent groups

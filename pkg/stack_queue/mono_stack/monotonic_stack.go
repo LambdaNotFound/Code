@@ -243,9 +243,8 @@ func removeDuplicateLetters(s string) string {
 			stack = stack[:len(stack)-1]
 		}
 
-		stack = append(stack, s[i])
 		inStack[s[i]] = true
-
+		stack = append(stack, s[i])
 	}
 
 	return string(stack)
