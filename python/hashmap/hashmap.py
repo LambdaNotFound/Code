@@ -5,7 +5,7 @@ from typing import List
 """
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
-        complements: dict[int, int] = {}
+        complements: dict = {}
         for i, num in enumerate(nums):
             complement = target - num
             if complement in complements:
@@ -19,7 +19,7 @@ class Solution:
 from collections import defaultdict
 class Solution:
     def canConstruct(self, ransomNote: str, magazine: str) -> bool:
-        counts: defaultdict[int] = defaultdict(int)
+        counts: defaultdict = defaultdict(int)
         for ch in magazine:
             counts[ch] += 1
 
