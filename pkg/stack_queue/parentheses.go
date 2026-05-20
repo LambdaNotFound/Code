@@ -4,10 +4,12 @@ import "strings"
 
 /**
  * 32. Longest Valid Parentheses
- *    track the invalid indices
+ *  1. stack
+ *  2. two pointers
+ *  3. DP
  */
 func longestValidParentheses(s string) int {
-	stack := []int{-1} // sentinel: boundary before string starts
+	stack := []int{-1} // boundary: track the invalid indices
 	res := 0
 
 	for i, ch := range s {

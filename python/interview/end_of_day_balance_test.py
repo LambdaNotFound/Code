@@ -1,5 +1,5 @@
 import pytest
-from end_of_day_balance import Solution
+from end_of_day_balance import Solution  # type: ignore[import-not-found]
 
 @pytest.mark.parametrize("transactions,initial_balance,expected", [
     (
@@ -32,3 +32,25 @@ from end_of_day_balance import Solution
 ])
 def test_get_end_of_day_balance(transactions, initial_balance, expected):
     assert Solution().getEndOfDayBalance(transactions, initial_balance) == expected
+
+
+# ── 465. Optimal Account Balancing ────────────────────────────────────────────
+
+@pytest.mark.parametrize("transactions, want", [
+    # no transactions → nothing to settle
+    ([],                                        0),
+    # one net creditor, two debtors — cannot merge
+    ([[0, 1, 10], [2, 0, 5]],                   2),
+    # perfect cancellation: net balances are [+4, -4] → one transfer
+    ([[0, 1, 10], [1, 0, 1], [1, 2, 5], [2, 0, 5]], 1),
+    # circular: every net balance is 0
+    ([[0, 1, 1], [1, 2, 1], [2, 0, 1]],         0),
+    # single-direction debt: 0 owes 1
+    ([[0, 1, 5]],                               1),
+    # one creditor, two debtors with different amounts
+    ([[1, 3, 15], [2, 3, 10], [3, 1, 2]],       2),
+    # two independent pairs settle independently
+    ([[0, 1, 5], [2, 3, 7]],                    2),
+])
+def test_min_transfers(transactions, want):
+    assert Solution().minTransfers(transactions) == want
