@@ -24,6 +24,50 @@ import (
  * stack stores [..., result,  sign] before each '('
  *    when process ')', res = outerResult + outerSign * result
  */
+func calculateWithParse(s string) int {
+	whitespace := regexp.MustCompile(`[^0-9+\-()]`)
+	s = whitespace.ReplaceAllString(s, "")
+
+	pos := 0
+	var parse func() int
+	parse = func() int {
+		stack := []int{}
+		num, sign := 0, 1
+
+		for pos < len(s) {
+			ch := s[pos]
+			pos++
+
+			if ch >= '0' && ch <= '9' {
+				num = num*10 + int(ch-'0')
+			} else if ch == '+' || ch == '-' {
+				stack = append(stack, sign*num)
+				num = 0
+				if ch == '+' {
+					sign = 1
+				} else {
+					sign = -1
+				}
+			} else if ch == '(' {
+				sub := parse()
+				stack = append(stack, sign*sub)
+				sign = 1
+			} else if ch == ')' {
+				break
+			}
+		}
+		stack = append(stack, sign*num)
+
+		total := 0
+		for _, val := range stack {
+			total += val
+		}
+		return total
+	}
+
+	return parse()
+}
+
 func calculate(s string) int {
 	reg := regexp.MustCompile(`[^0-9+\-()]`)
 	s = reg.ReplaceAllString(s, "")
@@ -54,8 +98,9 @@ func calculate(s string) int {
 			num = 0
 			// restore outer context
 			outerSign := stack[len(stack)-1]
-			outerResult := stack[len(stack)-2]
-			stack = stack[:len(stack)-2]
+			stack = stack[:len(stack)-1]
+			outerResult := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
 			result = outerResult + outerSign*result
 		}
 		if i == len(s)-1 {
@@ -185,10 +230,6 @@ func calculateIII(s string) int {
 				num = num*10 + int(ch-'0')
 			}
 
-			if ch == '(' {
-				num = parse() // recurse into parens
-			}
-
 			isOperator := ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')'
 			if isOperator || pos == len(s) {
 				switch op {
@@ -202,6 +243,10 @@ func calculateIII(s string) int {
 					stack[len(stack)-1] /= num
 				}
 				num, op = 0, ch
+			}
+
+			if ch == '(' {
+				num = parse() // recurse into parens
 			}
 
 			if ch == ')' {
