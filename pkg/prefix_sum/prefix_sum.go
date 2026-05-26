@@ -36,30 +36,6 @@ func productExceptSelf(nums []int) []int {
  * 525. Contiguous Array
  */
 func findMaxLength(nums []int) int {
-	// balance: +1 for 0, -1 for 1
-	// equal 0s and 1s → balance returns to same value
-	// store first occurrence of each balance value
-	balanceToIndex := map[int]int{0: -1}
-
-	res, balance := 0, 0
-	for i, num := range nums {
-		if num == 0 {
-			balance++
-		} else {
-			balance--
-		}
-
-		if idx, found := balanceToIndex[balance]; found {
-			res = max(res, i-idx)
-		} else {
-			balanceToIndex[balance] = i
-		}
-	}
-
-	return res
-}
-
-func findMaxLengthPrefixSum(nums []int) int {
 	// firstSeen[prefixSum] = earliest index where this prefix sum occurred
 	firstSeen := map[int]int{0: -1} // base case: sum=0 seen before index 0
 
@@ -109,8 +85,8 @@ func subarraySum(nums []int, k int) int {
 }
 
 func subarraySumWithHashmap(nums []int, k int) int {
-	// countMap[sum] = number of times this prefix sum has been seen
-	countMap := map[int]int{0: 1} // base case: empty prefix has sum 0
+	// prefixSumFreq[sum] = freq of this prefix sum has been seen
+	prefixSumFreq := map[int]int{0: 1} // base case: empty prefix has sum 0
 	prefixSum := 0
 	count := 0
 
@@ -123,10 +99,10 @@ func subarraySumWithHashmap(nums []int, k int) int {
 
 		// how many previous prefixSums equal prefixSum-k?
 		// each one forms a valid subarray ending at current index
-		count += countMap[prefixSum-k]
+		count += prefixSumFreq[prefixSum-k]
 
 		// record current prefix sum
-		countMap[prefixSum]++
+		prefixSumFreq[prefixSum]++
 	}
 
 	return count
@@ -171,45 +147,6 @@ func numSubarraysWithSumPrefixSum(nums []int, goal int) int {
 		}
 	}
 	return count
-}
-
-/**
- * 437. Path Sum III
- *
- * Given the root of a binary tree and an integer targetSum,
- * return the number of paths where the sum of the values along the path equals targetSum.
- *
- * Time: O(n), Space: O(n) — prefix map
- */
-func pathSum(root *TreeNode, targetSum int) int {
-	// prefixCount[sum] = number of paths from root with this prefix sum
-	prefixCount := map[int]int{0: 1} // base case: empty path
-	res := 0
-
-	var dfs func(node *TreeNode, currSum int)
-	dfs = func(node *TreeNode, currSum int) {
-		if node == nil {
-			return
-		}
-
-		currSum += node.Val
-
-		// how many paths ending at current node sum to targetSum?
-		// currSum - targetSum = prefix sum we need to have seen before
-		res += prefixCount[currSum-targetSum]
-
-		// record current prefix sum
-		prefixCount[currSum]++
-
-		dfs(node.Left, currSum)
-		dfs(node.Right, currSum)
-
-		// undo — remove current node's prefix sum when backtracking
-		prefixCount[currSum]--
-	}
-
-	dfs(root, 0)
-	return res
 }
 
 /**

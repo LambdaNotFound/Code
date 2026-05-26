@@ -7,6 +7,8 @@ from common import TreeNode
 
 """
 437. Path Sum III
+
+prefixSum[j] - prefixSum[i] = k => prefixSum[i] = prefixSum[j] - k
 """
 class Solution:
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
