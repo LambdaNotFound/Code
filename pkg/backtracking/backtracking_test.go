@@ -1,7 +1,6 @@
 package backtracking
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,9 +111,8 @@ func Test_combinationSum(t *testing.T) {
             []int{2, 3, 5},
             7,
             [][]int{
-                {2, 2, 2, 2},
-                {2, 3, 3},
-                {3, 5},
+                {2, 2, 3},
+                {2, 5},
             },
         },
         {
@@ -128,7 +126,7 @@ func Test_combinationSum(t *testing.T) {
     for _, tc := range testCases {
         t.Run(tc.name, func(t *testing.T) {
             result := combinationSum(tc.candidates, tc.target)
-            reflect.DeepEqual(tc.expected, result)
+            assert.ElementsMatch(t, tc.expected, result)
         })
     }
 }

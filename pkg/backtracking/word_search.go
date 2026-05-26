@@ -102,16 +102,17 @@ func existClaude(board [][]byte, word string) bool {
  * Backtracking w/ Trie
  */
 type Trie struct {
-	nodes     map[rune]*Trie
+	nodes     map[byte]*Trie
 	endOfWord string // store word itself instead of bool — avoids rebuilding prefix
 }
 
 func Constructor() Trie {
-	return Trie{nodes: make(map[rune]*Trie)}
+	return Trie{nodes: make(map[byte]*Trie)}
 }
 
 func (t *Trie) Insert(word string) {
-	for _, c := range word {
+	for i := 0; i < len(word); i++ {
+		c := word[i]
 		if _, found := t.nodes[c]; !found {
 			node := Constructor()
 			t.nodes[c] = &node
@@ -137,7 +138,7 @@ func findWords(board [][]byte, words []string) []string {
 			return
 		}
 
-		c := rune(board[row][col])
+		c := board[row][col]
 
 		// single trie lookup — replaces both Search and StartsWith
 		nextNode, found := node.nodes[c]
@@ -156,7 +157,12 @@ func findWords(board [][]byte, words []string) []string {
 		for _, d := range dirs {
 			backtrack(row+d[0], col+d[1], nextNode)
 		}
-		board[row][col] = byte(c) // restore cell
+		board[row][col] = c // restore cell
+
+		// prune dead trie branch so future DFS calls skip exhausted subtrees
+		if len(nextNode.nodes) == 0 && nextNode.endOfWord == "" {
+			delete(node.nodes, c)
+		}
 	}
 
 	for row := 0; row < m; row++ {

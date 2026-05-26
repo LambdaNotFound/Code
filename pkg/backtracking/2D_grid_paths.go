@@ -8,16 +8,22 @@ import "strings"
 func solveSudoku(board [][]byte) {
 	var isValid func(int, int, byte) bool
 	isValid = func(row, col int, num byte) bool {
-		for i := 0; i < 9; i++ { // current (row, col)
-			if board[row][i] == num || board[i][col] == num {
+		for idx := range 9 {
+			if idx != col && board[row][idx] == num {
+				return false
+			}
+			if idx != row && board[idx][col] == num {
 				return false
 			}
 		}
 
 		startRow, startCol := (row/3)*3, (col/3)*3 // sub 3 x 3 board
-		for i := startRow; i < startRow+3; i++ {
-			for j := startCol; j < startCol+3; j++ {
-				if board[i][j] == num {
+		for subRow := startRow; subRow < startRow+3; subRow++ {
+			for subCol := startCol; subCol < startCol+3; subCol++ {
+				if subRow == row && subCol == col {
+					continue
+				}
+				if board[subRow][subCol] == num {
 					return false
 				}
 			}
