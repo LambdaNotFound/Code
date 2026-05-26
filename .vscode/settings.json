@@ -1,19 +1,18 @@
 {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true,
+    
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+
     "[go]": {
         "editor.defaultFormatter": "golang.go",
         "editor.formatOnSave": true,
         "editor.detectIndentation": false,
         "editor.insertSpaces": true,
-        "editor.tabSize": 4
-    },
-    "[sql]": {
-        "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-    },
-    "python.testing.pytestArgs": [
-        "python"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+        "editor.tabSize": 4,
+    }
 }

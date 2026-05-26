@@ -1,4 +1,13 @@
 {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+
     "python.defaultInterpreterPath": "${workspaceFolder}/venv/bin/python",
     "python.testing.pytestArgs": [
         "."

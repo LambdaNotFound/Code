@@ -24,7 +24,7 @@ import (
  * stack stores [..., result,  sign] before each '('
  *    when process ')', res = outerResult + outerSign * result
  */
-func calculateWithParse(s string) int {
+func calculate(s string) int {
 	whitespace := regexp.MustCompile(`[^0-9+\-()]`)
 	s = whitespace.ReplaceAllString(s, "")
 
@@ -32,31 +32,30 @@ func calculateWithParse(s string) int {
 	var parse func() int
 	parse = func() int {
 		stack := []int{}
-		num, sign := 0, 1
-
+		currentNumber, pendingSign := 0, 1
 		for pos < len(s) {
 			ch := s[pos]
 			pos++
 
 			if ch >= '0' && ch <= '9' {
-				num = num*10 + int(ch-'0')
+				currentNumber = currentNumber*10 + int(ch-'0')
 			} else if ch == '+' || ch == '-' {
-				stack = append(stack, sign*num)
-				num = 0
+				stack = append(stack, pendingSign*currentNumber)
+				currentNumber = 0
 				if ch == '+' {
-					sign = 1
+					pendingSign = 1
 				} else {
-					sign = -1
+					pendingSign = -1
 				}
 			} else if ch == '(' {
-				sub := parse()
-				stack = append(stack, sign*sub)
-				sign = 1
+				subResult := parse()
+				stack = append(stack, pendingSign*subResult)
+				pendingSign = 1
 			} else if ch == ')' {
 				break
 			}
 		}
-		stack = append(stack, sign*num)
+		stack = append(stack, pendingSign*currentNumber)
 
 		total := 0
 		for _, val := range stack {
@@ -68,45 +67,45 @@ func calculateWithParse(s string) int {
 	return parse()
 }
 
-func calculate(s string) int {
+func calculateIterative(s string) int {
 	reg := regexp.MustCompile(`[^0-9+\-()]`)
 	s = reg.ReplaceAllString(s, "")
 
 	stack := []int{} // stores result + sign before each '('
-	result, num, sign := 0, 0, 1
-	for i, ch := range s {
+	result, currentNumber, pendingSign := 0, 0, 1
+	for _, char := range s {
 		switch {
-		case ch >= '0' && ch <= '9':
-			num = num*10 + int(ch-'0')
+		case char >= '0' && char <= '9':
+			currentNumber = currentNumber*10 + int(char-'0')
 
-		case ch == '+' || ch == '-':
-			result += sign * num // commit current number
-			num = 0
-			if ch == '+' {
-				sign = 1
+		case char == '+' || char == '-':
+			result += pendingSign * currentNumber // commit current number
+			currentNumber = 0
+			if char == '+' {
+				pendingSign = 1
 			} else {
-				sign = -1
+				pendingSign = -1
 			}
 
-		case ch == '(':
-			// save current state, start fresh inside parens
-			stack = append(stack, result, sign)
-			result, sign = 0, 1
+		case char == '(':
+			stack = append(stack, result) // save current number
+			stack = append(stack, pendingSign)
+			result, pendingSign = 0, 1 // start fresh inside parens
 
-		case ch == ')':
-			result += sign * num // commit last number in parens
-			num = 0
-			// restore outer context
-			outerSign := stack[len(stack)-1]
+		case char == ')':
+			result += pendingSign * currentNumber // commit last number in parens
+			currentNumber = 0
+
+			outerSign := stack[len(stack)-1] // restore outer context
 			stack = stack[:len(stack)-1]
 			outerResult := stack[len(stack)-1]
 			stack = stack[:len(stack)-1]
 			result = outerResult + outerSign*result
 		}
-		if i == len(s)-1 {
-			result += sign * num
-		}
+
 	}
+	result += pendingSign * currentNumber
+
 	return result
 }
 
