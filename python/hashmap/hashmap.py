@@ -1,10 +1,10 @@
 from typing import List
 from collections import defaultdict
 
-"""
-1. Two Sum
-"""
 class Solution:
+    """
+    1. Two Sum
+    """
     def twoSum(self, nums: List[int], target: int) -> List[int]:
         complements: dict[int] = {}
         for i, num in enumerate(nums):
@@ -14,10 +14,9 @@ class Solution:
             complements[num] = i
         return None
 
-"""
-383. Ransom Note
-"""
-class Solution:
+    """
+    383. Ransom Note
+    """
     def canConstruct(self, ransomNote: str, magazine: str) -> bool:
         counts: defaultdict = defaultdict(int)
         for ch in magazine:
