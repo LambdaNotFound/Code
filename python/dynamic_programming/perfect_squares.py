@@ -1,9 +1,10 @@
-"""
-279. Perfect Squares
 
-dp[i] = min over k where k*k <= i  of  ( dp[i - k*k] + 1 )
-"""
 class Solution:
+    """
+    279. Perfect Squares
+
+    dp[i] = min over k where k*k <= i  of  ( dp[i - k*k] + 1 )
+    """
     def numSquares(self, n: int) -> int:
         # Base case: dp[0] = 0 (zero squares needed to make zero)
         # multiplying a list by an integer repeats the list that many times

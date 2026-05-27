@@ -102,3 +102,4 @@ def test_calculate2(s, want):
 ])
 def test_calculate3(s, want):
     assert Solution().calculate3(s) == want
+    assert Solution().calculate_template(s) == want

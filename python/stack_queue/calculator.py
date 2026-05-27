@@ -1,47 +1,47 @@
 from collections import deque
 
-"""
-Basic Calculator Template
-"""
-def calculate_template(s: str) -> int:
-    s = s.replace(" ", "")
-    pos = [0]
-
-    def parse() -> int:
-        stack = []
-        current_number, pending_sign = 0, '+'
-
-        while pos[0] < len(s):
-            ch = s[pos[0]]
-            pos[0] += 1
-
-            if '0' <= ch <= '9':
-                current_number = current_number * 10 + int(ch)
-
-            if ch == '(':
-                current_number = parse()
-
-            if pos[0] == len(s) or ch in '+-*/)': # commit on operator, end, or closing paren
-                if pending_sign == '+':
-                    stack.append(current_number)
-                elif pending_sign == '-':
-                    stack.append(-current_number)
-                elif pending_sign == '*':
-                    stack[-1] *= current_number
-                elif pending_sign == '/':
-                    stack[-1] = int(stack[-1] / current_number)
-
-                if ch == ')':
-                    break
-
-                current_number = 0
-                pending_sign = ch
-
-        return sum(stack)
-
-    return parse()
-
 class Solution:
+    """
+    Basic Calculator Template
+    """
+    def calculate_template(self, s: str) -> int:
+        s = s.replace(" ", "")
+        pos = [0]
+
+        def parse() -> int:
+            stack = []
+            current_number, pending_sign = 0, '+'
+
+            while pos[0] < len(s):
+                ch = s[pos[0]]
+                pos[0] += 1
+
+                if '0' <= ch <= '9':
+                    current_number = current_number * 10 + int(ch)
+
+                if ch == '(':
+                    current_number = parse()
+
+                if pos[0] == len(s) or ch in '+-*/)': # commit on operator, end, or closing paren
+                    if pending_sign == '+':
+                        stack.append(current_number)
+                    elif pending_sign == '-':
+                        stack.append(-current_number)
+                    elif pending_sign == '*':
+                        stack[-1] *= current_number
+                    elif pending_sign == '/':
+                        stack[-1] = int(stack[-1] / current_number)
+
+                    if ch == ')':
+                        break
+
+                    current_number = 0
+                    pending_sign = ch
+
+            return sum(stack)
+
+        return parse()
+
     """
     224. Basic Calculator
 

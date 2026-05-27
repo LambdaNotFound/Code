@@ -40,3 +40,25 @@ METHODS = ["removeDuplicates", "removeDuplicatesClaude"]
 def test_remove_duplicates(method, s, k, want):
     fn = getattr(Solution(), method)
     assert fn(s, k) == want
+
+
+@pytest.mark.parametrize("s, want", [
+    # LeetCode examples
+    ("3[a]2[bc]",      "aaabcbc"),
+    ("3[a2[c]]",       "accaccacc"),
+    ("2[abc]3[cd]ef",  "abcabccdcdcdef"),
+
+    # Single character repeated
+    ("4[x]",           "xxxx"),
+
+    # No brackets — returned as-is
+    ("abc",            "abc"),
+
+    # Nested two levels deep
+    ("2[3[a]]",        "aaaaaa"),
+
+    # Multiple groups
+    ("2[ab]3[c]",      "ababccc"),
+])
+def test_decodeString(s, want):
+    assert Solution().decodeString(s) == want

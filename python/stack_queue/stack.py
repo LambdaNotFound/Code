@@ -1,9 +1,9 @@
 from collections import deque
 
-"""
-1209. Remove All Adjacent Duplicates in String II
-"""
 class Solution:
+    """
+    1209. Remove All Adjacent Duplicates in String II
+    """
     def removeDuplicatesClaude(self, s: str, k: int) -> str:
         stack: deque[tuple[str, int]] = deque()
         for ch in s:
@@ -13,7 +13,7 @@ class Solution:
             else:
                 stack.append((ch, 1))
 
-            if stack[-1][1] == k: # Time: O(n)
+            if stack[-1][1] == k: # Time complexity: O(n)
                 stack.pop()
 
         return ''.join(ch * count for ch, count in stack)
@@ -33,4 +33,30 @@ class Solution:
                     for _ in range(k):
                        stack.pop()
 
+        return ''.join(stack)
+    
+    """
+    394. Decode String
+
+    Input: s = "3[a]2[bc]"
+    Output: "aaabcbc"
+
+    Input: s = "3[a2[c]]"
+    Output: "accaccacc"
+    """
+    def decodeString(self, s: str) -> str:
+        stack: deque[str] = deque()
+
+        for char in s:
+            if char != ']':
+                stack.append(char)
+            else:
+                letters, nums = '', ''
+                while stack[-1] != '[':
+                    letters = stack.pop() + letters
+                stack.pop()
+                while stack and '0' <= stack[-1] <= '9':
+                    nums =  stack.pop() + nums
+                stack.append(letters * int(nums))
+        
         return ''.join(stack)
