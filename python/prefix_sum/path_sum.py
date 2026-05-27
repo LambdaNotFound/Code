@@ -5,12 +5,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from common import TreeNode
 
-"""
-437. Path Sum III
-
-prefixSum[j] - prefixSum[i] = k => prefixSum[i] = prefixSum[j] - k
-"""
 class Solution:
+    """
+    437. Path Sum III
+
+    prefixSum[j] - prefixSum[i] = k => prefixSum[i] = prefixSum[j] - k
+    """
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
         prefix_counts = defaultdict(int)
         prefix_counts[0] = 1   # empty path base case
