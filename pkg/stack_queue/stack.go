@@ -164,3 +164,47 @@ func removeDuplicatesClaude(s string, k int) string {
 	}
 	return sb.String()
 }
+
+/**
+ * 394. Decode String
+ *
+ * Input: s = "3[a]2[bc]"
+ * Output: "aaabcbc"
+ *
+ * Input: s = "3[a2[c]]"
+ * Output: "accaccacc"
+ *
+ * Input: s = "2[abc]3[cd]ef"
+ * Output: "abcabccdcdcdef"
+ */
+func decodeString(s string) string {
+	// stack stores either string segments or digits
+	stack := make([]string, 0)
+
+	for _, c := range s {
+		if c != ']' {
+			stack = append(stack, string(c))
+		} else {
+			// pop until '[' to get the substring
+			substr := ""
+			for stack[len(stack)-1] != "[" {
+				substr = stack[len(stack)-1] + substr
+				stack = stack[:len(stack)-1]
+			}
+			stack = stack[:len(stack)-1] // pop '['
+
+			// pop digits to get the repeat count
+			k := ""
+			for len(stack) > 0 && stack[len(stack)-1] >= "0" && stack[len(stack)-1] <= "9" {
+				k = stack[len(stack)-1] + k
+				stack = stack[:len(stack)-1]
+			}
+			num, _ := strconv.Atoi(k)
+
+			// push expanded string back onto stack
+			stack = append(stack, strings.Repeat(substr, num))
+		}
+	}
+
+	return strings.Join(stack, "")
+}

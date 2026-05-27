@@ -50,7 +50,7 @@ func Test_calculate(t *testing.T) {
 	}
 }
 
-func Test_calculateII(t *testing.T) {
+func Test_calculate2(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -90,12 +90,12 @@ func Test_calculateII(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, calculateII(tt.input))
+			assert.Equal(t, tt.expected, calculate2(tt.input))
 		})
 	}
 }
 
-func Test_calculateIIVariant(t *testing.T) {
+func Test_calculate2Variant(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -135,12 +135,12 @@ func Test_calculateIIVariant(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, calculateIIVariant(tt.input))
+			assert.Equal(t, tt.expected, calculate2Variant(tt.input))
 		})
 	}
 }
 
-func Test_calculateIII(t *testing.T) {
+func Test_calculate3(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -199,8 +199,8 @@ func Test_calculateIII(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, calculateIII(tt.input), "calculateIII")
-			assert.Equal(t, tt.expected, calculateT(tt.input), "calculateT")
+			assert.Equal(t, tt.expected, calculate3(tt.input), "calculateIII")
+			assert.Equal(t, tt.expected, calculateTemplate(tt.input), "calculateT")
 		})
 	}
 }

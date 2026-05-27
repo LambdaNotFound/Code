@@ -2,9 +2,61 @@ package stack
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 )
+
+// Basic Calculator template
+func calculateTemplate(s string) int {
+	s = strings.ReplaceAll(s, " ", "")
+	pos := 0
+
+	var dfs func() int
+	dfs = func() int {
+		stack := []int{}
+		currentNumber, pendingSign := 0, '+'
+
+		for pos < len(s) {
+			char := s[pos]
+			pos++
+
+			if char >= '0' && char <= '9' {
+				currentNumber = currentNumber*10 + int(char-'0')
+			}
+
+			if char == '(' {
+				currentNumber = dfs()
+			}
+
+			// commit on operator, end, or closing paren
+			if pos == len(s) || char == '+' || char == '-' || char == '*' || char == '/' || char == ')' {
+				switch pendingSign {
+				case '+':
+					stack = append(stack, currentNumber)
+				case '-':
+					stack = append(stack, -currentNumber)
+				case '*':
+					stack[len(stack)-1] *= currentNumber
+				case '/':
+					stack[len(stack)-1] /= currentNumber
+				}
+
+				if char == ')' {
+					break
+				}
+				currentNumber = 0
+				pendingSign = rune(char) // ← only update for real operators
+			}
+		}
+
+		result := 0
+		for _, num := range stack {
+			result += num
+		}
+		return result
+	}
+
+	return dfs()
+}
 
 /**
  * 224. Basic Calculator
@@ -34,28 +86,29 @@ func calculate(s string) int {
 		stack := []int{}
 		currentNumber, pendingSign := 0, 1
 		for pos < len(s) {
-			ch := s[pos]
+			char := s[pos]
 			pos++
 
-			if ch >= '0' && ch <= '9' {
-				currentNumber = currentNumber*10 + int(ch-'0')
-			} else if ch == '+' || ch == '-' {
+			if char >= '0' && char <= '9' {
+				currentNumber = currentNumber*10 + int(char-'0')
+			}
+			if char == '(' {
+				currentNumber = parse()
+			}
+			if pos == len(s) || char == '+' || char == '-' || char == ')' {
 				stack = append(stack, pendingSign*currentNumber)
+				if char == ')' {
+					break
+				}
 				currentNumber = 0
-				if ch == '+' {
+				switch char {
+				case '+':
 					pendingSign = 1
-				} else {
+				case '-':
 					pendingSign = -1
 				}
-			} else if ch == '(' {
-				subResult := parse()
-				stack = append(stack, pendingSign*subResult)
-				pendingSign = 1
-			} else if ch == ')' {
-				break
 			}
 		}
-		stack = append(stack, pendingSign*currentNumber)
 
 		total := 0
 		for _, val := range stack {
@@ -74,11 +127,9 @@ func calculateIterative(s string) int {
 	stack := []int{} // stores result + sign before each '('
 	result, currentNumber, pendingSign := 0, 0, 1
 	for _, char := range s {
-		switch {
-		case char >= '0' && char <= '9':
+		if char >= '0' && char <= '9' {
 			currentNumber = currentNumber*10 + int(char-'0')
-
-		case char == '+' || char == '-':
+		} else if char == '+' || char == '-' {
 			result += pendingSign * currentNumber // commit current number
 			currentNumber = 0
 			if char == '+' {
@@ -86,13 +137,11 @@ func calculateIterative(s string) int {
 			} else {
 				pendingSign = -1
 			}
-
-		case char == '(':
+		} else if char == '(' {
 			stack = append(stack, result) // save current number
 			stack = append(stack, pendingSign)
 			result, pendingSign = 0, 1 // start fresh inside parens
-
-		case char == ')':
+		} else if char == ')' {
 			result += pendingSign * currentNumber // commit last number in parens
 			currentNumber = 0
 
@@ -115,31 +164,31 @@ func calculateIterative(s string) int {
  * Input: s = "3+2*2"
  * Output: 7
  */
-func calculateII(s string) int {
+func calculate2(s string) int {
 	reg := regexp.MustCompile(`[^0-9+\-*/]`)
 	s = reg.ReplaceAllString(s, "")
 
 	stack := []int{}
-	num, op := 0, '+'
-	for i, c := range s {
-		if c >= '0' && c <= '9' {
-			num = num*10 + int(c-'0')
+	currentNumber, pendingSign := 0, '+'
+	for i, char := range s {
+		if char >= '0' && char <= '9' {
+			currentNumber = currentNumber*10 + int(char-'0')
 		}
-		if i == len(s)-1 || c == '+' || c == '-' || c == '*' || c == '/' {
-			switch op {
+		if i == len(s)-1 || char == '+' || char == '-' || char == '*' || char == '/' {
+			switch pendingSign {
 			case '+':
-				stack = append(stack, num)
+				stack = append(stack, currentNumber)
 			case '-':
-				stack = append(stack, -num)
+				stack = append(stack, -currentNumber)
 			case '*':
 				top := stack[len(stack)-1]
-				stack[len(stack)-1] = top * num
+				stack[len(stack)-1] = top * currentNumber
 			case '/':
 				top := stack[len(stack)-1]
-				stack[len(stack)-1] = top / num
+				stack[len(stack)-1] = top / currentNumber
 			}
-			num = 0
-			op = c
+			currentNumber = 0
+			pendingSign = char
 		}
 	}
 
@@ -158,7 +207,7 @@ func calculateII(s string) int {
  * Input: s = "3add2mul2"
  * Output: 7
  */
-func calculateIIVariant(s string) int {
+func calculate2Variant(s string) int {
 	s = strings.ReplaceAll(s, " ", "")
 
 	stack := []int{}
@@ -210,7 +259,7 @@ func calculateIIVariant(s string) int {
  * Input:  "(2+6*3+5-(3*14/7+2)*5)+3"
  * Output: -12
  */
-func calculateIII(s string) int {
+func calculate3(s string) int {
 	reg := regexp.MustCompile(`[^0-9+\-*/%()]`)
 	s = reg.ReplaceAllString(s, "")
 
@@ -219,141 +268,47 @@ func calculateIII(s string) int {
 	var parse func() int
 	parse = func() int {
 		stack := []int{}
-		num, op := 0, byte('+')
+		currentNumber, pendingSign := 0, byte('+')
 
 		for pos < len(s) {
 			ch := s[pos]
 			pos++
 
 			if ch >= '0' && ch <= '9' {
-				num = num*10 + int(ch-'0')
-			}
-
-			isOperator := ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')'
-			if isOperator || pos == len(s) {
-				switch op {
-				case '+':
-					stack = append(stack, num)
-				case '-':
-					stack = append(stack, -num)
-				case '*':
-					stack[len(stack)-1] *= num
-				case '/':
-					stack[len(stack)-1] /= num
-				}
-				num, op = 0, ch
+				currentNumber = currentNumber*10 + int(ch-'0')
 			}
 
 			if ch == '(' {
-				num = parse() // recurse into parens
+				currentNumber = parse() // recurse into parens
 			}
 
-			if ch == ')' {
-				break // commit and return to caller
+			isOperator := ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')'
+			if pos == len(s) || isOperator {
+				switch pendingSign {
+				case '+':
+					stack = append(stack, currentNumber)
+				case '-':
+					stack = append(stack, -currentNumber)
+				case '*':
+					stack[len(stack)-1] *= currentNumber
+				case '/':
+					stack[len(stack)-1] /= currentNumber
+				}
+
+				if ch == ')' {
+					break // commit and return to caller
+				}
+				currentNumber, pendingSign = 0, ch
 			}
+
 		}
 
 		result := 0
-		for _, v := range stack {
-			result += v
+		for _, num := range stack {
+			result += num
 		}
 		return result
 	}
 
 	return parse()
-}
-
-// Basic Calculator template
-func calculateT(s string) int {
-	pos := 0
-
-	var dfs func() int
-	dfs = func() int {
-		stack := []int{}
-		num, preOp := 0, '+'
-
-		for pos < len(s) {
-			ch := s[pos]
-			pos++
-
-			if ch >= '0' && ch <= '9' {
-				num = num*10 + int(ch-'0')
-			} else if ch == '(' { // ← else if: mutually exclusive
-				num = dfs()
-			}
-
-			// commit on operator, end, or closing paren
-			if pos == len(s) || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ')' {
-				switch preOp {
-				case '+':
-					stack = append(stack, num)
-				case '-':
-					stack = append(stack, -num)
-				case '*':
-					stack[len(stack)-1] *= num
-				case '/':
-					stack[len(stack)-1] /= num
-				}
-				num = 0
-				if ch == '+' || ch == '-' || ch == '*' || ch == '/' {
-					preOp = rune(ch) // ← only update for real operators
-				}
-				if ch == ')' {
-					break
-				}
-			}
-		}
-
-		res := 0
-		for _, v := range stack {
-			res += v
-		}
-		return res
-	}
-
-	return dfs()
-}
-
-/**
- * 394. Decode String
- *
- * Input: s = "3[a]2[bc]"
- * Output: "aaabcbc"
- *
- * Input: s = "3[a2[c]]"
- * Output: "accaccacc"
- *
- * Input: s = "2[abc]3[cd]ef"
- * Output: "abcabccdcdcdef"
- */
-func decodeString(s string) string {
-	// stack stores either string segments or digits
-	stack := make([]string, 0)
-
-	for _, c := range s {
-		if c != ']' {
-			stack = append(stack, string(c))
-		} else {
-			// pop until '[' to get the substring
-			substr := ""
-			for stack[len(stack)-1] != "[" {
-				substr = stack[len(stack)-1] + substr
-				stack = stack[:len(stack)-1]
-			}
-			stack = stack[:len(stack)-1] // pop '['
-
-			// pop digits to get the repeat count
-			k := ""
-			for len(stack) > 0 && stack[len(stack)-1] >= "0" && stack[len(stack)-1] <= "9" {
-				k = stack[len(stack)-1] + k
-				stack = stack[:len(stack)-1]
-			}
-			num, _ := strconv.Atoi(k)
-
-			// push expanded string back onto stack
-			stack = append(stack, strings.Repeat(substr, num))
-		}
-	}
-
-	return strings.Join(stack, "")
 }
