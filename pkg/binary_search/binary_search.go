@@ -21,7 +21,7 @@ package binarysearch
  *    }
  *    return -1
  *
- * // Style 2: exclusive right boundary
+ * // Style 1': exclusive right boundary
  *    left, right := 0, len(nums)  // right is exclusive
  *    for left < right {
  *        mid := left + (right-left)/2
