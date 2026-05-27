@@ -23,11 +23,12 @@ go test ./... -v
 This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
 
 **Top-level packages:**
-- `pkg/` — LeetCode solutions grouped by algorithm category: `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `tree`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
+- `pkg/` — LeetCode solutions grouped by algorithm category: `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
 - `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns
 - `types/` — shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs)
 - `utils/` — test helpers for constructing and comparing linked lists, trees, and graphs
+- `fixtures/` — static test data files (e.g. input text for API design problems)
 
 **Import conventions:**
 - Packages that use `types` use a dot import: `. "gocode/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
@@ -37,6 +38,13 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
 - `utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
+
+## Python sub-project
+
+`python/` is a parallel Python LeetCode repository with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands.
+
+- See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
+- Python packages mirror the Go structure: `array`, `dynamic_programming`, `hashmap`, `heap`, `prefix_sum`, `stack_queue`, `two_pointers`, `interview`; shared types live in `common/`.
 
 ## LeetCode conventions
 

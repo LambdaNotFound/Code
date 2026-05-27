@@ -7,7 +7,7 @@ import os
 import pytest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from queue.mono_queue import Solution  # noqa: E402
+from mono_queue import Solution  # noqa: E402
 
 
 @pytest.mark.parametrize("nums, limit, want", [

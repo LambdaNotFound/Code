@@ -46,7 +46,6 @@ class Solution:
     """
     def decodeString(self, s: str) -> str:
         stack: deque[str] = deque()
-
         for char in s:
             if char != ']':
                 stack.append(char)
@@ -58,5 +57,4 @@ class Solution:
                 while stack and '0' <= stack[-1] <= '9':
                     nums =  stack.pop() + nums
                 stack.append(letters * int(nums))
-        
         return ''.join(stack)
