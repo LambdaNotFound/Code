@@ -12,9 +12,11 @@ Am I looking for an exact value?
                     left = mid+1 when true → return left-1
 """
 
+
 # The isBadVersion API is already defined for you.
 def isBadVersion(version: int) -> bool:
     pass
+
 
 class Solution:
     """
@@ -22,38 +24,63 @@ class Solution:
 
     search for exact match
     """
+
     def search(self, nums: List[int], target: int) -> int:
         if not nums:
             return -1
 
-        left, right = 0, len(nums)-1
+        left, right = 0, len(nums) - 1
         while left <= right:
-            mid = left + (right - left)//2
+            mid = left + (right - left) // 2
             if nums[mid] == target:
                 return mid
 
-            if nums[mid] < nums[right]: # right half sorted
+            if nums[mid] < nums[right]:  # right half sorted
                 if nums[mid] < target <= nums[right]:
                     left = mid + 1
                 else:
                     right = mid - 1
-            else: # left half sorted
+            else:  # left half sorted
                 if nums[left] <= target < nums[mid]:
                     right = mid - 1
                 else:
                     left = mid + 1
         return -1
 
+    """
+    81. Search in Rotated Sorted Array II
+    """
+
+    def searchWithDuplicates(self, nums: List[int], target: int) -> bool:
+        left, right = 0, len(nums) - 1
+        while left <= right:
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return True
+            if nums[mid] < nums[right]:
+                if nums[mid] < target <= nums[right]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+            elif nums[mid] == nums[right]:
+                right -= 1  # eliminating one known non-target
+            else:
+                if nums[left] <= target < nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+        return False
 
     """
     278. First Bad Version
 
     search for a boundary
     """
+
     def firstBadVersion(self, n: int) -> int:
         left, right = 1, n
         while left < right:
-            mid = left + (right - left)//2
+            mid = left + (right - left) // 2
             if isBadVersion(mid):
                 right = mid
             else:
