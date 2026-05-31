@@ -111,14 +111,14 @@ func eraseOverlapIntervals(intervals [][]int) int {
 		return intervals[i][0] < intervals[j][0]
 	})
 	erased := 0
-	for prev, j := 0, 1; j < len(intervals); j++ {
-		if intervals[prev][1] <= intervals[j][0] {
-			prev = j
-		} else if intervals[prev][1] > intervals[j][1] {
+	for prev, curr := 0, 1; curr < len(intervals); curr++ {
+		if intervals[prev][1] <= intervals[curr][0] {
+			prev = curr
+		} else {
 			erased++
-			prev = j
-		} else if intervals[prev][1] <= intervals[j][1] {
-			erased++
+			if intervals[prev][1] > intervals[curr][1] {
+				prev = curr
+			}
 		}
 	}
 	return erased
@@ -129,11 +129,11 @@ func eraseOverlapIntervalsSortByEndTime(intervals [][]int) int {
 		return intervals[i][1] < intervals[j][1]
 	})
 	erased := 0
-	for prev, j := 0, 1; j < len(intervals); j++ {
-		if intervals[j][0] < intervals[prev][1] {
+	for prev, curr := 0, 1; curr < len(intervals); curr++ {
+		if intervals[curr][0] < intervals[prev][1] {
 			erased++
 		} else {
-			prev = j
+			prev = curr
 		}
 	}
 	return erased
@@ -209,12 +209,32 @@ func canAttendMeetings(intervals []Interval) bool {
  *
  * find the minimum number of rooms required to schedule all meetings without any conflicts.
  *
- * whats next earliest start time, next earliest end time?
- *
- * 1. Sweep line
+ * Two pointers: sort starts and ends separately; advance end pointer when a room frees up.
  */
 func minMeetingRooms(intervals []Interval) int {
-	timeline := make(map[int]int) // time point → room delta (start: +1, end: -1)
+	starts := make([]int, len(intervals))
+	ends := make([]int, len(intervals))
+	for i, iv := range intervals {
+		starts[i] = iv.Start
+		ends[i] = iv.End
+	}
+	sort.Ints(starts)
+	sort.Ints(ends)
+
+	rooms, endPtr := 0, 0
+	for _, start := range starts {
+		if start < ends[endPtr] {
+			rooms++
+		} else {
+			endPtr++
+		}
+	}
+	return rooms
+}
+
+// Sweep line: accumulate +1 at each start, -1 at each end, track peak.
+func minMeetingRoomsSweepLine(intervals []Interval) int {
+	timeline := make(map[int]int)
 	for _, meeting := range intervals {
 		timeline[meeting.Start]++
 		timeline[meeting.End]--

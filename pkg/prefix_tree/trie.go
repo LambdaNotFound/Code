@@ -1,6 +1,12 @@
 package prefixtree
 
 /**
+ * Prefix trie        dictionary of words    autocomplete, prefix queries, word lookup
+ * Aho-Corasick       set of patterns        find many patterns in one text pass
+ * Suffix tree/trie   the text itself        substring queries, repeats, LCS
+ */
+
+/**
  * 208. Implement Trie (Prefix Tree)
  */
 type Trie struct {
