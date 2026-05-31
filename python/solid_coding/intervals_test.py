@@ -14,3 +14,18 @@ from intervals import Solution
 ])
 def test_eraseOverlapIntervals(intervals, expected):
     assert Solution().eraseOverlapIntervals(intervals) == expected
+
+
+@pytest.mark.parametrize("firstList,secondList,expected", [
+    (
+        [[0, 2], [5, 10], [13, 23], [24, 25]],
+        [[1, 5], [8, 12], [15, 24], [25, 26]],
+        [[1, 2], [5, 5], [8, 10], [15, 23], [24, 24], [25, 25]],
+    ),
+    ([[1, 3], [5, 9]], [], []),
+    ([], [[4, 8], [10, 12]], []),
+    ([[1, 7]], [[3, 10]], [[3, 7]]),
+    ([[1, 4], [6, 8]], [[2, 3], [5, 7]], [[2, 3], [6, 7]]),
+])
+def test_intervalIntersection(firstList, secondList, expected):
+    assert Solution().intervalIntersection(firstList, secondList) == expected
