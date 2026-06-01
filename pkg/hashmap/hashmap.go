@@ -1,5 +1,7 @@
 package hashmap
 
+import "strconv"
+
 /**
  * 1. Two Sum
  *
@@ -53,4 +55,28 @@ func isAnagram(s string, t string) bool {
 	}
 
 	return len(s) == len(t)
+}
+
+/*
+ * Encode this code into a new string where for each digit d at index i in the original code,
+ * “nd” will be appended to the output string, where n is the number of occurrences of d after and including index i.
+ *
+ * Input String: “13612344”
+ * Expected Output: “2123161112132414”
+ *
+ */
+func encode(s string) string {
+	charCount := map[rune]int{}
+	for _, ch := range s {
+		charCount[ch]++
+	}
+
+	result := ""
+	for _, ch := range s {
+		count := strconv.Itoa(charCount[ch])
+		result += count + string(ch)
+		charCount[ch]--
+	}
+
+	return result
 }

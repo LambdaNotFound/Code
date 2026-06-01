@@ -57,6 +57,27 @@ func Test_isAnagram(t *testing.T) {
     }
 }
 
+func Test_encode(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "example", input: "13612344", expected: "2123161112132414"},
+		{name: "all_same", input: "aaa", expected: "3a2a1a"},
+		{name: "all_unique", input: "abc", expected: "1a1b1c"},
+		{name: "single_char", input: "z", expected: "1z"},
+		{name: "two_distinct_repeated", input: "aabb", expected: "2a1a2b1b"},
+		{name: "non_adjacent_duplicates", input: "aba", expected: "2a1b1a"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, encode(tt.input))
+		})
+	}
+}
+
 func Test_canConstruct(t *testing.T) {
     tests := []struct {
         name        string
