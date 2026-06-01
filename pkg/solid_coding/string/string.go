@@ -10,8 +10,12 @@ import (
 
 /**
  *           Unicode code point
+ *           |
  *    for i, rune := range string {
+ *        |
  *        byte index
+ *
+ *    rune is just an alias for int32, and a single-quoted literal like '0' is a rune constant
  *
  *    for i := 0; i < len(string); i++ {
  *        byte := string[i]
@@ -19,6 +23,9 @@ import (
  *    num, op := 0, byte('+')  byte
  *    num, op := 0, '+'        rune literals
  *    num, op := 0, "+"        string
+ *
+ *    Single quotes → a rune literal: exactly one Unicode code point
+ *    Double quotes → a string literal (interpreted): a sequence of zero or more characters, type string (a read-only sequence of bytes, UTF-8 encoded)
  */
 
 /**
@@ -27,7 +34,7 @@ import (
  * Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer.
  */
 func myAtoi(s string) int {
-	s = strings.TrimSpace(s)
+	s = strings.ReplaceAll(s, " ", "")
 	multiplier := 1
 	if len(s) == 0 {
 		return 0
@@ -40,7 +47,7 @@ func myAtoi(s string) int {
 
 	res := 0
 	for i, r := range s {
-		if unicode.IsDigit(r) {
+		if r >= '0' && r <= '9' { // unicode.IsDigit(r)
 			num := s[i] - '0'
 			res = res*10 + int(num)
 
