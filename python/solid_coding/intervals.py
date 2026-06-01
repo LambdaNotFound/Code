@@ -1,5 +1,14 @@
 from typing import List
 
+"""
+Sort by a computed value:
+
+data.sort(key=lambda a: (a[0], -a[1], a[0] + a[1] + a[2]))
+                           │      │         └─ tie on a[1] → sum all three, asc
+                           │      └─ tie on a[0] → a[1] descending
+                           └─ primary: a[0] ascending
+"""
+
 
 class Solution:
     """

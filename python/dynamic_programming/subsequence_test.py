@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from LIS import Solution
+from dynamic_programming.subsequence import Solution
 
 
 @pytest.mark.parametrize(

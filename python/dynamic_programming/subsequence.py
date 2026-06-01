@@ -1,9 +1,27 @@
 from typing import List
 
+"""
+subsequence => non-contiguous
+subarray => contiguous
+"""
+
 
 class Solution:
     """
-    300. Longest Increasing Subsequence
+    1143. Longest Common Subsequence
+    """
+
+    """
+    300. Longest Increasing Subsequence / LIS
+
+    dp[i] = length of the longest increasing subsequence ending at index i 
+    
+    Transition:
+        dp[i] = max(dp[j] + 1)  for all j < i where nums[j] < nums[i]
+        dp[i] = 1               if no such j exists
+    
+    Base case: dp[i] = 1 for all i (every element is an LIS of length 1 by itself)
+    Answer: max(dp)
     """
 
     def lengthOfLIS(self, nums: List[int]) -> int:
