@@ -8,6 +8,11 @@ import (
 /**
  * 987. Vertical Order Traversal of a Binary Tree
  */
+
+/**
+ * Time: O(N log N) Sorting the column keys: O(N log N) worst case
+ * Space: O(N + H) map holds all N entries: O(N), DFS call stack: O(H) where H is the tree height
+ */
 func verticalTraversalDFS(root *TreeNode) [][]int {
 	if root == nil {
 		return nil
@@ -60,42 +65,43 @@ func verticalTraversalBFS(root *TreeNode) [][]int {
 
 	type entry struct {
 		node          *TreeNode
-		val, row, col int
+		col, row, val int
 	}
 
-	var items []entry
-	queue := []entry{{root, root.Val, 0, 0}}
+	columns := map[int][]entry{}
+	queue := []entry{{root, 0, 0, root.Val}}
 	for len(queue) > 0 {
 		e := queue[0]
 		queue = queue[1:]
-		items = append(items, e)
+		columns[e.col] = append(columns[e.col], e)
 		if e.node.Left != nil {
-			queue = append(queue, entry{e.node.Left, e.node.Left.Val, e.row + 1, e.col - 1})
+			queue = append(queue, entry{e.node.Left, e.col - 1, e.row + 1, e.node.Left.Val})
 		}
 		if e.node.Right != nil {
-			queue = append(queue, entry{e.node.Right, e.node.Right.Val, e.row + 1, e.col + 1})
+			queue = append(queue, entry{e.node.Right, e.col + 1, e.row + 1, e.node.Right.Val})
 		}
 	}
 
-	sort.Slice(items, func(i, j int) bool {
-		if items[i].col != items[j].col {
-			return items[i].col < items[j].col
-		}
-		if items[i].row != items[j].row {
-			return items[i].row < items[j].row
-		}
-		return items[i].val < items[j].val
-	})
+	columnKeys := make([]int, 0, len(columns))
+	for key := range columns {
+		columnKeys = append(columnKeys, key)
+	}
+	sort.Ints(columnKeys)
 
 	var res [][]int
-	for i := 0; i < len(items); {
-		col := items[i].col
-		var group []int
-		for i < len(items) && items[i].col == col {
-			group = append(group, items[i].val)
-			i++
+	for _, key := range columnKeys {
+		entries := columns[key]
+		sort.Slice(entries, func(i, j int) bool {
+			if entries[i].row != entries[j].row {
+				return entries[i].row < entries[j].row
+			}
+			return entries[i].val < entries[j].val
+		})
+		vals := make([]int, len(entries))
+		for i, e := range entries {
+			vals[i] = e.val
 		}
-		res = append(res, group)
+		res = append(res, vals)
 	}
 	return res
 }
