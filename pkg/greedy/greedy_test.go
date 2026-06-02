@@ -84,6 +84,89 @@ func Test_videoStitching(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, videoStitching(tt.clips, tt.time))
+			assert.Equal(t, tt.want, videoStitchingJumpGame(tt.clips, tt.time))
+		})
+	}
+}
+
+func Test_videoStitchingWithinRange(t *testing.T) {
+	tests := []struct {
+		name      string
+		clips     [][]int
+		timeRange []int
+		want      int
+	}{
+		{
+			name:      "range_zero_to_ten_same_as_original",
+			clips:     [][]int{{0, 2}, {4, 6}, {8, 10}, {1, 9}, {1, 5}, {5, 9}},
+			timeRange: []int{0, 10},
+			want:      3,
+		},
+		{
+			name:      "range_starts_mid_two_clips",
+			clips:     [][]int{{0, 4}, {2, 6}, {5, 9}},
+			timeRange: []int{2, 8},
+			want:      2,
+		},
+		{
+			name:      "clip_before_range_start_reaches_in",
+			clips:     [][]int{{0, 5}, {3, 9}},
+			timeRange: []int{2, 9},
+			want:      2,
+		},
+		{
+			name:      "no_clip_reaches_range_start",
+			clips:     [][]int{{4, 8}},
+			timeRange: []int{2, 8},
+			want:      -1,
+		},
+		{
+			name:      "single_clip_exact_cover",
+			clips:     [][]int{{3, 7}},
+			timeRange: []int{3, 7},
+			want:      1,
+		},
+		{
+			name:      "clip_extends_beyond_range_end",
+			clips:     [][]int{{2, 15}},
+			timeRange: []int{2, 10},
+			want:      1,
+		},
+		{
+			name:      "two_clips_sequential",
+			clips:     [][]int{{3, 6}, {5, 9}},
+			timeRange: []int{3, 9},
+			want:      2,
+		},
+		{
+			name:      "gap_within_range",
+			clips:     [][]int{{0, 4}, {6, 10}},
+			timeRange: []int{0, 10},
+			want:      -1,
+		},
+		{
+			name:      "empty_clips",
+			clips:     [][]int{},
+			timeRange: []int{0, 5},
+			want:      -1,
+		},
+		{
+			name:      "range_start_equals_end",
+			clips:     [][]int{{3, 7}},
+			timeRange: []int{5, 5},
+			want:      0,
+		},
+		{
+			name:      "unsorted_input",
+			clips:     [][]int{{5, 9}, {1, 5}, {0, 2}, {1, 9}},
+			timeRange: []int{0, 9},
+			want:      2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, videoStitchingWithinRange(tt.clips, tt.timeRange))
 		})
 	}
 }

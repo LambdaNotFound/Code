@@ -152,6 +152,55 @@ func videoStitching(clips [][]int, time int) int {
 	return clipCount
 }
 
+func videoStitchingWithinRange(clips [][]int, timeRange []int) int {
+	rangeStart, rangeEnd := timeRange[0], timeRange[1]
+	sort.Slice(clips, func(i, j int) bool {
+		return clips[i][0] < clips[j][0]
+	})
+	if len(clips) == 0 || clips[0][0] > rangeStart {
+		return -1
+	}
+
+	currEnd, farthestReach := rangeStart, rangeStart
+	clipIdx, clipCount := 0, 0
+	for currEnd < rangeEnd {
+		clipCount++
+		for clipIdx < len(clips) && clips[clipIdx][0] <= currEnd {
+			farthestReach = max(farthestReach, clips[clipIdx][1])
+			clipIdx++
+		}
+
+		if farthestReach == currEnd {
+			return -1
+		}
+		currEnd = farthestReach
+	}
+
+	return clipCount
+}
+
+func videoStitchingJumpGame(clips [][]int, time int) int {
+	maxEnd := make([]int, time+1)
+	for _, clip := range clips {
+		if clip[0] <= time {
+			maxEnd[clip[0]] = max(maxEnd[clip[0]], clip[1])
+		}
+	}
+
+	currEnd, farthestReach, clipCount := 0, 0, 0
+	for i := 0; i < time; i++ {
+		farthestReach = max(farthestReach, maxEnd[i])
+		if i == currEnd {
+			if farthestReach == currEnd {
+				return -1
+			}
+			clipCount++
+			currEnd = farthestReach
+		}
+	}
+	return clipCount
+}
+
 /**
  * Tasks / Allocation
  */
