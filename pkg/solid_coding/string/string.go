@@ -381,3 +381,33 @@ func romanToInt(s string) int {
 
 	return res
 }
+
+/**
+ * 443. String Compression
+ *
+ * Input: chars = ["a","a","b","b","c","c","c"]
+ * Output: 6
+ */
+func compress(chars []byte) int {
+	left, right := 0, 0
+	for right < len(chars) {
+		ch := chars[right]
+		count := 0
+		for right < len(chars) && chars[right] == ch {
+			right++
+			count++
+		}
+
+		chars[left] = ch
+		left++
+		if count > 1 {
+			num := strconv.Itoa(count)
+			for i := range num {
+				chars[left] = num[i]
+				left++
+			}
+		}
+	}
+
+	return left
+}
