@@ -29,32 +29,20 @@ import (
  */
 
 func minSensorRange(crossings, towers []int) int {
-	sort.Ints(crossings)
 	sort.Ints(towers)
-	distances, n := []int{}, len(towers)
+	numTowers, maxMinDist := len(towers), math.MinInt32
 	for _, crossing := range crossings {
-		minDist := math.MaxInt32
+		rightIdx := sort.Search(numTowers, func(i int) bool { return towers[i] > crossing })
 
-		left := sort.Search(n, func(i int) bool {
-			return towers[i] > crossing
-		}) - 1
-		if left >= 0 {
-			minDist = min(minDist, crossing-towers[left])
+		nearestTowerDist := math.MaxInt32
+		if rightIdx < numTowers {
+			nearestTowerDist = min(nearestTowerDist, towers[rightIdx]-crossing)
 		}
-
-		right := sort.Search(n, func(i int) bool {
-			return towers[i] > crossing
-		})
-		if right != n {
-			minDist = min(minDist, towers[right]-crossing)
+		if rightIdx > 0 {
+			nearestTowerDist = min(nearestTowerDist, crossing-towers[rightIdx-1])
 		}
-
-		distances = append(distances, minDist)
+		maxMinDist = max(maxMinDist, nearestTowerDist)
 	}
 
-	minRange := math.MinInt32
-	for _, dist := range distances {
-		minRange = max(minRange, dist)
-	}
-	return minRange
+	return maxMinDist
 }
