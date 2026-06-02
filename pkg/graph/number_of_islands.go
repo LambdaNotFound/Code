@@ -9,10 +9,12 @@ package graph
  * DFS: Time: O(m x n), Space: O(m x n)
  * BFS: Time: O(m x n), Space: O(m x n)
  * UF:  Time: O(m x n), Space: O(m x n)
- *
+ */
+
+/*
  * Complexity
- *   Time O(m × n)
- *   Space O(m × n) — call stack
+ *   Time: O(m × n)
+ *   Space: O(m × n) — worst case call stack depth when the entire grid is one island
  */
 func numIslandsDFS(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
@@ -24,18 +26,23 @@ func numIslandsDFS(grid [][]byte) int {
 
 	var dfs func(int, int)
 	dfs = func(i, j int) {
+		if i < 0 || i >= m || j < 0 || j >= n {
+			return
+		}
+
 		if grid[i][j] != '1' {
 			return
 		}
 
-		if grid[i][j] == '1' {
-			grid[i][j] = 'X'
+		if grid[i][j] != '1' {
+			return
 		}
+
+		grid[i][j] = 'X'
+
 		for _, dir := range directions {
 			row, col := i+dir[0], j+dir[1]
-			if row >= 0 && row < m && col >= 0 && col < n {
-				dfs(row, col)
-			}
+			dfs(row, col)
 		}
 	}
 
@@ -51,6 +58,11 @@ func numIslandsDFS(grid [][]byte) int {
 	return res
 }
 
+/*
+ * Complexity
+ *   Time: O(m × n)
+ *   Space: O(min(m, n)) — the queue holds the BFS frontier, which is a diagonal wavefront across the grid.
+ */
 func numIslandsBFS(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
 		return 0
@@ -59,8 +71,7 @@ func numIslandsBFS(grid [][]byte) int {
 	m, n := len(grid), len(grid[0])
 	directions := [][]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 
-	var bfs func(int, int)
-	bfs = func(i, j int) {
+	bfs := func(i, j int) {
 		queue := [][]int{{i, j}}
 		grid[i][j] = 'X'
 		for len(queue) > 0 {
@@ -89,6 +100,11 @@ func numIslandsBFS(grid [][]byte) int {
 	return res
 }
 
+/*
+ * Complexity
+ *   Time: O(m × n × log(m×n))
+ *   Space: O(m × n) w/o rank
+ */
 func numIslandsUF(grid [][]byte) int {
 	if len(grid) == 0 || len(grid[0]) == 0 {
 		return 0
@@ -187,6 +203,11 @@ func islandPerimeter(grid [][]int) int {
 	return 0
 }
 
+/*
+ * Complexity
+ *   Time: O(m × n)
+ *   Space: O(1)
+ */
 func islandPerimeterClaude(grid [][]int) int {
 	dirs := [][2]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 	m, n := len(grid), len(grid[0])
