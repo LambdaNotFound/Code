@@ -125,6 +125,13 @@ func canCompleteCircuitBruteForce(gas []int, cost []int) int {
  * 1024. Video Stitching
  *
  * Return the minimum number of clips needed so that we can cut the clips into segments that cover the entire sporting event [0, time]. If the task is impossible, return -1.
+ *
+ * [currStart             currEnd]
+ *  i:               <-     ->
+ *  j:                 <-            ->
+ *  k:                 <-                   ->
+ *
+ *  next, need to expand                   <-     ->
  */
 func videoStitching(clips [][]int, time int) int {
 	sort.Slice(clips, func(i, j int) bool {
@@ -137,8 +144,7 @@ func videoStitching(clips [][]int, time int) int {
 	currEnd, farthestReach := 0, 0
 	clipIdx, clipCount := 0, 0
 	for currEnd < time {
-		clipCount++
-		for clipIdx < len(clips) && clips[clipIdx][0] <= currEnd {
+		for clipIdx < len(clips) && clips[clipIdx][0] <= currEnd { // overlapping intervals
 			farthestReach = max(farthestReach, clips[clipIdx][1])
 			clipIdx++
 		}
@@ -146,6 +152,7 @@ func videoStitching(clips [][]int, time int) int {
 		if farthestReach == currEnd {
 			return -1
 		}
+		clipCount++
 		currEnd = farthestReach
 	}
 
@@ -161,10 +168,9 @@ func videoStitchingWithinRange(clips [][]int, timeRange []int) int {
 		return -1
 	}
 
-	currEnd, farthestReach := rangeStart, rangeStart
+	currEnd, farthestReach := rangeStart, rangeStart // skip intervals before start time
 	clipIdx, clipCount := 0, 0
 	for currEnd < rangeEnd {
-		clipCount++
 		for clipIdx < len(clips) && clips[clipIdx][0] <= currEnd {
 			farthestReach = max(farthestReach, clips[clipIdx][1])
 			clipIdx++
@@ -173,6 +179,7 @@ func videoStitchingWithinRange(clips [][]int, timeRange []int) int {
 		if farthestReach == currEnd {
 			return -1
 		}
+		clipCount++
 		currEnd = farthestReach
 	}
 

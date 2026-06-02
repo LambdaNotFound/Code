@@ -68,6 +68,15 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
  * 210. Course Schedule II
  *
  * Return the topological ordering
+ *
+ * Time: O(V + E)
+ *     Building indegree and adjList: O(E)
+ *     Seeding the queue: O(V)
+ *     BFS: each course dequeued once O(V), each edge traversed once O(E)
+ *
+ * Space: O(V + E)
+ *     adjList: O(V + E) — V sublists with E total entries
+ *     indegree, queue, order: O(V) each
  */
 func findOrder(numCourses int, prerequisites [][]int) []int {
 	indegree := make([]int, numCourses)
