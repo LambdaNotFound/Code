@@ -46,3 +46,36 @@ func minSensorRange(crossings, towers []int) int {
 
 	return maxMinDist
 }
+
+/**
+ * 475. Heaters
+ *
+ * Time: O((H + N) log N)
+ *     Sorting heaters: O(N log N) where N = len(heaters)
+ *     For each of H = len(houses) houses, sort.Search does a binary search over N heaters: O(H log N)
+ *
+ * Space: O(log N)
+ *     Sorting is in-place but uses O(log N) stack space for Go's sort.Ints (introsort)
+ */
+func findRadius(houses []int, heaters []int) int {
+	sort.Ints(heaters)
+
+	maxMinDist, n := math.MinInt32, len(heaters)
+	for _, house := range houses {
+		rightIdx := sort.Search(n, func(i int) bool {
+			return house < heaters[i]
+		})
+		leftIdx := rightIdx - 1
+
+		minDist := math.MaxInt32
+		if rightIdx < n {
+			minDist = min(minDist, heaters[rightIdx]-house)
+		}
+		if leftIdx >= 0 {
+			minDist = min(minDist, house-heaters[leftIdx])
+		}
+		maxMinDist = max(maxMinDist, minDist)
+	}
+
+	return maxMinDist
+}
