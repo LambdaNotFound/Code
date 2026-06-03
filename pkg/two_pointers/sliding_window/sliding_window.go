@@ -64,6 +64,8 @@ func lengthOfLongestSubstringRune(s string) int {
  *
  * return the minimum window substring of s such that
  * every character in t (including duplicates) is included in the window
+ *
+ * Time: O(n + m) where n = len(s) and m = len(t)
  */
 func minWindow(s string, t string) string {
 	freqMap := make(map[byte]int)
@@ -102,6 +104,9 @@ func minWindow(s string, t string) string {
  *
  * You are given a string s and an integer k. You can choose any character of the string and
  * change it to any other uppercase English character. You can perform this operation at most k times.
+ *
+ * Input:  "AABABBA", 1,
+ * Output: 4
  */
 func characterReplacement(s string, k int) int {
 	freq := [26]int{}
@@ -230,3 +235,7 @@ func containsNearbyDuplicate(nums []int, k int) bool {
 	}
 	return false
 }
+
+/**
+ * 1004. Max Consecutive Ones III
+ */

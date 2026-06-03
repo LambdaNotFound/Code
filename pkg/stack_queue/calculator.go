@@ -6,12 +6,13 @@ import (
 )
 
 // Basic Calculator template
+// Time: O(n), Space: O(n) including call stack and explicit stack
 func calculateTemplate(s string) int {
 	s = strings.ReplaceAll(s, " ", "")
-	pos := 0
+	pos := 0 // recursive descent parsing
 
-	var dfs func() int
-	dfs = func() int {
+	var parse func() int
+	parse = func() int {
 		stack := []int{}
 		currentNumber, pendingSign := 0, '+'
 
@@ -24,7 +25,7 @@ func calculateTemplate(s string) int {
 			}
 
 			if char == '(' {
-				currentNumber = dfs()
+				currentNumber = parse()
 			}
 
 			// commit on operator, end, or closing paren
@@ -55,7 +56,7 @@ func calculateTemplate(s string) int {
 		return result
 	}
 
-	return dfs()
+	return parse()
 }
 
 /**
@@ -77,8 +78,8 @@ func calculateTemplate(s string) int {
  *    when process ')', res = outerResult + outerSign * result
  */
 func calculate(s string) int {
-	whitespace := regexp.MustCompile(`[^0-9+\-()]`)
-	s = whitespace.ReplaceAllString(s, "")
+	reg := regexp.MustCompile(`[^0-9+\-()]`)
+	s = reg.ReplaceAllString(s, "")
 
 	pos := 0
 	var parse func() int
