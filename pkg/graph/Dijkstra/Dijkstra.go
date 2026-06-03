@@ -98,10 +98,10 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	}
 	heap.Push(h, state{0, src, 0})
 
-	// visited[node] = minimum stops to reach node at lowest cost
-	visited := make([]int, n)
-	for i := range visited {
-		visited[i] = math.MaxInt
+	// dist[node] = minimum stops to reach node at lowest cost
+	dist := make([]int, n)
+	for i := range dist {
+		dist[i] = math.MaxInt
 	}
 
 	for h.Len() > 0 {
@@ -115,21 +115,19 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 			continue
 		}
 
-		visited[cur.node] = cur.stops
+		dist[cur.node] = cur.stops
 
 		for _, nei := range graph[cur.node] {
 			nextNode, nextPrice := nei[0], nei[1]
 			newPrice, newStops := cur.cost+nextPrice, cur.stops+1
 
-			if visited[nextNode] <= newStops {
-				continue // pruning: already visited with fewer stops
+			if newStops < dist[nextNode] {
+				heap.Push(h, state{
+					cost:  newPrice,
+					node:  nextNode,
+					stops: newStops,
+				})
 			}
-
-			heap.Push(h, state{
-				cost:  newPrice,
-				node:  nextNode,
-				stops: newStops,
-			})
 		}
 	}
 	return -1

@@ -238,4 +238,25 @@ func containsNearbyDuplicate(nums []int, k int) bool {
 
 /**
  * 1004. Max Consecutive Ones III
+ *
+ * Input: nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2
+ * Output: 6
+ *
  */
+func longestOnes(nums []int, k int) int {
+	left, maxLen := 0, 0
+	count := k
+	for right := range len(nums) {
+		if nums[right] == 0 {
+			count--
+		}
+		if count < 0 {
+			if nums[left] == 0 {
+				count++
+			}
+			left++
+		}
+		maxLen = max(maxLen, right-left+1)
+	}
+	return maxLen
+}
