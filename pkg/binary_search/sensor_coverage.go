@@ -56,6 +56,10 @@ func minSensorRange(crossings, towers []int) int {
  *
  * Space: O(log N)
  *     Sorting is in-place but uses O(log N) stack space for Go's sort.Ints (introsort)
+ *
+ * [1,  3, 7, 10]
+ *      3, 7
+ *  |<2>|  |<3>|
  */
 func findRadius(houses []int, heaters []int) int {
 	sort.Ints(heaters)

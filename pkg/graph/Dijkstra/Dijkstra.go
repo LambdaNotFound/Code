@@ -70,6 +70,17 @@ func dijkstra(graph [][][2]int, src int) []int {
 /**
  * 787. Cheapest Flights Within K Stops
  *
+ * Time: O(E + NK log(NK))
+ *     Building the adjacency list: O(E)
+ *     The visited pruning ensures each (node, stops) pair is pushed at most once — there are at most N×(K+2) such pairs, so the heap holds at most O(NK) states
+ *     Each push/pop costs O(log(NK))
+ *     Overall: O(E + NK log(NK))
+ *
+ * Space: O(E + NK)
+ *     Adjacency list: O(N + E)
+ *     visited array: O(N)
+ *     Heap: O(NK) states in the worst case (each node reachable at every stop count 0..K+1)
+ *     Overall: O(E + NK)
  */
 func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	graph := make([][][2]int, n)

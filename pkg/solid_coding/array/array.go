@@ -82,8 +82,8 @@ func canArrange(team1, team2 []int) bool {
 			if front[fi] < back[bi] {
 				fi++
 				bi++
-			} else {
-				bi++
+			} else { //  BBBBBBBB
+				bi++ //  FFFF_FF
 			}
 		}
 

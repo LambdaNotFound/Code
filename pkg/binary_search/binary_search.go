@@ -1,5 +1,23 @@
 package binarysearch
 
+import "sort"
+
+/**
+ *	Lower bound — first index where a[i] >= target
+ *	lowerBound := sort.Search(n, func(i int) bool {
+ *		return nums[i] >= target
+ *	})
+ *
+ *	found := lowerBound < n && nums[lowerBound] == target
+ *
+ *	// Upper bound — first index where a[i] > target
+ *	upperBound := sort.Search(n, func(i int) bool {
+ *		return nums[i] > target
+ *	})
+ *
+ *  found := upperBound > 0 && nums[upperBound - 1] == target
+ */
+
 /**
  * for rotated sorted array
  *     compare nums[mid] with nums[right] to determine
@@ -140,6 +158,8 @@ func findMinInRotatedSortedArrayII(nums []int) int {
 
 /*
  * 34. Find First and Last Position of Element in Sorted Array
+ *          lower_bound
+ *                    upper_bound
  */
 func searchRange(nums []int, target int) []int {
 	var left, right = 0, len(nums) // [0, len)
@@ -168,6 +188,26 @@ func searchRange(nums []int, target int) []int {
 	}
 	if left > 0 && nums[left-1] == target {
 		last = left - 1
+	}
+
+	return []int{first, last}
+}
+
+func searchRangeSearch(nums []int, target int) []int {
+	n := len(nums)
+	first, last := -1, -1
+	lowerBound := sort.Search(n, func(i int) bool {
+		return nums[i] >= target
+	})
+	if lowerBound < n && nums[lowerBound] == target {
+		first = lowerBound
+	}
+
+	upperBound := sort.Search(n, func(i int) bool {
+		return nums[i] > target
+	})
+	if upperBound > 0 && nums[upperBound-1] == target {
+		last = upperBound - 1
 	}
 
 	return []int{first, last}
