@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List
+from typing import Counter, List
 
 
 class Solution:
@@ -39,3 +39,18 @@ class Solution:
             else:
                 return False
         return True
+
+    """
+    242. Valid Anagram
+
+    Input: s = "anagram", t = "nagaram"
+    Output: true
+    """
+
+    def isAnagram(self, s: str, t: str) -> bool:
+        needs = Counter(s)
+
+        for ch in t:
+            needs[ch] -= 1
+
+        return all(v == 0 for v in needs.values())
