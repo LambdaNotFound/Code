@@ -2,6 +2,7 @@ package string
 
 import (
 	"math"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -410,4 +411,33 @@ func compress(chars []byte) int {
 	}
 
 	return left
+}
+
+/**
+ * 415. Add Strings
+ *
+ * Time: O(L), Space: O(L)
+ */
+func addStrings(num1 string, num2 string) string {
+	m, n := len(num1)-1, len(num2)-1
+	var sb strings.Builder
+	carry := 0
+	for m >= 0 || n >= 0 || carry > 0 {
+		d1, d2 := 0, 0
+		if m >= 0 {
+			d1 = int(num1[m] - '0')
+			m--
+		}
+		if n >= 0 {
+			d2 = int(num2[n] - '0')
+			n--
+		}
+		sum := d1 + d2 + carry
+		carry = sum / 10
+		sb.WriteByte(byte('0' + sum%10))
+	}
+
+	b := []byte(sb.String())
+	slices.Reverse(b)
+	return string(b)
 }
