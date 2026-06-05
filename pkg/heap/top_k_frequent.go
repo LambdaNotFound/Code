@@ -7,24 +7,6 @@ type Pair struct {
 	Freq int
 }
 
-type TopKHeap struct {
-	items []Pair
-	less  func(Pair, Pair) bool
-}
-
-func (t *TopKHeap) Less(i int, j int) bool { return t.less(t.items[i], t.items[j]) }
-func (t *TopKHeap) Swap(i int, j int)      { t.items[i], t.items[j] = t.items[j], t.items[i] }
-func (t *TopKHeap) Len() int               { return len(t.items) }
-
-func (t *TopKHeap) Push(item interface{}) {
-	t.items = append(t.items, item.(Pair))
-}
-func (t *TopKHeap) Pop() interface{} {
-	item := t.items[len(t.items)-1]
-	t.items = t.items[:len(t.items)-1]
-	return item
-}
-
 /*
  * 347. Top K Frequent Elements
  */
@@ -35,7 +17,7 @@ func topKFrequent(nums []int, k int) []int {
 		freqMap[v] += 1
 	}
 
-	maxHeap := &TopKHeap{
+	maxHeap := &Heap[Pair]{
 		less: func(i Pair, j Pair) bool {
 			return i.Freq > j.Freq
 		},

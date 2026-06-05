@@ -14,13 +14,19 @@ package heap
  */
 import "container/heap"
 
+type Task struct {
+	name        byte
+	freq        int
+	availableAt int
+}
+
 func leastInterval(tasks []byte, n int) int {
 	freq := make(map[byte]int)
 	for _, t := range tasks {
 		freq[t]++
 	}
 
-	maxHeap := &TaskHeap{
+	maxHeap := &Heap[Task]{
 		less: func(a, b Task) bool { return a.freq > b.freq },
 	}
 	for name, count := range freq {
@@ -53,12 +59,18 @@ func leastInterval(tasks []byte, n int) int {
 }
 
 func leastIntervalCalude(tasks []byte, n int) int {
+	type Task struct {
+		name        byte
+		freq        int
+		availableAt int
+	}
+
 	freqMap := make(map[byte]int)
 	for _, t := range tasks {
 		freqMap[t]++
 	}
 
-	maxHeap := &TaskHeap{
+	maxHeap := &Heap[Task]{
 		items: make([]Task, 0, len(freqMap)),
 		less:  func(a, b Task) bool { return a.freq > b.freq },
 	}
@@ -94,29 +106,4 @@ func leastIntervalCalude(tasks []byte, n int) int {
 	}
 
 	return currentTime
-}
-
-type Task struct {
-	name        byte
-	freq        int
-	availableAt int
-}
-
-type TaskHeap struct {
-	items []Task
-	less  func(Task, Task) bool
-}
-
-func (h *TaskHeap) Len() int           { return len(h.items) }
-func (h *TaskHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
-func (h *TaskHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
-
-func (h *TaskHeap) Push(x interface{}) {
-	h.items = append(h.items, x.(Task))
-}
-
-func (h *TaskHeap) Pop() interface{} {
-	item := h.items[len(h.items)-1]
-	h.items = h.items[:len(h.items)-1]
-	return item
 }

@@ -6,8 +6,8 @@ import "container/heap"
  * 295. Find Median from Data Stream
  */
 type MedianFinder struct {
-	largeHeap *Heap // MinHeap, intended to hold the larger half
-	smallHeap *Heap // MaxHeap, intended to hold the smaller half
+	largeHeap *Heap[int] // MinHeap, intended to hold the larger half
+	smallHeap *Heap[int] // MaxHeap, intended to hold the smaller half
 }
 
 func Constructor() MedianFinder {

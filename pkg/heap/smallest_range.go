@@ -9,7 +9,13 @@ import (
  * 632. Smallest Range Covering Elements from K Lists
  */
 func smallestRange(nums [][]int) []int {
-	minHeap := &ItemHeap{
+	type NumItem struct {
+		num      int
+		idx      int
+		arrayIdx int
+	}
+
+	minHeap := &Heap[NumItem]{
 		less: func(a, b NumItem) bool {
 			return a.num < b.num
 		},
@@ -47,29 +53,4 @@ func smallestRange(nums [][]int) []int {
 	}
 
 	return res
-}
-
-type NumItem struct {
-	num      int
-	idx      int
-	arrayIdx int
-}
-
-type ItemHeap struct {
-	items []NumItem
-	less  func(NumItem, NumItem) bool
-}
-
-func (h *ItemHeap) Len() int           { return len(h.items) }
-func (h *ItemHeap) Swap(i, j int)      { h.items[i], h.items[j] = h.items[j], h.items[i] }
-func (h *ItemHeap) Less(i, j int) bool { return h.less(h.items[i], h.items[j]) }
-
-func (h *ItemHeap) Push(item interface{}) {
-	h.items = append(h.items, item.(NumItem))
-}
-
-func (h *ItemHeap) Pop() interface{} {
-	item := h.items[len(h.items)-1]
-	h.items = h.items[:len(h.items)-1]
-	return item
 }

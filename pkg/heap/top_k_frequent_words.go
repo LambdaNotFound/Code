@@ -12,12 +12,17 @@ import (
  * Sort the words with the same frequency by their lexicographical order.
  */
 func topKFrequentWords(words []string, k int) []string {
+	type Item struct {
+		str  string
+		freq int
+	}
+
 	freqMap := make(map[string]int)
 	for _, word := range words {
 		freqMap[word]++
 	}
 
-	wordHeap := &WordHeap{
+	wordHeap := &Heap[Item]{
 		less: func(a Item, b Item) bool {
 			if a.freq == b.freq {
 				return a.str > b.str
@@ -45,30 +50,4 @@ func topKFrequentWords(words []string, k int) []string {
 	slices.Reverse(res)
 
 	return res
-}
-
-type Item struct {
-	str  string
-	freq int
-}
-
-type WordHeap struct {
-	items []Item
-	less  func(Item, Item) bool
-}
-
-func (w *WordHeap) Len() int           { return len(w.items) }
-func (w *WordHeap) Less(i, j int) bool { return w.less(w.items[i], w.items[j]) }
-func (w *WordHeap) Swap(i, j int) {
-	w.items[i], w.items[j] = w.items[j], w.items[i]
-}
-
-func (w *WordHeap) Push(item interface{}) {
-	w.items = append(w.items, item.(Item))
-}
-
-func (w *WordHeap) Pop() interface{} {
-	item := w.items[len(w.items)-1]
-	w.items = w.items[:len(w.items)-1]
-	return item
 }
