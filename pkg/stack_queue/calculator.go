@@ -28,7 +28,7 @@ func calculateTemplate(s string) int {
 				currentNumber = parse()
 			}
 
-			// commit on operator, end, or closing paren
+			// commit on operator, end, or closing paren *** pos == len(s)***
 			if pos == len(s) || char == '+' || char == '-' || char == '*' || char == '/' || char == ')' {
 				switch pendingSign {
 				case '+':
