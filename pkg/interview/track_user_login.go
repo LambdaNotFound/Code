@@ -1,12 +1,6 @@
 package interview
 
-import (
-	"fmt"
-	"sort"
-	"time"
-)
-
-type LoginRecord struct {
+/* type LoginRecord struct {
 	UserID    string
 	LoginDate time.Time
 }
@@ -108,3 +102,4 @@ func testUserLogin() {
 			userID, s.TotalLogins, s.LongestStreak, s.StreakPeriods)
 	}
 }
+*/
