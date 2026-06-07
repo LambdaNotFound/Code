@@ -28,7 +28,7 @@ func TestWordTrie_InsertSearch(t *testing.T) {
 	// non-existent WordTrie type.
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			trie := prefixtree.ConstructorTrie()
+			trie := prefixtree.NewTrie()
 			for _, word := range tc.bannedWords {
 				trie.Insert(strings.ToLower(word))
 			}

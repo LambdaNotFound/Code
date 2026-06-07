@@ -1,6 +1,8 @@
 package interview
 
 import (
+	"bufio"
+	"io"
 	"math"
 	"strconv"
 	"strings"
@@ -59,7 +61,7 @@ func NewLoanManager(logSources ...[]string) *LoanManager {
 	// Phase 1: aggregate stats from all log sources
 	for _, logs := range logSources {
 		for _, line := range logs {
-			lm.parseLogs(line)
+			lm.Ingest(line)
 		}
 	}
 
@@ -74,7 +76,7 @@ func NewLoanManager(logSources ...[]string) *LoanManager {
 }
 
 // parses a single log line and updates the user's stats.
-func (lm *LoanManager) parseLogs(line string) {
+func (lm *LoanManager) Ingest(line string) {
 	// Format: YYYY-MM-DD,loanType,userId,amount
 	parts := strings.Split(line, ",")
 	if len(parts) != 4 {
@@ -160,14 +162,17 @@ func (lm *LoanManager) Score(userID, loanType string, amount float64) int {
 	return score
 }
 
-/*
-// Read line by line
-scanner := bufio.NewScanner(os.Stdin)
-for scanner.Scan() { line := scanner.Text(); ... }
-
-// Read JSON
-json.NewDecoder(os.Stdin).Decode(&result)
-
-// Read lmV
-records, _ := lmv.NewReader(os.Stdin).ReadAll()
-*/
+// Parse reads log lines from r (e.g. os.Stdin) and returns a LoanManager
+// seeded with all lines from that source.
+//
+// f, _ := os.Open("web.log")
+// defer f.Close()
+// lm := Parse(f)
+func Parse(r io.Reader) *LoanManager {
+	var lines []string
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return NewLoanManager(lines)
+}

@@ -15,7 +15,7 @@ import (
  * text:   "this hate speech is very bad indeed today"
  */
 func filterUnsafeWords(text string, bannedWords []string) string {
-	trie := prefixtree.ConstructorTrie()
+	trie := prefixtree.NewTrie()
 	for _, word := range bannedWords {
 		trie.Insert(strings.ToLower(word))
 	}

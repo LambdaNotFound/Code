@@ -11,18 +11,19 @@ package prefixtree
  */
 type Trie struct {
 	nodes     map[rune]*Trie
-	endOfWord bool // endOfWord string
+	endOfWord bool   // endOfWord string
+	word      string // full word if end of a word
 }
 
-func ConstructorTrie() Trie {
-	return Trie{make(map[rune]*Trie), false}
+func NewTrie() *Trie {
+	return &Trie{make(map[rune]*Trie), false, ""}
 }
 
 func (t *Trie) Insert(word string) {
 	for _, c := range word {
 		if _, found := t.nodes[c]; !found {
-			node := ConstructorTrie()
-			t.nodes[c] = &node
+			node := NewTrie()
+			t.nodes[c] = node
 		}
 		t = t.nodes[c]
 	}

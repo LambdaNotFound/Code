@@ -8,7 +8,7 @@ import (
 
 func Test_Trie(t *testing.T) {
 	t.Run("leetcode_example", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("apple")
 		assert.True(t, trie.Search("apple"))
 		assert.False(t, trie.Search("app"))
@@ -18,13 +18,13 @@ func Test_Trie(t *testing.T) {
 	})
 
 	t.Run("empty_trie_search", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		assert.False(t, trie.Search("anything"))
 		assert.False(t, trie.StartsWith("a"))
 	})
 
 	t.Run("single_char_word", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("a")
 		assert.True(t, trie.Search("a"))
 		assert.False(t, trie.Search("ab"))
@@ -33,7 +33,7 @@ func Test_Trie(t *testing.T) {
 	})
 
 	t.Run("prefix_not_word", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("hello")
 		assert.False(t, trie.Search("hell"))
 		assert.True(t, trie.StartsWith("hell"))
@@ -42,7 +42,7 @@ func Test_Trie(t *testing.T) {
 	})
 
 	t.Run("multiple_words_common_prefix", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("car")
 		trie.Insert("card")
 		trie.Insert("care")
@@ -59,7 +59,7 @@ func Test_Trie(t *testing.T) {
 	})
 
 	t.Run("no_false_prefix_match", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("abc")
 		assert.False(t, trie.Search("ab"))
 		assert.False(t, trie.Search("a"))
@@ -71,7 +71,7 @@ func Test_Trie(t *testing.T) {
 	})
 
 	t.Run("duplicate_insert", func(t *testing.T) {
-		trie := ConstructorTrie()
+		trie := NewTrie()
 		trie.Insert("word")
 		trie.Insert("word")
 		assert.True(t, trie.Search("word"))
@@ -140,7 +140,7 @@ func Test_WordDictionary(t *testing.T) {
 		assert.True(t, wd.Search(".e..."))
 		assert.True(t, wd.Search("....o"))
 		assert.True(t, wd.Search("....."))
-		assert.False(t, wd.Search("h..."))  // too short
+		assert.False(t, wd.Search("h..."))   // too short
 		assert.False(t, wd.Search("h.....")) // too long
 	})
 }

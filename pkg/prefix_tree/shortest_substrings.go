@@ -10,6 +10,16 @@ package prefixtree
  * answer[i] is the shortest substring of arr[i] that does not occur as a substring in any other string in arr. If multiple such substrings exist, answer[i] should be the lexicographically smallest. And if no such substring exists, answer[i] should be an empty string.
  * Return the array answer.
  */
+type TrieNode struct {
+	children [26]*TrieNode
+	count    int // distinct strings with a substring reaching this node
+	lastSeen int // index of last string that incremented count (dedup guard)
+}
+
+func newTrieNode() *TrieNode {
+	return &TrieNode{lastSeen: -1}
+}
+
 func shortestSubstrings(arr []string) []string {
 	root := newTrieNode()
 
@@ -63,14 +73,4 @@ func shortestSubstrings(arr []string) []string {
 	}
 
 	return result
-}
-
-type TrieNode struct {
-	children [26]*TrieNode
-	count    int // distinct strings with a substring reaching this node
-	lastSeen int // index of last string that incremented count (dedup guard)
-}
-
-func newTrieNode() *TrieNode {
-	return &TrieNode{lastSeen: -1}
 }
