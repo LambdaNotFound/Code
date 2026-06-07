@@ -1,4 +1,4 @@
-package oodesign
+package interview
 
 import (
 	"bufio"

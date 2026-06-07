@@ -50,7 +50,7 @@ func getRedeemableOffers(
 			}
 
 			// Offer must have started, not yet expired, and user must be under limit
-			offerStarted := !offer.StartTime.After(cutoff)
+			offerStarted := offer.StartTime.Before(cutoff)
 			offerActive := offer.EndTime.After(cutoff)
 			underLimit := count < offer.MaxRedeem
 
