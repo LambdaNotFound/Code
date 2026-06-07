@@ -4,6 +4,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // LoanLogEntry from a daily log file: <date, user id, order type, amount>.
@@ -17,7 +18,7 @@ type LoanLogEntry struct {
 // UserStats for single user's loan stats
 type UserStats struct {
 	ByLoanType map[string][]*LoanLogEntry
-	BtLoanDate map[string][]*LoanLogEntry
+	ByLoanDate map[string][]*LoanLogEntry
 	MinAmount  float64
 	MaxAmount  float64
 }
@@ -26,6 +27,8 @@ type LoanManager struct {
 	EstablishedUsers map[string]bool
 
 	userStats map[string]*UserStats
+	// follow up: stream input instead of log files
+	mu sync.RWMutex
 }
 
 /**
@@ -43,6 +46,8 @@ type LoanManager struct {
  * "2025-08-07,Mobile,uuid2,50"
  * "2025-09-02,Store,uuid4,200"
  *
+ * Time: O(N) — one pass to parse all lines, O(1) per line (hash map ops); O(U) for the established-user scan, dominated by O(N).
+ * Space: O(N) — every LoanLogEntry is stored twice (once in ByLoanType, once in ByLoanDate), plus O(U·(T+D)) for the map keys — all bounded by O(N).
  */
 func NewLoanManager(logSources ...[]string) *LoanManager {
 	lm := &LoanManager{
@@ -60,7 +65,7 @@ func NewLoanManager(logSources ...[]string) *LoanManager {
 
 	// Phase 2: calculate established users
 	for userID, s := range lm.userStats {
-		if len(s.BtLoanDate) >= 2 && len(s.ByLoanType) >= 2 {
+		if len(s.ByLoanDate) >= 2 && len(s.ByLoanType) >= 2 {
 			lm.EstablishedUsers[userID] = true
 		}
 	}
@@ -93,7 +98,7 @@ func (lm *LoanManager) parseLogs(line string) {
 	if !exists {
 		stats = &UserStats{
 			ByLoanType: make(map[string][]*LoanLogEntry),
-			BtLoanDate: make(map[string][]*LoanLogEntry),
+			ByLoanDate: make(map[string][]*LoanLogEntry),
 			MinAmount:  math.MaxFloat64,
 			MaxAmount:  -math.MaxFloat64,
 		}
@@ -101,7 +106,7 @@ func (lm *LoanManager) parseLogs(line string) {
 	}
 
 	stats.ByLoanType[loanType] = append(stats.ByLoanType[loanType], entry)
-	stats.BtLoanDate[date] = append(stats.ByLoanType[loanType], entry)
+	stats.ByLoanDate[date] = append(stats.ByLoanDate[date], entry)
 	stats.MinAmount = min(stats.MinAmount, amount)
 	stats.MaxAmount = max(stats.MaxAmount, amount)
 }
@@ -125,6 +130,8 @@ func (lm *LoanManager) parseLogs(line string) {
 
 // Score returns the credit score for a new incoming transaction.
 // Returns 0 for non-established users.
+// Time: O(1) — two hash map lookups and a constant number of comparisons.
+// Space: O(1) — no allocations.
 func (lm *LoanManager) Score(userID, loanType string, amount float64) int {
 	if !lm.EstablishedUsers[userID] {
 		return 0

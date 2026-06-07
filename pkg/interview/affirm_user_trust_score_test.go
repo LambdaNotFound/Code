@@ -55,3 +55,42 @@ func Test_LoanManager_Score(t *testing.T) {
 		})
 	}
 }
+
+// Tests below expose the bug on line 104:
+//   stats.ByLoanDate[date] = append(stats.ByLoanType[loanType], entry)
+// should be:
+//   stats.ByLoanDate[date] = append(stats.ByLoanDate[date], entry)
+
+// A single entry on a date should produce exactly one entry in BtLoanDate.
+// The bug appends to the already-updated ByLoanType slice, duplicating the entry.
+func Test_ByLoanDate_single_entry_no_duplicate(t *testing.T) {
+	lm := NewLoanManager([]string{
+		"2025-09-03,Web,uuid1,100",
+		"2025-09-04,Mobile,uuid1,200", // second date to make uuid1 established
+	})
+
+	entries := lm.userStats["uuid1"].ByLoanDate["2025-09-03"]
+	assert.Len(t, entries, 1)
+	assert.Equal(t, "Web", entries[0].LoanType)
+	assert.Equal(t, 100.0, entries[0].Amount)
+}
+
+// Two loan types on the same date should both appear in ByLoanDate for that date.
+// The bug reassigns ByLoanDate[date] from the second type's slice, losing the first.
+func Test_ByLoanDate_multiple_types_same_date(t *testing.T) {
+	lm := NewLoanManager([]string{
+		"2025-09-03,Web,uuid1,100",
+		"2025-09-03,Mobile,uuid1,200", // same date, different type
+		"2025-09-04,Store,uuid1,150",  // second date to make uuid1 established
+	})
+
+	entries := lm.userStats["uuid1"].ByLoanDate["2025-09-03"]
+	assert.Len(t, entries, 2)
+
+	types := map[string]bool{}
+	for _, e := range entries {
+		types[e.LoanType] = true
+	}
+	assert.True(t, types["Web"], "Web entry missing from BtLoanDate")
+	assert.True(t, types["Mobile"], "Mobile entry missing from BtLoanDate")
+}
