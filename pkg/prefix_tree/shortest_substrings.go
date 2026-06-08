@@ -7,17 +7,24 @@ package prefixtree
  *
  * Find a string array answer of size n such that:
  *
- * answer[i] is the shortest substring of arr[i] that does not occur as a substring in any other string in arr. If multiple such substrings exist, answer[i] should be the lexicographically smallest. And if no such substring exists, answer[i] should be an empty string.
+ * answer[i] is the shortest substring of arr[i] that does not occur as a substring in any other string in arr.
+ * If multiple such substrings exist, answer[i] should be the lexicographically smallest.
+ * And if no such substring exists, answer[i] should be an empty string.
+ *
  * Return the array answer.
  */
 type TrieNode struct {
-	children [26]*TrieNode
+	children map[rune]*TrieNode
+
 	count    int // distinct strings with a substring reaching this node
 	lastSeen int // index of last string that incremented count (dedup guard)
 }
 
 func newTrieNode() *TrieNode {
-	return &TrieNode{lastSeen: -1}
+	return &TrieNode{
+		children: make(map[rune]*TrieNode),
+		lastSeen: -1,
+	}
 }
 
 func shortestSubstrings(arr []string) []string {
@@ -30,15 +37,14 @@ func shortestSubstrings(arr []string) []string {
 		for start := range s {
 			node := root
 			for end := start; end < len(s); end++ {
-				charIdx := s[end] - 'a'
-				if node.children[charIdx] == nil {
-					node.children[charIdx] = newTrieNode()
+				ch := rune(s[end])
+				if node.children[ch] == nil {
+					node.children[ch] = newTrieNode()
 				}
-				node = node.children[charIdx]
+				node = node.children[ch]
 
-				// Only count each string once per node. Processing strings
-				// sequentially means all visits from strIdx are contiguous,
-				// so lastSeen cleanly deduplicates.
+				// Only count each string once per node, for deduplicate
+				// e.g. abcabc
 				if node.lastSeen != strIdx {
 					node.count++
 					node.lastSeen = strIdx
@@ -56,12 +62,11 @@ func shortestSubstrings(arr []string) []string {
 			node := root
 			for end := start; end < len(s); end++ {
 				// Path is guaranteed to exist — we built it from this string.
-				node = node.children[s[end]-'a']
+				node = node.children[rune(s[end])]
 
 				if node.count == 1 {
 					candidate := s[start : end+1]
-					if best == "" ||
-						len(candidate) < len(best) ||
+					if best == "" || len(candidate) < len(best) ||
 						(len(candidate) == len(best) && candidate < best) {
 						best = candidate
 					}
