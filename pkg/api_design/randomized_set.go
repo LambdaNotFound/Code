@@ -9,13 +9,13 @@ import "math/rand"
  */
 
 type RandomizedSet struct {
-	nums    []int
+	array   []int
 	indices map[int]int // val → index in nums
 }
 
 func ConstructorRandomizedSet() RandomizedSet {
 	return RandomizedSet{
-		nums:    make([]int, 0),
+		array:   make([]int, 0),
 		indices: make(map[int]int),
 	}
 }
@@ -24,8 +24,8 @@ func (rs *RandomizedSet) Insert(val int) bool {
 	if _, exists := rs.indices[val]; exists {
 		return false
 	}
-	rs.nums = append(rs.nums, val)
-	rs.indices[val] = len(rs.nums) - 1
+	rs.array = append(rs.array, val)
+	rs.indices[val] = len(rs.array) - 1
 	return true
 }
 
@@ -36,19 +36,22 @@ func (rs *RandomizedSet) Remove(val int) bool {
 	}
 
 	// swap val with last element
-	last := rs.nums[len(rs.nums)-1]
-	rs.nums[idx] = last
-	rs.indices[last] = idx
+	lastPos := len(rs.array) - 1
+	if idx != lastPos {
+		last := rs.array[len(rs.array)-1]
+		rs.array[idx] = last
+		rs.indices[last] = idx
+	}
 
 	// remove last element
-	rs.nums = rs.nums[:len(rs.nums)-1]
+	rs.array = rs.array[:lastPos]
 	delete(rs.indices, val)
 
 	return true
 }
 
 func (rs *RandomizedSet) GetRandom() int {
-	return rs.nums[rand.Intn(len(rs.nums))]
+	return rs.array[rand.Intn(len(rs.array))]
 }
 
 /**
@@ -105,7 +108,7 @@ func (r *RandomizedCollection) Remove(val int) bool {
 		delete(r.indices[lastVal], lastPos)
 	}
 
-	// Remove val's index entry
+	// Remove val's index entry, 1. delete key in set, 2. delete key in hashmap
 	delete(r.indices[val], idx)
 	if len(r.indices[val]) == 0 {
 		delete(r.indices, val)
