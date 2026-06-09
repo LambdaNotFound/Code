@@ -122,6 +122,10 @@ func TestFilter(t *testing.T) {
 	}
 }
 
+func TestRun(t *testing.T) {
+	testSpreadSheet()
+}
+
 func rowsEqual(a, b []Row) bool {
 	if len(a) != len(b) {
 		return false

@@ -183,8 +183,8 @@ func printRows(rows []Row, headers []string) {
 
 // -------- Demo --------
 
-func main() {
-	sheet, err := NewSpreadSheet("../fixtures/file.txt")
+func testSpreadSheet() {
+	sheet, err := NewSpreadSheet("../../fixtures/file.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
