@@ -11,9 +11,10 @@ import (
  *    less func(i, j T) bool
  *    ... return h.less(h.items[i], h.items[j])
  */
-type Heap[T any] struct {
-	items []T
-	less  func(a, b T) bool
+type Heap[T comparable] struct {
+	items   []T
+	less    func(a, b T) bool
+	deleted map[T]int
 }
 
 // container/heap interface
@@ -38,8 +39,24 @@ func (h *Heap[T]) Push(x any) { h.items = append(h.items, x.(T)) }
 
 func (h *Heap[T]) Peek() T { return h.items[0] }
 
-func NewHeap[T any](less func(a, b T) bool) *Heap[T] {
-	h := &Heap[T]{less: less}
+func NewHeap[T comparable](less func(a, b T) bool) *Heap[T] {
+	h := &Heap[T]{less: less, deleted: make(map[T]int)}
 	heap.Init(h)
 	return h
+}
+
+// Delete marks val for lazy removal. O(1).
+func (h *Heap[T]) Delete(val T) {
+	if h.deleted == nil {
+		h.deleted = make(map[T]int)
+	}
+	h.deleted[val]++
+}
+
+// Purge removes deleted elements from the top of the heap. Amortized O(log n).
+func (h *Heap[T]) Purge() {
+	for h.Len() > 0 && h.deleted[h.Peek()] > 0 {
+		h.deleted[h.Peek()]--
+		heap.Pop(h)
+	}
 }
