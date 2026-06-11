@@ -54,7 +54,7 @@ func largestIsland(grid [][]int) int {
 			}
 			hasZero = true
 
-			seen := map[int]bool{}
+			visited := map[int]bool{}
 			mergedSize := 1 // the flipped cell itself
 			for _, dir := range directions {
 				neiRow, neiCol := row+dir[0], col+dir[1]
@@ -62,10 +62,10 @@ func largestIsland(grid [][]int) int {
 					continue
 				}
 				neighborID := grid[neiRow][neiCol]
-				if neighborID < 2 || seen[neighborID] {
+				if neighborID < 2 || visited[neighborID] {
 					continue // water, or an island already counted
 				}
-				seen[neighborID] = true
+				visited[neighborID] = true
 				mergedSize += islandSize[neighborID]
 			}
 			maxIsland = max(maxIsland, mergedSize)

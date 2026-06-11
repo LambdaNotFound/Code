@@ -60,34 +60,36 @@ func removeDuplicatesFromSortedArray(nums []int) int {
 /**
  * Team Arrangement
  *
- *  You are given two arrays of integers, heights1 and heights2, representing the heights of players from two different teams. Your task is to determine if it's possible to arrange the teams for a photograph according to the following rules:
- *  One team must stand entirely in front of the other.
- *  Every player in the front row must be strictly shorter than the player standing directly behind them.
- *  Players can be rearranged within their own team's row.
- *  The team with fewer players must stand in the front row. If the teams are of equal size, either team can be the front row.
- *  Your function should return True if such an arrangement is possible, and False otherwise.
+ * You are given two arrays of integers, heights1 and heights2, representing the heights of players from two different teams. Your task is to determine if it's possible to arrange the teams for a photograph according to the following rules:
+ * One team must stand entirely in front of the other.
+ * Every player in the front row must be strictly shorter than the player standing directly behind them.
+ * Players can be rearranged within their own team's row.
+ * The team with fewer players must stand in the front row. If the teams are of equal size, either team can be the front row.
+ * Your function should return True if such an arrangement is possible, and False otherwise.
+ *
+ * BBBBBBBB
+ * FF FFF     ok
+ *   FFFF FF  !ok
  */
 func canArrange(team1, team2 []int) bool {
 	sort.Ints(team1)
 	sort.Ints(team2)
 
-	var canMatch func(front, back []int) bool
-	canMatch = func(front, back []int) bool {
-		if len(front) > len(back) {
-			return canMatch(back, front)
-		}
-
-		fi, bi := 0, 0
-		for fi < len(front) && bi < len(back) {
+	check := func(front, back []int) bool {
+		fi := 0
+		for bi := 0; fi < len(front) && bi < len(back); bi++ {
 			if front[fi] < back[bi] {
 				fi++
-				bi++
-			} else { //  BBBBBBBB
-				bi++ //  FFFF_FF
 			}
 		}
-
 		return fi == len(front)
 	}
-	return canMatch(team1, team2) || canMatch(team2, team1)
+
+	if len(team1) > len(team2) {
+		team1, team2 = team2, team1
+	}
+	if len(team1) < len(team2) {
+		return check(team1, team2)
+	}
+	return check(team1, team2) || check(team2, team1)
 }

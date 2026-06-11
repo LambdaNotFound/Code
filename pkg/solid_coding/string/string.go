@@ -388,6 +388,9 @@ func romanToInt(s string) int {
  *
  * Input: chars = ["a","a","b","b","c","c","c"]
  * Output: 6
+ *
+ * Input: chars = ["a","b","b","b","b","b","b","b","b","b","b","b","b"]
+ * Ouptput: ["a","b","1","2"]
  */
 func compress(chars []byte) int {
 	left, right := 0, 0
