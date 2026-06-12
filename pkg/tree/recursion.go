@@ -87,3 +87,35 @@ func isSubtree(root *TreeNode, subRoot *TreeNode) bool {
 	}
 	return isSubtree(root.Left, subRoot) || isSubtree(root.Right, subRoot)
 }
+
+/**
+ * 1145. Binary Tree Coloring Game
+ *
+ * In each turn, that player chooses a node of their color (red if player 1, blue if player 2) and colors an uncolored neighbor of the chosen node (either the left child, right child, or parent of the chosen node.)
+ * BLOCKS the subtree
+ *
+ */
+
+/**
+ * Time: O(n) — single DFS traversal visiting every node once.
+ * Space: O(h) — call stack depth equals tree height h. O(log n) for a balanced tree, O(n) worst case for a skewed tree.
+ */
+func btreeGameWinningMove(root *TreeNode, n int, x int) bool {
+	leftCount, rightCount, totalCount := 0, 0, n
+	var dfs func(node *TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+
+		l, r := dfs(node.Left), dfs(node.Right)
+		if node.Val == x {
+			leftCount, rightCount = l, r
+		}
+
+		return l + r + 1
+	}
+
+	dfs(root)
+	return max(max(leftCount, rightCount), totalCount-1-leftCount-rightCount) > n/2
+}

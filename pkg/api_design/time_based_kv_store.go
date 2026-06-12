@@ -42,6 +42,17 @@ func (tm *TimeMap) Get(key string, timestamp int) string {
 		return ""
 	}
 
+	/*
+		left := sort.Search(len(entries), func(i int) bool {
+			return entries[i].timestamp > timestamp
+		})
+
+		if left == 0 {
+			return ""
+		}
+		return entries[left-1].value
+	*/
+
 	left, right := 0, len(entries)
 	for left < right {
 		mid := left + (right-left)/2
