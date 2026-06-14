@@ -18,6 +18,13 @@ func twoEggDrop(n int) int {
 
 /**
  * 1828. Queries on Number of Points Inside a Circle
+ *
+ * Time: O(m · n)
+ * Space: O(n)
+ *
+ * follow ups:
+ *     m >> n (many points, few circles) — KD-tree
+ *     m << n (few points, many circles) — sort + binary search on x
  */
 func countPoints(points [][]int, queries [][]int) []int {
 	answer := make([]int, len(queries))
