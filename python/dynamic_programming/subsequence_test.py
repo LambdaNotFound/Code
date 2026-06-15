@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from dynamic_programming.subsequence import Solution
+from subsequence import Solution
 
 
 @pytest.mark.parametrize(
@@ -31,3 +31,20 @@ def test_lengthOfLIS(nums, expected):
 )
 def test_computeLIS(nums, expected):
     assert Solution().computeLIS(nums) == expected
+
+
+# ── 673. Number of Longest Increasing Subsequences ───────────────────────────
+
+@pytest.mark.parametrize(
+    "nums, expected",
+    [
+        ([1, 3, 5, 4, 7],           2),  # LC example: [1,3,5,7] and [1,3,4,7]
+        ([2, 2, 2, 2, 2],           5),  # LC example: every element is its own LIS
+        ([1],                       1),  # single element
+        ([1, 2, 3, 4, 5],           1),  # fully sorted: exactly one LIS
+        ([5, 4, 3, 2, 1],           5),  # fully descending: five LIS of length 1
+        ([1, 2, 4, 3, 5, 4, 7, 2],  3),  # three distinct LIS of max length 5
+    ],
+)
+def test_countLIS(nums, expected):
+    assert Solution().countLIS(nums) == expected

@@ -1,5 +1,5 @@
 """
-Unit tests for hashmap.py — Two Sum (1) and Ransom Note (383)
+Unit tests for hashmap.py — Two Sum (1), Ransom Note (383), Valid Anagram (242)
 """
 import sys
 import os
@@ -71,3 +71,41 @@ def test_two_sum(nums, target, want):
 ])
 def test_can_construct(ransom_note, magazine, want):
     assert Solution().canConstruct(ransom_note, magazine) == want
+
+
+# ── 242. Valid Anagram ────────────────────────────────────────────────────────
+
+@pytest.mark.parametrize("s, t, want", [
+    # LC example: anagram
+    ("anagram",     "nagaram",  True),
+
+    # LC example: not an anagram
+    ("rat",         "car",      False),
+
+    # identical strings
+    ("abc",         "abc",      True),
+
+    # different lengths: s longer than t
+    ("ab",          "a",        False),
+
+    # different lengths: t longer than s
+    ("a",           "ab",       False),
+
+    # both empty
+    ("",            "",         True),
+
+    # single char match
+    ("z",           "z",        True),
+
+    # single char mismatch
+    ("a",           "b",        False),
+
+    # case-sensitive: uppercase ≠ lowercase
+    ("Listen",      "Silent",   False),
+
+    # repeated characters: counts must match exactly
+    ("aab",         "bba",      False),
+    ("aab",         "aba",      True),
+])
+def test_isAnagram(s, t, want):
+    assert Solution().isAnagram(s, t) == want
