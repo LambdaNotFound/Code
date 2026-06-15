@@ -34,7 +34,7 @@ pytest -v
 Python LeetCode solutions organized by algorithm category. Each category is a directory containing one or more solution files and a co-located `_test.py` file.
 
 **Packages:**
-- `array/`, `dynamic_programming/`, `hashmap/`, `heap/`, `prefix_sum/`, `stack_queue/`, `interview/` — solutions grouped by technique
+- `array/`, `backtracking/`, `binary_search/`, `dynamic_programming/`, `graph/`, `hashmap/`, `heap/`, `interview/`, `prefix_sum/`, `solid_coding/`, `stack_queue/`, `tree/`, `two_pointers/` — solutions grouped by technique
 - `common/` — shared node definitions (`ListNode`, `TreeNode`) and test helpers (`build_list`, `list_to_vals`, `build_tree`); imported with `sys.path.insert` since there is no `setup.py`
 
 **Import conventions:**
