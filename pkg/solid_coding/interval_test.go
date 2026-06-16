@@ -286,3 +286,54 @@ func Test_intervalIntersection(t *testing.T) {
 		})
 	}
 }
+
+func Test_carPooling(t *testing.T) {
+	tests := []struct {
+		name     string
+		trips    [][]int
+		capacity int
+		expected bool
+	}{
+		{
+			// single trip, passengers exactly at capacity
+			name:     "single_trip_at_capacity",
+			trips:    [][]int{{3, 1, 5}},
+			capacity: 3,
+			expected: true,
+		},
+		{
+			// two overlapping trips exceed capacity at stop 3
+			name:     "two_trips_exceed_capacity",
+			trips:    [][]int{{3, 1, 5}, {3, 3, 7}},
+			capacity: 4,
+			expected: false,
+		},
+		{
+			// passengers alight before new ones board at same stop — never exceeds capacity
+			name:     "alight_before_board_same_stop",
+			trips:    [][]int{{2, 1, 5}, {3, 5, 7}},
+			capacity: 3,
+			expected: true,
+		},
+		{
+			// multiple trips that together stay within capacity
+			name:     "multiple_trips_within_capacity",
+			trips:    [][]int{{2, 1, 5}, {3, 3, 7}},
+			capacity: 4,
+			expected: false,
+		},
+		{
+			// single passenger, large capacity
+			name:     "one_passenger_large_capacity",
+			trips:    [][]int{{1, 0, 100}},
+			capacity: 100,
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, carPooling(tt.trips, tt.capacity))
+		})
+	}
+}

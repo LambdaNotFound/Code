@@ -273,3 +273,118 @@ func Test_inorderSuccessor(t *testing.T) {
 		})
 	}
 }
+
+func Test_deleteNode(t *testing.T) {
+	//       5
+	//      / \
+	//     3   7
+	//    / \
+	//   2   4
+	build := func() *TreeNode {
+		return node(5, node(3, node(2, nil, nil), node(4, nil, nil)), node(7, nil, nil))
+	}
+
+	tests := []struct {
+		name     string
+		key      int
+		expected []int // in-order traversal after deletion
+	}{
+		{"delete_leaf", 4, []int{2, 3, 5, 7}},
+		{"delete_two_children", 3, []int{2, 4, 5, 7}},
+		{"delete_nonexistent", 6, []int{2, 3, 4, 5, 7}},
+		{"delete_root", 5, []int{2, 3, 4, 7}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := build()
+			result := deleteNode(root, tt.key)
+			assert.Equal(t, tt.expected, inorderTraversal(result))
+		})
+	}
+
+	t.Run("delete_nil_root", func(t *testing.T) {
+		assert.Nil(t, deleteNode(nil, 5))
+	})
+
+	t.Run("delete_node_one_left_child", func(t *testing.T) {
+		//   5
+		//  /
+		// 3
+		// /
+		// 2
+		root := node(5, node(3, node(2, nil, nil), nil), nil)
+		result := deleteNode(root, 3)
+		assert.Equal(t, []int{2, 5}, inorderTraversal(result))
+	})
+
+	t.Run("delete_node_one_right_child", func(t *testing.T) {
+		//   5
+		//    \
+		//     7
+		//      \
+		//       9
+		root := node(5, nil, node(7, nil, node(9, nil, nil)))
+		result := deleteNode(root, 7)
+		assert.Equal(t, []int{5, 9}, inorderTraversal(result))
+	})
+
+	t.Run("delete_two_children_successor_has_left_subtree", func(t *testing.T) {
+		//     5
+		//    / \
+		//   3   8
+		//      /
+		//     6
+		// Delete 5: in-order successor = 6 (found by going left from 8),
+		// so the for-min.Left loop body executes.
+		root := node(5, node(3, nil, nil), node(8, node(6, nil, nil), nil))
+		result := deleteNode(root, 5)
+		assert.Equal(t, []int{3, 6, 8}, inorderTraversal(result))
+	})
+}
+
+func Test_maxAncestorDiff(t *testing.T) {
+	tests := []struct {
+		name     string
+		root     *TreeNode
+		expected int
+	}{
+		{
+			name:     "nil_root",
+			root:     nil,
+			expected: 0,
+		},
+		{
+			name:     "single_node",
+			root:     &TreeNode{Val: 5},
+			expected: 0,
+		},
+		{
+			// path 8→3→1: |8-1|=7
+			name:     "left_skewed",
+			root:     node(8, node(3, node(1, nil, nil), nil), nil),
+			expected: 7,
+		},
+		{
+			// LC example: max diff is |8-1|=7
+			name: "balanced",
+			root: node(8,
+				node(3, node(1, nil, nil), node(6, node(4, nil, nil), node(7, nil, nil))),
+				node(10, nil, node(14, node(13, nil, nil), nil)),
+			),
+			expected: 7,
+		},
+		{
+			// ascending right spine 1→2→3: max ancestor diff = |3-1|=2
+			name:     "right_skewed",
+			root:     node(1, nil, node(2, nil, node(3, nil, nil))),
+			expected: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, maxAncestorDiff(tt.root))
+		})
+	}
+}

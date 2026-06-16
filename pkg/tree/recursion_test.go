@@ -186,3 +186,71 @@ func Test_isSubtree(t *testing.T) {
 		})
 	}
 }
+
+func Test_btreeGameWinningMove(t *testing.T) {
+	//     1
+	//    / \
+	//   2   3
+	//  / \ /
+	// 4  5 6
+	build6 := func() *TreeNode {
+		return &TreeNode{Val: 1,
+			Left: &TreeNode{Val: 2,
+				Left:  &TreeNode{Val: 4},
+				Right: &TreeNode{Val: 5},
+			},
+			Right: &TreeNode{Val: 3,
+				Left: &TreeNode{Val: 6},
+			},
+		}
+	}
+
+	tests := []struct {
+		name     string
+		root     *TreeNode
+		n        int
+		x        int
+		expected bool
+	}{
+		{
+			// player 1 takes node 3; parent side has 4 nodes > n/2=3 → player 2 wins
+			name:     "player2_wins_via_parent",
+			root:     build6(),
+			n:        6,
+			x:        3,
+			expected: true,
+		},
+		{
+			// player 1 takes root (node 1); left=3, right=2, parent=0 → max=3, n/2=3 → not >3 → player 2 loses
+			name:     "player2_loses_root_taken",
+			root:     build6(),
+			n:        6,
+			x:        1,
+			expected: false,
+		},
+		{
+			// balanced 3-node tree: root=1, left=2, right=3, n=3, x=1
+			// leftCount=1, rightCount=1, parentCount=0 → max=1, n/2=1 → not >1 → false
+			name:     "balanced_three_nodes",
+			root:     &TreeNode{Val: 1, Left: &TreeNode{Val: 2}, Right: &TreeNode{Val: 3}},
+			n:        3,
+			x:        1,
+			expected: false,
+		},
+		{
+			// right-skewed: 1→2→3→4, n=4, x=1
+			// leftCount=0, rightCount=3, parentCount=0 → max=3, n/2=2 → 3>2 → true
+			name:     "right_skewed_x_root",
+			root:     &TreeNode{Val: 1, Right: &TreeNode{Val: 2, Right: &TreeNode{Val: 3, Right: &TreeNode{Val: 4}}}},
+			n:        4,
+			x:        1,
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, btreeGameWinningMove(tt.root, tt.n, tt.x))
+		})
+	}
+}

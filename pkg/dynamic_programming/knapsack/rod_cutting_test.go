@@ -57,3 +57,63 @@ func Test_maxProfit(t *testing.T) {
 		})
 	}
 }
+
+func Test_maxTotalProfit(t *testing.T) {
+	tests := []struct {
+		name        string
+		rods        []int
+		salePrice   float64
+		costPerCut  float64
+		expected    float64
+	}{
+		{
+			// saleLength=6: 1 piece, 0 cuts, revenue=18, profit=18 (best)
+			name:       "single_rod_best_is_full_length",
+			rods:       []int{6},
+			salePrice:  3.0,
+			costPerCut: 4.0,
+			expected:   18.0,
+		},
+		{
+			// saleLength=7 for rod 7: 1 piece, 0 cuts, profit=7.0
+			// saleLength=3 for rods [3,7]: rod3→profit=3, rod7→pieces=2,cuts=2,profit=2 → total=5
+			// best across all lengths is 7.0 (saleLength=7 skips rod 3, profits 7 from rod 7)
+			name:       "two_rods_optimal_uses_full_rod",
+			rods:       []int{3, 7},
+			salePrice:  1.0,
+			costPerCut: 2.0,
+			expected:   7.0,
+		},
+		{
+			// high cut cost → only profitable at full rod length; saleLength=5: profit=5
+			name:       "high_cut_cost_favors_no_cuts",
+			rods:       []int{5},
+			salePrice:  1.0,
+			costPerCut: 10.0,
+			expected:   5.0,
+		},
+		{
+			// saleLength=2: rod4→pieces=2,cuts=1,profit=7; rod6→pieces=3,cuts=2,profit=10 → total=17
+			name:       "two_rods_optimal_mid_length",
+			rods:       []int{4, 6},
+			salePrice:  2.0,
+			costPerCut: 1.0,
+			expected:   17.0,
+		},
+		{
+			// rod shorter than every saleLength > rod: pieces=0 → skip (covers continue branch)
+			// rod=[2], salePrice=1, costPerCut=0: saleLength=2 → pieces=1,cuts=0,profit=2
+			name:       "short_rod_skip_longer_sale_lengths",
+			rods:       []int{2},
+			salePrice:  1.0,
+			costPerCut: 0.0,
+			expected:   2.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.InDelta(t, tt.expected, maxTotalProfit(tt.rods, tt.salePrice, tt.costPerCut), 1e-9)
+		})
+	}
+}

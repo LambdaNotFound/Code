@@ -303,6 +303,7 @@ func Test_myAtoi_extra(t *testing.T) {
 		{"int32_max_overflow", "9999999999", 2147483647},
 		{"int32_min_overflow", "-9999999999", -2147483648},
 		{"leading_zeros", "007", 7},
+		{"non_digit_stops_parse", "42abc", 42},
 	}
 
 	for _, tt := range tests {

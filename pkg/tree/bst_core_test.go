@@ -613,4 +613,12 @@ func Test_BST_SprintTree(t *testing.T) {
 		// Forward slashes connect the spine.
 		assert.Equal(t, 2, strings.Count(out, "/"))
 	})
+
+	t.Run("PrintTree_delegates_to_sprintBST", func(t *testing.T) {
+		b := NewBST()
+		b.Insert(5)
+		b.Insert(3)
+		b.Insert(7)
+		assert.NotPanics(t, func() { b.PrintTree() })
+	})
 }
