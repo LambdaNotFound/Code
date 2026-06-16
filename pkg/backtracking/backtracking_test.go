@@ -295,3 +295,44 @@ func Test_generateParenthesis(t *testing.T) {
         })
     }
 }
+
+func Test_maxUniqueSplit(t *testing.T) {
+	testCases := []struct {
+		name     string
+		s        string
+		expected int
+	}{
+		{
+			name:     "leetcode_example_1",
+			s:        "ababccc",
+			expected: 5,
+		},
+		{
+			name:     "leetcode_example_2",
+			s:        "aba",
+			expected: 2,
+		},
+		{
+			name:     "all_same",
+			s:        "aa",
+			expected: 1,
+		},
+		{
+			name:     "single_char",
+			s:        "a",
+			expected: 1,
+		},
+		{
+			name:     "all_unique_chars",
+			s:        "abcd",
+			expected: 4,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := maxUniqueSplit(tc.s)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}

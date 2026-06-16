@@ -143,3 +143,65 @@ func Test_findWords(t *testing.T) {
 		})
 	}
 }
+
+func Test_findWordsNaive(t *testing.T) {
+	testCases := []struct {
+		name     string
+		board    [][]byte
+		words    []string
+		expected []string
+	}{
+		{
+			name: "leetcode_example_1",
+			board: [][]byte{
+				{'o', 'a', 'a', 'n'},
+				{'e', 't', 'a', 'e'},
+				{'i', 'h', 'k', 'r'},
+				{'i', 'f', 'l', 'v'},
+			},
+			words:    []string{"oath", "pea", "eat", "rain"},
+			expected: []string{"eat", "oath"},
+		},
+		{
+			name: "no_path_reuse",
+			board: [][]byte{
+				{'a', 'b'},
+				{'c', 'd'},
+			},
+			words:    []string{"abcb"},
+			expected: []string{},
+		},
+		{
+			name: "single_word_found",
+			board: [][]byte{
+				{'a', 'b', 'c'},
+				{'d', 'e', 'f'},
+			},
+			words:    []string{"abc"},
+			expected: []string{"abc"},
+		},
+		{
+			name: "no_words_found",
+			board: [][]byte{
+				{'a', 'b'},
+			},
+			words:    []string{"xyz"},
+			expected: []string{},
+		},
+		{
+			name: "single_cell_match",
+			board: [][]byte{
+				{'z'},
+			},
+			words:    []string{"z"},
+			expected: []string{"z"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := findWordsNaive(tc.board, tc.words)
+			assert.ElementsMatch(t, tc.expected, result)
+		})
+	}
+}

@@ -102,3 +102,29 @@ func Test_binarySearch(t *testing.T) {
         })
     }
 }
+
+func Test_searchRangeSearch(t *testing.T) {
+	testCases := []struct {
+		name     string
+		nums     []int
+		target   int
+		expected []int
+	}{
+		{"found_range", []int{5, 7, 7, 8, 8, 10}, 8, []int{3, 4}},
+		{"not_found", []int{5, 7, 7, 8, 8, 10}, 6, []int{-1, -1}},
+		{"empty_array", []int{}, 8, []int{-1, -1}},
+		{"single_occurrence", []int{1, 2, 3, 4, 5}, 3, []int{2, 2}},
+		{"all_same", []int{2, 2, 2, 2}, 2, []int{0, 3}},
+		{"target_at_start", []int{1, 1, 2, 3}, 1, []int{0, 1}},
+		{"target_at_end", []int{1, 2, 3, 3}, 3, []int{2, 3}},
+		{"single_element_hit", []int{5}, 5, []int{0, 0}},
+		{"single_element_miss", []int{5}, 6, []int{-1, -1}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := searchRangeSearch(tc.nums, tc.target)
+			assert.Equal(t, tc.expected, result)
+		})
+	}
+}

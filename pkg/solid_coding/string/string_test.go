@@ -139,6 +139,7 @@ func Test_longestCommonPrefix(t *testing.T) {
 		{"single_string", []string{"hello"}, "hello"},
 		{"empty_prefix", []string{"a", "b"}, ""},
 		{"one_empty", []string{"", "abc"}, ""},
+		{"empty_slice", []string{}, ""},
 	}
 
 	for _, tt := range tests {
@@ -307,6 +308,106 @@ func Test_myAtoi_extra(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, myAtoi(tt.s))
+		})
+	}
+}
+
+func Test_compress(t *testing.T) {
+	tests := []struct {
+		name     string
+		chars    []byte
+		wantLen  int
+		wantOut  []byte
+	}{
+		{
+			name:    "multi_char_groups",
+			chars:   []byte{'a', 'a', 'b', 'b', 'c', 'c', 'c'},
+			wantLen: 6,
+			wantOut: []byte{'a', '2', 'b', '2', 'c', '3'},
+		},
+		{
+			name:    "single_chars_no_count",
+			chars:   []byte{'a'},
+			wantLen: 1,
+			wantOut: []byte{'a'},
+		},
+		{
+			name:    "long_run_multi_digit_count",
+			chars:   []byte{'a', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'},
+			wantLen: 4,
+			wantOut: []byte{'a', 'b', '1', '2'},
+		},
+		{
+			name:    "all_unique",
+			chars:   []byte{'a', 'b', 'c'},
+			wantLen: 3,
+			wantOut: []byte{'a', 'b', 'c'},
+		},
+		{
+			name:    "two_char_run",
+			chars:   []byte{'x', 'x'},
+			wantLen: 2,
+			wantOut: []byte{'x', '2'},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			length := compress(tt.chars)
+			assert.Equal(t, tt.wantLen, length)
+			assert.Equal(t, tt.wantOut, tt.chars[:length])
+		})
+	}
+}
+
+func Test_addStrings(t *testing.T) {
+	tests := []struct {
+		name     string
+		num1     string
+		num2     string
+		expected string
+	}{
+		{
+			name:     "leetcode_example_1",
+			num1:     "11",
+			num2:     "123",
+			expected: "134",
+		},
+		{
+			name:     "leetcode_example_2",
+			num1:     "456",
+			num2:     "77",
+			expected: "533",
+		},
+		{
+			name:     "carry_propagation",
+			num1:     "999",
+			num2:     "1",
+			expected: "1000",
+		},
+		{
+			name:     "zeros",
+			num1:     "0",
+			num2:     "0",
+			expected: "0",
+		},
+		{
+			name:     "different_lengths",
+			num1:     "1",
+			num2:     "9999",
+			expected: "10000",
+		},
+		{
+			name:     "single_digits_no_carry",
+			num1:     "3",
+			num2:     "4",
+			expected: "7",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, addStrings(tt.num1, tt.num2))
 		})
 	}
 }

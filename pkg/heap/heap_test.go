@@ -360,4 +360,46 @@ func Test_Heap(t *testing.T) {
 		heap.Pop(h)
 		assert.Equal(t, 2, h.Len())
 	})
+
+	t.Run("delete_and_purge", func(t *testing.T) {
+		h := NewHeap(func(a, b int) bool { return a < b })
+		heap.Push(h, 1)
+		heap.Push(h, 2)
+		heap.Push(h, 3)
+
+		// Mark 1 for lazy deletion; after Purge, 2 should be at the top.
+		h.Delete(1)
+		h.Purge()
+		assert.Equal(t, 2, h.Peek())
+
+		// Delete a middle element; top should stay 2 until it's popped.
+		h.Delete(3)
+		h.Purge()
+		assert.Equal(t, 2, h.Peek())
+		assert.Equal(t, 2, h.Len())
+
+		// Pop 2, then Purge removes lazy-deleted 3.
+		v := heap.Pop(h).(int)
+		assert.Equal(t, 2, v)
+		h.Purge()
+		assert.Equal(t, 0, h.Len())
+	})
+
+	t.Run("purge_noop_when_empty", func(t *testing.T) {
+		h := NewHeap(func(a, b int) bool { return a < b })
+		h.Purge() // should not panic on empty heap
+		assert.Equal(t, 0, h.Len())
+	})
+
+	t.Run("delete_on_heap_without_newheap_initializes_map", func(t *testing.T) {
+		// Heap created directly (not via NewHeap) has a nil deleted map;
+		// Delete must initialize it on first call.
+		h := &Heap[int]{less: func(a, b int) bool { return a < b }}
+		heap.Push(h, 5)
+		heap.Push(h, 3)
+		h.Delete(3) // triggers the nil-deleted-map branch
+		h.Purge()
+		assert.Equal(t, 1, h.Len())
+		assert.Equal(t, 5, h.Peek())
+	})
 }
