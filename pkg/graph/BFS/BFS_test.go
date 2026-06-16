@@ -311,3 +311,86 @@ func Test_zigzagLevelOrder(t *testing.T) {
 		})
 	}
 }
+
+func Test_isCompleteTree(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []any
+		expected bool
+	}{
+		{
+			name:     "leetcode_example1_complete",
+			input:    []any{1, 2, 3, 4, 5, 6},
+			expected: true,
+		},
+		{
+			name:     "leetcode_example2_not_complete",
+			input:    []any{1, 2, 3, 4, 5, nil, 7},
+			expected: false,
+		},
+		{
+			name:     "single_node",
+			input:    []any{1},
+			expected: true,
+		},
+		{
+			name:     "two_nodes_left_only",
+			input:    []any{1, 2},
+			expected: true,
+		},
+		{
+			name:     "two_nodes_right_only",
+			input:    []any{1, nil, 2},
+			expected: false,
+		},
+		{
+			name:     "full_three_levels",
+			input:    []any{1, 2, 3, 4, 5, 6, 7},
+			expected: true,
+		},
+		{
+			name:     "gap_in_middle",
+			input:    []any{1, 2, 3, nil, 5},
+			expected: false,
+		},
+		{
+			name:     "last_level_left_filled",
+			input:    []any{1, 2, 3, 4},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			root := buildTree(tt.input)
+			assert.Equal(t, tt.expected, isCompleteTree(root))
+		})
+	}
+}
+
+func Test_canMeasureWater(t *testing.T) {
+	tests := []struct {
+		name     string
+		jug1     int
+		jug2     int
+		target   int
+		expected bool
+	}{
+		{"leetcode_example1", 3, 5, 4, true},
+		{"leetcode_example2", 2, 6, 5, false},
+		{"leetcode_example3", 1, 2, 3, true},
+		{"target_zero", 3, 5, 0, true},
+		{"target_equals_jug1", 3, 5, 3, true},
+		{"target_equals_jug2", 3, 5, 5, true},
+		{"target_exceeds_capacity", 3, 5, 9, false},
+		{"both_jugs_same", 4, 4, 4, true},
+		{"target_is_sum", 3, 5, 8, true},
+		{"impossible", 2, 4, 3, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, canMeasureWater(tt.jug1, tt.jug2, tt.target))
+		})
+	}
+}

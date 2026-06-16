@@ -30,6 +30,28 @@ func Test_dailyTemperatures(t *testing.T) {
 		})
 	}
 }
+func Test_removeDuplicateLetters(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected string
+	}{
+		{"leetcode_example1", "bcabc", "abc"},
+		{"leetcode_example2", "cbacdcbc", "acdb"},
+		{"single_char", "a", "a"},
+		{"all_same", "aaaa", "a"},
+		{"already_unique", "abc", "abc"},
+		{"reverse_sorted", "dcba", "dcba"},
+		{"repeated_pairs", "abacb", "abc"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, removeDuplicateLetters(tt.s))
+		})
+	}
+}
+
 func Test_trap_extra(t *testing.T) {
 	tests := []struct {
 		name     string

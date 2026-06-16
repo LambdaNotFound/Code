@@ -28,6 +28,7 @@ func (t *Trie) Insert(word string) {
 		t = t.nodes[c]
 	}
 	t.endOfWord = true
+	t.word = word
 }
 
 func (t *Trie) Search(word string) bool {
