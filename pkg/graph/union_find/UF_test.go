@@ -336,3 +336,36 @@ func Test_countComponents(t *testing.T) {
 		})
 	}
 }
+
+func Test_unionFindString(t *testing.T) {
+	tests := []struct {
+		name  string
+		graph [][2]string
+	}{
+		{
+			name:  "empty_graph",
+			graph: [][2]string{},
+		},
+		{
+			name:  "single_edge",
+			graph: [][2]string{{"a", "b"}},
+		},
+		{
+			// union("a","b")→true, union("b","c")→true, union("a","c")→false (already same root)
+			// exercises path compression in find and the rootX==rootY early-return in union
+			name:  "triangle_with_redundant_edge",
+			graph: [][2]string{{"a", "b"}, {"b", "c"}, {"a", "c"}},
+		},
+		{
+			// long chain forces recursive path compression: find("a")→"b"→"c"→"d"
+			name:  "chain_path_compression",
+			graph: [][2]string{{"a", "b"}, {"b", "c"}, {"c", "d"}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NotPanics(t, func() { unionFindString(tt.graph) })
+		})
+	}
+}

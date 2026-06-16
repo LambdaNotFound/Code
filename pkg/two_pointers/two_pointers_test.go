@@ -256,3 +256,67 @@ func Test_sortedSquares(t *testing.T) {
 		})
 	}
 }
+
+func Test_validWordAbbreviation(t *testing.T) {
+	tests := []struct {
+		name     string
+		word     string
+		abbr     string
+		expected bool
+	}{
+		{
+			name:     "leetcode_example_valid",
+			word:     "internationalization",
+			abbr:     "i12iz4n",
+			expected: true,
+		},
+		{
+			name:     "leetcode_example_invalid",
+			word:     "apple",
+			abbr:     "a2e",
+			expected: false,
+		},
+		{
+			name:     "leading_zero_invalid",
+			word:     "substitution",
+			abbr:     "s010n",
+			expected: false,
+		},
+		{
+			name:     "abbr_skips_past_end",
+			word:     "hi",
+			abbr:     "3",
+			expected: false,
+		},
+		{
+			name:     "exact_length_match_via_number",
+			word:     "word",
+			abbr:     "4",
+			expected: true,
+		},
+		{
+			name:     "no_abbreviation_full_word",
+			word:     "abc",
+			abbr:     "abc",
+			expected: true,
+		},
+		{
+			name:     "char_mismatch",
+			word:     "abc",
+			abbr:     "axc",
+			expected: false,
+		},
+		{
+			name:     "number_overshoots_word",
+			word:     "ab",
+			abbr:     "1b2",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, validWordAbbreviation(tt.word, tt.abbr))
+		})
+	}
+}

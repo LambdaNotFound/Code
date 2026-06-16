@@ -383,3 +383,61 @@ func Test_findSubstring(t *testing.T) {
 		})
 	}
 }
+
+func Test_longestOnes(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		k        int
+		expected int
+	}{
+		{
+			// flip indices 3 and 4 → window [1,1,1,0,0] becomes all ones after 2 flips → length 6
+			name:     "leetcode_example_1",
+			nums:     []int{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0},
+			k:        2,
+			expected: 6,
+		},
+		{
+			// k=3 flips; optimal window covers indices 0..9, length 10
+			name:     "leetcode_example_2",
+			nums:     []int{0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1},
+			k:        3,
+			expected: 10,
+		},
+		{
+			// all ones, no flips needed
+			name:     "all_ones",
+			nums:     []int{1, 1, 1, 1},
+			k:        0,
+			expected: 4,
+		},
+		{
+			// k=0, no zeros can be flipped → longest consecutive ones block is 2
+			name:     "k_zero_no_flips",
+			nums:     []int{1, 0, 1, 1, 0},
+			k:        0,
+			expected: 2,
+		},
+		{
+			// k covers all zeros → entire array
+			name:     "k_covers_all_zeros",
+			nums:     []int{0, 1, 0, 1, 0},
+			k:        3,
+			expected: 5,
+		},
+		{
+			// single element
+			name:     "single_zero_k1",
+			nums:     []int{0},
+			k:        1,
+			expected: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, longestOnes(tt.nums, tt.k))
+		})
+	}
+}
