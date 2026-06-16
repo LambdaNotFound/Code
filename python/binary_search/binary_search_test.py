@@ -100,6 +100,12 @@ def test_search(nums, target, want):
     # no rotation, with duplicates
     ([1, 1, 2, 3, 4, 4],        4,      True),
     ([1, 1, 2, 3, 4, 4],        5,      False),
+
+    # left half sorted (nums[mid] > nums[right]); target inside left half → right = mid-1
+    ([3, 4, 5, 1, 1, 2],        4,      True),
+
+    # left half sorted; target outside left half → left = mid+1
+    ([3, 4, 5, 1, 1, 2],        1,      True),
 ])
 def test_searchWithDuplicates(nums, target, want):
     assert Solution().searchWithDuplicates(nums, target) == want

@@ -33,7 +33,7 @@ def bfs_levels(start, target, graph):
     return -1
 
 
-def bfs_grid(grid, start):
+def bfs_grid(grid, start, obstacle="#"):
     rows, cols = len(grid), len(grid[0])
     queue = deque([start])
     visited = {start}
@@ -48,6 +48,7 @@ def bfs_grid(grid, start):
                 and 0 <= nc < cols
                 and (nr, nc) not in visited
                 and grid[nr][nc] != obstacle
-            ):  # adapt condition
+            ):
                 visited.add((nr, nc))
                 queue.append((nr, nc))
+    return visited
