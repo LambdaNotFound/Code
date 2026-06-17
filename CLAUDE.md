@@ -16,6 +16,12 @@ go test ./pkg/backtracking/ -run Test_solveSudoku
 
 # Run with verbose output
 go test ./... -v
+
+# Check coverage (summary per package)
+go test ./... -cover
+
+# Full coverage report
+go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 ```
 
 ## Architecture
@@ -31,6 +37,16 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - `fixtures/` — static test data files (e.g. input text for API design problems)
 - `notes/` — system design and architecture reference notes (e.g. sharding, replication patterns)
 
+**`pkg/graph` sub-packages:**
+- `BFS/` — BFS on graphs and grids
+- `Bellman_Ford/` — Bellman-Ford SSSP; handles negative weights and detects negative cycles; standard adjacency-list signature `graph [][][2]int`
+- `DFS/` — DFS traversal patterns
+- `Dijkstra/` — Dijkstra with a generic `Heap[T]` (see `generic_heap.go`); adjacency-list signature `graph [][][2]int, src int`; also covers LC 787, 743, 1631, 1514, 499, 505
+- `bidirectional_BFS/` — meet-in-the-middle BFS
+- `multi_source/` — multi-source BFS (e.g. rotting oranges, 01-matrix)
+- `topological_sort/` — Kahn's algorithm and DFS-based topo sort
+- `union_find/` — Union-Find with path compression
+
 **Import conventions:**
 - Packages that use `types` use a dot import: `. "gocode/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
 - The module is named `gocode` (see `go.mod`)
@@ -39,6 +55,10 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
 - `utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
+
+**Naming conventions:**
+- Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement
+- Functions suffixed with `Naive` are brute-force or O(n²) baselines kept for comparison
 
 ## Python sub-project
 
