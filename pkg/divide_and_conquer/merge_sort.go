@@ -90,6 +90,10 @@ func merge(first *ListNode, second *ListNode) *ListNode {
  * 109. Convert Sorted List to Binary Search Tree
  *
  */
+func sortListMergeSort(head *ListNode) *ListNode {
+	return sortList(head)
+}
+
 func sortedListToBST(head *ListNode) *TreeNode {
 	if head == nil {
 		return nil

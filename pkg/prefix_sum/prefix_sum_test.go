@@ -279,3 +279,23 @@ func Test_pathSum(t *testing.T) {
 		})
 	}
 }
+
+func Test_checkSubarraySumNaive(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		k        int
+		expected bool
+	}{
+		{name: "leetcode_example1", nums: []int{23, 2, 4, 6, 7}, k: 6, expected: true},
+		{name: "leetcode_example2", nums: []int{23, 2, 6, 4, 7}, k: 6, expected: true},
+		{name: "leetcode_example3_false", nums: []int{23, 2, 6, 4, 7}, k: 13, expected: false},
+		{name: "two_elements_multiple", nums: []int{0, 0}, k: 1, expected: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, checkSubarraySumNaive(tt.nums, tt.k))
+		})
+	}
+}

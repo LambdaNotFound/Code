@@ -1,9 +1,10 @@
 package divide_and_conquer
 
 import (
-	"gocode/utils"
-
 	"testing"
+
+	. "gocode/types"
+	"gocode/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -126,4 +127,52 @@ func Test_MergeSort(t *testing.T) {
             assert.Equal(t, tc.expected, got)
         })
     }
+}
+
+func Test_sortedListToBST(t *testing.T) {
+	t.Run("nil_returns_nil", func(t *testing.T) {
+		assert.Nil(t, sortedListToBST(nil))
+	})
+
+	t.Run("single_node", func(t *testing.T) {
+		head := &ListNode{Val: 5}
+		root := sortedListToBST(head)
+		assert.NotNil(t, root)
+		assert.Equal(t, 5, root.Val)
+		assert.Nil(t, root.Left)
+		assert.Nil(t, root.Right)
+	})
+
+	t.Run("three_nodes_balanced", func(t *testing.T) {
+		// 1 -> 2 -> 3  =>  root=2, left=1, right=3
+		head := utils.CreateLinkedList([]int{1, 2, 3})
+		root := sortedListToBST(head)
+		assert.Equal(t, 2, root.Val)
+		assert.Equal(t, 1, root.Left.Val)
+		assert.Equal(t, 3, root.Right.Val)
+	})
+
+	t.Run("two_nodes", func(t *testing.T) {
+		// upper-midpoint: [1,2] → root=2, left=1, right=nil
+		head := utils.CreateLinkedList([]int{1, 2})
+		root := sortedListToBST(head)
+		assert.NotNil(t, root)
+		assert.Equal(t, 2, root.Val)
+		assert.Equal(t, 1, root.Left.Val)
+		assert.Nil(t, root.Right)
+	})
+
+	t.Run("five_nodes_in_order_bst", func(t *testing.T) {
+		head := utils.CreateLinkedList([]int{1, 2, 3, 4, 5})
+		root := sortedListToBST(head)
+		// verify BST property: in-order traversal must match [1,2,3,4,5]
+		var inorder func(*TreeNode) []int
+		inorder = func(n *TreeNode) []int {
+			if n == nil {
+				return nil
+			}
+			return append(append(inorder(n.Left), n.Val), inorder(n.Right)...)
+		}
+		assert.Equal(t, []int{1, 2, 3, 4, 5}, inorder(root))
+	})
 }

@@ -71,6 +71,32 @@ func accountsMerge(accounts [][]string) [][]string {
 	return result
 }
 
+type UnionFind struct {
+	parent []int
+}
+
+func NewUnionFind(n int) *UnionFind {
+	parent := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	return &UnionFind{parent: parent}
+}
+
+func (uf *UnionFind) Find(x int) int {
+	if uf.parent[x] != x {
+		uf.parent[x] = uf.Find(uf.parent[x])
+	}
+	return uf.parent[x]
+}
+
+func (uf *UnionFind) Union(x, y int) {
+	rootX, rootY := uf.Find(x), uf.Find(y)
+	if rootX != rootY {
+		uf.parent[rootX] = rootY
+	}
+}
+
 /**
  * Union-Find
  */

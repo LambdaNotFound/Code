@@ -49,7 +49,7 @@ func Test_asteroidCollision(t *testing.T) {
 			input1 := append([]int(nil), tt.asteroids...)
 			input2 := append([]int(nil), tt.asteroids...)
 			assert.Equal(t, tt.expected, asteroidCollision(input1))
-			assert.Equal(t, tt.expected, asteroidCollisionCalude(input2))
+			assert.Equal(t, tt.expected, asteroidCollisionClaude(input2))
 		})
 	}
 }

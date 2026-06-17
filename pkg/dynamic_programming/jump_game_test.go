@@ -30,3 +30,24 @@ func Test_canJump(t *testing.T) {
 		})
 	}
 }
+
+func Test_jump(t *testing.T) {
+	tests := []struct {
+		name     string
+		nums     []int
+		expected int
+	}{
+		{name: "leetcode_example1", nums: []int{2, 3, 1, 1, 4}, expected: 2},
+		{name: "leetcode_example2", nums: []int{2, 3, 0, 1, 4}, expected: 2},
+		{name: "single_element", nums: []int{0}, expected: 0},
+		{name: "two_elements", nums: []int{1, 0}, expected: 1},
+		{name: "large_jump", nums: []int{5, 0, 0, 0, 0}, expected: 1},
+		{name: "all_ones", nums: []int{1, 1, 1, 1, 1}, expected: 4},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, jump(tt.nums))
+		})
+	}
+}

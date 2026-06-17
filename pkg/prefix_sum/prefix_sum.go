@@ -1,8 +1,5 @@
 package prefixsum
 
-import (
-	. "gocode/types"
-)
 
 /**
  * 238. Product of Array Except Self
@@ -59,6 +56,28 @@ func findMaxLength(nums []int) int {
 		}
 	}
 
+	return maxLen
+}
+
+func findMaxLengthPrefixSum(nums []int) int {
+	n := len(nums)
+	prefix := make([]int, n+1)
+	for i, num := range nums {
+		if num == 0 {
+			prefix[i+1] = prefix[i] - 1
+		} else {
+			prefix[i+1] = prefix[i] + 1
+		}
+	}
+	firstSeen := make(map[int]int)
+	maxLen := 0
+	for i, s := range prefix {
+		if j, ok := firstSeen[s]; ok {
+			maxLen = max(maxLen, i-j)
+		} else {
+			firstSeen[s] = i
+		}
+	}
 	return maxLen
 }
 

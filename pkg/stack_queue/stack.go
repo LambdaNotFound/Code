@@ -86,6 +86,28 @@ func asteroidCollision(asteroids []int) []int {
 	return st
 }
 
+func asteroidCollisionClaude(asteroids []int) []int {
+	stack := make([]int, 0, len(asteroids))
+	for _, a := range asteroids {
+		alive := true
+		for alive && a < 0 && len(stack) > 0 && stack[len(stack)-1] > 0 {
+			switch {
+			case stack[len(stack)-1] < -a:
+				stack = stack[:len(stack)-1]
+			case stack[len(stack)-1] == -a:
+				stack = stack[:len(stack)-1]
+				alive = false
+			default:
+				alive = false
+			}
+		}
+		if alive {
+			stack = append(stack, a)
+		}
+	}
+	return stack
+}
+
 /**
  * 1209. Remove All Adjacent Duplicates in String II
  *

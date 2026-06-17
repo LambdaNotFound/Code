@@ -80,6 +80,30 @@ func Test_minPathSum(t *testing.T) {
 				copy(gridCopy[i], row)
 			}
 			assert.Equal(t, tt.expected, minPathSumBottomUp(gridCopy))
+			// space-optimised variant; does not mutate the grid
+			assert.Equal(t, tt.expected, minPathSum(tt.grid))
+		})
+	}
+}
+
+func Test_minPathSumDiagonally(t *testing.T) {
+	// Allows right, down, AND diagonal moves — gives a shorter path than
+	// the standard (right/down-only) variant on grids with off-axis shortcuts.
+	tests := []struct {
+		name     string
+		grid     [][]int
+		expected int
+	}{
+		{name: "example1", grid: [][]int{{1, 3, 1}, {1, 5, 1}, {4, 2, 1}}, expected: 5},
+		{name: "example2", grid: [][]int{{1, 2, 3}, {4, 5, 6}}, expected: 9},
+		{name: "one_by_one", grid: [][]int{{5}}, expected: 5},
+		{name: "single_row", grid: [][]int{{1, 2, 3}}, expected: 6},
+		{name: "single_col", grid: [][]int{{1}, {2}, {3}}, expected: 6},
+		{name: "all_zeros", grid: [][]int{{0, 0}, {0, 0}}, expected: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, minPathSumDiagonally(tt.grid))
 		})
 	}
 }

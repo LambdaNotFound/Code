@@ -319,3 +319,127 @@ func maxProbability(n int, edges [][]int, succProb []float64, start_node int, en
 
 	return prob[end_node]
 }
+
+/**
+ * 499. The Maze II
+ *
+ * A ball rolls in a maze until it hits a wall. Find the minimum distance
+ * from start to destination, or -1 if unreachable.
+ */
+func shortestDistance(maze [][]int, start []int, destination []int) int {
+	rows, cols := len(maze), len(maze[0])
+	dist := make([][]int, rows)
+	for i := range dist {
+		dist[i] = make([]int, cols)
+		for j := range dist[i] {
+			dist[i][j] = math.MaxInt
+		}
+	}
+	dist[start[0]][start[1]] = 0
+
+	type state struct{ dist, r, c int }
+	h := &Heap[state]{less: func(a, b state) bool { return a.dist < b.dist }}
+	heap.Push(h, state{0, start[0], start[1]})
+
+	dirs := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
+	for h.Len() > 0 {
+		cur := heap.Pop(h).(state)
+		r, c, d := cur.r, cur.c, cur.dist
+		if d > dist[r][c] {
+			continue
+		}
+		for _, dir := range dirs {
+			nr, nc, steps := r, c, 0
+			for nr+dir[0] >= 0 && nr+dir[0] < rows && nc+dir[1] >= 0 && nc+dir[1] < cols && maze[nr+dir[0]][nc+dir[1]] == 0 {
+				nr += dir[0]
+				nc += dir[1]
+				steps++
+			}
+			if nd := d + steps; nd < dist[nr][nc] {
+				dist[nr][nc] = nd
+				heap.Push(h, state{nd, nr, nc})
+			}
+		}
+	}
+
+	if dist[destination[0]][destination[1]] == math.MaxInt {
+		return -1
+	}
+	return dist[destination[0]][destination[1]]
+}
+
+/**
+ * 505. The Maze III
+ *
+ * Same rolling mechanic as Maze II, but the ball falls into a hole when it
+ * passes through or lands on it. Return the lexicographically smallest path
+ * string ('d','l','r','u') with minimum total distance, or "impossible".
+ */
+func findShortestWay(maze [][]int, ball []int, hole []int) string {
+	rows, cols := len(maze), len(maze[0])
+
+	bestDist := make([][]int, rows)
+	bestPath := make([][]string, rows)
+	for i := range bestDist {
+		bestDist[i] = make([]int, cols)
+		bestPath[i] = make([]string, cols)
+		for j := range bestDist[i] {
+			bestDist[i][j] = math.MaxInt
+		}
+	}
+	bestDist[ball[0]][ball[1]] = 0
+
+	type state struct {
+		dist int
+		path string
+		r, c int
+	}
+	h := &Heap[state]{less: func(a, b state) bool {
+		if a.dist != b.dist {
+			return a.dist < b.dist
+		}
+		return a.path < b.path
+	}}
+	heap.Push(h, state{0, "", ball[0], ball[1]})
+
+	dirs := []struct {
+		dr, dc int
+		ch     string
+	}{{-1, 0, "u"}, {0, -1, "l"}, {0, 1, "r"}, {1, 0, "d"}}
+
+	for h.Len() > 0 {
+		cur := heap.Pop(h).(state)
+		r, c, d, p := cur.r, cur.c, cur.dist, cur.path
+		if d > bestDist[r][c] || (d == bestDist[r][c] && p > bestPath[r][c]) {
+			continue
+		}
+		if r == hole[0] && c == hole[1] {
+			return p
+		}
+		for _, dir := range dirs {
+			nr, nc, steps := r, c, 0
+			for {
+				nextR, nextC := nr+dir.dr, nc+dir.dc
+				if nextR < 0 || nextR >= rows || nextC < 0 || nextC >= cols || maze[nextR][nextC] == 1 {
+					break
+				}
+				nr, nc = nextR, nextC
+				steps++
+				if nr == hole[0] && nc == hole[1] {
+					break
+				}
+			}
+			if steps == 0 {
+				continue
+			}
+			nd := d + steps
+			np := p + dir.ch
+			if nd < bestDist[nr][nc] || (nd == bestDist[nr][nc] && np < bestPath[nr][nc]) {
+				bestDist[nr][nc] = nd
+				bestPath[nr][nc] = np
+				heap.Push(h, state{nd, np, nr, nc})
+			}
+		}
+	}
+	return "impossible"
+}
