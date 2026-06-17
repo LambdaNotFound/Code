@@ -6,6 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_TimeMap_get_missing_key(t *testing.T) {
+	tm := ConstructorTimeMap()
+	assert.Equal(t, "", tm.Get("missing", 1))
+}
+
 func Test_TimeMap(t *testing.T) {
     timeMap := ConstructorTimeMap()
 

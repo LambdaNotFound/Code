@@ -67,4 +67,9 @@ func Test_FileSystem(t *testing.T) {
 		assert.Equal(t, []string{"c", "file.txt"}, fs.Ls("/a/b"))
 		assert.Equal(t, "hello", fs.ReadContentFromFile("/a/b/file.txt"))
 	})
+
+	t.Run("traverse_returns_nil_for_non-existent_path_without_create", func(t *testing.T) {
+		fs := ConstructorFileSystem()
+		assert.Nil(t, fs.traverse("/nonexistent", false))
+	})
 }

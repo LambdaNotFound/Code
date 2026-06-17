@@ -75,3 +75,65 @@ func Test_RandomizedSet(t *testing.T) {
 		assert.Equal(t, 2, rs.GetRandom())
 	})
 }
+
+func Test_RandomizedCollection(t *testing.T) {
+	t.Run("insert_returns_true_for_new_value", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		assert.True(t, rc.Insert(1))
+	})
+
+	t.Run("insert_returns_false_for_duplicate", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		rc.Insert(1)
+		assert.False(t, rc.Insert(1))
+	})
+
+	t.Run("remove_returns_false_for_missing_value", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		assert.False(t, rc.Remove(99))
+	})
+
+	t.Run("remove_only_copy_then_absent", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		rc.Insert(1)
+		assert.True(t, rc.Remove(1))
+		assert.False(t, rc.Remove(1))
+	})
+
+	t.Run("remove_swaps_non-last_element_with_last", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		rc.Insert(1) // array=[1]
+		rc.Insert(2) // array=[1,2]
+		rc.Insert(3) // array=[1,2,3]
+		// Remove 1 at idx=0: swaps with lastVal=3 → array=[3,2]
+		assert.True(t, rc.Remove(1))
+		allowed := map[int]bool{2: true, 3: true}
+		for i := 0; i < 20; i++ {
+			assert.True(t, allowed[rc.GetRandom()])
+		}
+	})
+
+	t.Run("remove_when_last_element_is_same_value", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		rc.Insert(1) // array=[1],   indices[1]={0}
+		rc.Insert(2) // array=[1,2], indices[2]={1}
+		rc.Insert(1) // array=[1,2,1], indices[1]={0,2}
+		// lastPos=2, lastVal=1==val → idx forced to lastPos, no swap
+		assert.True(t, rc.Remove(1))
+		allowed := map[int]bool{1: true, 2: true}
+		for i := 0; i < 20; i++ {
+			assert.True(t, allowed[rc.GetRandom()])
+		}
+	})
+
+	t.Run("get_random_returns_element_from_collection", func(t *testing.T) {
+		rc := ConstructorRandomizedCollection()
+		rc.Insert(1)
+		rc.Insert(1)
+		rc.Insert(2)
+		allowed := map[int]bool{1: true, 2: true}
+		for i := 0; i < 20; i++ {
+			assert.True(t, allowed[rc.GetRandom()])
+		}
+	})
+}
