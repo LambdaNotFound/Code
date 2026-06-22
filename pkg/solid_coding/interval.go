@@ -341,6 +341,7 @@ func carPooling(trips [][]int, capacity int) bool {
  * Input: schedule = [[[2,4],[7,10]],[[1,5]],[[6,9]]]
  * Output: [(5,6)]
  * Explanation: The three employees collectively have only one common free time interval, which is from 5 to 6.
+ *
  */
 func employeeFreeTime(schedule [][][]int) [][]int {
 	// Step 1: flatten all intervals
@@ -372,4 +373,48 @@ func employeeFreeTime(schedule [][][]int) [][]int {
 	}
 
 	return freeTimes
+}
+
+/*
+ * 1229. Meeting Scheduler
+ * Given the availability time slots arrays slots1 and slots2 of two people and a meeting duration,
+ * return the earliest time slot that works for both of them and is of duration length.
+ * If there is no common time slot that satisfies the requirements, return an empty array.
+ *
+ * Example 1:
+ * Input:  slots1 = [[10,50],[60,120],[140,210]]
+ *        slots2 = [[0,15],[60,70]]
+ *        duration = 8
+ * Output: [60,68]
+ * Example 2:
+ * Input:  slots1 = [[10,50],[60,120],[140,210]]
+ *        slots2 = [[0,15],[60,70]]
+ *        duration = 12
+ * Output: []
+ *
+ * Two-pointer sweep: at each step, compute overlapStart = max(s1, s2), overlapEnd = min(e1, e2).
+ * If overlapEnd - overlapStart >= duration, return [overlapStart, overlapStart + duration]. Advance the pointer whose slot ends earlier.
+ */
+func minAvailableDuration(slots1 [][]int, slots2 [][]int, duration int) []int {
+	sort.Slice(slots1, func(i, j int) bool { return slots1[i][0] < slots1[j][0] })
+	sort.Slice(slots2, func(i, j int) bool { return slots2[i][0] < slots2[j][0] })
+
+	left, right := 0, 0
+	for left < len(slots1) && right < len(slots2) {
+		overlapStart := max(slots1[left][0], slots2[right][0])
+		overlapEnd := min(slots1[left][1], slots2[right][1])
+
+		if overlapEnd-overlapStart >= duration {
+			return []int{overlapStart, overlapStart + duration}
+		}
+
+		// Slot that ends earlier cannot overlap with anything the other pointer
+		// hasn't seen yet — safe to discard it.
+		if slots1[left][1] < slots2[right][1] {
+			left++
+		} else {
+			right++
+		}
+	}
+	return []int{}
 }
