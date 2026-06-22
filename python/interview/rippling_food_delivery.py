@@ -29,7 +29,8 @@ class Solution:
         self.drivers: dict[str, Driver] = {}
         self.total_cost = 0
         self.sorted_deliveries: list[Delivery] = []  # sorted by end_time
-        self.paid_up_to: datetime | None = None
+        self.paid_index: int = 0    # first unpaid delivery in sorted_deliveries
+        self.paid_total: float = 0.0
 
     """
     Part 1:
@@ -49,10 +50,13 @@ class Solution:
     Note: The choice of time format is an important design decision to discuss before implementation.
     """
 
+    # T: O(1)  S: O(d) total across all drivers
     def add_driver(self, driver_id: str, hourly_rate: float):
         if driver_id not in self.drivers:
             self.drivers[driver_id] = Driver(driver_id, hourly_rate)
 
+    # T: O(n) — bisect.insort is O(log n) search but O(n) list shift
+    # S: O(1) per call; O(n) total across all deliveries in sorted_deliveries
     def record_delivery(self, driver_id: str, start_time: str, end_time: str):
         if driver_id in self.drivers:
             dt_start = datetime.fromisoformat(start_time)
@@ -64,7 +68,8 @@ class Solution:
             bisect.insort(self.sorted_deliveries, delivery, key=lambda d: d.end_time)
             self.total_cost += cost
 
-    def get_total_cost(self) -> float:  # total cost across all drivers
+    # T: O(1) — total_cost maintained incrementally
+    def get_total_cost(self) -> float:
         return self.total_cost
 
     """
@@ -73,22 +78,24 @@ class Solution:
     Then total_cost_unpaid() returns only wages from deliveries after the last pay cutoff.
     """
 
+    # T: O(k) amortized — each delivery is visited at most once across all pay_up_to calls
     def pay_up_to(self, pay_time: str):
-        self.paid_up_to = datetime.fromisoformat(pay_time)
+        cutoff = datetime.fromisoformat(pay_time)
+        while (self.paid_index < len(self.sorted_deliveries) and
+               self.sorted_deliveries[self.paid_index].end_time <= cutoff):
+            self.paid_total += self.sorted_deliveries[self.paid_index].cost
+            self.paid_index += 1
 
+    # T: O(1)  S: O(1)
     def total_cost_unpaid(self) -> float:
-        if self.paid_up_to is None:
-            return self.total_cost
-        first_unpaid = bisect.bisect_right(
-            self.sorted_deliveries, self.paid_up_to, key=lambda d: d.end_time
-        )
-        return sum(d.cost for d in self.sorted_deliveries[first_unpaid:])
+        return self.total_cost - self.paid_total
 
     """
     Part 3: Max simultaneous drivers (open-ended)
     same driver can have multiple concurrent deliveries
     """
 
+    # T: O(n log n) — sort 2n events; O(n) sweep  S: O(n) for events + driver_active
     def max_simultaneous_drivers(self) -> int:
         events = []
         for delivery in self.sorted_deliveries:
