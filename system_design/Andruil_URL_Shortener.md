@@ -44,6 +44,7 @@ GET /{short_code}
   Semantics: read-only, cache-first. Served from CDN/Redis on hit;
   falls through to the store on miss.
 
+Arch Diagram
                               ┌─────────────────────────────────────┐
                               │              CLIENTS                │
                               │   POST /shorten      GET /{code}    │
@@ -101,7 +102,7 @@ GET /{short_code}
               └────────────────────────────────────────────────┘
                             (seeded rehash loop, bounded ~3-5x)
 
-  ┌────────────────────────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────────────────────────┐
   │  CONCURRENCY  —  DB uniqueness constraint on short_code IS the lock     │
   │                                                                         │
   │   Two requests, SAME url    → both compute same code → one wins insert, │
@@ -123,4 +124,10 @@ GET /{short_code}
   │    the piece that makes idempotent creates fast.                         │
   │  • 62^7 ≈ 3.5T keys before exhaustion. Reads ≫ writes (100:1+),          │
   │    so the whole system is cache-first, sub-10ms redirect on hit.         │
-  └─────────────────────────────────────────────────────────────────────----- d┘
+  └──────────────────────────────────────────────────────────────────────────┘
+
+short_code — partition key. Point lookups on the read path route by this. Uniformly distributed because it's derived from a hash, so no hot partitions.
+long_url — the redirect target. The payload, ~500 bytes average.
+url_hash — the reverse-lookup index answering "has this long URL been shortened before?" for idempotent creates (FR-4). Worth noting: with deterministic hashing you mostly don't need this — the same URL hashes to the same code, so you check the PK directly. It only earns its keep for the rare seeded-collision case where a URL got bumped to seed+1 and no longer sits at its natural code.
+collision_seed — stored so reads can reconstruct deterministically. On a true collision, you rehash with SHA-256(long_url + ":" + seed); persisting the seed lets you reproduce which code a given URL actually landed on.
+created_at / ttl — metadata for expiration (FR-7) and cleanup. ttl nullable because permanent is the default.

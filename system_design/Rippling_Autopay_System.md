@@ -33,6 +33,14 @@ PATCH /schedules/{id}/deactivate — Soft-delete. Sets status to INACTIVE. Past 
 GET /payees/{id}/payments — Paginated audit ledger. Query params: ?from=&to=&cursor=&limit=
 POST /payroll-runs — Optional manual trigger. Primary path is cron-driven.
 
+Key Design Decisions
+Exactly-once guarantee — Three-layer dedup: outbox poller LSN tracking → Kafka idempotent producer → DB unique constraint at the sink.
+No dual-write — Outbox pattern. Payment + Outbox row written in a single DB transaction. Outbox poller (or CDC/Debezium at scale) drains to Kafka separately.
+Parallelism without orchestration — Kafka consumer group with partition-per-consumer assignment. Partitioned by schedule_id for per-payee ordering. No centralized orchestrator needed.
+Currency — ISO 4217 minor units as BIGINT. Conversion only at the API boundary.
+
+Arch Diagram
+
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              PAYROLL SYSTEM                                     │
 │                                                                                 │

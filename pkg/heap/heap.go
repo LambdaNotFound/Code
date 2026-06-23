@@ -45,6 +45,10 @@ func NewHeap[T comparable](less func(a, b T) bool) *Heap[T] {
 	return h
 }
 
+/**
+ * 3408. Design Task Manager
+ */
+
 // Delete marks val for lazy removal. O(1).
 func (h *Heap[T]) Delete(val T) {
 	if h.deleted == nil {
