@@ -11,12 +11,15 @@ package recursion
  *
  */
 
-/*
-type NestedInteger struct{}
+type NestedInteger struct {
+	isInt bool
+	val   int
+	list  []*NestedInteger
+}
 
-func (n NestedInteger) IsInteger() bool
-func (n NestedInteger) GetInteger() int
-func (n NestedInteger) GetList() []*NestedInteger
+func (n *NestedInteger) IsInteger() bool         { return n.isInt }
+func (n *NestedInteger) GetInteger() int          { return n.val }
+func (n *NestedInteger) GetList() []*NestedInteger { return n.list }
 
 func depthSum(nestedList []*NestedInteger) int {
 	queue := make([]*NestedInteger, len(nestedList))
@@ -58,8 +61,20 @@ func depthSumDFS(nestedList []*NestedInteger) int {
 	return dfs(nestedList, 1)
 }
 
-// 341. Flatten Nested List Iterator
-
+/**
+ * 341. Flatten Nested List Iterator
+ *
+ * You are given a nested list of integers nestedList. Each element is * either an integer or a list whose elements may also be integers or * other lists. Implement an iterator to flatten it.)
+ *
+ * Example 1:
+ *
+ * Input:  nestedList = [[1,1],2,[1,1]]
+ * Output: [1,1,2,1,1]
+ * Example 2:
+ *
+ * Input:  nestedList = [1,[4,[6]]]
+ * Output: [1,4,6]
+ */
 type NestedIterator struct {
 	items   []int
 	current int
@@ -93,4 +108,3 @@ func (it *NestedIterator) Next() int {
 func (it *NestedIterator) HasNext() bool {
 	return it.current < len(it.items)
 }
-*/
