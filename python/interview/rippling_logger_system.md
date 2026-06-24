@@ -14,6 +14,12 @@ LogHandler class, with a process(s str) behavior method for its sub-classes. Bel
 
 4. Array log handler - Stores log messages in an array without printing.
 
+follwo up:
+
+5. A database logger with a new connection made per logging event.
+
+6. A logger that sends messages to a remote API endpoint.
+
 ### Low Level Design
 Apply OOP principal in this design, using the strategy pattern for the LogHandler. 
 

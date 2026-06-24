@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Callable
+import json
+import urllib.request
 
 
 class LogHandler(ABC):
@@ -33,6 +36,42 @@ class ArrayHandler(LogHandler):
 
     def process(self, s: str) -> None:  # T: O(1) amortized, S: O(n) total across all appended strings
         self.logs.append(s)
+
+
+class DatabaseHandler(LogHandler):
+    # connection_factory is called once per log event to open a fresh connection (per spec)
+    def __init__(self, connection_factory: Callable[[], object]):
+        self._factory = connection_factory
+
+    def process(self, s: str) -> None:  # T: O(n), S: O(1) — IO-bound; n = message length
+        conn = self._factory()
+        try:
+            conn.execute("INSERT INTO logs (message) VALUES (?)", (s,))
+            conn.commit()
+        finally:
+            conn.close()
+
+
+class HttpClient(ABC):
+    @abstractmethod
+    def post(self, url: str, payload: dict) -> None: ...
+
+
+class DefaultHttpClient(HttpClient):
+    def post(self, url: str, payload: dict) -> None:
+        data = json.dumps(payload).encode()
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req):
+            pass
+
+
+class RemoteAPIHandler(LogHandler):
+    def __init__(self, endpoint: str, client: HttpClient | None = None):
+        self._endpoint = endpoint
+        self._client = client or DefaultHttpClient()
+
+    def process(self, s: str) -> None:  # T: O(n), S: O(n) — IO-bound; n = message length for JSON encoding
+        self._client.post(self._endpoint, {"message": s})
 
 
 class Logger:
