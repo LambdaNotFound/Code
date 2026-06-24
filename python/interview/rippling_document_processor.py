@@ -3,6 +3,24 @@ import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
+""" Large word dictionary (map too big for one machine's memory/disk):
+Split the vocabulary across multiple reducer machines using consistent 
+hashing — hash(word) % num_reducers routes all counts for the same word 
+to the same machine. Each reducer owns a partition of the vocabulary, 
+aggregates its words independently, finds its local top-k with a heap, 
+then a coordinator merges the results. No single machine needs to hold the full dictionary.
+
+Large document (file too big for one machine):
+Split the file into fixed-size chunks (one per mapper machine), 
+each mapper builds a local frequency count and pre-aggregates before 
+sending data over the network (combiner step). Results are shuffled by 
+word to the correct reducer. The combiner is the key optimization — 
+instead of sending one record per word occurrence, each mapper sends 
+one record per unique word, cutting network traffic drastically. 
+Spark handles both the combiner and fault tolerance automatically via 
+lineage replay. 
+"""
+
 
 class Handler(ABC):
     @abstractmethod
