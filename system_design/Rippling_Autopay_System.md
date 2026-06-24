@@ -112,3 +112,9 @@ Arch Diagram
 │                       └──────────────┘                                          │
 │                                                                                 │
 └─────────────────────────────────────────────────────────────────────────────────┘
+
+The trade-off vs. just adding more partitions + consumers:
+Adding partitions works, but has limits. At 10K TPS, you'd need hundreds of partitions to get one-message-at-a-time throughput. Each partition has overhead — leader election, replication, file handles. The fan-out pattern lets you get, say, 100 TPS per partition with a 10-thread pool, so you only need 100 partitions instead of 1000.
+
+Why your payroll design doesn't need this: at ~100 TPS with each payment taking maybe 200ms (tax call + gateway call), 10 partitions with 10 consumers each doing serial processing clears ~500 TPS easily. The fan-out pattern matters when per-job latency is high or TPS is in the thousands.
+The downside of fan-out: offset management gets complicated. If you commit offset 50 but worker thread 3 is still processing message 48, and the consumer crashes, message 48 gets reprocessed. You need your idempotency guard to catch that. The hellointerview design accepts this trade-off because they're targeting 10K TPS where the throughput gain justifies the complexity.
