@@ -64,6 +64,36 @@ from stack import Solution
 - Static methods (no `self`) are called as `Solution.method(args)`, not `Solution().method(args)`
 - Test file naming: `<module>_test.py` co-located with the solution file; when a directory has multiple solution files, a single `<dir>_test.py` covers them all (e.g. `heap/heap_test.py` tests both `merge_k_lists.py` and `top_k_frequent.py`)
 
+## Interview problems (`interview/`)
+
+**Module-level design comment** — every interview solution opens with a block comment (not a docstring) describing the data model, key invariants, and complexity rationale. Format:
+
+```python
+# Design:
+#   _field   type   — purpose and any invariant
+#
+# Key decision: why this data structure was chosen over alternatives.
+```
+
+**Method complexity annotations** — inline comment on each method signature:
+
+```python
+def process(self, document: str) -> int:  # T: O(n), S: O(1)
+```
+
+**Private attributes** — all instance state uses `_` prefix (`_map`, `_scores`, `_next_id`).
+
+**Common patterns used across problems:**
+
+- *Strategy pattern*: `Handler` ABC with `process()` (document processor, logger). Concrete handlers compose into a manager class that holds `list[Handler]`.
+- *Bounded recent-N list*: for "last N unique items," maintain a list capped at N. On insert of X: remove X if present (O(N) = O(1) since N is fixed), append X, pop front if over N. O(1) insert and retrieval.
+- *Fixed-size min-heap for top-k*: push `(score, item)`, pop when `len > k`. Uses `_RevStr` wrapper to invert string comparison when lexically-smallest ties must be kept (plain `(count, word)` would pop the lexically smallest on ties, keeping the largest — wrong).
+- *Incremental score maintenance*: first vote ±1; direction change ±2. Avoids recomputing from history.
+- *`heapq.nlargest(k, items, key=...)`*: O(n log k) top-k; prefer over sorting when k ≪ n.
+- *Python method overloading*: use a default `None` parameter and branch on it (`get(k, snap_id=None)`).
+
+**Test structure for interview problems** — use `@pytest.fixture` for shared setup and group tests into classes by feature area (e.g. `TestBasicMapOps`, `TestTakeSnapshot`). Not everything needs to be parametrized; explicit named tests are fine when the case has a distinct semantic.
+
 ## Coverage auditing
 
 To check coverage, diff solution methods against tested methods:
