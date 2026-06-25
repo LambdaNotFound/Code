@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Optional
 
 
@@ -49,3 +50,15 @@ class FileSystem:
         if node is None or not node.is_directory:
             return []
         return sorted(node.children.keys())
+
+
+"""
+The current design has no search API. There are two approaches depending on what "search" means:
+
+Search by exact name across the whole tree — add an inverted index: a dict[str, list[Node]] maintained 
+alongside the tree. On every create/delete, update the map. Lookups are O(1) by name at the cost of O(n) extra space. 
+This is the right call for a filesystem that needs fast find -name style queries.
+
+Search by path prefix — the tree itself already is a trie on path segments. Traversing to /a/b and listing everything under 
+it is O(depth + results), which is already optimal. No structural change needed.
+"""
