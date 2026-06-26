@@ -1,4 +1,4 @@
-package solid_coding
+package array
 
 import (
 	"testing"
