@@ -43,8 +43,8 @@ func reverseList(head *ListNode) *ListNode {
 	}
 
 	tail := head.Next
-	head.Next = nil // reset pointer
 	newHead := reverseList(tail)
+	head.Next = nil // reset pointer
 	tail.Next = head
 
 	return newHead
@@ -103,6 +103,30 @@ func swapPairs(head *ListNode) *ListNode {
 /**
  * 25. Reverse Nodes in k-Group
  */
+func reverseKGroup(head *ListNode, k int) *ListNode {
+	var count int
+	curr := head
+	for curr != nil {
+		count++
+		curr = curr.Next
+	}
+
+	dummy := &ListNode{Next: head}
+	prev := dummy
+
+	for i := 0; i < count/k; i++ {
+		curr = prev.Next
+		for j := 1; j < k; j++ {
+			nextNode := curr.Next
+			curr.Next = nextNode.Next
+			nextNode.Next = prev.Next
+			prev.Next = nextNode
+		}
+		prev = curr
+	}
+
+	return dummy.Next
+}
 
 /**
  * 19. Remove Nth Node From End of List
@@ -320,32 +344,4 @@ func oddEvenListCalude(head *ListNode) *ListNode {
 
 	odd.Next = evenHead // splice even list onto odd list
 	return head
-}
-
-/**
- * 25. Reverse Nodes in k-Group
- */
-func reverseKGroup(head *ListNode, k int) *ListNode {
-	var count int
-	curr := head
-	for curr != nil {
-		count++
-		curr = curr.Next
-	}
-
-	dummy := &ListNode{Next: head}
-	prev := dummy
-
-	for i := 0; i < count/k; i++ {
-		curr = prev.Next
-		for j := 1; j < k; j++ {
-			nextNode := curr.Next
-			curr.Next = nextNode.Next
-			nextNode.Next = prev.Next
-			prev.Next = nextNode
-		}
-		prev = curr
-	}
-
-	return dummy.Next
 }
