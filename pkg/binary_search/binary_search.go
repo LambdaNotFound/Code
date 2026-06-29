@@ -273,6 +273,8 @@ func searchMatrix(matrix [][]int, target int) bool {
  *
  * Integers in each row are sorted in ascending from left to right.
  * Integers in each column are sorted in ascending from top to bottom.
+ *
+ * O(m + n) where m = rows, n = columns.
  */
 func searchMatrix2(matrix [][]int, target int) bool {
 	if len(matrix) == 0 || len(matrix[0]) == 0 {

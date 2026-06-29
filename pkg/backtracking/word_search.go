@@ -14,9 +14,9 @@ func exist(board [][]byte, word string) bool {
 		visited[i] = make([]bool, n)
 	}
 
-	var backtrack func(int, int, int) bool
+	var dfs func(int, int, int) bool
 	dirs := [][]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-	backtrack = func(row, col, pos int) bool {
+	dfs = func(row, col, pos int) bool {
 		if pos == len(word) {
 			return true
 		}
@@ -31,7 +31,7 @@ func exist(board [][]byte, word string) bool {
 		found := false
 		for _, d := range dirs {
 			r, c := row+d[0], col+d[1]
-			if backtrack(r, c, pos+1) {
+			if dfs(r, c, pos+1) {
 				visited[row][col] = false
 				return true
 			}
@@ -43,7 +43,7 @@ func exist(board [][]byte, word string) bool {
 
 	for i := 0; i < len(board); i++ {
 		for j := 0; j < len(board[0]); j++ {
-			if board[i][j] == word[0] && backtrack(i, j, 0) {
+			if board[i][j] == word[0] && dfs(i, j, 0) {
 				return true
 			}
 		}
