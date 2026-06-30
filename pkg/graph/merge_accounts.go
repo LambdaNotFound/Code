@@ -15,6 +15,20 @@ import (
  * TimeO(N×K log(N×K)) — N = accounts, K = avg emails, log factor from sorting
  * SpaceO(N×K) — emailToAccounts map
  */
+
+/*
+		Input: accounts = [
+		    ["John","johnsmith@mail.com","john_newyork@mail.com"],
+		    ["John","johnsmith@mail.com","john00@mail.com"],
+		    ["Mary","mary@mail.com"],
+		    ["John","johnnybravo@mail.com"]
+	    ]
+	    Output: [
+		    ["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],
+		    ["Mary","mary@mail.com"],
+		    ["John","johnnybravo@mail.com"]
+	    ]
+*/
 func accountsMerge(accounts [][]string) [][]string {
 	// map each email to all account indices that contain it
 	emailToAccounts := make(map[string][]int)
@@ -35,7 +49,7 @@ func accountsMerge(accounts [][]string) [][]string {
 		// BFS to collect all connected accounts
 		queue := []int{idx}
 		visited[idx] = true
-		emails := make(map[string]bool)
+		emails := make(map[string]bool) // emails that belongs to
 
 		for len(queue) > 0 {
 			accountIdx := queue[0]
@@ -63,7 +77,7 @@ func accountsMerge(accounts [][]string) [][]string {
 		for email := range emails {
 			merged = append(merged, email)
 		}
-		sort.Strings(merged)
+		sort.Strings(merged) // O(nlogn)
 		merged = append([]string{account[0]}, merged...)
 		result = append(result, merged)
 	}
