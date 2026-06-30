@@ -74,3 +74,13 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - Prefer runtime optimization over memory when there is no explicit space constraint
 - Add helper functions only when genuinely necessary; keep solutions self-contained
 - Think through edge cases and T/S complexity before writing code
+
+**Block comments:** when commenting out multiple lines, use a `/** ... */` block with every line prefixed by `* ` (GoLand-style), not `//` per line. Example:
+```go
+/**
+ * s = "abba"
+ * wordDict = ["ab", "a", "abb"]
+ * Trace:
+ * i=1: "a" matches, freq["a"]-- → 0, dp[1]=true
+ */
+```

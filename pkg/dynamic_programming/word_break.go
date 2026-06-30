@@ -65,8 +65,8 @@ func wordBreakCharIndex(s string, wordDict []string) bool {
 	return dp[len(s)]
 }
 
-// Time: O(n² + W)
-// Space: O(n + W)
+// Trie lookup approach:
+// Time: O(n² + W), Space: O(n + W)
 func wordBreakTrie(s string, wordDict []string) bool {
 	root := NewTrie()
 	for _, word := range wordDict {
@@ -120,6 +120,9 @@ func (t *Trie) Insert(word string) {
  * 140. Word Break II
  *
  * Return all such possible sentences in any order.
+ *
+ * dp[i]: substr of length i, can be break into the words in the dict
+ * table[i]: sentences of substr of length i
  */
 func wordBreak2(s string, wordDict []string) []string {
 	wordMap := make(map[string]bool)
@@ -150,4 +153,66 @@ func wordBreak2(s string, wordDict []string) []string {
 		}
 	}
 	return table[n]
+}
+
+/**
+ * follow up: each word in the input list can only be used once
+ *
+ * par1 = ["back", "end", "front", "start"]
+ * par2 = "backend" | "frontend" --> T ; backwards --> F
+ *        "backback"  --> false,  word can not used multiple times
+ *
+ * par1 := []string{"back", "end", "backe", "front", "start", "back", "nds", "backend"}
+ * par2 := "backend"
+ * fmt.Println(wordMatch(par1, par2))
+ *
+ * par2 = "frontend"
+ * fmt.Println(wordMatch(par1, par2))
+ *
+ * par2 = "backwards"
+ * fmt.Println(wordMatch(par1, par2))
+ *
+ * par2 = "backe nds"
+ * fmt.Println(wordMatch(par1, par2))
+ *
+ */
+
+/**
+ * s = "abba"
+ * wordDict = ["ab", "a", "abb"]
+ * Correct answer: true  ("abb" + "a")
+ *
+ * Trace:
+ * i=1: "a" matches, freq["a"]-- → 0, dp[1]=true
+ * i=3: "abb" matches, dp[3]=true
+ * i=4: needs "a" at dp[3], but freq["a"]=0 already → returns false ✗
+ */
+
+// Time: O(2ⁿ · n) worst case, Branching ⇒ 2ⁿ⁻¹ paths & Per-node cost O(n)
+// Space: O(n + W)
+func wordBreakNoReuse(s string, words []string) bool {
+	freq := map[string]int{}
+	for _, w := range words {
+		freq[w]++
+	}
+
+	var backtrack func(s string, start int) bool
+	backtrack = func(s string, start int) bool {
+		if start == len(s) {
+			return true
+		}
+		for end := start + 1; end <= len(s); end++ {
+			sub := s[start:end]
+			if freq[sub] > 0 {
+				freq[sub]--
+				if backtrack(s, end) {
+					return true
+				}
+				freq[sub]++ // restore on failure
+			}
+		}
+		return false
+	}
+
+	return backtrack(s, 0)
 }
