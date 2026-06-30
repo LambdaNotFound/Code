@@ -2,6 +2,7 @@ package solid_coding
 
 import (
 	"fmt"
+	"strconv"
 )
 
 /**
@@ -29,7 +30,7 @@ func linearScan(nums []int) [][]int {
  * Input: nums = [0,2,3,4,6,8,9]
  * Output: ["0","2->4","6","8->9"]
  */
-func summaryRanges(nums []int) []string {
+func summaryRangesClaude(nums []int) []string {
 	ranges := []string{}
 	for i := 0; i < len(nums); i++ {
 		start := i
@@ -43,6 +44,23 @@ func summaryRanges(nums []int) []string {
 		}
 	}
 	return ranges
+}
+
+func summaryRanges(nums []int) []string {
+	res := []string{}
+	left, right := 0, 0
+	for right < len(nums) {
+		if right+1 == len(nums) || nums[right+1] != nums[right]+1 {
+			if left == right {
+				res = append(res, strconv.Itoa(nums[left]))
+			} else {
+				res = append(res, fmt.Sprintf("%v->%v", nums[left], nums[right]))
+			}
+			left = right + 1
+		}
+		right++
+	}
+	return res
 }
 
 /**
