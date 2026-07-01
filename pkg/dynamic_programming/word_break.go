@@ -24,24 +24,28 @@ package dynamic_programming
  *     wordMap: O(W) where W = total characters across all words in the dict.
  */
 func wordBreak(s string, wordDict []string) bool {
-	wordMap := make(map[string]bool)
+	wordMap := map[string]bool{}
 	for _, word := range wordDict {
 		wordMap[word] = true
 	}
 
-	dp := make([]bool, len(s)+1)
-	dp[0] = true // base case: empty string, dp[length]
-	for i := 1; i <= len(s); i++ {
-		for j := 0; j < i; j++ {
-			substr := s[j:i] // i is the gap index
-			if wordMap[substr] && dp[j] {
+	n := len(s)
+	dp := make([]bool, n+1)
+	for i := 1; i <= n; i++ {
+		str := s[:i]
+		if _, found := wordMap[str]; found {
+			dp[i] = true
+			continue
+		}
+		for j := 1; j < i; j++ {
+			substr := str[j:i] // none of which depend on dp[0].
+			if _, found := wordMap[substr]; found && dp[j] {
 				dp[i] = true
-				break // no need to check remaining splits
+				break
 			}
 		}
 	}
-
-	return dp[len(s)]
+	return dp[n]
 }
 
 func wordBreakCharIndex(s string, wordDict []string) bool {
@@ -134,20 +138,18 @@ func wordBreak2(s string, wordDict []string) []string {
 	dp := make([]bool, n+1)
 	table := make([][]string, n+1)
 	for i := 1; i <= n; i++ {
-		substr := s[0:i]
-		if _, exist := wordMap[substr]; exist {
+		str := s[:i]
+		if _, found := wordMap[str]; found {
 			dp[i] = true
-
-			table[i] = append(table[i], substr)
+			table[i] = append(table[i], str)
 		}
 
-		for j := 0; j < i; j += 1 {
-			substr = s[j:i]
-			if _, exist := wordMap[substr]; exist && dp[j] {
+		for j := 1; j < i; j++ {
+			substr := s[j:i]
+			if _, found := wordMap[substr]; found && dp[j] {
 				dp[i] = true
-
-				for _, str := range table[j] { // multipe sentences at s[:j]
-					table[i] = append(table[i], str+" "+substr)
+				for _, seq := range table[j] {
+					table[i] = append(table[i], seq+" "+substr)
 				}
 			}
 		}
