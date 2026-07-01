@@ -19,21 +19,21 @@ import (
 func maxPathSum(root *TreeNode) int {
 	maxSum := math.MinInt
 
-	var postOrderTraversal func(*TreeNode) int
-	postOrderTraversal = func(root *TreeNode) int {
+	var dfs func(*TreeNode) int
+	dfs = func(root *TreeNode) int {
 		if root == nil {
 			return 0
 		}
 
-		leftMaxSum := max(postOrderTraversal(root.Left), 0)   // exclude negative sum
-		rightMaxSum := max(postOrderTraversal(root.Right), 0) // exclude negative sum
+		leftMaxSum := max(dfs(root.Left), 0)   // exclude negative sum
+		rightMaxSum := max(dfs(root.Right), 0) // exclude negative sum
 		pathSum := leftMaxSum + rightMaxSum + root.Val
 		maxSum = max(maxSum, pathSum)
 
 		return root.Val + max(leftMaxSum, rightMaxSum)
 	}
 
-	postOrderTraversal(root)
+	dfs(root)
 	return maxSum
 }
 
