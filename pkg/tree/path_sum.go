@@ -16,6 +16,8 @@ import (
  *
  * note that the path does not need to pass through the root
  */
+// Time: O(n) — each node is visited exactly once in the postorder DFS
+// Space: O(h) for the recursion stack, where h is the tree height
 func maxPathSum(root *TreeNode) int {
 	maxSum := math.MinInt
 
@@ -45,12 +47,14 @@ func maxPathSum(root *TreeNode) int {
  *
  * A root-to-leaf path is a path starting from the root and ending at any leaf node. A leaf is a node with no children.
  */
+// Time: O(n²) worst case, O(n log n) average
+// Space: O(n) for the recursion stack + path array
 func pathSum(root *TreeNode, targetSum int) [][]int {
 	res := make([][]int, 0)
 	path := make([]int, 0)
 
-	var dfs func(node *TreeNode, remaining int)
-	dfs = func(node *TreeNode, remaining int) {
+	var backtrack func(node *TreeNode, remaining int)
+	backtrack = func(node *TreeNode, remaining int) {
 		if node == nil {
 			return
 		}
@@ -61,13 +65,13 @@ func pathSum(root *TreeNode, targetSum int) [][]int {
 		if node.Left == nil && node.Right == nil && remaining == 0 {
 			res = append(res, append([]int{}, path...)) // deep copy
 		} else {
-			dfs(node.Left, remaining)
-			dfs(node.Right, remaining)
+			backtrack(node.Left, remaining)
+			backtrack(node.Right, remaining)
 		}
 
 		path = path[:len(path)-1]
 	}
 
-	dfs(root, targetSum)
+	backtrack(root, targetSum)
 	return res
 }
