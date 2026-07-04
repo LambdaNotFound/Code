@@ -52,8 +52,8 @@ func flat(arr []any, n int) []any { // nested array, type has to be []any
 	s = strings.ReplaceAll(s, "[", " [ ")
 	s = strings.ReplaceAll(s, "]", " ] ")
 	tokens := strings.Fields(s)
-	pos := 0
 
+	pos := 0
 	var parseArr func(n int) []any
 	parseArr = func(n int) []any {
 		pos++ // consume '['

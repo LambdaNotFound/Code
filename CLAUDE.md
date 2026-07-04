@@ -29,13 +29,15 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
 
 **Top-level packages:**
-- `pkg/` — LeetCode solutions grouped by algorithm category: `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
+- `pkg/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
 - `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns
 - `types/` — shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs)
 - `utils/` — test helpers for constructing and comparing linked lists, trees, and graphs
 - `fixtures/` — static test data files (e.g. input text for API design problems)
-- `notes/` — system design and architecture reference notes (e.g. sharding, replication patterns)
+- `system_design/` — written system design solutions/notes (e.g. URL shortener, autopay, hotel booking, sharding, feed generation), not part of the Go module
+- `notes/project_rules/` — interview-prep "project rules" prompts (behavioral, coding/DSA, system design mock-interview instructions) used to configure Claude Code sessions for interview practice; unrelated to the Go source
+- `vibe_coding/` — scratch/sandbox project scaffold (currently just a `.claude/settings.json`)
 
 **`pkg/graph` sub-packages:**
 - `BFS/` — BFS on graphs and grids
@@ -59,6 +61,11 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 **Naming conventions:**
 - Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement
 - Functions suffixed with `Naive` are brute-force or O(n²) baselines kept for comparison
+
+## Claude Code configuration
+
+- `.claude/agents/leetcode-reviewer.md` — subagent that reviews Go LeetCode solutions for correctness, edge cases, complexity, and idiom; invoke proactively after writing/modifying a solution
+- `.claude/skills/` — `review-code`, `review-naming`, `summarize-changes` project-specific skills
 
 ## Python sub-project
 
