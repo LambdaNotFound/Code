@@ -24,6 +24,27 @@ type Payment struct {
 	executed  bool
 }
 
+/**
+ * BankingSystem — CodeSignal "Banking System" progressive mock interview,
+ * levels 1-4 built up in a single type:
+ *   level 1: CreateAccount, Deposit, Transfer
+ *   level 2: outgoing-amount tracking + TopSpenders ranking
+ *   level 3: delayed/scheduled Payments, lazily applied via processPending
+ *            (called at the top of every operation) instead of a timer
+ *   level 4: per-account balance history (BalanceSnapshot) for point-in-time
+ *            GetBalance, and MergeAccounts combining two accounts' state
+ *
+ * Storage: accounts map[id]*Account for O(1) lookup; payments kept in a
+ * single slice ordered by creation time and scanned+filtered on each
+ * processPending call rather than removed, so canceled/executed payments
+ * are just flagged in place.
+ *
+ * Complexity: CreateAccount/Deposit/Transfer/GetBalance are O(1) plus the
+ * O(p) cost of processPending (p = total payments ever scheduled) and,
+ * for GetBalance, O(h) to scan an account's history (h = snapshot count).
+ * TopSpenders is O(a log a) (a = number of accounts) for the sort.
+ * MergeAccounts is O(h1+h2) to merge and re-sort combined history.
+ */
 type BankingSystem struct {
 	accounts map[string]*Account
 	// level 3
