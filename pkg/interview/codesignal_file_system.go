@@ -1,12 +1,17 @@
 package interview
 
-/*
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 )
 
+/**
+ * FileSystem — flat baseline file store: a single map[name]size with no
+ * ownership, TTL, or history. AddFile/GetFileSize/DeleteFile are O(1);
+ * ListFiles is O(n log n), sorting by size desc then name asc.
+ */
 type FileSystem struct {
 	files map[string]int // name -> size
 }
@@ -63,7 +68,7 @@ func (fs *FileSystem) ListFiles() []string {
 
 // PROGRESSIVE
 
-type File struct {
+type FileV1 struct {
 	name         string
 	size         int
 	originalSize int // for compression (Problem 4)
@@ -71,21 +76,40 @@ type File struct {
 	ownerId      string
 }
 
-type User struct {
+type UserV1 struct {
 	id       string
 	capacity int
-	files    map[string]*File // name -> file
+	files    map[string]*FileV1 // name -> file
 }
 
+/**
+ * ProgressiveFS — progressive mock-interview file system, levels 1-4:
+ *   level 1: AddFile/GetFileSize/DeleteFile on a flat file map
+ *   level 2: FindFiles by prefix+suffix (via shared formatAndSort helper)
+ *   level 3: per-user ownership with capacity limits (AddUser,
+ *            AddFileByUser tracks usage by summing owned file sizes)
+ *   level 4: UpdateCapacity evicts largest-file-first (name-desc tie-break)
+ *            until under the new cap; CopyFile respects owner capacity;
+ *            Compress/DecompressFile halve/restore size via originalSize
+ *
+ * Storage: files map[name]*FileV1 for O(1) lookup, cross-referenced by
+ * users[id].files map[name]*FileV1 (same pointers) so per-user usage can
+ * be recomputed by summing that user's file map without touching fs.files.
+ *
+ * Complexity: AddFile/GetFileSize/DeleteFile/CopyFile/Compress/Decompress
+ * are O(1) (O(u) for AddFileByUser/CopyFile's capacity scan, u = user's
+ * file count). FindFiles is O(n log n). UpdateCapacity is O(u^2) worst
+ * case (linear victim scan repeated per eviction).
+ */
 type ProgressiveFS struct {
-	files map[string]*File
-	users map[string]*User
+	files map[string]*FileV1
+	users map[string]*UserV1
 }
 
 func NewProgressiveFS() *ProgressiveFS {
 	return &ProgressiveFS{
-		files: make(map[string]*File),
-		users: make(map[string]*User),
+		files: make(map[string]*FileV1),
+		users: make(map[string]*UserV1),
 	}
 }
 
@@ -95,7 +119,7 @@ func (fs *ProgressiveFS) AddFile(name string, size int) bool {
 	if _, exists := fs.files[name]; exists {
 		return false
 	}
-	fs.files[name] = &File{name: name, size: size, originalSize: size}
+	fs.files[name] = &FileV1{name: name, size: size, originalSize: size}
 	return true
 }
 
@@ -124,16 +148,16 @@ func (fs *ProgressiveFS) DeleteFile(name string) bool {
 // ==================== LEVEL 2 ====================
 
 func (fs *ProgressiveFS) FindFiles(prefix, suffix string) []string {
-	var matched []*File
+	var matched []*FileV1
 	for _, f := range fs.files {
 		if strings.HasPrefix(f.name, prefix) && strings.HasSuffix(f.name, suffix) {
 			matched = append(matched, f)
 		}
 	}
-	return formatAndSort(matched)
+	return formatAndSortFiles(matched)
 }
 
-func formatAndSort(files []*File) []string {
+func formatAndSortFiles(files []*FileV1) []string {
 	sort.Slice(files, func(i, j int) bool {
 		if files[i].size != files[j].size {
 			return files[i].size > files[j].size
@@ -153,10 +177,10 @@ func (fs *ProgressiveFS) AddUser(userId string, capacity int) bool {
 	if _, exists := fs.users[userId]; exists {
 		return false
 	}
-	fs.users[userId] = &User{
+	fs.users[userId] = &UserV1{
 		id:       userId,
 		capacity: capacity,
-		files:    make(map[string]*File),
+		files:    make(map[string]*FileV1),
 	}
 	return true
 }
@@ -177,7 +201,7 @@ func (fs *ProgressiveFS) AddFileByUser(userId, name string, size int) bool {
 	if used+size > u.capacity {
 		return false
 	}
-	f := &File{name: name, size: size, originalSize: size, ownerId: userId}
+	f := &FileV1{name: name, size: size, originalSize: size, ownerId: userId}
 	fs.files[name] = f
 	u.files[name] = f
 	return true
@@ -201,7 +225,7 @@ func (fs *ProgressiveFS) UpdateCapacity(userId string, newCapacity int) *int {
 	removed := 0
 	for used > newCapacity {
 		// Find largest file, tie-break by name descending (remove "last" alphabetically)
-		var victim *File
+		var victim *FileV1
 		for _, f := range u.files {
 			if victim == nil || f.size > victim.size ||
 				(f.size == victim.size && f.name > victim.name) {
@@ -236,7 +260,7 @@ func (fs *ProgressiveFS) CopyFile(fromName, toName string) bool {
 			return false
 		}
 	}
-	f := &File{
+	f := &FileV1{
 		name:         toName,
 		size:         src.size,
 		originalSize: src.originalSize,
@@ -269,8 +293,7 @@ func (fs *ProgressiveFS) DecompressFile(name string) bool {
 	return true
 }
 
-
-type File struct {
+type FileV2 struct {
 	name     string
 	size     int
 	expireAt int // 0 = never expires
@@ -278,17 +301,37 @@ type File struct {
 
 type FileSnapshot struct {
 	timestamp int
-	files     map[string]*File // deep copy of state at that time
+	files     map[string]*FileV2 // deep copy of state at that time
 }
 
+/**
+ * FileServer — separate progressive problem: a timestamped file server,
+ * levels 1-4:
+ *   level 1: FileUpload/FileGet/FileCopy (thin wrappers with timestamp=0)
+ *   level 2: FileSearch by prefix, capped to top 10 by size desc/name asc
+ *   level 3: *At variants take an explicit timestamp; uploads carry a TTL
+ *            and files are treated as absent once timestamp >= expireAt
+ *            (panics on upload-name conflict or copy of a dead/missing
+ *            source, rather than returning a bool/error)
+ *   level 4: saveSnapshot deep-copies the whole file map after every
+ *            mutation; Rollback finds the latest snapshot at or before a
+ *            timestamp and restores it, shifting each restored file's
+ *            expireAt forward by the elapsed time so TTLs measured from
+ *            the rollback point behave as if they'd been ticking all along
+ *
+ * Complexity: FileUpload/FileGet/FileCopy are O(1) plus O(n) for the
+ * post-mutation snapshot copy (n = live file count). FileSearch is
+ * O(n log n) for the sort. Rollback is O(s + n) (s = snapshot count
+ * scanned back-to-front, n = files restored).
+ */
 type FileServer struct {
-	files     map[string]*File
+	files     map[string]*FileV2
 	snapshots []FileSnapshot // ordered by timestamp ascending
 }
 
 func NewFileServer() *FileServer {
 	return &FileServer{
-		files: make(map[string]*File),
+		files: make(map[string]*FileV2),
 	}
 }
 
@@ -321,7 +364,7 @@ func (fs *FileServer) FileUploadAt(timestamp int, fileName string, size int, ttl
 			panic(fmt.Sprintf("file %s already exists", fileName))
 		}
 	}
-	f := &File{name: fileName, size: size}
+	f := &FileV2{name: fileName, size: size}
 	if ttl > 0 {
 		f.expireAt = timestamp + ttl
 	}
@@ -346,12 +389,12 @@ func (fs *FileServer) FileCopyAt(timestamp int, source, dest string) {
 		panic(fmt.Sprintf("source file %s does not exist", source))
 	}
 	// Copy inherits no TTL — fresh file at dest
-	fs.files[dest] = &File{name: dest, size: src.size}
+	fs.files[dest] = &FileV2{name: dest, size: src.size}
 	fs.saveSnapshot(timestamp)
 }
 
 func (fs *FileServer) FileSearchAt(timestamp int, prefix string) []string {
-	var matched []*File
+	var matched []*FileV2
 	for _, f := range fs.files {
 		if f.expireAt != 0 && timestamp >= f.expireAt {
 			continue
@@ -379,7 +422,7 @@ func (fs *FileServer) FileSearchAt(timestamp int, prefix string) []string {
 // ==================== LEVEL 4 ====================
 
 func (fs *FileServer) saveSnapshot(timestamp int) {
-	snapshot := make(map[string]*File)
+	snapshot := make(map[string]*FileV2)
 	for k, f := range fs.files {
 		// deep copy
 		copy := *f
@@ -387,7 +430,7 @@ func (fs *FileServer) saveSnapshot(timestamp int) {
 	}
 	fs.snapshots = append(fs.snapshots, FileSnapshot{
 		timestamp: timestamp,
-		records:   snapshot,
+		files:     snapshot,
 	})
 }
 
@@ -405,7 +448,7 @@ func (fs *FileServer) Rollback(timestamp int) {
 	}
 
 	// Restore, recalculating expireAt
-	fs.files = make(map[string]*File)
+	fs.files = make(map[string]*FileV2)
 	elapsed := timestamp - target.timestamp
 	for k, f := range target.files {
 		restored := *f
@@ -415,4 +458,3 @@ func (fs *FileServer) Rollback(timestamp int) {
 		fs.files[k] = &restored
 	}
 }
-*/
