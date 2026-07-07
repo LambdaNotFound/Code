@@ -1,0 +1,81 @@
+name: daily-leetcode
+
+# Fires at 6:00 PM Pacific year-round.
+# GitHub cron is UTC only, so we schedule both possible UTC hours
+# (01:00 = 18:00 PDT, 02:00 = 18:00 PST) and a guard step lets only
+# the one that is actually 6 PM in America/Los_Angeles proceed.
+on:
+  schedule:
+    - cron: "0 1 * * *" # 18:00 PDT (Mar-Nov)
+    - cron: "0 2 * * *" # 18:00 PST (Nov-Mar)
+  workflow_dispatch: # manual "Run workflow" button, always proceeds
+
+permissions:
+  contents: write # commit state.json back
+  issues: write # comment the daily plan
+
+concurrency:
+  group: daily-leetcode
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE_TITLE: "Daily LeetCode"
+    steps:
+      - name: Guard - only proceed at 6 PM Pacific
+        id: guard
+        run: |
+          hour=$(TZ=America/Los_Angeles date +%H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "18" ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping: it is ${hour}:00 in PT, not 18:00 (DST twin of this cron)."
+            echo "run=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.run == 'yes'
+        uses: actions/checkout@v4
+
+      - name: Generate today's plan (Pacific date)
+        if: steps.guard.outputs.run == 'yes'
+        run: |
+          PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          python3 spaced_repetition/sr.py today --md --date "$PT_DATE" | tee plan.md
+          printf '\ncc @%s\n' "${{ github.repository_owner }}" >> plan.md
+
+      - name: Commit updated state.json
+        if: steps.guard.outputs.run == 'yes'
+        run: |
+          if ! git diff --quiet spaced_repetition/state.json 2>/dev/null; then
+            git config user.name "sr-bot"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add spaced_repetition/state.json
+            git commit -m "sr: record daily plan"
+            git pull --rebase origin main
+            git push
+          else
+            echo "state.json unchanged (idempotent rerun) - nothing to commit."
+          fi
+
+      - name: Find or create the pinned issue
+        if: steps.guard.outputs.run == 'yes'
+        id: issue
+        run: |
+          num=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                --search "\"$ISSUE_TITLE\" in:title" --state open \
+                --json number --jq '.[0].number // empty')
+          if [ -z "$num" ]; then
+            url=$(gh issue create --repo "$GITHUB_REPOSITORY" \
+                  --title "$ISSUE_TITLE" \
+                  --body "Daily spaced-repetition plans are posted here at 6 PM PT. Subscribe to this issue for notifications.")
+            num="${url##*/}"
+          fi
+          echo "number=$num" >> "$GITHUB_OUTPUT"
+
+      - name: Post the plan as an issue comment
+        if: steps.guard.outputs.run == 'yes'
+        run: gh issue comment "${{ steps.issue.outputs.number }}" --repo "$GITHUB_REPOSITORY" --body-file plan.md
