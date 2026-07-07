@@ -42,10 +42,19 @@ def load_problems():
 
 DEFAULT_CONFIG = {
     # Daily effort budget: Easy costs 1, Medium/Hard cost 2.
-    # Budget 2 => two easies per day, or one medium/hard.
-    "new_per_day": 1,
-    "daily_budget": 2,
+    # Budget 4 => ~2 problems/day given the deck's difficulty mix.
+    "daily_budget": 4,
+    # Reserved slice of daily_budget that reviews may NOT consume, so new
+    # problems (and thus category rotation) can't be starved by a heavy
+    # review day. Reviews get (daily_budget - new_budget); new problems
+    # get new_budget plus whatever reviews left unused.
+    "new_budget": 2,
+    "new_per_day": 2,
     "cost": {"E": 1, "M": 2, "H": 2},
+    # "category_rotation": introduce new problems from the category whose
+    # last new-problem introduction is oldest, so every topic gets fresh
+    # coverage every ~1-2 weeks. "curated": strict problems.json order.
+    "new_order": "category_rotation",
 }
 
 
@@ -100,9 +109,10 @@ def pick_today(state, problems, date):
     cfg = state["config"]
     order = {p["id"]: i for i, p in enumerate(problems)}
     by_id = {p["id"]: p for p in problems}
-    budget = cfg["daily_budget"]
+    review_budget = cfg["daily_budget"] - cfg.get("new_budget", 0)
 
-    # Reviews first, in due order. First-fit: an item too big for the
+    # Reviews first, in due order, but only up to review_budget so new
+    # problems can't be starved. First-fit: an item too big for the
     # remaining budget is skipped, but a later cheaper one may still fit
     # (e.g. budget 1 left -> skip a Medium, take an Easy due later).
     due = [
@@ -113,16 +123,22 @@ def pick_today(state, problems, date):
     reviews = []
     for pid in due:
         c = cost_of(by_id[pid], cfg)
-        if c <= budget:
+        if c <= review_budget:
             reviews.append(pid)
-            budget -= c
-        if budget <= 0:
+            review_budget -= c
+        if review_budget <= 0:
             break
 
-    # Then at most new_per_day new problems, strictly in curated order
-    # (no skipping ahead), only if the next one fits the remaining budget.
-    # An unlogged new problem from a previous day is re-served before a
-    # fresh one is introduced.
+    # New problems get the reserved slice plus whatever reviews left over.
+    budget = cfg.get("new_budget", 0) + review_budget
+
+    # Then at most new_per_day new problems, if they fit the remaining
+    # budget. An unlogged new problem from a previous day is re-served
+    # before a fresh one is introduced. Fresh order depends on config:
+    #   category_rotation - pick from the category whose last introduction
+    #     is oldest (never-served categories first), curated order within
+    #     a category; guarantees every topic gets fresh coverage regularly
+    #   curated - strict problems.json order
     new = []
     if budget > 0 and cfg["new_per_day"] > 0:
         carried = [
@@ -133,15 +149,31 @@ def pick_today(state, problems, date):
             pid for plan in state["served"].values() for pid in plan["new"]
         }
         fresh = [p["id"] for p in problems if p["id"] not in seen]
-        for pid in (carried + fresh):
-            if len(new) >= cfg["new_per_day"]:
-                break
+        if cfg.get("new_order") == "category_rotation":
+            # last date each category had a new problem introduced
+            last_intro = {}
+            for d, plan in sorted(state["served"].items()):
+                for pid in plan["new"]:
+                    if pid in by_id:
+                        last_intro[by_id[pid].get("category", "?")] = d
+            fresh.sort(key=lambda pid: (
+                last_intro.get(by_id[pid].get("category", "?"), ""),
+                order[pid],
+            ))
+        candidates = carried + fresh
+        while candidates and len(new) < cfg["new_per_day"] and budget > 0:
+            pid = candidates.pop(0)
             c = cost_of(by_id[pid], cfg)
             if c <= budget:
                 new.append(pid)
                 budget -= c
-            else:
-                break  # next-in-order doesn't fit; don't skip ahead
+                if cfg.get("new_order") == "category_rotation":
+                    # don't introduce two problems of the same category today
+                    cat = by_id[pid].get("category")
+                    candidates = [f for f in candidates
+                                  if by_id[f].get("category") != cat]
+            elif cfg.get("new_order") != "category_rotation":
+                break  # curated mode: don't skip ahead
 
     plan = {"review": reviews, "new": new}
     state["served"][date] = plan
@@ -152,7 +184,7 @@ def pick_today(state, problems, date):
 def fmt_problem(p, card=None):
     diff = {"E": "Easy", "M": "Medium", "H": "Hard"}[p["difficulty"]]
     url = p["alt_url"] if p.get("paid") else p["url"]
-    tags = ", ".join(p["tags"][:3])
+    tags = p.get("category", "") + " · " + ", ".join(p["tags"][:2])
     extra = ""
     if card:
         extra = f"  [reps {card['reps']}, last {card['last']}]"
@@ -163,7 +195,8 @@ def fmt_problem(p, card=None):
 def md_problem(p, card=None):
     diff = {"E": "Easy", "M": "Medium", "H": "Hard"}[p["difficulty"]]
     url = p["alt_url"] if p.get("paid") else p["url"]
-    line = f"- [ ] **#{p['id']} [{p['title']}]({url})** ({diff}) — {', '.join(p['tags'][:3])}"
+    line = (f"- [ ] **#{p['id']} [{p['title']}]({url})** ({diff}) — "
+            f"{p.get('category', '')} · {', '.join(p['tags'][:2])}")
     if p.get("paid"):
         line += " · premium, free mirror linked"
     if card:

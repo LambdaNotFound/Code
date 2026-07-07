@@ -23,8 +23,10 @@
       "H": 2,
       "M": 2
     },
-    "daily_budget": 2,
-    "new_per_day": 1
+    "daily_budget": 4,
+    "new_budget": 2,
+    "new_order": "category_rotation",
+    "new_per_day": 2
   },
   "log": [
     {

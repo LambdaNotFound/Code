@@ -14,7 +14,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/two-sum/"
+  "url": "https://leetcode.com/problems/two-sum/",
+  "category": "Array"
  },
  {
   "id": "3",
@@ -32,7 +33,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+  "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+  "category": "String"
  },
  {
   "id": "5",
@@ -50,7 +52,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-palindromic-substring/"
+  "url": "https://leetcode.com/problems/longest-palindromic-substring/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "8",
@@ -65,7 +68,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/string-to-integer-atoi/"
+  "url": "https://leetcode.com/problems/string-to-integer-atoi/",
+  "category": "String"
  },
  {
   "id": "11",
@@ -83,7 +87,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/container-with-most-water/"
+  "url": "https://leetcode.com/problems/container-with-most-water/",
+  "category": "Array"
  },
  {
   "id": "15",
@@ -101,7 +106,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/3sum/"
+  "url": "https://leetcode.com/problems/3sum/",
+  "category": "Array"
  },
  {
   "id": "17",
@@ -118,7 +124,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/"
+  "url": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/",
+  "category": "Recursion"
  },
  {
   "id": "20",
@@ -135,7 +142,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/valid-parentheses/"
+  "url": "https://leetcode.com/problems/valid-parentheses/",
+  "category": "Stack"
  },
  {
   "id": "21",
@@ -152,7 +160,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/merge-two-sorted-lists/"
+  "url": "https://leetcode.com/problems/merge-two-sorted-lists/",
+  "category": "Linked List"
  },
  {
   "id": "23",
@@ -171,7 +180,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/merge-k-sorted-lists/"
+  "url": "https://leetcode.com/problems/merge-k-sorted-lists/",
+  "category": "Linked List"
  },
  {
   "id": "33",
@@ -188,7 +198,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/"
+  "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/",
+  "category": "Binary Search"
  },
  {
   "id": "39",
@@ -205,7 +216,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/combination-sum/"
+  "url": "https://leetcode.com/problems/combination-sum/",
+  "category": "Recursion"
  },
  {
   "id": "42",
@@ -224,7 +236,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/trapping-rain-water/"
+  "url": "https://leetcode.com/problems/trapping-rain-water/",
+  "category": "Stack"
  },
  {
   "id": "46",
@@ -240,7 +253,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/permutations/"
+  "url": "https://leetcode.com/problems/permutations/",
+  "category": "Recursion"
  },
  {
   "id": "53",
@@ -258,7 +272,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/maximum-subarray/"
+  "url": "https://leetcode.com/problems/maximum-subarray/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "54",
@@ -276,7 +291,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/spiral-matrix/"
+  "url": "https://leetcode.com/problems/spiral-matrix/",
+  "category": "Matrix"
  },
  {
   "id": "56",
@@ -293,7 +309,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/merge-intervals/"
+  "url": "https://leetcode.com/problems/merge-intervals/",
+  "category": "Array"
  },
  {
   "id": "57",
@@ -309,7 +326,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/insert-interval/"
+  "url": "https://leetcode.com/problems/insert-interval/",
+  "category": "Array"
  },
  {
   "id": "62",
@@ -327,7 +345,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/unique-paths/"
+  "url": "https://leetcode.com/problems/unique-paths/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "70",
@@ -345,7 +364,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/climbing-stairs/"
+  "url": "https://leetcode.com/problems/climbing-stairs/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "75",
@@ -362,7 +382,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/sort-colors/"
+  "url": "https://leetcode.com/problems/sort-colors/",
+  "category": "Array"
  },
  {
   "id": "76",
@@ -380,7 +401,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/minimum-window-substring/"
+  "url": "https://leetcode.com/problems/minimum-window-substring/",
+  "category": "String"
  },
  {
   "id": "79",
@@ -400,7 +422,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/word-search/"
+  "url": "https://leetcode.com/problems/word-search/",
+  "category": "Graph"
  },
  {
   "id": "84",
@@ -417,7 +440,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/"
+  "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/",
+  "category": "Stack"
  },
  {
   "id": "98",
@@ -436,7 +460,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/validate-binary-search-tree/"
+  "url": "https://leetcode.com/problems/validate-binary-search-tree/",
+  "category": "Binary Search Tree"
  },
  {
   "id": "102",
@@ -454,7 +479,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/binary-tree-level-order-traversal/"
+  "url": "https://leetcode.com/problems/binary-tree-level-order-traversal/",
+  "category": "Binary Tree"
  },
  {
   "id": "104",
@@ -473,7 +499,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/"
+  "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "105",
@@ -493,7 +520,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"
+  "url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/",
+  "category": "Binary Tree"
  },
  {
   "id": "110",
@@ -510,7 +538,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/balanced-binary-tree/"
+  "url": "https://leetcode.com/problems/balanced-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "121",
@@ -527,7 +556,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/"
+  "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "125",
@@ -544,7 +574,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/valid-palindrome/"
+  "url": "https://leetcode.com/problems/valid-palindrome/",
+  "category": "String"
  },
  {
   "id": "127",
@@ -561,7 +592,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/word-ladder/"
+  "url": "https://leetcode.com/problems/word-ladder/",
+  "category": "Graph"
  },
  {
   "id": "133",
@@ -580,7 +612,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/clone-graph/"
+  "url": "https://leetcode.com/problems/clone-graph/",
+  "category": "Graph"
  },
  {
   "id": "139",
@@ -601,7 +634,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/word-break/"
+  "url": "https://leetcode.com/problems/word-break/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "141",
@@ -619,7 +653,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/linked-list-cycle/"
+  "url": "https://leetcode.com/problems/linked-list-cycle/",
+  "category": "Linked List"
  },
  {
   "id": "146",
@@ -637,7 +672,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/lru-cache/"
+  "url": "https://leetcode.com/problems/lru-cache/",
+  "category": "Linked List"
  },
  {
   "id": "150",
@@ -654,7 +690,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/"
+  "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/",
+  "category": "Stack"
  },
  {
   "id": "155",
@@ -670,7 +707,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/min-stack/"
+  "url": "https://leetcode.com/problems/min-stack/",
+  "category": "Stack"
  },
  {
   "id": "169",
@@ -689,7 +727,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/majority-element/"
+  "url": "https://leetcode.com/problems/majority-element/",
+  "category": "Array"
  },
  {
   "id": "199",
@@ -707,7 +746,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/binary-tree-right-side-view/"
+  "url": "https://leetcode.com/problems/binary-tree-right-side-view/",
+  "category": "Binary Tree"
  },
  {
   "id": "200",
@@ -727,7 +767,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/number-of-islands/"
+  "url": "https://leetcode.com/problems/number-of-islands/",
+  "category": "Graph"
  },
  {
   "id": "206",
@@ -744,7 +785,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/reverse-linked-list/"
+  "url": "https://leetcode.com/problems/reverse-linked-list/",
+  "category": "Linked List"
  },
  {
   "id": "207",
@@ -763,7 +805,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/course-schedule/"
+  "url": "https://leetcode.com/problems/course-schedule/",
+  "category": "Graph"
  },
  {
   "id": "208",
@@ -782,7 +825,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/implement-trie-prefix-tree/"
+  "url": "https://leetcode.com/problems/implement-trie-prefix-tree/",
+  "category": "Trie"
  },
  {
   "id": "217",
@@ -800,7 +844,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/contains-duplicate/"
+  "url": "https://leetcode.com/problems/contains-duplicate/",
+  "category": "Hash Table"
  },
  {
   "id": "224",
@@ -818,7 +863,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/basic-calculator/"
+  "url": "https://leetcode.com/problems/basic-calculator/",
+  "category": "Stack"
  },
  {
   "id": "226",
@@ -837,7 +883,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/invert-binary-tree/"
+  "url": "https://leetcode.com/problems/invert-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "230",
@@ -856,7 +903,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
+  "url": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/",
+  "category": "Binary Search Tree"
  },
  {
   "id": "232",
@@ -873,7 +921,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/implement-queue-using-stacks/"
+  "url": "https://leetcode.com/problems/implement-queue-using-stacks/",
+  "category": "Stack"
  },
  {
   "id": "235",
@@ -892,7 +941,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/"
+  "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/",
+  "category": "Binary Search Tree"
  },
  {
   "id": "236",
@@ -909,7 +959,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+  "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "238",
@@ -926,7 +977,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/product-of-array-except-self/"
+  "url": "https://leetcode.com/problems/product-of-array-except-self/",
+  "category": "Array"
  },
  {
   "id": "242",
@@ -944,7 +996,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/valid-anagram/"
+  "url": "https://leetcode.com/problems/valid-anagram/",
+  "category": "String"
  },
  {
   "id": "278",
@@ -960,7 +1013,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/first-bad-version/"
+  "url": "https://leetcode.com/problems/first-bad-version/",
+  "category": "Binary Search"
  },
  {
   "id": "295",
@@ -980,7 +1034,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/find-median-from-data-stream/"
+  "url": "https://leetcode.com/problems/find-median-from-data-stream/",
+  "category": "Heap"
  },
  {
   "id": "297",
@@ -1001,7 +1056,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"
+  "url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "310",
@@ -1019,7 +1075,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/minimum-height-trees/"
+  "url": "https://leetcode.com/problems/minimum-height-trees/",
+  "category": "Graph"
  },
  {
   "id": "322",
@@ -1037,7 +1094,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/coin-change/"
+  "url": "https://leetcode.com/problems/coin-change/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "383",
@@ -1054,7 +1112,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/ransom-note/"
+  "url": "https://leetcode.com/problems/ransom-note/",
+  "category": "Hash Table"
  },
  {
   "id": "409",
@@ -1071,7 +1130,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/longest-palindrome/"
+  "url": "https://leetcode.com/problems/longest-palindrome/",
+  "category": "String"
  },
  {
   "id": "416",
@@ -1087,7 +1147,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/partition-equal-subset-sum/"
+  "url": "https://leetcode.com/problems/partition-equal-subset-sum/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "438",
@@ -1104,7 +1165,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/find-all-anagrams-in-a-string/"
+  "url": "https://leetcode.com/problems/find-all-anagrams-in-a-string/",
+  "category": "String"
  },
  {
   "id": "542",
@@ -1122,7 +1184,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/01-matrix/"
+  "url": "https://leetcode.com/problems/01-matrix/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "543",
@@ -1139,7 +1202,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/diameter-of-binary-tree/"
+  "url": "https://leetcode.com/problems/diameter-of-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "621",
@@ -1159,7 +1223,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/task-scheduler/"
+  "url": "https://leetcode.com/problems/task-scheduler/",
+  "category": "Heap"
  },
  {
   "id": "704",
@@ -1175,7 +1240,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/binary-search/"
+  "url": "https://leetcode.com/problems/binary-search/",
+  "category": "Binary Search"
  },
  {
   "id": "721",
@@ -1196,7 +1262,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/accounts-merge/"
+  "url": "https://leetcode.com/problems/accounts-merge/",
+  "category": "Graph"
  },
  {
   "id": "733",
@@ -1214,7 +1281,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/flood-fill/"
+  "url": "https://leetcode.com/problems/flood-fill/",
+  "category": "Graph"
  },
  {
   "id": "876",
@@ -1230,7 +1298,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/middle-of-the-linked-list/"
+  "url": "https://leetcode.com/problems/middle-of-the-linked-list/",
+  "category": "Linked List"
  },
  {
   "id": "973",
@@ -1251,7 +1320,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/k-closest-points-to-origin/"
+  "url": "https://leetcode.com/problems/k-closest-points-to-origin/",
+  "category": "Heap"
  },
  {
   "id": "981",
@@ -1269,7 +1339,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/time-based-key-value-store/"
+  "url": "https://leetcode.com/problems/time-based-key-value-store/",
+  "category": "Binary Search"
  },
  {
   "id": "994",
@@ -1286,7 +1357,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/rotting-oranges/"
+  "url": "https://leetcode.com/problems/rotting-oranges/",
+  "category": "Graph"
  },
  {
   "id": "1235",
@@ -1304,7 +1376,8 @@
    "G75",
    "G169"
   ],
-  "url": "https://leetcode.com/problems/maximum-profit-in-job-scheduling/"
+  "url": "https://leetcode.com/problems/maximum-profit-in-job-scheduling/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "2",
@@ -1320,7 +1393,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/add-two-numbers/"
+  "url": "https://leetcode.com/problems/add-two-numbers/",
+  "category": "Linked List"
  },
  {
   "id": "4",
@@ -1336,7 +1410,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/"
+  "url": "https://leetcode.com/problems/median-of-two-sorted-arrays/",
+  "category": "Binary Search"
  },
  {
   "id": "7",
@@ -1350,7 +1425,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/reverse-integer/"
+  "url": "https://leetcode.com/problems/reverse-integer/",
+  "category": "Math"
  },
  {
   "id": "9",
@@ -1364,7 +1440,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/palindrome-number/"
+  "url": "https://leetcode.com/problems/palindrome-number/",
+  "category": "Math"
  },
  {
   "id": "13",
@@ -1380,7 +1457,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/roman-to-integer/"
+  "url": "https://leetcode.com/problems/roman-to-integer/",
+  "category": "String"
  },
  {
   "id": "14",
@@ -1396,7 +1474,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/longest-common-prefix/"
+  "url": "https://leetcode.com/problems/longest-common-prefix/",
+  "category": "String"
  },
  {
   "id": "16",
@@ -1412,7 +1491,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/3sum-closest/"
+  "url": "https://leetcode.com/problems/3sum-closest/",
+  "category": "Array"
  },
  {
   "id": "19",
@@ -1428,7 +1508,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/"
+  "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/",
+  "category": "Linked List"
  },
  {
   "id": "22",
@@ -1444,7 +1525,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/generate-parentheses/"
+  "url": "https://leetcode.com/problems/generate-parentheses/",
+  "category": "Recursion"
  },
  {
   "id": "24",
@@ -1459,7 +1541,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/swap-nodes-in-pairs/"
+  "url": "https://leetcode.com/problems/swap-nodes-in-pairs/",
+  "category": "Linked List"
  },
  {
   "id": "25",
@@ -1474,7 +1557,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/reverse-nodes-in-k-group/"
+  "url": "https://leetcode.com/problems/reverse-nodes-in-k-group/",
+  "category": "Linked List"
  },
  {
   "id": "31",
@@ -1489,7 +1573,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/next-permutation/"
+  "url": "https://leetcode.com/problems/next-permutation/",
+  "category": "Array"
  },
  {
   "id": "32",
@@ -1505,7 +1590,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/longest-valid-parentheses/"
+  "url": "https://leetcode.com/problems/longest-valid-parentheses/",
+  "category": "Stack"
  },
  {
   "id": "36",
@@ -1521,7 +1607,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/valid-sudoku/"
+  "url": "https://leetcode.com/problems/valid-sudoku/",
+  "category": "Matrix"
  },
  {
   "id": "37",
@@ -1538,7 +1625,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/sudoku-solver/"
+  "url": "https://leetcode.com/problems/sudoku-solver/",
+  "category": "Recursion"
  },
  {
   "id": "41",
@@ -1553,7 +1641,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/first-missing-positive/"
+  "url": "https://leetcode.com/problems/first-missing-positive/",
+  "category": "Array"
  },
  {
   "id": "48",
@@ -1570,7 +1659,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/rotate-image/"
+  "url": "https://leetcode.com/problems/rotate-image/",
+  "category": "Matrix"
  },
  {
   "id": "49",
@@ -1588,7 +1678,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/group-anagrams/"
+  "url": "https://leetcode.com/problems/group-anagrams/",
+  "category": "Hash Table"
  },
  {
   "id": "50",
@@ -1603,7 +1694,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/powx-n/"
+  "url": "https://leetcode.com/problems/powx-n/",
+  "category": "Recursion"
  },
  {
   "id": "51",
@@ -1618,7 +1710,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/n-queens/"
+  "url": "https://leetcode.com/problems/n-queens/",
+  "category": "Recursion"
  },
  {
   "id": "55",
@@ -1635,7 +1728,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/jump-game/"
+  "url": "https://leetcode.com/problems/jump-game/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "61",
@@ -1650,7 +1744,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/rotate-list/"
+  "url": "https://leetcode.com/problems/rotate-list/",
+  "category": "Linked List"
  },
  {
   "id": "73",
@@ -1667,7 +1762,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/set-matrix-zeroes/"
+  "url": "https://leetcode.com/problems/set-matrix-zeroes/",
+  "category": "Matrix"
  },
  {
   "id": "74",
@@ -1683,7 +1779,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/search-a-2d-matrix/"
+  "url": "https://leetcode.com/problems/search-a-2d-matrix/",
+  "category": "Binary Search"
  },
  {
   "id": "91",
@@ -1699,7 +1796,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/decode-ways/"
+  "url": "https://leetcode.com/problems/decode-ways/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "100",
@@ -1717,7 +1815,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/same-tree/"
+  "url": "https://leetcode.com/problems/same-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "101",
@@ -1734,7 +1833,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/symmetric-tree/"
+  "url": "https://leetcode.com/problems/symmetric-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "103",
@@ -1750,7 +1850,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/"
+  "url": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/",
+  "category": "Binary Tree"
  },
  {
   "id": "108",
@@ -1768,7 +1869,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/"
+  "url": "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/",
+  "category": "Binary Search Tree"
  },
  {
   "id": "113",
@@ -1785,7 +1887,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/path-sum-ii/"
+  "url": "https://leetcode.com/problems/path-sum-ii/",
+  "category": "Binary Tree"
  },
  {
   "id": "124",
@@ -1803,7 +1906,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/"
+  "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/",
+  "category": "Binary Tree"
  },
  {
   "id": "128",
@@ -1820,7 +1924,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-consecutive-sequence/"
+  "url": "https://leetcode.com/problems/longest-consecutive-sequence/",
+  "category": "Graph"
  },
  {
   "id": "134",
@@ -1835,7 +1940,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/gas-station/"
+  "url": "https://leetcode.com/problems/gas-station/",
+  "category": "Array"
  },
  {
   "id": "143",
@@ -1853,7 +1959,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/reorder-list/"
+  "url": "https://leetcode.com/problems/reorder-list/",
+  "category": "Linked List"
  },
  {
   "id": "148",
@@ -1871,7 +1978,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/sort-list/"
+  "url": "https://leetcode.com/problems/sort-list/",
+  "category": "Linked List"
  },
  {
   "id": "152",
@@ -1887,7 +1995,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/maximum-product-subarray/"
+  "url": "https://leetcode.com/problems/maximum-product-subarray/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "153",
@@ -1903,7 +2012,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"
+  "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/",
+  "category": "Binary Search"
  },
  {
   "id": "179",
@@ -1920,7 +2030,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/largest-number/"
+  "url": "https://leetcode.com/problems/largest-number/",
+  "category": "String"
  },
  {
   "id": "189",
@@ -1936,7 +2047,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/rotate-array/"
+  "url": "https://leetcode.com/problems/rotate-array/",
+  "category": "Math"
  },
  {
   "id": "198",
@@ -1952,7 +2064,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/house-robber/"
+  "url": "https://leetcode.com/problems/house-robber/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "210",
@@ -1969,7 +2082,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/course-schedule-ii/"
+  "url": "https://leetcode.com/problems/course-schedule-ii/",
+  "category": "Graph"
  },
  {
   "id": "211",
@@ -1987,7 +2101,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/design-add-and-search-words-data-structure/"
+  "url": "https://leetcode.com/problems/design-add-and-search-words-data-structure/",
+  "category": "Trie"
  },
  {
   "id": "212",
@@ -2006,7 +2121,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/word-search-ii/"
+  "url": "https://leetcode.com/problems/word-search-ii/",
+  "category": "Trie"
  },
  {
   "id": "215",
@@ -2024,7 +2140,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+  "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/",
+  "category": "Heap"
  },
  {
   "id": "221",
@@ -2040,7 +2157,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/maximal-square/"
+  "url": "https://leetcode.com/problems/maximal-square/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "227",
@@ -2056,7 +2174,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/basic-calculator-ii/"
+  "url": "https://leetcode.com/problems/basic-calculator-ii/",
+  "category": "Stack"
  },
  {
   "id": "234",
@@ -2073,7 +2192,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/palindrome-linked-list/"
+  "url": "https://leetcode.com/problems/palindrome-linked-list/",
+  "category": "Linked List"
  },
  {
   "id": "239",
@@ -2091,7 +2211,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/sliding-window-maximum/"
+  "url": "https://leetcode.com/problems/sliding-window-maximum/",
+  "category": "Heap"
  },
  {
   "id": "252",
@@ -2108,7 +2229,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/meeting-rooms/",
-  "alt_url": "https://leetcode.ca/all/252.html"
+  "alt_url": "https://leetcode.ca/all/252.html",
+  "category": "Array"
  },
  {
   "id": "253",
@@ -2129,7 +2251,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/meeting-rooms-ii/",
-  "alt_url": "https://leetcode.ca/all/253.html"
+  "alt_url": "https://leetcode.ca/all/253.html",
+  "category": "Heap"
  },
  {
   "id": "261",
@@ -2148,7 +2271,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/graph-valid-tree/",
-  "alt_url": "https://leetcode.ca/all/261.html"
+  "alt_url": "https://leetcode.ca/all/261.html",
+  "category": "Graph"
  },
  {
   "id": "269",
@@ -2169,7 +2293,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/alien-dictionary/",
-  "alt_url": "https://leetcode.ca/all/269.html"
+  "alt_url": "https://leetcode.ca/all/269.html",
+  "category": "Graph"
  },
  {
   "id": "271",
@@ -2187,7 +2312,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/encode-and-decode-strings/",
-  "alt_url": "https://leetcode.ca/all/271.html"
+  "alt_url": "https://leetcode.ca/all/271.html",
+  "category": "String"
  },
  {
   "id": "283",
@@ -2202,7 +2328,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/move-zeroes/"
+  "url": "https://leetcode.com/problems/move-zeroes/",
+  "category": "Array"
  },
  {
   "id": "285",
@@ -2220,7 +2347,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/inorder-successor-in-bst/",
-  "alt_url": "https://leetcode.ca/all/285.html"
+  "alt_url": "https://leetcode.ca/all/285.html",
+  "category": "Binary Search Tree"
  },
  {
   "id": "300",
@@ -2237,7 +2365,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-increasing-subsequence/"
+  "url": "https://leetcode.com/problems/longest-increasing-subsequence/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "323",
@@ -2256,7 +2385,8 @@
    "B75"
   ],
   "url": "https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/",
-  "alt_url": "https://leetcode.ca/all/323.html"
+  "alt_url": "https://leetcode.ca/all/323.html",
+  "category": "Graph"
  },
  {
   "id": "328",
@@ -2270,7 +2400,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/odd-even-linked-list/"
+  "url": "https://leetcode.com/problems/odd-even-linked-list/",
+  "category": "Linked List"
  },
  {
   "id": "329",
@@ -2291,7 +2422,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/longest-increasing-path-in-a-matrix/"
+  "url": "https://leetcode.com/problems/longest-increasing-path-in-a-matrix/",
+  "category": "Graph"
  },
  {
   "id": "336",
@@ -2309,7 +2441,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/palindrome-pairs/"
+  "url": "https://leetcode.com/problems/palindrome-pairs/",
+  "category": "String"
  },
  {
   "id": "362",
@@ -2328,7 +2461,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/design-hit-counter/",
-  "alt_url": "https://leetcode.ca/all/362.html"
+  "alt_url": "https://leetcode.ca/all/362.html",
+  "category": "Queue"
  },
  {
   "id": "377",
@@ -2343,7 +2477,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/combination-sum-iv/"
+  "url": "https://leetcode.com/problems/combination-sum-iv/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "380",
@@ -2361,7 +2496,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/insert-delete-getrandom-o1/"
+  "url": "https://leetcode.com/problems/insert-delete-getrandom-o1/",
+  "category": "Math"
  },
  {
   "id": "394",
@@ -2377,7 +2513,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/decode-string/"
+  "url": "https://leetcode.com/problems/decode-string/",
+  "category": "Stack"
  },
  {
   "id": "417",
@@ -2395,7 +2532,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/pacific-atlantic-water-flow/"
+  "url": "https://leetcode.com/problems/pacific-atlantic-water-flow/",
+  "category": "Graph"
  },
  {
   "id": "424",
@@ -2412,7 +2550,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+  "url": "https://leetcode.com/problems/longest-repeating-character-replacement/",
+  "category": "String"
  },
  {
   "id": "435",
@@ -2430,7 +2569,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/non-overlapping-intervals/"
+  "url": "https://leetcode.com/problems/non-overlapping-intervals/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "437",
@@ -2446,7 +2586,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/path-sum-iii/"
+  "url": "https://leetcode.com/problems/path-sum-iii/",
+  "category": "Binary Tree"
  },
  {
   "id": "525",
@@ -2462,7 +2603,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/contiguous-array/"
+  "url": "https://leetcode.com/problems/contiguous-array/",
+  "category": "Array"
  },
  {
   "id": "528",
@@ -2480,7 +2622,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/random-pick-with-weight/"
+  "url": "https://leetcode.com/problems/random-pick-with-weight/",
+  "category": "Binary Search"
  },
  {
   "id": "560",
@@ -2496,7 +2639,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/subarray-sum-equals-k/"
+  "url": "https://leetcode.com/problems/subarray-sum-equals-k/",
+  "category": "Array"
  },
  {
   "id": "572",
@@ -2515,7 +2659,8 @@
    "G169",
    "B75"
   ],
-  "url": "https://leetcode.com/problems/subtree-of-another-tree/"
+  "url": "https://leetcode.com/problems/subtree-of-another-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "588",
@@ -2534,7 +2679,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/design-in-memory-file-system/",
-  "alt_url": "https://leetcode.ca/all/588.html"
+  "alt_url": "https://leetcode.ca/all/588.html",
+  "category": "String"
  },
  {
   "id": "632",
@@ -2553,7 +2699,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/"
+  "url": "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/",
+  "category": "Heap"
  },
  {
   "id": "658",
@@ -2572,7 +2719,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/find-k-closest-elements/"
+  "url": "https://leetcode.com/problems/find-k-closest-elements/",
+  "category": "Heap"
  },
  {
   "id": "662",
@@ -2589,7 +2737,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/maximum-width-of-binary-tree/"
+  "url": "https://leetcode.com/problems/maximum-width-of-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "692",
@@ -2610,7 +2759,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/top-k-frequent-words/"
+  "url": "https://leetcode.com/problems/top-k-frequent-words/",
+  "category": "Heap"
  },
  {
   "id": "735",
@@ -2626,7 +2776,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/asteroid-collision/"
+  "url": "https://leetcode.com/problems/asteroid-collision/",
+  "category": "Stack"
  },
  {
   "id": "739",
@@ -2642,7 +2793,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/daily-temperatures/"
+  "url": "https://leetcode.com/problems/daily-temperatures/",
+  "category": "Stack"
  },
  {
   "id": "759",
@@ -2660,7 +2812,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/employee-free-time/",
-  "alt_url": "https://leetcode.ca/all/759.html"
+  "alt_url": "https://leetcode.ca/all/759.html",
+  "category": "Heap"
  },
  {
   "id": "787",
@@ -2679,7 +2832,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/"
+  "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/",
+  "category": "Graph"
  },
  {
   "id": "815",
@@ -2695,7 +2849,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/bus-routes/"
+  "url": "https://leetcode.com/problems/bus-routes/",
+  "category": "Graph"
  },
  {
   "id": "844",
@@ -2712,7 +2867,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/backspace-string-compare/"
+  "url": "https://leetcode.com/problems/backspace-string-compare/",
+  "category": "Stack"
  },
  {
   "id": "863",
@@ -2730,7 +2886,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/"
+  "url": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/",
+  "category": "Binary Tree"
  },
  {
   "id": "895",
@@ -2747,7 +2904,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/maximum-frequency-stack/"
+  "url": "https://leetcode.com/problems/maximum-frequency-stack/",
+  "category": "Stack"
  },
  {
   "id": "977",
@@ -2763,7 +2921,8 @@
   "lists": [
    "G169"
   ],
-  "url": "https://leetcode.com/problems/squares-of-a-sorted-array/"
+  "url": "https://leetcode.com/problems/squares-of-a-sorted-array/",
+  "category": "Array"
  },
  {
   "id": "1197",
@@ -2778,7 +2937,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/minimum-knight-moves/",
-  "alt_url": "https://leetcode.ca/all/1197.html"
+  "alt_url": "https://leetcode.ca/all/1197.html",
+  "category": "Graph"
  },
  {
   "id": "1730",
@@ -2795,7 +2955,8 @@
    "G169"
   ],
   "url": "https://leetcode.com/problems/shortest-path-to-get-food/",
-  "alt_url": "https://leetcode.ca/all/1730.html"
+  "alt_url": "https://leetcode.ca/all/1730.html",
+  "category": "Graph"
  },
  {
   "id": "213",
@@ -2810,7 +2971,8 @@
   "lists": [
    "B75"
   ],
-  "url": "https://leetcode.com/problems/house-robber-ii/"
+  "url": "https://leetcode.com/problems/house-robber-ii/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "347",
@@ -2831,7 +2993,8 @@
   "lists": [
    "B75"
   ],
-  "url": "https://leetcode.com/problems/top-k-frequent-elements/"
+  "url": "https://leetcode.com/problems/top-k-frequent-elements/",
+  "category": "Heap"
  },
  {
   "id": "647",
@@ -2847,7 +3010,8 @@
   "lists": [
    "B75"
   ],
-  "url": "https://leetcode.com/problems/palindromic-substrings/"
+  "url": "https://leetcode.com/problems/palindromic-substrings/",
+  "category": "Dynamic Programming"
  },
  {
   "id": "1143",
@@ -2862,6 +3026,7 @@
   "lists": [
    "B75"
   ],
-  "url": "https://leetcode.com/problems/longest-common-subsequence/"
+  "url": "https://leetcode.com/problems/longest-common-subsequence/",
+  "category": "Dynamic Programming"
  }
 ]

@@ -4,7 +4,7 @@ Daily practice scheduler for 165 problems (Grind 75 ∪ Grind 169 ∪ Blind 75, 
 
 ## Daily flow
 
-1. Every day at 3 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): 1–2 problems per day — Easy counts 1, Medium/Hard counts 2, against a daily budget of 2 (so two Easies, or one Medium/Hard). Due reviews are picked first, then at most 1 new problem if it fits the remaining budget. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
+1. Every day at 3 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): ~2-3 problems per day — Easy costs 1, Medium/Hard costs 2, against a daily budget of 4. Reviews take up to half the budget (due-order); the other half is reserved for new problems so a heavy review day can't starve them. New problems are introduced by **category rotation**: each problem carries one of 16 Grind-style categories (`category` in problems.json), and the next new problem comes from the category that least recently got one — so every topic gets fresh coverage roughly every 2 weeks, and a full first pass takes ~4-5 months. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
 2. Solve them on LeetCode (premium problems link to a free mirror on leetcode.ca).
 3. Log each solve, any of three ways:
    - **From your phone (no laptop):** reply to the daily comment on the "Daily LeetCode" issue — e.g. "solved 200 good, #33 was hard". The [`log-solve` workflow](../.github/workflows/log-solve.yml) parses your comment, updates `state.json`, commits it, and replies with the next review dates. Only your own comments trigger it.
@@ -40,7 +40,9 @@ python3 sr.py due       # every card's next review date
 
 ## Tuning
 
-Edit `config` inside `state.json`: `new_per_day` (default 1), `daily_budget` (default 2), and `cost` per difficulty (default E=1, M=2, H=2). Reviews and new problems draw from the same budget. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
+Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), and `cost` per difficulty (default E=1, M=2, H=2).
+
+Pace levers, measured by simulation: budget 4 / new 2 ≈ 2.4 problems/day, ~13-day tag rotation, full pass ~4.5 months, but overdue reviews queue up over time. Raise `daily_budget` to 6-7 (keeping `new_budget` 2) to clear reviews on schedule at ~3.5 problems/day; raise both (e.g. 10/5) to finish the deck in ~2 months at ~5 problems/day. Overdue reviews aren't lost — they serve oldest-first as budget allows. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
 
 ## Note for Claude sessions
 
