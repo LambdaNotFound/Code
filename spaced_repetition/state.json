@@ -1,10 +1,25 @@
 {
-  "cards": {},
+  "cards": {
+    "1": {
+      "due": "2026-07-08",
+      "ease": 2.5,
+      "interval": 2,
+      "lapses": 0,
+      "last": "2026-07-06",
+      "reps": 1
+    }
+  },
   "config": {
     "daily_cap": 3,
     "new_per_day": 1
   },
-  "log": [],
+  "log": [
+    {
+      "date": "2026-07-06",
+      "grade": "good",
+      "id": "1"
+    }
+  ],
   "served": {
     "2026-07-06": {
       "new": [
