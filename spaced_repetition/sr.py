@@ -40,12 +40,24 @@ def load_problems():
         return json.load(f)
 
 
+DEFAULT_CONFIG = {
+    # Daily effort budget: Easy costs 1, Medium/Hard cost 2.
+    # Budget 2 => two easies per day, or one medium/hard.
+    "new_per_day": 1,
+    "daily_budget": 2,
+    "cost": {"E": 1, "M": 2, "H": 2},
+}
+
+
 def load_state():
     if STATE_FILE.exists():
         with open(STATE_FILE) as f:
-            return json.load(f)
+            state = json.load(f)
+        state["config"] = {**DEFAULT_CONFIG, **state.get("config", {})}
+        state["config"].pop("daily_cap", None)  # pre-budget config key
+        return state
     return {
-        "config": {"new_per_day": 1, "daily_cap": 3},
+        "config": dict(DEFAULT_CONFIG),
         "cards": {},          # id -> {interval, ease, due, reps, lapses, last}
         "served": {},         # date -> {"review": [...], "new": [...]}
         "log": [],            # {date, id, grade}
@@ -77,6 +89,10 @@ def unlogged_served(state, before_date):
     return out
 
 
+def cost_of(problem, cfg):
+    return cfg["cost"].get(problem["difficulty"], 2)
+
+
 def pick_today(state, problems, date):
     if date in state["served"]:
         return state["served"][date], True
@@ -84,30 +100,48 @@ def pick_today(state, problems, date):
     cfg = state["config"]
     order = {p["id"]: i for i, p in enumerate(problems)}
     by_id = {p["id"]: p for p in problems}
+    budget = cfg["daily_budget"]
 
+    # Reviews first, in due order. First-fit: an item too big for the
+    # remaining budget is skipped, but a later cheaper one may still fit
+    # (e.g. budget 1 left -> skip a Medium, take an Easy due later).
     due = [
         pid for pid, c in state["cards"].items()
         if c["due"] <= date and pid in by_id
     ]
     due.sort(key=lambda pid: (state["cards"][pid]["due"], order[pid]))
-    reviews = due[: cfg["daily_cap"]]
+    reviews = []
+    for pid in due:
+        c = cost_of(by_id[pid], cfg)
+        if c <= budget:
+            reviews.append(pid)
+            budget -= c
+        if budget <= 0:
+            break
 
+    # Then at most new_per_day new problems, strictly in curated order
+    # (no skipping ahead), only if the next one fits the remaining budget.
+    # An unlogged new problem from a previous day is re-served before a
+    # fresh one is introduced.
     new = []
-    slots = max(0, cfg["daily_cap"] - len(reviews))
-    if slots > 0:
-        # carry over yesterday's unsolved new problem instead of piling on
+    if budget > 0 and cfg["new_per_day"] > 0:
         carried = [
             pid for pid in unlogged_served(state, date)
             if pid not in state["cards"] and pid not in reviews
         ]
-        for pid in carried[: cfg["new_per_day"]]:
-            new.append(pid)
-        if not new:
-            seen = set(state["cards"]) | {
-                pid for plan in state["served"].values() for pid in plan["new"]
-            }
-            fresh = [p["id"] for p in problems if p["id"] not in seen]
-            new = fresh[: min(cfg["new_per_day"], slots)]
+        seen = set(state["cards"]) | {
+            pid for plan in state["served"].values() for pid in plan["new"]
+        }
+        fresh = [p["id"] for p in problems if p["id"] not in seen]
+        for pid in (carried + fresh):
+            if len(new) >= cfg["new_per_day"]:
+                break
+            c = cost_of(by_id[pid], cfg)
+            if c <= budget:
+                new.append(pid)
+                budget -= c
+            else:
+                break  # next-in-order doesn't fit; don't skip ahead
 
     plan = {"review": reviews, "new": new}
     state["served"][date] = plan

@@ -4,7 +4,7 @@ Daily practice scheduler for 165 problems (Grind 75 ∪ Grind 169 ∪ Blind 75, 
 
 ## Daily flow
 
-1. Every day at 6 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): due reviews first, then 1 new problem, max 3 total. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
+1. Every day at 6 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): 1–2 problems per day — Easy counts 1, Medium/Hard counts 2, against a daily budget of 2 (so two Easies, or one Medium/Hard). Due reviews are picked first, then at most 1 new problem if it fits the remaining budget. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
 2. Solve them on LeetCode (premium problems link to a free mirror on leetcode.ca).
 3. Log each solve — either tell Claude in any Cowork chat ("solved 200 good, 33 again") or run:
 
@@ -37,7 +37,7 @@ python3 sr.py due       # every card's next review date
 
 ## Tuning
 
-Edit `config` inside `state.json`: `new_per_day` (default 1) and `daily_cap` (default 3, reviews + new combined). To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
+Edit `config` inside `state.json`: `new_per_day` (default 1), `daily_budget` (default 2), and `cost` per difficulty (default E=1, M=2, H=2). Reviews and new problems draw from the same budget. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
 
 ## Note for Claude sessions
 
