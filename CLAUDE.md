@@ -9,10 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 go test ./...
 
 # Run a single package
-go test ./pkg/backtracking/
+go test ./golang/backtracking/
 
 # Run a single test
-go test ./pkg/backtracking/ -run Test_solveSudoku
+go test ./golang/backtracking/ -run Test_solveSudoku
 
 # Run with verbose output
 go test ./... -v
@@ -29,7 +29,7 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
 
 **Top-level packages:**
-- `pkg/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
+- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
 - `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns
 - `types/` — shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs)
@@ -39,7 +39,7 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - `notes/project_rules/` — interview-prep "project rules" prompts (behavioral, coding/DSA, system design mock-interview instructions) used to configure Claude Code sessions for interview practice; unrelated to the Go source
 - `vibe_coding/` — scratch/sandbox project scaffold (currently just a `.claude/settings.json`)
 
-**`pkg/graph` sub-packages:**
+**`golang/graph` sub-packages:**
 - `BFS/` — BFS on graphs and grids
 - `Bellman_Ford/` — Bellman-Ford SSSP; handles negative weights and detects negative cycles; standard adjacency-list signature `graph [][][2]int`
 - `DFS/` — DFS traversal patterns
