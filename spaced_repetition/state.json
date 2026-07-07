@@ -10,7 +10,12 @@
     }
   },
   "config": {
-    "daily_cap": 3,
+    "cost": {
+      "E": 1,
+      "H": 2,
+      "M": 2
+    },
+    "daily_budget": 2,
     "new_per_day": 1
   },
   "log": [
