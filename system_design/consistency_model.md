@@ -1,0 +1,2 @@
+strong consistency ⇒ writes need quorum ack ⇒ added write latency = RTT-to-quorum; AND 
+reads need leader-routing/quorum-read to stay linearizable ⇒ added read latency too, unless you accept stale local reads.
