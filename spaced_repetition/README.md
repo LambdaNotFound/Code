@@ -4,9 +4,12 @@ Daily practice scheduler for 165 problems (Grind 75 ∪ Grind 169 ∪ Blind 75, 
 
 ## Daily flow
 
-1. Every day at 6 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): 1–2 problems per day — Easy counts 1, Medium/Hard counts 2, against a daily budget of 2 (so two Easies, or one Medium/Hard). Due reviews are picked first, then at most 1 new problem if it fits the remaining budget. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
+1. Every day at 3 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and posts the plan as a comment on the open **"Daily LeetCode"** issue (created automatically on first run): 1–2 problems per day — Easy counts 1, Medium/Hard counts 2, against a daily budget of 2 (so two Easies, or one Medium/Hard). Due reviews are picked first, then at most 1 new problem if it fits the remaining budget. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
 2. Solve them on LeetCode (premium problems link to a free mirror on leetcode.ca).
-3. Log each solve — either tell Claude in any Cowork chat ("solved 200 good, 33 again") or run:
+3. Log each solve, any of three ways:
+   - **From your phone (no laptop):** reply to the daily comment on the "Daily LeetCode" issue — e.g. "solved 200 good, #33 was hard". The [`log-solve` workflow](../.github/workflows/log-solve.yml) parses your comment, updates `state.json`, commits it, and replies with the next review dates. Only your own comments trigger it.
+   - Tell Claude in any Cowork chat ("solved 200 good, 33 again").
+   - Run it directly:
 
 ```bash
 python3 sr.py log <id> <again|hard|good|easy>
@@ -18,7 +21,7 @@ Unlogged problems don't advance — they carry over to the next day's plan, so s
 
 **State sync:** the workflow commits `state.json` to `main` after each run (it records which plan was served). Run `git pull` before logging locally, and `git push` after — GitHub is the source of truth for review state.
 
-**Timing notes:** GitHub cron is UTC, so the workflow schedules both DST variants (01:00/02:00 UTC) and a guard step keeps only the one matching 18:00 America/Los_Angeles. Scheduled runs can start a few minutes late (occasionally more) on GitHub's side. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
+**Timing notes:** GitHub cron is UTC, so the workflow schedules both DST variants (22:00/23:00 UTC) and a guard step keeps only the one matching 15:00 America/Los_Angeles. Scheduled runs can start a few minutes late (occasionally more) on GitHub's side. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
 
 ## Commands
 

@@ -1,0 +1,83 @@
+name: log-solve
+
+# Log solves from anywhere (GitHub mobile app / web) by commenting on the
+# "Daily LeetCode" issue. Recognized patterns, any number per comment:
+#   "solved 200 good"  ·  "1 easy, 33 again"  ·  "#5 hard"
+# The workflow runs sr.py log for each pair, commits state.json, and
+# replies with the next review dates.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: daily-leetcode # serialize with the daily plan workflow
+  cancel-in-progress: false
+
+jobs:
+  log:
+    # Only the repo owner's comments on the Daily LeetCode issue,
+    # and never the bot's own confirmation replies.
+    if: >
+      github.event.comment.user.login == github.repository_owner &&
+      contains(github.event.issue.title, 'Daily LeetCode')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      # Passed via env, not template interpolation, so comment text
+      # cannot inject shell commands.
+      COMMENT_BODY: ${{ github.event.comment.body }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse comment and log solves (Pacific date)
+        id: parse
+        run: |
+          PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          python3 - "$PT_DATE" <<'EOF'
+          import os, re, subprocess, sys
+
+          date = sys.argv[1]
+          body = os.environ.get("COMMENT_BODY", "")
+          # id, then optionally a few filler chars ("was", ":", "-"),
+          # then a grade. Punctuation breaks a match so grades can't
+          # attach to a number from an earlier clause.
+          pairs = re.findall(r"#?(\d+)[^\d\n,.;!?]{0,12}?\b(again|hard|good|easy)\b",
+                             body, re.IGNORECASE)
+          lines = []
+          for pid, grade in pairs:
+              r = subprocess.run(
+                  ["python3", "spaced_repetition/sr.py",
+                   "log", pid, grade.lower(), "--date", date],
+                  capture_output=True, text=True)
+              msg = (r.stdout or r.stderr).strip()
+              lines.append(("- " if r.returncode == 0 else "- FAILED: ") + msg)
+          with open("reply.md", "w") as f:
+              if lines:
+                  f.write("\n".join(lines) + "\n")
+          print(f"parsed {len(pairs)} solve(s)")
+          EOF
+
+      - name: Commit updated state.json
+        run: |
+          if ! git diff --quiet spaced_repetition/state.json 2>/dev/null; then
+            git config user.name "sr-bot"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add spaced_repetition/state.json
+            git commit -m "sr: log solves from issue comment"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Reply with confirmation
+        run: |
+          if [ -s reply.md ]; then
+            gh issue comment "${{ github.event.issue.number }}" \
+              --repo "$GITHUB_REPOSITORY" --body-file reply.md
+          else
+            echo "No solve commands found in comment; nothing to do."
+          fi

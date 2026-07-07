@@ -69,7 +69,7 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 
 ## Spaced-repetition practice (`spaced_repetition/`)
 
-Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go module). `problems.json` holds the 165-problem set (Grind 75/169 + Blind 75, bit-manipulation excluded); `state.json` tracks SM-2 review state. A GitHub Actions workflow (`.github/workflows/daily-leetcode.yml`) posts the daily plan to the "Daily LeetCode" issue at 6 PM PT and commits `state.json`, so `git pull` before touching state and `git push` after logging. When the user reports solving a problem (e.g. "solved 200 good"), run `python3 spaced_repetition/sr.py log <id> <again|hard|good|easy>`. See [spaced_repetition/README.md](spaced_repetition/README.md).
+Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go module). `problems.json` holds the 165-problem set (Grind 75/169 + Blind 75, bit-manipulation excluded); `state.json` tracks SM-2 review state. GitHub Actions workflows post the daily plan to the "Daily LeetCode" issue at 3 PM PT (`daily-leetcode.yml`) and log solves from the user's comments on that issue (`log-solve.yml`); both commit `state.json`, so `git pull` before touching state and `git push` after logging locally. When the user reports solving a problem (e.g. "solved 200 good"), run `python3 spaced_repetition/sr.py log <id> <again|hard|good|easy>`. See [spaced_repetition/README.md](spaced_repetition/README.md).
 
 ## Python sub-project
 

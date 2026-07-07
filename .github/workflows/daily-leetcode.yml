@@ -1,13 +1,13 @@
 name: daily-leetcode
 
-# Fires at 6:00 PM Pacific year-round.
+# Fires at 3:00 PM Pacific year-round.
 # GitHub cron is UTC only, so we schedule both possible UTC hours
-# (01:00 = 18:00 PDT, 02:00 = 18:00 PST) and a guard step lets only
-# the one that is actually 6 PM in America/Los_Angeles proceed.
+# (22:00 = 15:00 PDT, 23:00 = 15:00 PST) and a guard step lets only
+# the one that is actually 3 PM in America/Los_Angeles proceed.
 on:
   schedule:
-    - cron: "0 1 * * *" # 18:00 PDT (Mar-Nov)
-    - cron: "0 2 * * *" # 18:00 PST (Nov-Mar)
+    - cron: "0 22 * * *" # 15:00 PDT (Mar-Nov)
+    - cron: "0 23 * * *" # 15:00 PST (Nov-Mar)
   workflow_dispatch: # manual "Run workflow" button, always proceeds
 
 permissions:
@@ -25,14 +25,14 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       ISSUE_TITLE: "Daily LeetCode"
     steps:
-      - name: Guard - only proceed at 6 PM Pacific
+      - name: Guard - only proceed at 3 PM Pacific
         id: guard
         run: |
           hour=$(TZ=America/Los_Angeles date +%H)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "18" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "15" ]; then
             echo "run=yes" >> "$GITHUB_OUTPUT"
           else
-            echo "Skipping: it is ${hour}:00 in PT, not 18:00 (DST twin of this cron)."
+            echo "Skipping: it is ${hour}:00 in PT, not 15:00 (DST twin of this cron)."
             echo "run=no" >> "$GITHUB_OUTPUT"
           fi
 
@@ -71,7 +71,7 @@ jobs:
           if [ -z "$num" ]; then
             url=$(gh issue create --repo "$GITHUB_REPOSITORY" \
                   --title "$ISSUE_TITLE" \
-                  --body "Daily spaced-repetition plans are posted here at 6 PM PT. Subscribe to this issue for notifications.")
+                  --body "Daily spaced-repetition plans are posted here at 3 PM PT. Subscribe to this issue for notifications.")
             num="${url##*/}"
           fi
           echo "number=$num" >> "$GITHUB_OUTPUT"
