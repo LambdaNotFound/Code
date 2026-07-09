@@ -40,18 +40,18 @@ class Solution:
     def firstMissingPositive(self, nums: List[int]) -> int:
         n = len(nums)
 
-        # Phase 1: cyclic sort — place value v at index v-1 for v in [1, n]
-        for i, _ in enumerate(nums):
+        # Phase 1: cyclic sort — place value v at index v-1 for v in [1, n], aka nums[i] == i+1
+        for i in range(n):
             while 0 <= nums[i] - 1 <= n - 1 and nums[i] != nums[nums[i] - 1]:
-                target = nums[i] - 1  # cache before swap — see notes below
+                target = nums[i] - 1  # cache before swap
                 nums[i], nums[target] = nums[target], nums[i]
 
         # Phase 2: find first mismatch
-        for i, _ in enumerate(nums):
+        for i in range(n):
             if nums[i] != i + 1:
                 return i + 1
 
-        return n + 1  # all [1..n] present → answer is n+1
+        return len(nums) + 1  # all [1..n] present → answer is n+1
 
     """
     1. Two Sum
