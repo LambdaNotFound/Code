@@ -1,6 +1,5 @@
 import bisect
 from dataclasses import dataclass
-from datetime import datetime
 
 
 @dataclass
@@ -12,8 +11,8 @@ class Driver:
 @dataclass
 class Delivery:
     driver_id: str
-    start_time: datetime
-    end_time: datetime
+    start_time: int  # unix epoch seconds
+    end_time: int  # unix epoch seconds
 
 
 # Design:
@@ -23,7 +22,11 @@ class Delivery:
 #
 # Key decision: deliveries are kept as a flat list. Since
 # the list isn't time-sorted, total_cost_between can't early-exit and must
-# scan every delivery.
+# scan every delivery. start_time/end_time are stored as unix epoch seconds
+# (int) rather than datetime — duration becomes a plain integer subtraction
+# and bisect/comparisons operate on ints directly, with no datetime overhead
+# and no timezone ambiguity (callers are responsible for converting to epoch
+# consistently before calling in).
 #
 # Assumption: total_cost_between includes a delivery only if it falls fully
 # within [start, end] (both start_time and end_time inside the window) —
@@ -40,26 +43,22 @@ class Solution:
         self._drivers[driver_id] = Driver(driver_id, hourly_rate)
 
     def record_delivery(
-        self, driver_id: str, start_time: str, end_time: str
+        self, driver_id: str, start_time: int, end_time: int
     ) -> None:  # T: O(1), S: O(1)
-        start = datetime.fromisoformat(start_time)
-        end = datetime.fromisoformat(end_time)
-        self._deliveries.append(Delivery(driver_id, start, end))
+        self._deliveries.append(Delivery(driver_id, start_time, end_time))
 
     def total_cost(self) -> int:  # T: O(n), S: O(1)
         return sum(self._pay(delivery) for delivery in self._deliveries)
 
-    def total_cost_between(self, start: str, end: str) -> int:  # T: O(n), S: O(1)
-        start_dt = datetime.fromisoformat(start)
-        end_dt = datetime.fromisoformat(end)
+    def total_cost_between(self, start: int, end: int) -> int:  # T: O(n), S: O(1)
         return sum(
             self._pay(delivery)
             for delivery in self._deliveries
-            if delivery.start_time >= start_dt and delivery.end_time <= end_dt
+            if delivery.start_time >= start and delivery.end_time <= end
         )
 
     def total_cost_between_sorted(
-        self, start: str, end: str
+        self, start: int, end: int
     ) -> int:  # T: O(log n + k), S: O(1)
         # Precondition: _deliveries must be sorted by start_time, which holds
         # only if record_delivery is called with non-decreasing start_time
@@ -67,17 +66,15 @@ class Solution:
         # happen). If violated, bisect's results are undefined.
         #
         # Binary search narrows to the contiguous window [lo, hi) where
-        # start_dt <= start_time <= end_dt; sorting by a single key can't
-        # resolve the end_time <= end_dt half of containment, so that's
+        # start <= start_time <= end; sorting by a single key can't
+        # resolve the end_time <= end half of containment, so that's
         # checked with a linear scan over just that window. k = hi - lo,
         # so this beats total_cost_between's O(n) when the window is narrow.
-        start_dt = datetime.fromisoformat(start)
-        end_dt = datetime.fromisoformat(end)
-        lo = bisect.bisect_left(self._deliveries, start_dt, key=lambda d: d.start_time)
-        hi = bisect.bisect_right(self._deliveries, end_dt, key=lambda d: d.start_time)
+        lo = bisect.bisect_left(self._deliveries, start, key=lambda d: d.start_time)
+        hi = bisect.bisect_right(self._deliveries, end, key=lambda d: d.start_time)
         total = 0
         for delivery in self._deliveries[lo:hi]:
-            if delivery.end_time <= end_dt:
+            if delivery.end_time <= end:
                 total += self._pay(delivery)
         return total
 
@@ -87,6 +84,5 @@ class Solution:
         # Fractional cents are rounded half-up (biasing the numerator by
         # half the divisor before floor-dividing), not truncated.
         rate_cents = self._drivers[delivery.driver_id].hourly_rate_cents
-        duration = delivery.end_time - delivery.start_time
-        duration_seconds = duration.days * 86400 + duration.seconds
+        duration_seconds = delivery.end_time - delivery.start_time
         return (duration_seconds * rate_cents + 1800) // 3600  # ROUND_HALF_UP
