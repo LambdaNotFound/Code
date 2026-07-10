@@ -14,6 +14,8 @@ from doordash_bootstrap import (
     UserNotFoundError,
 )
 
+METHODS = ["get_user_profile", "get_user_profile_concurrent"]
+
 
 class _FakeConsumerService(ConsumerService):
     def __init__(self, consumer: Consumer = None, error: Exception = None):
@@ -63,15 +65,16 @@ def address():
     return Address(line1="123 Main St", city="Anytown", zip="12345")
 
 
+@pytest.mark.parametrize("method", METHODS)
 class TestHappyPath:
-    def test_assembles_full_profile(self, consumer, payment_info, address):
+    def test_assembles_full_profile(self, method, consumer, payment_info, address):
         service = BootstrapService(
             _FakeConsumerService(consumer=consumer),
             _FakePaymentService(payment_info=payment_info),
             _FakeAddressService(address=address),
         )
 
-        profile = service.get_user_profile("user123")
+        profile = getattr(service, method)("user123")
 
         assert profile == UserProfile(
             consumer_id="123",
@@ -82,8 +85,9 @@ class TestHappyPath:
         )
 
 
+@pytest.mark.parametrize("method", METHODS)
 class TestConsumerServiceFailure:
-    def test_invalid_user_raises(self, payment_info, address):
+    def test_invalid_user_raises(self, method, payment_info, address):
         service = BootstrapService(
             _FakeConsumerService(error=RuntimeError("not found")),
             _FakePaymentService(payment_info=payment_info),
@@ -91,18 +95,19 @@ class TestConsumerServiceFailure:
         )
 
         with pytest.raises(UserNotFoundError):
-            service.get_user_profile("bad_user")
+            getattr(service, method)("bad_user")
 
 
+@pytest.mark.parametrize("method", METHODS)
 class TestPaymentServiceFailure:
-    def test_partial_profile_without_payment_fields(self, consumer, address):
+    def test_partial_profile_without_payment_fields(self, method, consumer, address):
         service = BootstrapService(
             _FakeConsumerService(consumer=consumer),
             _FakePaymentService(error=RuntimeError("payment down")),
             _FakeAddressService(address=address),
         )
 
-        profile = service.get_user_profile("user123")
+        profile = getattr(service, method)("user123")
 
         assert profile.consumer_id == "123"
         assert profile.name == "Alice"
@@ -111,15 +116,16 @@ class TestPaymentServiceFailure:
         assert profile.address == address
 
 
+@pytest.mark.parametrize("method", METHODS)
 class TestAddressServiceFailure:
-    def test_partial_profile_without_address(self, consumer, payment_info):
+    def test_partial_profile_without_address(self, method, consumer, payment_info):
         service = BootstrapService(
             _FakeConsumerService(consumer=consumer),
             _FakePaymentService(payment_info=payment_info),
             _FakeAddressService(error=RuntimeError("address down")),
         )
 
-        profile = service.get_user_profile("user123")
+        profile = getattr(service, method)("user123")
 
         assert profile.consumer_id == "123"
         assert profile.name == "Alice"
@@ -128,14 +134,15 @@ class TestAddressServiceFailure:
         assert profile.address is None
 
 
+@pytest.mark.parametrize("method", METHODS)
 class TestMultipleServiceFailures:
-    def test_only_consumer_fields_present(self, consumer):
+    def test_only_consumer_fields_present(self, method, consumer):
         service = BootstrapService(
             _FakeConsumerService(consumer=consumer),
             _FakePaymentService(error=RuntimeError("payment down")),
             _FakeAddressService(error=RuntimeError("address down")),
         )
 
-        profile = service.get_user_profile("user123")
+        profile = getattr(service, method)("user123")
 
         assert profile == UserProfile(consumer_id="123", name="Alice")
