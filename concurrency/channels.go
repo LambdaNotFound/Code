@@ -231,9 +231,10 @@ func pipelineFilter(in <-chan int, pred func(int) bool) <-chan int {
 // Data flows: generate(1..5) → double → filter(>5) → print
 //
 // Concurrently:
-//   stage 1 generates 1,2,3,4,5
-//   stage 2 doubles to  2,4,6,8,10
-//   stage 3 keeps only  6,8,10
+//
+//	stage 1 generates 1,2,3,4,5
+//	stage 2 doubles to  2,4,6,8,10
+//	stage 3 keeps only  6,8,10
 func ExamplePipeline() {
 	isGreaterThanFive := func(n int) bool { return n > 5 }
 
