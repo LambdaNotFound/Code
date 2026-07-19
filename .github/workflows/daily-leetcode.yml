@@ -23,7 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      ISSUE_TITLE: "Daily LeetCode"
     steps:
       - name: Guard - only proceed at 3 PM Pacific
         id: guard
@@ -61,21 +60,33 @@ jobs:
             echo "state.json unchanged (idempotent rerun) - nothing to commit."
           fi
 
-      - name: Find or create the pinned issue
+      - name: Create today's issue (idempotent - edits body on rerun)
         if: steps.guard.outputs.run == 'yes'
-        id: issue
         run: |
-          num=$(gh issue list --repo "$GITHUB_REPOSITORY" \
-                --search "\"$ISSUE_TITLE\" in:title" --state open \
-                --json number --jq '.[0].number // empty')
-          if [ -z "$num" ]; then
-            url=$(gh issue create --repo "$GITHUB_REPOSITORY" \
-                  --title "$ISSUE_TITLE" \
-                  --body "Daily spaced-repetition plans are posted here at 3 PM PT. Subscribe to this issue for notifications.")
-            num="${url##*/}"
+          PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          TITLE="Daily LeetCode $PT_DATE"
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                     --search "\"$TITLE\" in:title" --state all \
+                     --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
+                     | awk -F'\t' -v t="$TITLE" '$2==t{print $1; exit}')
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file plan.md
+            echo "Updated existing issue #$existing"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "$TITLE" --body-file plan.md
           fi
-          echo "number=$num" >> "$GITHUB_OUTPUT"
 
-      - name: Post the plan as an issue comment
+      - name: Close earlier daily issues
         if: steps.guard.outputs.run == 'yes'
-        run: gh issue comment "${{ steps.issue.outputs.number }}" --repo "$GITHUB_REPOSITORY" --body-file plan.md
+        run: |
+          PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          TITLE="Daily LeetCode $PT_DATE"
+          gh issue list --repo "$GITHUB_REPOSITORY" \
+            --search "Daily LeetCode in:title" --state open \
+            --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
+            | awk -F'\t' -v t="$TITLE" 'index($2,"Daily LeetCode")==1 && $2!=t {print $1}' \
+            | while read -r n; do
+                gh issue close "$n" --repo "$GITHUB_REPOSITORY" \
+                  --comment "Superseded by today's plan. (You can still log solves by commenting here - closed issues work too.)"
+              done
