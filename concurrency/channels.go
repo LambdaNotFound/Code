@@ -104,7 +104,8 @@ func ExampleBufferedBackpressure() {
 	jobs := make(chan int, 2) // small buffer to keep the example short
 	var wg sync.WaitGroup
 
-	// Consumer: processes jobs as they arrive.
+	// Consumer: each receive here frees one buffer slot, which is what
+	// unblocks a pending send in the producer loop below.
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -113,13 +114,18 @@ func ExampleBufferedBackpressure() {
 		}
 	}()
 
-	// Producer: sends 5 jobs; will stall whenever the buffer is full.
+	// Producer: sends 5 jobs into a buffer of capacity 2.
+	//   i=1,2 fill the empty buffer and return immediately — no consumer needed yet.
+	//   i=3,4,5 each block until the consumer's next receive frees a slot: per the
+	//   Go memory model, the kth receive happens-before the (k+cap)th send
+	//   completes, so send i=3 can't complete until receive #1 has run, i=4 until
+	//   receive #2, and so on.
 	for i := 1; i <= 5; i++ {
-		jobs <- i // blocks when buffer holds 2 unprocessed jobs
+		jobs <- i // blocks once 2 unprocessed jobs are already buffered
 	}
-	close(jobs) // signal: no more jobs
+	close(jobs) // no more sends coming — lets the consumer's range loop exit once drained
 
-	wg.Wait()
+	wg.Wait() // blocks until the consumer has processed everything and returned
 }
 
 // -----------------------------------------------------------------------------
