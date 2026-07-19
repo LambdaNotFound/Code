@@ -31,7 +31,7 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 **Top-level packages:**
 - `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
-- `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns
+- `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns. Most patterns live as `Example*` functions in plain `.go` files (not `_test.go`) for narrative documentation — `go test` does **not** execute these (Example funcs only run when declared in a `_test.go` file); actual assertions live in the sibling `_test.go` files (e.g. `channels_test.go`), which don't yet cover every pattern
 - `types/` — shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs, `Interval`)
 - `utils/` — test helpers for constructing and comparing linked lists, trees, and graphs
 - `fixtures/` — static test data files (e.g. `file.txt`, the input loaded by `golang/interview/affirm_spreadsheet.go`)
@@ -57,10 +57,13 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
 - `utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
+- Exception to the split-file norm: `utils/`'s Go-pattern demos and `golang/oo_design/`'s GoF-pattern files (`facade_test.go`, `adapter_test.go`, `mediator_test.go`, `decorator_test.go`, `composite_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
 
 **Naming conventions:**
 - Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement
 - Functions suffixed with `Naive` are brute-force or O(n²) baselines kept for comparison
+
+**Design patterns (`golang/oo_design/`):** see [golang/oo_design/README.md](golang/oo_design/README.md) for the full catalogue of which of the 23 classic GoF patterns (Creational/Structural/Behavioral) are implemented here vs. not yet. `affirm_card_game.go`, `affirm_filter_match.go`, `brex_stervo_game.go` (and their test pairs) in the same package are unrelated, company-specific mock-interview OO-design problems, not named GoF patterns.
 
 ## Root README (`README.md`)
 
@@ -73,7 +76,7 @@ A manually-maintained index table (Problem Tag | Problem Name | LeetCode Link | 
 
 ## Spaced-repetition practice (`spaced_repetition/`)
 
-Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go module). `problems.json` holds the 165-problem set (Grind 75/169 + Blind 75, bit-manipulation excluded); `state.json` tracks SM-2 review state. GitHub Actions workflows post the daily plan to the "Daily LeetCode" issue at 3 PM PT (`daily-leetcode.yml`) and log solves from the user's comments on that issue (`log-solve.yml`); both commit `state.json`, so `git pull` before touching state and `git push` after logging locally. When the user reports solving a problem (e.g. "solved 200 good"), run `python3 spaced_repetition/sr.py log <id> <again|hard|good|easy>`. See [spaced_repetition/README.md](spaced_repetition/README.md).
+Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go module). `problems.json` holds the 165-problem set (Grind 75/169 + Blind 75, bit-manipulation excluded); `state.json` tracks SM-2 review state. At 3 PM PT, a GitHub Actions workflow (`daily-leetcode.yml`) opens a new dated "Daily LeetCode YYYY-MM-DD" issue with the day's plan (auto-closing the previous day's issue), and `log-solve.yml` logs solves from the user's comments on that issue (commenting still works on closed issues); both commit `state.json` under the repo owner's identity, so `git pull` before touching state and `git push` after logging locally. When the user reports solving a problem (e.g. "solved 200 good"), run `python3 spaced_repetition/sr.py log <id> <again|hard|good|easy>`. See [spaced_repetition/README.md](spaced_repetition/README.md).
 
 ## Python sub-project
 
