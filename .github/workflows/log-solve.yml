@@ -65,8 +65,8 @@ jobs:
       - name: Commit updated state.json
         run: |
           if ! git diff --quiet spaced_repetition/state.json 2>/dev/null; then
-            git config user.name "sr-bot"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config user.name "LambdaNotFound"
+            git config user.email "yiqyudev@gmail.com"
             git add spaced_repetition/state.json
             git commit -m "sr: log solves from issue comment"
             git pull --rebase origin main
