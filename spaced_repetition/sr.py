@@ -55,6 +55,11 @@ DEFAULT_CONFIG = {
     # last new-problem introduction is oldest, so every topic gets fresh
     # coverage every ~1-2 weeks. "curated": strict problems.json order.
     "new_order": "category_rotation",
+    # A problem served this many days running without being logged is
+    # assumed skipped: it gets pushed back by defer_days so the plan keeps
+    # rotating instead of showing the same item forever.
+    "carry_limit": 2,
+    "defer_days": 4,
 }
 
 
@@ -102,10 +107,58 @@ def cost_of(problem, cfg):
     return cfg["cost"].get(problem["difficulty"], 2)
 
 
+def last_touch(state, pid):
+    """Most recent date this problem was logged or deferred."""
+    dates = [e["date"] for e in state["log"] if e["id"] == pid]
+    d = state.get("deferred", {}).get(pid, {}).get("at")
+    if d:
+        dates.append(d)
+    return max(dates) if dates else ""
+
+
+def apply_deferrals(state, date):
+    """Push back anything served carry_limit days running without a log.
+
+    Returns the list of ids deferred on this call. Without this, an item
+    the user never logs stays due forever and reappears every single day,
+    crowding out the rotation.
+    """
+    cfg = state["config"]
+    limit = cfg.get("carry_limit", 2)
+    days = cfg.get("defer_days", 4)
+    state.setdefault("deferred", {})
+    if limit <= 0:
+        return []
+
+    counts = {}
+    for d, plan in state["served"].items():
+        if d >= date:
+            continue
+        for pid in plan["review"] + plan["new"]:
+            if d > last_touch(state, pid):
+                counts[pid] = counts.get(pid, 0) + 1
+
+    until = (dt.date.fromisoformat(date) + dt.timedelta(days=days)).isoformat()
+    deferred_now = []
+    for pid, n in sorted(counts.items()):
+        if n >= limit:
+            state["deferred"][pid] = {"at": date, "until": until}
+            if pid in state["cards"]:
+                state["cards"][pid]["due"] = until
+            deferred_now.append(pid)
+    return deferred_now
+
+
+def is_deferred(state, pid, date):
+    d = state.get("deferred", {}).get(pid)
+    return bool(d) and d["until"] > date
+
+
 def pick_today(state, problems, date):
     if date in state["served"]:
         return state["served"][date], True
 
+    deferred_now = apply_deferrals(state, date)
     cfg = state["config"]
     order = {p["id"]: i for i, p in enumerate(problems)}
     by_id = {p["id"]: p for p in problems}
@@ -117,7 +170,7 @@ def pick_today(state, problems, date):
     # (e.g. budget 1 left -> skip a Medium, take an Easy due later).
     due = [
         pid for pid, c in state["cards"].items()
-        if c["due"] <= date and pid in by_id
+        if c["due"] <= date and pid in by_id and not is_deferred(state, pid, date)
     ]
     due.sort(key=lambda pid: (state["cards"][pid]["due"], order[pid]))
     reviews = []
@@ -144,11 +197,19 @@ def pick_today(state, problems, date):
         carried = [
             pid for pid in unlogged_served(state, date)
             if pid not in state["cards"] and pid not in reviews
+            and not is_deferred(state, pid, date)
         ]
         seen = set(state["cards"]) | {
             pid for plan in state["served"].values() for pid in plan["new"]
         }
         fresh = [p["id"] for p in problems if p["id"] not in seen]
+        # A deferred new problem is not "fresh" yet, but once its defer
+        # window passes it re-enters the pool ahead of never-seen ones.
+        revived = [pid for pid in state.get("deferred", {})
+                   if pid not in state["cards"] and pid in by_id
+                   and not is_deferred(state, pid, date)
+                   and pid not in carried]
+        fresh = revived + fresh
         if cfg.get("new_order") == "category_rotation":
             # last date each category had a new problem introduced
             last_intro = {}
@@ -176,6 +237,8 @@ def pick_today(state, problems, date):
                 break  # curated mode: don't skip ahead
 
     plan = {"review": reviews, "new": new}
+    if deferred_now:
+        plan["deferred"] = deferred_now
     state["served"][date] = plan
     save_state(state)
     return plan, False
@@ -217,15 +280,13 @@ def cmd_today_md(state, problems, date, plan):
         print(f"\n**New ({len(plan['new'])}):**\n")
         for pid in plan["new"]:
             print(md_problem(by_id[pid]))
-    backlog = [
-        pid for pid in unlogged_served(state, date)
-        if pid not in plan["review"] and pid not in plan["new"]
-    ]
-    if backlog:
-        print("\n**Unlogged from previous days:** "
-              + ", ".join(f"#{pid} {by_id[pid]['title']}" for pid in backlog))
-    print("\n_Log solves with `python3 spaced_repetition/sr.py log <id> "
-          "<again|hard|good|easy>` — or just tell Claude._")
+    if plan.get("deferred"):
+        until = state["deferred"][plan["deferred"][0]]["until"]
+        print(f"\n_Pushed to {until} (served repeatedly without being logged): "
+              + ", ".join(f"#{pid} {by_id[pid]['title']}"
+                          for pid in plan["deferred"] if pid in by_id) + "._")
+    print("\n_Log solves by commenting here — e.g. `solved 1 good`, "
+          "`#20 hard` (grades: again / hard / good / easy)._")
 
 
 def cmd_today(args):

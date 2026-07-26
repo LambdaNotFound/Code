@@ -17,11 +17,13 @@ python3 sr.py log <id> <again|hard|good|easy>
 
 Grades: `again` = needed the solution · `hard` = solved but slow/messy · `good` = minor friction · `easy` = clean and fast.
 
-Unlogged problems don't advance — they carry over to the next day's plan, so skipping a day just pauses the schedule rather than breaking it.
+Unlogged problems carry over to the next day, then get deferred (see below) so the rotation continues — skipping a day pauses the schedule rather than breaking it.
 
 **State sync:** the workflow commits `state.json` to `main` after each run (it records which plan was served). Run `git pull` before logging locally, and `git push` after — GitHub is the source of truth for review state.
 
-**Timing notes:** GitHub cron is UTC, so the workflow schedules both DST variants (22:00/23:00 UTC) and a guard step keeps only the one matching 15:00 America/Los_Angeles. Scheduled runs can start a few minutes late (occasionally more) on GitHub's side. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
+**Timing notes:** GitHub cron is UTC-only and scheduled runs are routinely delayed 30-60+ minutes, so the workflow fires four times each afternoon (22:00/23:00/00:00/02:00 UTC). The guard proceeds only when the local Pacific time is 15:00-20:59 *and* today's issue doesn't exist yet, so the first attempt that lands wins and the later crons act as automatic retries for a delayed or failed run.
+
+**If you don't log:** a problem served `carry_limit` days running (default 2) without a grade is assumed skipped and pushed back `defer_days` (default 4), so the plan keeps rotating instead of showing the same item forever. Deferred items return automatically; nothing is dropped from the deck. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
 
 ## Commands
 
@@ -40,7 +42,7 @@ python3 sr.py due       # every card's next review date
 
 ## Tuning
 
-Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), and `cost` per difficulty (default E=1, M=2, H=2).
+Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), `cost` per difficulty (default E=1, M=2, H=2), `carry_limit` (default 2) and `defer_days` (default 4).
 
 Pace levers, measured by simulation: budget 4 / new 2 ≈ 2.4 problems/day, ~13-day tag rotation, full pass ~4.5 months, but overdue reviews queue up over time. Raise `daily_budget` to 6-7 (keeping `new_budget` 2) to clear reviews on schedule at ~3.5 problems/day; raise both (e.g. 10/5) to finish the deck in ~2 months at ~5 problems/day. Overdue reviews aren't lost — they serve oldest-first as budget allows. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
 
