@@ -17,12 +17,12 @@
       "reps": 1
     },
     "20": {
-      "due": "2026-07-20",
-      "ease": 2.5,
-      "interval": 2,
+      "due": "2026-07-31",
+      "ease": 2.65,
+      "interval": 6,
       "lapses": 0,
-      "last": "2026-07-18",
-      "reps": 1
+      "last": "2026-07-25",
+      "reps": 2
     },
     "21": {
       "due": "2026-07-23",
@@ -50,12 +50,14 @@
     }
   },
   "config": {
+    "carry_limit": 2,
     "cost": {
       "E": 1,
       "H": 2,
       "M": 2
     },
     "daily_budget": 4,
+    "defer_days": 4,
     "new_budget": 2,
     "new_order": "category_rotation",
     "new_per_day": 2
@@ -90,6 +92,11 @@
       "date": "2026-07-21",
       "grade": "good",
       "id": "17"
+    },
+    {
+      "date": "2026-07-25",
+      "grade": "easy",
+      "id": "20"
     }
   ],
   "served": {
