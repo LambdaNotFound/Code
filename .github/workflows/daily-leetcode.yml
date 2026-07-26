@@ -1,13 +1,17 @@
 name: daily-leetcode
 
-# Fires at 3:00 PM Pacific year-round.
-# GitHub cron is UTC only, so we schedule both possible UTC hours
-# (22:00 = 15:00 PDT, 23:00 = 15:00 PST) and a guard step lets only
-# the one that is actually 3 PM in America/Los_Angeles proceed.
+# Targets 3:00 PM Pacific year-round.
+# GitHub cron is UTC only AND scheduled runs are routinely delayed 30-60+
+# minutes, so we fire several times each afternoon and let the guard decide:
+# proceed when it is 15:00-20:59 in America/Los_Angeles AND today's issue
+# does not exist yet. First attempt that lands wins; the rest self-skip.
+# This makes every later cron an automatic retry for a delayed/missed run.
 on:
   schedule:
-    - cron: "0 22 * * *" # 15:00 PDT (Mar-Nov)
-    - cron: "0 23 * * *" # 15:00 PST (Nov-Mar)
+    - cron: "0 22 * * *" # 15:00 PDT / 14:00 PST
+    - cron: "0 23 * * *" # 16:00 PDT / 15:00 PST
+    - cron: "0 0 * * *" #  17:00 PDT / 16:00 PST
+    - cron: "0 2 * * *" #  19:00 PDT / 18:00 PST
   workflow_dispatch: # manual "Run workflow" button, always proceeds
 
 permissions:
@@ -24,15 +28,36 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Guard - only proceed at 3 PM Pacific
+      - name: Guard - once per Pacific day, from 3 PM PT onward
         id: guard
         run: |
           hour=$(TZ=America/Los_Angeles date +%H)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "15" ]; then
+          PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          TITLE="Daily LeetCode $PT_DATE"
+          echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual run - proceeding."
             echo "run=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "Skipping: it is ${hour}:00 in PT, not 15:00 (DST twin of this cron)."
+            exit 0
+          fi
+
+          # Too early in the PT day (a cron twin that lands before 3 PM PT).
+          if [ "$((10#$hour))" -lt 15 ] || [ "$((10#$hour))" -gt 20 ]; then
+            echo "Skipping: ${hour}:00 PT is outside the 15:00-20:59 window."
+            echo "run=no" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          # Already posted today? Then this cron is a redundant retry.
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                     --search "\"$TITLE\" in:title" --state all \
+                     --json title --jq "[.[] | select(.title == \"$TITLE\")] | length")
+          if [ "${existing:-0}" -gt 0 ]; then
+            echo "Skipping: '$TITLE' already exists."
             echo "run=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "Proceeding at ${hour}:00 PT."
+            echo "run=yes" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout
