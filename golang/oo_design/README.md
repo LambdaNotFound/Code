@@ -9,8 +9,8 @@ Concerned with object *creation* — decoupling a client from the concrete types
 | Pattern | Idea | Status |
 |---|---|---|
 | Singleton | Ensure a type has exactly one instance, with global access to it (`sync.Once` in Go) | not yet added |
-| Factory Method | Defer object creation to a method/subtype so the caller doesn't need to know the concrete type | not yet added |
-| Abstract Factory | A factory of factories: produces families of related objects (e.g. a `UIFactory` that makes matching `Button`+`Checkbox` for a theme) | not yet added |
+| Factory Method | Defer object creation to a method/subtype so the caller doesn't need to know the concrete type | [factory_method_test.go](factory_method_test.go#L37) |
+| Abstract Factory | A factory of factories: produces families of related objects (e.g. a `UIFactory` that makes matching `Button`+`Checkbox` for a theme) | [abstract_factory_test.go](abstract_factory_test.go#L50) |
 | Builder | Construct a complex object step-by-step via chained calls, separating construction from representation | not yet added |
 | Prototype | Create new objects by cloning an existing instance rather than instantiating from scratch | not yet added |
 
@@ -41,7 +41,7 @@ Concerned with how objects *communicate* and distribute responsibility.
 | Command | Encapsulate a request as an object, enabling queuing, undo/redo, logging | not yet added |
 | Chain of Responsibility | Pass a request along a chain of handlers until one handles it (middleware pipelines) | not yet added |
 | Template Method | Define an algorithm's skeleton in a base type, letting subtypes override specific steps | not yet added |
-| Iterator | Sequential access to a collection's elements without exposing its internals (Go's `range` largely covers this natively) | not yet added |
+| Iterator | Sequential access to a collection's elements without exposing its internals (Go's `range` largely covers this natively) | [iterator_test.go](iterator_test.go#L31) |
 | Visitor | Add operations to a type hierarchy without modifying the types themselves | not yet added |
 | Memento | Capture/restore an object's internal state for undo | not yet added |
 | Interpreter | Model a grammar as an object tree | not yet added |
