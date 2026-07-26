@@ -15,7 +15,16 @@ Daily practice scheduler for 165 problems (Grind 75 ∪ Grind 169 ∪ Blind 75, 
 python3 sr.py log <id> <again|hard|good|easy>
 ```
 
-Grades: `again` = needed the solution · `hard` = solved but slow/messy · `good` = minor friction · `easy` = clean and fast.
+Grades describe **how the attempt went**, not the problem's LeetCode difficulty (that's static and already in `problems.json`):
+
+| Grade | Means | Also accepted |
+|---|---|---|
+| `again` | needed the solution | `failed`, `fail`, `stuck`, `blanked`, `no` |
+| `hard` | solved, but slow or messy | `slow`, `rough`, `tough` |
+| `good` | solved with minor friction | `medium`, `ok`, `okay`, `fine`, `yes` |
+| `easy` | quick and clean | `trivial`, `quick`, `clean` |
+
+`medium` maps to `good` because it reads naturally — but it means "moderate friction on this attempt", not "this is a Medium problem".
 
 Unlogged problems carry over to the next day, then get deferred (see below) so the rotation continues — skipping a day pauses the schedule rather than breaking it.
 

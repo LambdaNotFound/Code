@@ -68,8 +68,11 @@ jobs:
         if: steps.guard.outputs.run == 'yes'
         run: |
           PT_DATE=$(TZ=America/Los_Angeles date +%F)
-          python3 spaced_repetition/sr.py today --md --date "$PT_DATE" | tee plan.md
-          printf '\ncc @%s\n' "${{ github.repository_owner }}" >> plan.md
+          # plan.md is a scratch file in the runner's temp dir - it lives
+          # only for this run and is never committed to the repo.
+          python3 spaced_repetition/sr.py today --md --date "$PT_DATE" \
+            | tee "$RUNNER_TEMP/plan.md"
+          printf '\ncc @%s\n' "${{ github.repository_owner }}" >> "$RUNNER_TEMP/plan.md"
 
       - name: Commit updated state.json
         if: steps.guard.outputs.run == 'yes'
@@ -85,33 +88,24 @@ jobs:
             echo "state.json unchanged (idempotent rerun) - nothing to commit."
           fi
 
-      - name: Create today's issue (idempotent - edits body on rerun)
+      # Always a brand-new issue for the day. The guard above already
+      # skipped this run if today's issue exists, so the only way to reach
+      # this step twice in a day is a manual re-dispatch - in which case we
+      # update that same issue's body rather than opening a duplicate.
+      # Previous days' issues are left open; nothing is auto-closed.
+      - name: Create today's issue
         if: steps.guard.outputs.run == 'yes'
         run: |
-          PT_DATE=$(TZ=America/Los_Angeles date +%F)
-          TITLE="Daily LeetCode $PT_DATE"
+          TITLE="Daily LeetCode ${{ steps.guard.outputs.pt_date }}"
           existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
                      --search "\"$TITLE\" in:title" --state all \
                      --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
                      | awk -F'\t' -v t="$TITLE" '$2==t{print $1; exit}')
           if [ -n "$existing" ]; then
-            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file plan.md
-            echo "Updated existing issue #$existing"
+            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" \
+              --body-file "$RUNNER_TEMP/plan.md"
+            echo "Manual re-run: refreshed body of existing issue #$existing"
           else
             gh issue create --repo "$GITHUB_REPOSITORY" \
-              --title "$TITLE" --body-file plan.md
+              --title "$TITLE" --body-file "$RUNNER_TEMP/plan.md"
           fi
-
-      - name: Close earlier daily issues
-        if: steps.guard.outputs.run == 'yes'
-        run: |
-          PT_DATE=$(TZ=America/Los_Angeles date +%F)
-          TITLE="Daily LeetCode $PT_DATE"
-          gh issue list --repo "$GITHUB_REPOSITORY" \
-            --search "Daily LeetCode in:title" --state open \
-            --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
-            | awk -F'\t' -v t="$TITLE" 'index($2,"Daily LeetCode")==1 && $2!=t {print $1}' \
-            | while read -r n; do
-                gh issue close "$n" --repo "$GITHUB_REPOSITORY" \
-                  --comment "Superseded by today's plan. (You can still log solves by commenting here - closed issues work too.)"
-              done

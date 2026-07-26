@@ -30,6 +30,24 @@ EASE_MIN = 1.3
 MAX_INTERVAL = 90
 GRADES = ("again", "hard", "good", "easy")
 
+# Accepted synonyms -> canonical grade. The grade records how the ATTEMPT
+# went, not the problem's LeetCode difficulty (which is static and already
+# stored in problems.json). "medium" is accepted as a synonym for "good"
+# because it reads naturally, but note it means "moderate friction", not
+# "this is a Medium problem".
+GRADE_ALIASES = {
+    "again": "again", "fail": "again", "failed": "again", "stuck": "again",
+    "blanked": "again", "no": "again",
+    "hard": "hard", "slow": "hard", "rough": "hard", "tough": "hard",
+    "good": "good", "medium": "good", "ok": "good", "okay": "good",
+    "fine": "good", "yes": "good",
+    "easy": "easy", "trivial": "easy", "quick": "easy", "clean": "easy",
+}
+
+
+def normalize_grade(word):
+    return GRADE_ALIASES.get(word.strip().lower())
+
 
 def today_str(args):
     return args.date or dt.date.today().isoformat()
@@ -328,11 +346,12 @@ def cmd_log(args):
     state = load_state()
     problems = load_problems()
     by_id = {p["id"]: p for p in problems}
-    pid, grade = args.id, args.grade
+    pid, grade = args.id, normalize_grade(args.grade)
     if pid not in by_id:
         sys.exit(f"Unknown problem id {pid}")
-    if grade not in GRADES:
-        sys.exit(f"Grade must be one of {GRADES}")
+    if grade is None:
+        sys.exit(f"Unknown grade {args.grade!r}; use one of "
+                 f"{sorted(set(GRADE_ALIASES))}")
     date = today_str(args)
 
     card = state["cards"].get(pid, {
@@ -417,7 +436,8 @@ def main():
 
     p = sub.add_parser("log")
     p.add_argument("id")
-    p.add_argument("grade", choices=GRADES)
+    p.add_argument("grade", choices=sorted(set(GRADE_ALIASES)),
+                   metavar="again|hard|good|easy")
     p.add_argument("--date")
     p.set_defaults(fn=cmd_log)
 

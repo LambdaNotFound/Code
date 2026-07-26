@@ -46,7 +46,11 @@ jobs:
           # id, then optionally a few filler chars ("was", ":", "-"),
           # then a grade. Punctuation breaks a match so grades can't
           # attach to a number from an earlier clause.
-          pairs = re.findall(r"#?(\d+)[^\d\n,.;!?]{0,12}?\b(again|hard|good|easy)\b",
+          # Grade vocabulary comes from sr.py so the two never drift apart.
+          sys.path.insert(0, "spaced_repetition")
+          from sr import GRADE_ALIASES
+          words = "|".join(sorted(GRADE_ALIASES, key=len, reverse=True))
+          pairs = re.findall(rf"#?(\d+)[^\d\n,.;!?]{{0,12}}?\b({words})\b",
                              body, re.IGNORECASE)
           lines = []
           for pid, grade in pairs:
@@ -56,10 +60,19 @@ jobs:
                   capture_output=True, text=True)
               msg = (r.stdout or r.stderr).strip()
               lines.append(("- " if r.returncode == 0 else "- FAILED: ") + msg)
-          with open("reply.md", "w") as f:
+          # scratch file in the runner temp dir - never committed
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "reply.md"), "w") as f:
               if lines:
                   f.write("\n".join(lines) + "\n")
-          print(f"parsed {len(pairs)} solve(s)")
+
+          # Did this comment look like someone trying to log a solve? If so
+          # and nothing parsed, the next step explains the format instead of
+          # failing silently.
+          attempt = bool(re.search(rf"\b({words}|solved|logged|done)\b",
+                                   body, re.IGNORECASE)) or bool(re.search(r"#\d", body))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"looked_like_attempt={'yes' if (attempt and not pairs) else 'no'}\n")
+          print(f"parsed {len(pairs)} solve(s); body was: {body!r}")
           EOF
 
       - name: Commit updated state.json
@@ -73,11 +86,22 @@ jobs:
             git push
           fi
 
-      - name: Reply with confirmation
+      - name: Reply with confirmation (or explain why nothing was logged)
         run: |
-          if [ -s reply.md ]; then
+          if [ -s "$RUNNER_TEMP/reply.md" ]; then
             gh issue comment "${{ github.event.issue.number }}" \
-              --repo "$GITHUB_REPOSITORY" --body-file reply.md
+              --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/reply.md"
+          elif [ "${{ steps.parse.outputs.looked_like_attempt }}" = "yes" ]; then
+            # Silence is indistinguishable from "the workflow never ran",
+            # so say so explicitly when a comment looks like a log attempt.
+            gh issue comment "${{ github.event.issue.number }}" \
+              --repo "$GITHUB_REPOSITORY" --body \
+          "Nothing logged - I could not find a \`<number> <grade>\` pair in that comment.
+
+          Use: \`1 good\` · \`solved 1 good\` · \`#1 good\` · \`1 good, 20 hard\`
+          Grades: \`again\` (needed the solution) · \`hard\` (slow/messy) · \`good\` · \`easy\`
+
+          Note: punctuation between the number and the grade breaks it - \`1. good\` will not match, \`1 good\` will."
           else
-            echo "No solve commands found in comment; nothing to do."
+            echo "Comment did not look like a log attempt; staying quiet."
           fi
