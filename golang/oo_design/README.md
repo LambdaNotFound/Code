@@ -36,9 +36,9 @@ Concerned with how objects *communicate* and distribute responsibility.
 |---|---|---|
 | Mediator | Centralize communication between peer objects behind one mediator, decoupling them from each other | [mediator_test.go](mediator_test.go#L53) |
 | Strategy | Encapsulate interchangeable algorithms behind a common interface, swappable at runtime | not yet added |
-| Observer | Subjects notify a list of registered observers on state change (pub/sub, event listeners) | not yet added |
+| Observer | Subjects notify a list of registered observers on state change (pub/sub, event listeners) | [observer_test.go](observer_test.go#L24) |
 | State | An object changes behavior when its internal state changes, by delegating to state-specific objects | not yet added |
-| Command | Encapsulate a request as an object, enabling queuing, undo/redo, logging | not yet added |
+| Command | Encapsulate a request as an object, enabling queuing, undo/redo, logging | [command_test.go](command_test.go#L21) |
 | Chain of Responsibility | Pass a request along a chain of handlers until one handles it (middleware pipelines) | not yet added |
 | Template Method | Define an algorithm's skeleton in a base type, letting subtypes override specific steps | not yet added |
 | Iterator | Sequential access to a collection's elements without exposing its internals (Go's `range` largely covers this natively) | [iterator_test.go](iterator_test.go#L31) |
