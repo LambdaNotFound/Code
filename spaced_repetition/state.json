@@ -1,7 +1,7 @@
 {
   "cards": {
     "1": {
-      "due": "2026-07-30",
+      "due": "2026-08-05",
       "ease": 2.5,
       "interval": 2,
       "lapses": 0,
@@ -33,7 +33,7 @@
       "reps": 2
     },
     "21": {
-      "due": "2026-07-23",
+      "due": "2026-08-05",
       "ease": 2.5,
       "interval": 2,
       "lapses": 0,
@@ -90,6 +90,8 @@
     }
   },
   "config": {
+    "backlog_bonus_max": 2,
+    "backlog_step": 5,
     "carry_limit": 2,
     "cost": {
       "E": 1,
@@ -98,18 +100,25 @@
     },
     "daily_budget": 4,
     "defer_days": 4,
+    "defer_max_days": 24,
     "new_budget": 2,
     "new_order": "category_rotation",
     "new_per_day": 2
   },
   "deferred": {
     "1": {
-      "at": "2026-07-26",
-      "until": "2026-07-30"
+      "at": "2026-08-01",
+      "count": 1,
+      "until": "2026-08-05"
     },
     "20": {
       "at": "2026-07-26",
       "until": "2026-07-30"
+    },
+    "21": {
+      "at": "2026-08-01",
+      "count": 1,
+      "until": "2026-08-05"
     },
     "33": {
       "at": "2026-07-26",
@@ -368,6 +377,19 @@
       "review": [
         "21",
         "1"
+      ]
+    },
+    "2026-08-01": {
+      "deferred": [
+        "1",
+        "21"
+      ],
+      "new": [
+        "208"
+      ],
+      "review": [
+        "3",
+        "20"
       ]
     }
   }
