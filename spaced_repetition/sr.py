@@ -75,9 +75,18 @@ DEFAULT_CONFIG = {
     "new_order": "category_rotation",
     # A problem served this many days running without being logged is
     # assumed skipped: it gets pushed back by defer_days so the plan keeps
-    # rotating instead of showing the same item forever.
+    # rotating instead of showing the same item forever. Repeat deferrals
+    # double the window (capped at defer_max_days) so a problem you keep
+    # ignoring fades out instead of reappearing every few days.
     "carry_limit": 2,
     "defer_days": 4,
+    "defer_max_days": 24,
+    # When reviews pile up, add extra review capacity on top of the normal
+    # budget (1 extra slot per backlog_step overdue cards, up to
+    # backlog_bonus_max). New problems are never blocked - starving them
+    # just makes every day look the same, which is the opposite of the goal.
+    "backlog_step": 5,
+    "backlog_bonus_max": 2,
 }
 
 
@@ -156,11 +165,18 @@ def apply_deferrals(state, date):
             if d > last_touch(state, pid):
                 counts[pid] = counts.get(pid, 0) + 1
 
-    until = (dt.date.fromisoformat(date) + dt.timedelta(days=days)).isoformat()
+    cap = cfg.get("defer_max_days", 24)
     deferred_now = []
     for pid, n in sorted(counts.items()):
         if n >= limit:
-            state["deferred"][pid] = {"at": date, "until": until}
+            prev = state["deferred"].get(pid, {})
+            times = prev.get("count", 0) + 1
+            # escalate: 4d, 8d, 16d, ... capped
+            window = min(days * (2 ** (times - 1)), cap)
+            until = (dt.date.fromisoformat(date)
+                     + dt.timedelta(days=window)).isoformat()
+            state["deferred"][pid] = {"at": date, "until": until,
+                                      "count": times}
             if pid in state["cards"]:
                 state["cards"][pid]["due"] = until
             deferred_now.append(pid)
@@ -180,17 +196,34 @@ def pick_today(state, problems, date):
     cfg = state["config"]
     order = {p["id"]: i for i, p in enumerate(problems)}
     by_id = {p["id"]: p for p in problems}
-    review_budget = cfg["daily_budget"] - cfg.get("new_budget", 0)
 
-    # Reviews first, in due order, but only up to review_budget so new
-    # problems can't be starved. First-fit: an item too big for the
+    # Reviews first, in due order, but normally only up to review_budget so
+    # new problems can't be starved. First-fit: an item too big for the
     # remaining budget is skipped, but a later cheaper one may still fit
     # (e.g. budget 1 left -> skip a Medium, take an Easy due later).
     due = [
         pid for pid, c in state["cards"].items()
         if c["due"] <= date and pid in by_id and not is_deferred(state, pid, date)
     ]
-    due.sort(key=lambda pid: (state["cards"][pid]["due"], order[pid]))
+
+    # A card already shown recently without being graded goes to the BACK of
+    # the queue. Without this it keeps winning on due-date order and is
+    # re-served day after day, starving cards that are genuinely waiting.
+    shown_recently = set()
+    for d, plan in state["served"].items():
+        if d < date:
+            for pid in plan["review"]:
+                if d > last_touch(state, pid):
+                    shown_recently.add(pid)
+    due.sort(key=lambda pid: (pid in shown_recently,
+                              state["cards"][pid]["due"], order[pid]))
+
+    # Overdue reviews earn extra capacity, but never at the cost of new
+    # problems - variety is what keeps the queue from looking identical.
+    bonus = min(len(due) // cfg.get("backlog_step", 5),
+                cfg.get("backlog_bonus_max", 2))
+    review_budget = cfg["daily_budget"] - cfg.get("new_budget", 0) + bonus
+
     reviews = []
     for pid in due:
         c = cost_of(by_id[pid], cfg)
@@ -201,7 +234,7 @@ def pick_today(state, problems, date):
             break
 
     # New problems get the reserved slice plus whatever reviews left over.
-    budget = cfg.get("new_budget", 0) + review_budget
+    budget = cfg.get("new_budget", 0) + max(0, review_budget)
 
     # Then at most new_per_day new problems, if they fit the remaining
     # budget. An unlogged new problem from a previous day is re-served

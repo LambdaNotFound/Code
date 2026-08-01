@@ -1,6 +1,3 @@
-from typing import List
-
-
 class Solution:
     """
     You are given two arrays of integers, heights1 and heights2, representing the heights of players from two different teams. Your task is to determine if it's possible to arrange the teams for a photograph according to the following rules:
@@ -37,7 +34,7 @@ class Solution:
         0  1  2  3  4
     """
 
-    def firstMissingPositive(self, nums: List[int]) -> int:
+    def firstMissingPositive(self, nums: list[int]) -> int:
         n = len(nums)
 
         # Phase 1: cyclic sort — place value v at index v-1 for v in [1, n], aka nums[i] == i+1
@@ -57,10 +54,21 @@ class Solution:
     1. Two Sum
     """
 
-    def twoSum(self, nums: List[int], target: int) -> List[int]:
+    def twoSum(self, nums: list[int], target: int) -> list[int]:
         seen = {}  # value -> index
         for i, num in enumerate(nums):
             complement = target - num
             if complement in seen:
                 return [seen[complement], i]
             seen[num] = i
+
+    """
+    268. Missing Number
+    """
+
+    def missingNumber(self, nums: list[int]) -> int:
+        nums.sort()
+        for i, num in enumerate(nums):
+            if num != i:
+                return i
+        return len(nums)
