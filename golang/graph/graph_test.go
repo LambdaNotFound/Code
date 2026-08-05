@@ -2,7 +2,7 @@ package graph
 
 import (
 	. "gocode/golang/types"
-	"gocode/utils"
+	"gocode/golang/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

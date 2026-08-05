@@ -29,10 +29,9 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
 
 **Top-level packages:**
-- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`. Also holds `golang/types/`, the one non-category subpackage: shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs, `Interval`)
+- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`. Also holds two non-category subpackages: `golang/types/` (shared LeetCode node definitions — `ListNode`, `TreeNode`, `Node` for graphs, `Interval`) and `golang/utils/` (test helpers for constructing/comparing linked lists, trees, and graphs, plus standalone Go-pattern demo files)
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
 - `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns. Most patterns live as `Example*` functions in plain `.go` files (not `_test.go`) for narrative documentation — `go test` does **not** execute these (Example funcs only run when declared in a `_test.go` file); actual assertions live in the sibling `_test.go` files (e.g. `channels_test.go`), which don't yet cover every pattern
-- `utils/` — test helpers for constructing and comparing linked lists, trees, and graphs
 - `fixtures/` — static test data files (e.g. `file.txt`, the input loaded by `golang/interview/affirm_spreadsheet.go`)
 - `system_design/` — written system design solutions/notes (e.g. URL shortener, autopay, hotel booking, sharding, feed generation), not part of the Go module
 - `notes/project_rules/` — interview-prep "project rules" prompts (behavioral, coding/DSA, system design mock-interview instructions) used to configure Claude Code sessions for interview practice; unrelated to the Go source
@@ -55,8 +54,8 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 **Testing:**
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
-- `utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
-- Exception to the split-file norm: `utils/`'s Go-pattern demos and `golang/oo_design/`'s GoF-pattern files (`facade_test.go`, `adapter_test.go`, `mediator_test.go`, `decorator_test.go`, `composite_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
+- `golang/utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
+- Exception to the split-file norm: `golang/utils/`'s Go-pattern demos and `golang/oo_design/`'s GoF-pattern files (`facade_test.go`, `adapter_test.go`, `mediator_test.go`, `decorator_test.go`, `composite_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
 
 **Naming conventions:**
 - Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement

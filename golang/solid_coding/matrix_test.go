@@ -3,7 +3,7 @@ package solid_coding
 import (
 	"testing"
 
-	"gocode/utils"
+	"gocode/golang/utils"
 
 	"github.com/stretchr/testify/assert"
 )

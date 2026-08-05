@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	. "gocode/golang/types"
-	"gocode/utils"
+	"gocode/golang/utils"
 
 	"github.com/stretchr/testify/assert"
 )
