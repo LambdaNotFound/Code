@@ -1,7 +1,7 @@
 package apidesign
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

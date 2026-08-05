@@ -1,7 +1,7 @@
 package graph
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 )
 
 /**

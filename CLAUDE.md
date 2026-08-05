@@ -29,10 +29,9 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
 
 **Top-level packages:**
-- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`
+- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`. Also holds `golang/types/`, the one non-category subpackage: shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs, `Interval`)
 - `containers/` — custom data structure implementations used across problems: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter
 - `concurrency/` — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns. Most patterns live as `Example*` functions in plain `.go` files (not `_test.go`) for narrative documentation — `go test` does **not** execute these (Example funcs only run when declared in a `_test.go` file); actual assertions live in the sibling `_test.go` files (e.g. `channels_test.go`), which don't yet cover every pattern
-- `types/` — shared LeetCode node definitions (`ListNode`, `TreeNode`, `Node` for graphs, `Interval`)
 - `utils/` — test helpers for constructing and comparing linked lists, trees, and graphs
 - `fixtures/` — static test data files (e.g. `file.txt`, the input loaded by `golang/interview/affirm_spreadsheet.go`)
 - `system_design/` — written system design solutions/notes (e.g. URL shortener, autopay, hotel booking, sharding, feed generation), not part of the Go module
@@ -50,7 +49,7 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - `union_find/` — Union-Find with path compression
 
 **Import conventions:**
-- Packages that use `types` use a dot import: `. "gocode/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
+- Packages that use `types` use a dot import: `. "gocode/golang/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
 - The module is named `gocode` (see `go.mod`)
 
 **Testing:**

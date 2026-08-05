@@ -3,7 +3,8 @@ package array
 import (
 	"testing"
 
-	. "gocode/types"
+	. "gocode/golang/types"
+	"gocode/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -79,8 +80,8 @@ func Test_eraseOverlapIntervals(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			in1 := deepCopyMatrix(tt.intervals)
-			in2 := deepCopyMatrix(tt.intervals)
+			in1 := utils.DeepCopyMatrix(tt.intervals)
+			in2 := utils.DeepCopyMatrix(tt.intervals)
 			assert.Equal(t, tt.expected, eraseOverlapIntervals(in1), "sort_by_start")
 			assert.Equal(t, tt.expected, eraseOverlapIntervalsSortByEndTime(in2), "sort_by_end")
 		})
@@ -145,7 +146,7 @@ func Test_minMeetingRoomsMinHeap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			in := deepCopyMatrix(tt.intervals)
+			in := utils.DeepCopyMatrix(tt.intervals)
 			assert.Equal(t, tt.expected, minMeetingRoomsMinHeap(in))
 		})
 	}
@@ -231,7 +232,7 @@ func Test_mergeIntervals(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := mergeIntervals(deepCopyMatrix(tt.intervals))
+			got := mergeIntervals(utils.DeepCopyMatrix(tt.intervals))
 			assert.Equal(t, tt.expected, got)
 		})
 	}

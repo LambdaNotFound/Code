@@ -3,6 +3,8 @@ package dijkstra
 import (
 	"testing"
 
+	"gocode/utils"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -83,18 +85,9 @@ func Test_swimInWater(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.expected, swimInWater(deepCopy(tc.grid)))
-			assert.Equal(t, tc.expected, swimInWaterDFS(deepCopy(tc.grid)))
-			assert.Equal(t, tc.expected, swimInWaterDijkstra(deepCopy(tc.grid)))
+			assert.Equal(t, tc.expected, swimInWater(utils.DeepCopyMatrix(tc.grid)))
+			assert.Equal(t, tc.expected, swimInWaterDFS(utils.DeepCopyMatrix(tc.grid)))
+			assert.Equal(t, tc.expected, swimInWaterDijkstra(utils.DeepCopyMatrix(tc.grid)))
 		})
 	}
-}
-
-func deepCopy(grid [][]int) [][]int {
-	cp := make([][]int, len(grid))
-	for i, row := range grid {
-		cp[i] = make([]int, len(row))
-		copy(cp[i], row)
-	}
-	return cp
 }

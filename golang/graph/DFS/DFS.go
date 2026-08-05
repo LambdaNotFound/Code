@@ -1,7 +1,7 @@
 package dfs
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 )
 
 /**

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "gocode/types"
+	. "gocode/golang/types"
 )
 
 /**

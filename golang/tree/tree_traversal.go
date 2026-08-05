@@ -1,6 +1,6 @@
 package tree
 
-import . "gocode/types"
+import . "gocode/golang/types"
 
 /**
  * 105. Construct Binary Tree from Preorder and Inorder Traversal

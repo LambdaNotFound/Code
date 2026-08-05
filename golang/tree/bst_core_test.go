@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	. "gocode/types"
+	. "gocode/golang/types"
 
 	"github.com/stretchr/testify/assert"
 )
