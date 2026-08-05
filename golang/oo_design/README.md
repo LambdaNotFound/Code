@@ -1,6 +1,6 @@
 # Design Patterns
 
-Overview of the 23 classic Gang-of-Four design patterns. Each implemented pattern lives in its own self-contained `<pattern>_test.go` file (implementation + `Test_` cases together, mirroring the style used in [`utils/`](../../utils)), demonstrating the pattern's structure with a small, testable Go example rather than an abstract UML diagram.
+Overview of the 23 classic Gang-of-Four design patterns. Each implemented pattern lives in its own self-contained `<pattern>_test.go` file (implementation + `Test_` cases together, mirroring the style used in [`utils/`](../utils)), demonstrating the pattern's structure with a small, testable Go example rather than an abstract UML diagram.
 
 ## Creational
 

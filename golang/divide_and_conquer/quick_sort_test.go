@@ -2,7 +2,7 @@ package divide_and_conquer
 
 import (
 	. "gocode/golang/types"
-	"gocode/utils"
+	"gocode/golang/utils"
 
 	"testing"
 

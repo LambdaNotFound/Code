@@ -3,7 +3,7 @@ package graph
 import (
 	"testing"
 
-	"gocode/utils"
+	"gocode/golang/utils"
 
 	"github.com/stretchr/testify/assert"
 )

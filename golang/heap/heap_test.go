@@ -3,7 +3,7 @@ package heap
 import (
 	"container/heap"
 	. "gocode/golang/types"
-	"gocode/utils"
+	"gocode/golang/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
