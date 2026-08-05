@@ -1,7 +1,7 @@
 package bfs
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 	"slices"
 )
 

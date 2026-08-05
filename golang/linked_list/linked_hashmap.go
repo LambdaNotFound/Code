@@ -1,7 +1,7 @@
 package linked_list
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 	"sync"
 )
 

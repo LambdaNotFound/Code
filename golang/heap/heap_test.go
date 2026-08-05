@@ -2,7 +2,7 @@ package heap
 
 import (
 	"container/heap"
-	. "gocode/types"
+	. "gocode/golang/types"
 	"gocode/utils"
 	"testing"
 

@@ -3,6 +3,8 @@ package graph
 import (
 	"testing"
 
+	"gocode/utils"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,18 +43,9 @@ func Test_islandPerimeter(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g1 := deepCopyIntGrid(tt.grid)
+			g1 := utils.DeepCopyMatrix(tt.grid)
 			assert.Equal(t, tt.expected, islandPerimeter(g1))
 			assert.Equal(t, tt.expected, islandPerimeterClaude(tt.grid))
 		})
 	}
-}
-
-func deepCopyIntGrid(grid [][]int) [][]int {
-	cp := make([][]int, len(grid))
-	for i, row := range grid {
-		cp[i] = make([]int, len(row))
-		copy(cp[i], row)
-	}
-	return cp
 }

@@ -1,7 +1,7 @@
 package tree
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 	"math"
 )
 

@@ -3,7 +3,7 @@ package divide_and_conquer
 import (
 	"testing"
 
-	. "gocode/types"
+	. "gocode/golang/types"
 	"gocode/utils"
 
 	"github.com/stretchr/testify/assert"

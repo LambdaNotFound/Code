@@ -1,20 +1,12 @@
 package bfs
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
+	"gocode/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func deepCopy2D(src [][]int) [][]int {
-	dst := make([][]int, len(src))
-	for i := range src {
-		dst[i] = make([]int, len(src[i]))
-		copy(dst[i], src[i])
-	}
-	return dst
-}
 
 func Test_orangesRotting(t *testing.T) {
 	testCases := []struct {
@@ -51,7 +43,7 @@ func Test_orangesRotting(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			grid := deepCopy2D(tc.grid)
+			grid := utils.DeepCopyMatrix(tc.grid)
 			result := orangesRotting(grid)
 			assert.Equal(t, tc.expected, result)
 		})

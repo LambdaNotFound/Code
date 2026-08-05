@@ -3,16 +3,10 @@ package solid_coding
 import (
 	"testing"
 
+	"gocode/utils"
+
 	"github.com/stretchr/testify/assert"
 )
-
-func deepCopyMatrix(m [][]int) [][]int {
-	cp := make([][]int, len(m))
-	for i := range m {
-		cp[i] = append([]int(nil), m[i]...)
-	}
-	return cp
-}
 
 func Test_setZeroes(t *testing.T) {
 	tests := []struct {
@@ -54,8 +48,8 @@ func Test_setZeroes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m1 := deepCopyMatrix(tt.matrix)
-			m2 := deepCopyMatrix(tt.matrix)
+			m1 := utils.DeepCopyMatrix(tt.matrix)
+			m2 := utils.DeepCopyMatrix(tt.matrix)
 			setZeroes(m1)
 			assert.Equal(t, tt.expected, m1, "setZeroes")
 			setZeroesOptimal(m2)
@@ -174,7 +168,7 @@ func Test_rotateImage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			input := deepCopyMatrix(tt.matrix)
+			input := utils.DeepCopyMatrix(tt.matrix)
 			rotateImage(input)
 			assert.Equal(t, tt.expected, input)
 		})

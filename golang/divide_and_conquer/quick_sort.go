@@ -1,6 +1,6 @@
 package divide_and_conquer
 
-import . "gocode/types"
+import . "gocode/golang/types"
 
 /**
  * Quick Sort (recursive structure)

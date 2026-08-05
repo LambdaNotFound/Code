@@ -1,7 +1,7 @@
 package prefixsum
 
 import (
-	. "gocode/types"
+	. "gocode/golang/types"
 )
 
 /**

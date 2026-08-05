@@ -1,6 +1,6 @@
 package tree
 
-import . "gocode/types"
+import . "gocode/golang/types"
 
 /**
  * 285. Inorder Successor in BST

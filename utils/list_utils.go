@@ -1,6 +1,6 @@
 package utils
 
-import . "gocode/types"
+import . "gocode/golang/types"
 
 func CreateLinkedList(arr []int) *ListNode {
 	dummy := ListNode{}

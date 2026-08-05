@@ -1,6 +1,6 @@
 package utils
 
-import . "gocode/types"
+import . "gocode/golang/types"
 
 // GraphsEqual checks structural equality of two graphs
 func GraphsEqual(a, b *Node, visited map[*Node]*Node) bool {
