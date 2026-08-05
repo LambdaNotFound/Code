@@ -1,3 +1,16 @@
 {
-  "defaultMode": "auto"
+  "permissions": {
+    "allow": [
+      "Edit(*)",
+      "Write(*)",
+      "Read(*)",
+      "Bash(*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
 }
