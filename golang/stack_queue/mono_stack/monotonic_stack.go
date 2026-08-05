@@ -1,6 +1,6 @@
 package monostack
 
-import . "gocode/containers"
+import . "gocode/golang_containers"
 
 /**
  * Monotonic stack template:
