@@ -83,6 +83,10 @@ Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go modul
 - See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
 - Python packages mirror the Go structure: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `interview`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`; shared types live in `common/`.
 
+## Rust sub-project
+
+`rust/` is a small scratch Cargo project (`tokio_hello_world`) for practicing async Rust with Tokio — independent of the Go module, with its own `Cargo.toml`/`Cargo.lock`. `cargo run` prints a greeting via a task spawned with `tokio::spawn`; `cargo test` runs the async tests in `src/tests.rs`, which use `#[tokio::test(start_paused = true)]` (the `test-util` dev-dependency feature) to fast-forward simulated time instead of actually sleeping.
+
 ## LeetCode conventions
 
 - Strictly follow the provided function signature — do not change return types or parameters
