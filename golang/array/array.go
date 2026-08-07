@@ -13,7 +13,7 @@ import "sort"
  * Input: nums = [3,4,-1,1]
  * Output: 2
  *
- * goal: nums[i] == i+1
+ * goal: nums[i] == i+1, nums[i]-1 = i
  * move all nums[i] to nums[nums[i]-1]
  *
  */
