@@ -4,7 +4,56 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.104"
 tokio = { version = "1.53.1", features = ["full"] }
+tokio-util = "0.7.19"
 
 [dev-dependencies]
 tokio = { version = "1.53.1", features = ["test-util"] }
+
+# Cargo only auto-discovers examples in a folder literally named `examples/`;
+# this crate's examples live in `tokio_examples/`, so each target is declared
+# explicitly below.
+[[example]]
+name = "cancellation"
+path = "tokio_examples/cancellation.rs"
+
+[[example]]
+name = "channels"
+path = "tokio_examples/channels.rs"
+
+[[example]]
+name = "cooperative_scheduling"
+path = "tokio_examples/cooperative_scheduling.rs"
+
+[[example]]
+name = "error_handling"
+path = "tokio_examples/error_handling.rs"
+
+[[example]]
+name = "runtime_flavors"
+path = "tokio_examples/runtime_flavors.rs"
+
+[[example]]
+name = "select_macro"
+path = "tokio_examples/select_macro.rs"
+
+[[example]]
+name = "shared_state"
+path = "tokio_examples/shared_state.rs"
+
+[[example]]
+name = "sleep_and_timeout"
+path = "tokio_examples/sleep_and_timeout.rs"
+
+[[example]]
+name = "spawn_and_join"
+path = "tokio_examples/spawn_and_join.rs"
+
+[[example]]
+name = "spawn_blocking"
+path = "tokio_examples/spawn_blocking.rs"
+
+[[example]]
+name = "structured_concurrency"
+path = "tokio_examples/structured_concurrency.rs"
