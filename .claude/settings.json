@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Edit(*)",
@@ -12,5 +15,13 @@
       "Bash(curl:*)",
       "Bash(wget:*)"
     ]
-  }
+  },
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "agentPushNotifEnabled": false,
+  "preferences": {
+    "tmuxSplitPanes": true
+  },
+  "tui": "fullscreen"
 }
