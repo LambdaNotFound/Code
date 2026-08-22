@@ -31,6 +31,11 @@ name = "error_handling"
 path = "tokio_examples/error_handling.rs"
 
 [[example]]
+name = "leaky_bucket"
+path = "tokio_examples/leaky_bucket.rs"
+test = true
+
+[[example]]
 name = "runtime_flavors"
 path = "tokio_examples/runtime_flavors.rs"
 
