@@ -57,3 +57,54 @@ path = "tokio_examples/spawn_blocking.rs"
 [[example]]
 name = "structured_concurrency"
 path = "tokio_examples/structured_concurrency.rs"
+
+# rust/basics_examples/ mirrors the same "register each example by hand"
+# convention as tokio_examples/ above, for the companion "Rust Basics 101"
+# tutorial.
+[[example]]
+name = "ownership_and_move"
+path = "basics_examples/ownership_and_move.rs"
+
+[[example]]
+name = "borrowing_and_references"
+path = "basics_examples/borrowing_and_references.rs"
+
+[[example]]
+name = "copy_vs_clone"
+path = "basics_examples/copy_vs_clone.rs"
+
+[[example]]
+name = "structs_and_methods"
+path = "basics_examples/structs_and_methods.rs"
+
+[[example]]
+name = "enums_and_pattern_matching"
+path = "basics_examples/enums_and_pattern_matching.rs"
+
+[[example]]
+name = "option_type"
+path = "basics_examples/option_type.rs"
+
+[[example]]
+name = "result_type"
+path = "basics_examples/result_type.rs"
+
+[[example]]
+name = "slices_and_arrays"
+path = "basics_examples/slices_and_arrays.rs"
+
+[[example]]
+name = "strings_str_vs_string"
+path = "basics_examples/strings_str_vs_string.rs"
+
+[[example]]
+name = "vec_and_hashmap"
+path = "basics_examples/vec_and_hashmap.rs"
+
+[[example]]
+name = "traits_vs_interfaces"
+path = "basics_examples/traits_vs_interfaces.rs"
+
+[[example]]
+name = "generics_and_trait_bounds"
+path = "basics_examples/generics_and_trait_bounds.rs"
