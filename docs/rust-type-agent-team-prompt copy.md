@@ -1,4 +1,4 @@
-# Rust Tokio async programming research - Agent Team Prompt
+# Rust type research - Agent Team Prompt
 
 Goal: Research Rust basic types, data structures, type system, move semantics etc., build a 101 tutorial for engineer with Golang background
 
