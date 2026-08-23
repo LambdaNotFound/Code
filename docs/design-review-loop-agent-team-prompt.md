@@ -59,9 +59,12 @@ the design's restatement of them.
 
 ## Protocol (lead session)
 
-1. **Round 0 — author.** Write `brief.md` first, verbatim. Then
-   invoke `research-investigator` with the slug. It researches from first principles, designs
-   at both altitudes, and writes `design.md` (with `## Revision log`
+1. **Round 0 — author.** Write `brief.md` first, verbatim — if it
+   already conforms to `docs/brief-spec.md` (`Status: signed-off`,
+   e.g. from `/scoping`), keep it exactly as given; do not
+   re-author a scoped brief. Then invoke `research-investigator`
+   with the slug. It researches from first principles, designs at
+   both altitudes, and writes `design.md` (with `## Revision log`
    and `## Objection responses` sections).
 2. **Round N (1..5) — challenge.** Invoke `design-bar-raiser` with
    the slug and round number. It derives the requirements

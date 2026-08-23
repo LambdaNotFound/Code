@@ -48,10 +48,13 @@ so the PR's net diff carries only the change itself.
 
 ## Protocol (lead session)
 
-1. **Round 0 — implement.** Write `brief.md`, create branch
-   `pr/<slug>` from the default branch, then invoke `coding-expert`
-   with the slug. It implements in digestible commits, gets the
-   suite green, and writes `pr.md`. If it returns `blocked` or
+1. **Round 0 — implement.** Write `brief.md` — if it already
+   conforms to `docs/brief-spec.md` (`Status: signed-off`, e.g.
+   from `/scoping`), keep it exactly as given; do not re-author a
+   scoped brief. Create branch `pr/<slug>` from the default branch,
+   then invoke `coding-expert` with the slug. It implements in
+   digestible commits, gets the suite green, and writes `pr.md`. If
+   it returns `blocked` or
    `split proposed`, stop and put that to the user.
 2. **Round N (1..4) — review.** Invoke `code-bar-raiser` with the
    slug and round number. It derives independently from the brief,
