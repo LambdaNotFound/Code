@@ -43,6 +43,12 @@ requirement — leave them out and note them in `pr.md` as follow-ups.
   wins on conflict). If a requirement is ambiguous or two
   requirements conflict, stop and return the question; never
   resolve ambiguity by guessing silently.
+- Check the brief against `docs/brief-spec.md`. A `Status:
+  signed-off` brief with its required sections earns full trust —
+  build on it directly. A brief missing sections (no Non-goals, no
+  Constraints, no testable Goals) was not run through `/scoping`;
+  treat it as an informal ask, and log what is missing as a
+  follow-up in `pr.md` rather than silently guessing past the gap.
 - Read the surrounding code until you can name the conventions that
   bind you: error handling, naming, logging, test structure, module
   layout. Match them even where you would choose differently.

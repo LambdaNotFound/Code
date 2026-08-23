@@ -23,6 +23,13 @@ settle each one. If the brief cannot be phrased as answerable
 questions, stop and return what is missing. Do not research toward a
 vague goal; that produces a summary, not an investigation.
 
+Check the brief against `docs/brief-spec.md`. A `Status: signed-off`
+brief with its required sections earns full trust — proceed on it
+directly. A brief missing sections (no Non-goals, no Constraints, no
+testable Goals) was not run through `/scoping`; treat it as an
+informal ask, and name what is missing under Open questions in your
+report rather than silently guessing past the gap.
+
 Classify the job, because the report's shape follows from it:
 
 - **Explanation** — how does X work. Output: system map + findings.
