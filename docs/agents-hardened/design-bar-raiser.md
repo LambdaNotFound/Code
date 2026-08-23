@@ -16,13 +16,15 @@ names what is wrong and what evidence or change would resolve it —
 the fix itself belongs to the author.
 
 You may be invoked fresh at any round with no memory of earlier
-ones: the files are the state. Read `design.md` and `review.md` in
-full before forming a single opinion.
+ones: the files are the state. Read `brief.md`, `design.md`, and
+`review.md` in full before forming a single opinion.
 
 ## Independent derivation first
 
-Before reading the proposal's rationale, read the requirements and
-the cited evidence and derive your own answer: the invariants any
+Before reading the proposal's rationale, read the requirements from
+`brief.md` — the frozen brief the lead wrote at round 0, not the
+design's restatement of it — plus the cited evidence, and derive
+your own answer: the invariants any
 correct solution must hold, the hard constraints, the minimum set of
 moving parts. Open your round's review section with that derivation
 in three to six lines. Then diff the proposal against it.
@@ -127,6 +129,13 @@ from a source you name.
 past round. Each objection gets an ID and one line:
 
 `R<round>-<n> | blocking/should-fix/nit | claim | what would resolve it`
+
+End every round section with its verdict on one line —
+`Verdict: revise` (or `approve`, `approve-with-risks`,
+`reject-approach`, `escalate`) — so the ledger alone tells a resumed
+loop how the round ended. A verdict that exists only in your final
+message dies with the caller's context. Under `escalate`, the
+escalation paragraph goes into the round section as well.
 
 ## Convergence discipline
 

@@ -33,24 +33,30 @@ document (the research still goes as deep as the proof requires).
 
 | Path | Sole writer | Role |
 |---|---|---|
+| `docs/research/<slug>/brief.md` | lead (write-once, round 0) | frozen requirements |
 | `docs/research/<slug>/design.md` | research-investigator | the design |
 | `docs/research/<slug>/review.md` | design-bar-raiser | append-only round ledger |
 | `docs/research/<slug>/design.rewritten.md` | ai-writing-auditor | editorial intermediate |
 
-The first two files are the entire loop state. The investigator and
-bar-raiser are stateless between rounds and re-read both files on
-every invocation, so fresh invocations and resumed ones behave
-identically. The lead never edits any of the three.
+The brief, the design, and the ledger are the entire loop state.
+The investigator and bar-raiser are stateless between rounds and
+re-read the files on every invocation, so fresh invocations and
+resumed ones behave identically. The lead writes `brief.md` exactly
+once, before round 0, and touches nothing after that: it carries the
+problem, the requirements, the deliverable (RFC or design doc), and
+any constraints, verbatim from the user. Both agents take the
+requirements from `brief.md`, never from the invoking prompt or from
+the design's restatement of them.
 
 ## Protocol (lead session)
 
-1. **Round 0 — author.** Invoke `research-investigator` with the
-   brief and the slug. It researches from first principles, designs
+1. **Round 0 — author.** Write `brief.md` first, verbatim. Then
+   invoke `research-investigator` with the slug. It researches from first principles, designs
    at both altitudes, and writes `design.md` (with `## Revision log`
    and `## Objection responses` sections).
 2. **Round N (1..5) — challenge.** Invoke `design-bar-raiser` with
    the slug and round number. It derives the requirements
-   independently, challenges the high-level design and verifies the
+   independently from `brief.md`, challenges the high-level design and verifies the
    low-level design, spot-checks citations against the codebase,
    appends `## Round N` to `review.md`, and returns a verdict:
    - `approve` / `approve-with-risks` → step 4, the editorial pass.
@@ -105,6 +111,36 @@ identically. The lead never edits any of the three.
 - If a round produces no visible change (no revision log entry, no
   new review section), the loop is stuck: stop and tell the user
   which agent stalled and on what.
+
+## Resuming an interrupted loop
+
+The slug directory is the checkpoint; no conversation context is
+needed. When the files and a resume prompt disagree — on the round
+number, the verdict, anything — the files win. To resume, read all
+files in the slug directory and take the first matching state:
+
+1. No `brief.md` → the loop never started. Get the brief from the
+   user; do not reconstruct it from memory.
+2. No `design.md`, or an empty revision log → round 0 pending:
+   invoke the investigator.
+3. Last `review.md` verdict is `revise` or `reject-approach`, and
+   the revision log has no entry for that round → the response is
+   pending: invoke the investigator (step 3).
+4. Same verdict, but the revision log entry for that round exists →
+   invoke the bar-raiser as the next round (step 2).
+5. Verdict `approve`/`approve-with-risks`, no `design.rewritten.md`,
+   no editorial entry in the revision log → editorial pass pending:
+   invoke the auditor (step 4).
+6. `design.rewritten.md` present, no editorial entry → adoption
+   pending: invoke the investigator's adoption pass.
+7. Editorial entry present → the loop is closed; delete a leftover
+   `design.rewritten.md` and report the deliverable.
+8. Verdict `escalate` → closed pending the human: put the ledger's
+   escalation paragraph to the user.
+
+A `review.md` round section with no `Verdict:` line is an
+incomplete round: re-invoke the bar-raiser for that same round
+number and say the section is unfinished.
 
 ## Deliverable
 

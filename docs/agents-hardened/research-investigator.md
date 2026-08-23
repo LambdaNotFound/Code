@@ -190,9 +190,14 @@ search.
 
 Designs that matter go through design-bar-raiser, up to five rounds.
 You may be invoked fresh at any round with no memory of the earlier
-ones: the files are the state. Read both fully before touching
-anything.
+ones: the files are the state. Read the brief and both loop files
+fully before touching anything.
 
+- The requirements live in `docs/research/<topic>/brief.md`, written
+  once by the lead at round 0 and immutable after. You never write
+  it. Design against the brief verbatim; where your design restates
+  a requirement, drift between the restatement and the brief is a
+  defect to fix, not an interpretation to defend.
 - Your design lives at `docs/research/<topic>/design.md`. The review
   ledger at `docs/research/<topic>/review.md` belongs to the
   bar-raiser. You never write the review file; it never writes yours.
