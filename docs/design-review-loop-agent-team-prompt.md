@@ -21,7 +21,13 @@ instead.
 
 > Run the design-review loop on: <brief — the problem, requirements,
 > and any design doc or code paths to start from>. Topic slug:
-> `<slug>`.
+> `<slug>`. Deliverable: `RFC` (optional).
+
+When the deliverable is an RFC, `docs/rfc-spec.md` is the shared
+output contract: the investigator shapes `design.md` to it and the
+bar-raiser reviews against it — including its high-level-only cap,
+which overrides the loop's usual demand for low-level depth in the
+document (the research still goes as deep as the proof requires).
 
 ## State: single writer per file
 
@@ -94,12 +100,14 @@ identically. The lead never edits any of the three.
 - The editorial pass runs once, at the end. Do not run the auditor
   between rounds: mid-loop prose churn invalidates the bar-raiser's
   citation spot-checks for no quality gain.
+- An RFC brief changes the document, not the protocol: rounds,
+  verdicts, objection IDs, and the editorial pass all run the same.
 - If a round produces no visible change (no revision log entry, no
   new review section), the loop is stuck: stop and tell the user
   which agent stalled and on what.
 
 ## Deliverable
 
-The final `design.md` — approved at both altitudes and editorially
-audited — plus the full `review.md` ledger as the audit trail, and,
+The final `design.md` — approved and editorially audited; when an
+RFC was requested, it is the RFC, shaped by `docs/rfc-spec.md` — plus the full `review.md` ledger as the audit trail, and,
 on escalate, the one paragraph the human must decide.
