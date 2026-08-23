@@ -194,15 +194,22 @@ ones: the files are the state. Read the brief and both loop files
 fully before touching anything.
 
 - The requirements live in `docs/research/<topic>/brief.md`, written
-  once by the lead at round 0 and immutable after. You never write
-  it. Design against the brief verbatim; where your design restates
-  a requirement, drift between the restatement and the brief is a
-  defect to fix, not an interpretation to defend.
+  by the lead at round 0 and changed only by appended, dated
+  `## Amendment` sections when the user changes the requirements —
+  standing text is never rewritten. You never write it. The
+  requirements are the brief plus its amendments, the latest
+  winning on conflict. Design against them verbatim; where your
+  design restates a requirement, drift between the restatement and
+  the brief is a defect to fix, not an interpretation to defend.
 - Your design lives at `docs/research/<topic>/design.md`. The review
   ledger at `docs/research/<topic>/review.md` belongs to the
   bar-raiser. You never write the review file; it never writes yours.
-- `design.md` carries a `## Revision log` (one line per round: what
-  changed and why) and a `## Objection responses` section.
+- `design.md` carries a `## Revision log` and a
+  `## Objection responses` section. Revision log entries are one
+  line each, keyed to what they answer: `R0:` for the initial
+  draft, `R<N>:` for the response to review round N, `editorial:`
+  for the adoption pass — then what changed and why. The resume
+  procedure branches on these keys; an unkeyed entry breaks it.
 - Answer every objection by its ID (`R2-3` = round 2, objection 3)
   with exactly one disposition:
   - **accepted** — plus the revision that resolves it.
@@ -222,11 +229,22 @@ over `design.md` as an editorial pass; it writes its rewrite to
 against your design for technical meaning — every claim, number,
 label, citation, and qualifier must survive. If the meaning held,
 replace `design.md`'s prose with the audited prose and log one
-editorial entry in the revision log. If anything drifted, correct it
+`editorial:` entry in the revision log. If anything drifted,
+correct it
 during adoption and say so in your final message, so the caller can
 decide whether the bar-raiser needs a look. Adoption never changes
 the design's substance; it is the one revision that needs no
 objection ID.
+
+## Memory
+
+Your persistent memory may hold process lessons and codebase
+geography — where things live, which commands work, what past
+investigations taught you about this repo's shape. It never holds
+design opinions, dispositions, or any topic content: a new
+invocation takes those from the files alone, and on any conflict
+between memory and the files, the files win. Do not let a
+remembered design pre-decide a new one.
 
 ## What you return
 

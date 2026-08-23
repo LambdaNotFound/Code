@@ -33,7 +33,7 @@ document (the research still goes as deep as the proof requires).
 
 | Path | Sole writer | Role |
 |---|---|---|
-| `docs/research/<slug>/brief.md` | lead (write-once, round 0) | frozen requirements |
+| `docs/research/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
 | `docs/research/<slug>/design.md` | research-investigator | the design |
 | `docs/research/<slug>/review.md` | design-bar-raiser | append-only round ledger |
 | `docs/research/<slug>/design.rewritten.md` | ai-writing-auditor | editorial intermediate |
@@ -41,10 +41,15 @@ document (the research still goes as deep as the proof requires).
 The brief, the design, and the ledger are the entire loop state.
 The investigator and bar-raiser are stateless between rounds and
 re-read the files on every invocation, so fresh invocations and
-resumed ones behave identically. The lead writes `brief.md` exactly
-once, before round 0, and touches nothing after that: it carries the
-problem, the requirements, the deliverable (RFC or design doc), and
-any constraints, verbatim from the user. Both agents take the
+resumed ones behave identically. The lead writes `brief.md` before
+round 0 — the problem, the requirements, the deliverable (RFC or
+design doc), and any constraints, verbatim from the user — and
+after that touches it only to append a dated `## Amendment` section,
+only when the user changes the requirements; standing text is never
+rewritten or deleted. An amendment is revised material: it licenses
+new blocking objections without goalpost-drift penalty, and both
+agents read the requirements as brief plus amendments, the latest
+winning on conflict. Both agents take the
 requirements from `brief.md`, never from the invoking prompt or from
 the design's restatement of them.
 
@@ -77,7 +82,7 @@ the design's restatement of them.
    - Claim inventory clean → invoke `research-investigator` for the
      adoption pass: it diffs the rewrite against the design for
      technical meaning, replaces `design.md`'s prose with the
-     audited prose, and logs one editorial entry. If it returns
+     audited prose, and logs one `editorial:` entry. If it returns
      `Adopted`, the loop is done. If it returns `Adopted with
      corrections`, put the named corrections to `design-bar-raiser`
      for a check of only the drifted sections before closing.
@@ -124,16 +129,18 @@ files in the slug directory and take the first matching state:
 2. No `design.md`, or an empty revision log → round 0 pending:
    invoke the investigator.
 3. Last `review.md` verdict is `revise` or `reject-approach`, and
-   the revision log has no entry for that round → the response is
+   the revision log has no `R<N>:` entry for that round → the
+   response is
    pending: invoke the investigator (step 3).
-4. Same verdict, but the revision log entry for that round exists →
+4. Same verdict, but the `R<N>:` revision log entry exists →
    invoke the bar-raiser as the next round (step 2).
 5. Verdict `approve`/`approve-with-risks`, no `design.rewritten.md`,
-   no editorial entry in the revision log → editorial pass pending:
+   no `editorial:` entry in the revision log → editorial pass
+   pending:
    invoke the auditor (step 4).
-6. `design.rewritten.md` present, no editorial entry → adoption
+6. `design.rewritten.md` present, no `editorial:` entry → adoption
    pending: invoke the investigator's adoption pass.
-7. Editorial entry present → the loop is closed; delete a leftover
+7. `editorial:` entry present → the loop is closed; delete a leftover
    `design.rewritten.md` and report the deliverable.
 8. Verdict `escalate` → closed pending the human: put the ledger's
    escalation paragraph to the user.
