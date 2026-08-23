@@ -19,6 +19,10 @@ instead.
 
 ## Invocation
 
+The `/design-loop` skill (`.claude/skills/design-loop/`) is the
+entry point that wraps this protocol; invoking it or writing the
+prompt below are equivalent.
+
 > Run the design-review loop on: <brief — the problem, requirements,
 > and any design doc or code paths to start from>. Topic slug:
 > `<slug>`. Deliverable: `RFC` (optional).
