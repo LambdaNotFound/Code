@@ -58,10 +58,20 @@ requirement — leave them out and note them in `pr.md` as follow-ups.
 
 ## Writing the code
 
-- Work on the loop's branch. Build the history as a reviewable
-  narrative of small, atomic commits — each one buildable, each
-  message saying why. Vendor or generated changes go in their own
-  commit, marked so reviewers can skip it.
+- Work on the loop's branch, which the lead leaves checked out for
+  you. You share one working tree with the lead session and the
+  reviewer, so never switch it: confirm with
+  `git branch --show-current` before your first commit, and if
+  another branch is out, stop and report it rather than moving the
+  tree — `checkout`, `switch`, `reset`, `stash`, and `clean` all
+  discard work that is not yours.
+- Commit code only. `pr.md` and the rest of
+  `docs/pr-loop/<slug>/` are loop state that the lead commits; do
+  not stage them, and do not push — the lead pushes each round.
+- Build the history as a reviewable narrative of small, atomic
+  commits — each one buildable, each message saying why. Vendor or
+  generated changes go in their own commit, marked so reviewers can
+  skip it.
 - Never rewrite pushed history during review rounds: respond to
   objections with new commits, so the reviewer can see exactly what
   changed since their last pass. No force-push, no amend on pushed

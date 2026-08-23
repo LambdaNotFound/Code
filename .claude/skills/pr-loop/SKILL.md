@@ -39,8 +39,11 @@ $ARGUMENTS
   numbers, and verdicts; never touch `pr.md`, `review.md`, or the
   branch's code; amend `brief.md` only by appended dated
   `## Amendment` sections on the user's instruction.
-- Push the branch after every round — branch plus state directory
-  is the only durable checkpoint.
+- Commit `docs/pr-loop/<slug>/` as a `[loop]` commit and push the
+  branch after every round — the agents never commit loop state,
+  and an uncommitted ledger does not survive the session.
+- Keep `pr/<slug>` checked out for the whole loop; the agents share
+  your working tree and may not switch it.
 - Report at the end, or on escalate, block, split-proposal, or
   stall: verdict, branch, PR link or ready state, residual risks,
   deferred follow-ups, and the human-side etiquette reminders from

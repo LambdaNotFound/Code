@@ -39,27 +39,37 @@ invocation. The lead writes `brief.md` before round 0 (verbatim
 from the user; amendments only by appended dated `## Amendment`
 sections on the user's instruction, standing text never rewritten —
 an amendment is revised material and both agents read requirements
-as brief plus amendments, latest winning). The lead never touches
-the other files or the branch.
+as brief plus amendments, latest winning). The lead never writes
+`pr.md`, `review.md`, or any code — its only work on the branch is
+creating it, committing loop state, and pushing.
 
-Loop-state commits on the branch are prefixed `[loop]` so reviewers
-can skip them; the branch's final commit removes `docs/pr-loop/<slug>/`
-so the PR's net diff carries only the change itself.
+The lead owns every loop-state commit: after each round it stages
+`docs/pr-loop/<slug>/`, commits it with a `[loop]` prefix so
+reviewers can skip those commits, and pushes. Agents never commit
+loop state — `coding-expert` commits code only, `code-bar-raiser`
+commits nothing at all. The branch's final commit removes
+`docs/pr-loop/<slug>/` so the PR's net diff carries only the change
+itself.
+
+Every agent in this loop shares the lead's working tree. The lead
+creates `pr/<slug>` and leaves it checked out for the whole loop,
+and is the only one that may change which branch is out; the agents
+confirm the branch and stop rather than switching it.
 
 ## Protocol (lead session)
 
 1. **Round 0 — implement.** Write `brief.md` — if it already
    conforms to `docs/brief-spec.md` (`Status: signed-off`, e.g.
    from `/scoping`), keep it exactly as given; do not re-author a
-   scoped brief. Create branch `pr/<slug>` from the default branch,
-   then invoke `coding-expert` with the slug. It implements in
-   digestible commits, gets the suite green, and writes `pr.md`. If
-   it returns `blocked` or
-   `split proposed`, stop and put that to the user.
+   scoped brief. Create branch `pr/<slug>` from the default branch
+   and leave it checked out, then invoke `coding-expert` with the
+   slug. It implements in digestible commits, gets the suite green,
+   and writes `pr.md`. If it returns `blocked` or `split proposed`,
+   stop and put that to the user.
 2. **Round N (1..4) — review.** Invoke `code-bar-raiser` with the
    slug and round number. It derives independently from the brief,
-   checks out and runs the branch, appends `## Round N` with a
-   `Verdict:` line to `review.md`:
+   builds and runs the branch you left checked out, appends
+   `## Round N` with a `Verdict:` line to `review.md`:
    - `approve` / `approve-with-risks` → step 4.
    - `revise` → step 3.
    - `escalate` → **stop**; put the ledger's escalation paragraph
@@ -96,8 +106,11 @@ so the PR's net diff carries only the change itself.
   `brief.md`; the auditor touches `pr.md` prose only. Disagreement
   between author and reviewer is signal — surface it, never smooth
   it.
-- Push the branch after every round; the pushed branch plus the
-  state directory is the only durable checkpoint.
+- After every round, stage and commit `docs/pr-loop/<slug>/` as a
+  `[loop]` commit and push the branch — the pushed branch carrying
+  both the code and the state directory is the only durable
+  checkpoint, so a round whose ledger was never committed is a
+  round that did not survive.
 - If a round produces no visible change (no new commits or
   dispositions, no new ledger section), the loop is stuck: stop and
   tell the user which agent stalled and on what.
