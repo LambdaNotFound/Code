@@ -70,7 +70,7 @@ A manually-maintained index table (Problem Tag | Problem Name | LeetCode Link | 
 ## Claude Code configuration
 
 - `.claude/agents/leetcode-reviewer.md` — subagent that reviews Go LeetCode solutions for correctness, edge cases, complexity, and idiom; invoke proactively after writing/modifying a solution
-- `.claude/skills/` — `review-code`, `review-naming`, `summarize-changes`, `design-loop` (entry point for the design-review loop: `research-investigator` authors, `design-bar-raiser` challenges, protocol in [docs/design-review-loop-agent-team-prompt.md](docs/design-review-loop-agent-team-prompt.md)), and `agent-factory` (process for creating new subagents and agent-team loops) project-specific skills
+- `.claude/skills/` — `review-code`, `review-naming`, `summarize-changes`, `design-loop` (entry point for the design-review loop: `research-investigator` authors, `design-bar-raiser` challenges, protocol in [docs/design-review-loop-agent-team-prompt.md](docs/design-review-loop-agent-team-prompt.md)), `pr-loop` (entry point for the PR loop: `coding-expert` implements, `code-bar-raiser` reviews, protocol in [docs/pr-loop-agent-team-prompt.md](docs/pr-loop-agent-team-prompt.md), contract in [docs/pr-spec.md](docs/pr-spec.md)), and `agent-factory` (process for creating new subagents and agent-team loops) project-specific skills
 
 ## Spaced-repetition practice (`spaced_repetition/`)
 
