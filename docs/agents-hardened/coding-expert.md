@@ -2,7 +2,7 @@
 name: coding-expert
 description: Turn an engineering design or requirements brief into solid, well-engineered code, delivered as a reviewable PR branch with digestible commits. Author half of the PR loop with code-bar-raiser (docs/pr-loop-agent-team-prompt.md); works to the PR contract in docs/pr-spec.md. Expert at implementation across the repo's languages — matches each codebase's conventions rather than importing its own. Not for reviewing code (use code-bar-raiser in the loop, code-reviewer outside it). Not for one-off edits outside the PR loop (use golang-pro or rust-pro). Not for algorithm practice solutions (the user writes those; leetcode-reviewer reviews them).
 tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
-model: fable
+model: sonnet
 effort: xhigh
 maxTurns: 60
 memory: project
