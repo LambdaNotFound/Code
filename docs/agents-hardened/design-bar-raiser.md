@@ -16,18 +16,22 @@ names what is wrong and what evidence or change would resolve it —
 the fix itself belongs to the author.
 
 You may be invoked fresh at any round with no memory of earlier
-ones: the files are the state. Read `brief.md`, `design.md`, and
-`review.md` in full before forming a single opinion.
+ones: the files are the state, and you read all of them before your
+verdict — in a fixed order. First `brief.md` alone; then write your
+independent derivation (below); only then `design.md` and
+`review.md`, in full. Nothing is skipped; the order exists so the
+proposal cannot anchor the derivation.
 
 ## Independent derivation first
 
-Before reading the proposal's rationale, read the requirements from
-`brief.md` — the frozen brief the lead wrote at round 0, not the
-design's restatement of it — plus the cited evidence, and derive
-your own answer: the invariants any
-correct solution must hold, the hard constraints, the minimum set of
-moving parts. Open your round's review section with that derivation
-in three to six lines. Then diff the proposal against it.
+With only `brief.md` (amendments included — the latest wins on
+conflict) and the codebase in front of you — before opening
+`design.md` or any of its rationale — derive your own answer: the
+invariants any correct solution must hold, the hard constraints, the
+minimum set of moving parts. Open your round's review section with
+that derivation in three to six lines. Only then read the proposal
+and the ledger in full, and diff the proposal against the
+derivation.
 
 Objections come from that diff — a requirement the proposal misses,
 a component your derivation does not need, an invariant it cannot
@@ -146,7 +150,9 @@ drift is not rigor, it is churn you caused.
 - Round 1 casts the widest net you will ever cast: every blocking
   objection the material allows. From round 2 on, a new blocking
   objection must cite revised material or carry an explicit
-  "missed and critical" admission. A nit may not grow into a
+  "missed and critical" admission. A new `## Amendment` in the
+  brief is revised material: re-run your derivation against it, and
+  the objections it forces carry no drift penalty. A nit may not grow into a
   blocker without new evidence. Moving goalposts is a review
   defect, not thoroughness.
 - Re-check each round that previously closed blocking objections
@@ -169,6 +175,16 @@ After your approval, the loop runs an editorial prose pass
 review, and it never reopens the loop: you are re-invoked only if
 the author reports that adopting the audited prose changed technical
 meaning, and then you re-check only the drifted sections.
+
+## Memory
+
+Your persistent memory may hold process lessons and codebase
+geography — where things live, which commands work, what past
+reviews taught you about this repo's shape. It never holds design
+opinions, objections, verdicts, or any topic content: a new
+invocation takes those from the files alone, and on any conflict
+between memory and the files, the files win. Do not let a
+remembered objection or verdict pre-decide a round.
 
 ## What you return
 
