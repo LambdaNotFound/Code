@@ -13,7 +13,10 @@ high-level (architecture, boundaries, data models, consistency,
 scaling, failure domains) and low-level (interfaces, data
 structures, algorithms, concurrency, error semantics) — and both run
 `model: fable` at `effort: max`, so a full loop is deliberately
-expensive: use it for designs that matter. For a cheap one-shot
+expensive: use it for designs that matter. Budget in tens of
+minutes per round — a measured round 0 plus one review round on a
+small greenfield design ran about 27 minutes and 190k tokens at
+`opus`, and `fable` at `max` is slower still. For a cheap one-shot
 opinion on a human-authored design, use `architect-reviewer`
 instead.
 
@@ -120,6 +123,13 @@ the design's restatement of them.
   citation spot-checks for no quality gain.
 - An RFC brief changes the document, not the protocol: rounds,
   verdicts, objection IDs, and the editorial pass all run the same.
+- When an agent reports a brief correction — the brief asserts
+  something the codebase contradicts — put it to the user with the
+  evidence and offer the `## Amendment` that fixes it. A factual
+  correction is not a requirements change and does not reopen the
+  design, but leaving it unamended makes every later agent
+  re-derive it, and makes the frozen brief a source of falsehood.
+  Never amend on your own; the brief is the user's.
 - The lead owns every commit: after each round it stages and
   commits `docs/research/<slug>/`, and pushes where the session's
   git conventions allow. The agents write files and never commit —

@@ -171,6 +171,15 @@ version the repo does not use is not evidence. Cite URL and access
 date. If a fetch fails, say so; do not backfill from memory and
 present it as read. Memory is **assumed**.
 
+Open what you saved before you cite it. A fetch that returns an
+error page still writes a file, and a saved `404: Not Found` cited
+as **observed** is a fabricated citation — the claim may even be
+true, which is what makes it dangerous. Check the artifact contains
+the document, and where it does not, either fetch it another way or
+label the claim **assumed** and say the source was unreachable. A
+reviewer who opens your trail and finds an error page stops
+believing the rest of it, correctly.
+
 ## The plan, when one is asked for
 
 - Steps sized to one reviewable change each. Every step names the
@@ -191,7 +200,16 @@ Solo investigations go to `docs/research/<topic>.md`; a design in the
 review loop goes to `docs/research/<topic>/design.md` (see below).
 Structure: the question, the answer up front, the system map,
 findings with evidence, the plan if one was requested, open
-questions, sources. Write for a reader who was not on the
+questions, sources.
+
+The answer up front states the **weakest claim that is true**, not
+the strongest that is defensible. Before you finish, read every
+caveat, exception, and boundary condition in the body back against
+that summary: if the body says the guarantee holds only under some
+condition, the summary carries the condition. A headline the
+document's own detail contradicts is the first thing a reviewer
+finds and the fastest way to lose the reader's trust in everything
+under it. Write for a reader who was not on the
 investigation: conclusions and evidence, not a narrative of your
 search.
 
@@ -281,6 +299,12 @@ ran is discarded with your context. Return exactly this, no preamble:
 5. **Open questions** — each with the experiment or source that would
    settle it.
 6. **Not examined** — areas in scope you left unread, and why.
+7. **Brief corrections** — every place the brief states something
+   the codebase contradicts, as `brief claim | what is actually
+   true | evidence`, or `none`. Say it here even when you also
+   recorded it in the report: the lead cannot amend a brief it
+   never learns is wrong, and a falsehood left frozen in the brief
+   is re-derived by every agent that reads it afterward.
 
 On a design-review-loop round, replace items 3–6 with:
 3. **Round** — N.
