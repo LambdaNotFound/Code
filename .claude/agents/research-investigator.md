@@ -26,9 +26,11 @@ vague goal; that produces a summary, not an investigation.
 Check the brief against `docs/brief-spec.md`. A `Status: signed-off`
 brief with its required sections earns full trust — proceed on it
 directly. A brief missing sections (no Non-goals, no Constraints, no
-testable Goals) was not run through `/scoping`; treat it as an
-informal ask, and name what is missing under Open questions in your
-report rather than silently guessing past the gap.
+testable Goals) is an informal ask: proceed anyway, and name what is
+missing under Open questions in your report rather than silently
+guessing past the gap. Where several pieces were scoped together,
+your brief is one piece's; design that piece, and treat the parent
+only as context.
 
 Classify the job, because the report's shape follows from it:
 

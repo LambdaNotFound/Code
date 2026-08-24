@@ -25,8 +25,10 @@ $ARGUMENTS
 3. Fresh start: write `docs/pr-loop/<slug>/brief.md` verbatim from
    the arguments — requirements or the named design doc's content,
    target area, constraints — and create branch `pr/<slug>` from
-   the default branch, before any agent runs. A design-loop
-   `design.md` may be copied in as the brief. If the arguments name
+   the default branch, before any agent runs. When the argument is
+   a design-loop `design.md`, copy it in as the brief unchanged and
+   say so in the file's first line — it is a conforming input per
+   `docs/brief-spec.md`, not an informal one. If the arguments name
    a goal but no requirements to freeze, stop and ask; never invent
    the brief.
 4. Record whether the user authorized opening the PR (`open PR:
