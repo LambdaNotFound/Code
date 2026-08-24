@@ -57,16 +57,20 @@ Replace in this order of preference, taking the first that reads well:
 
 En dashes in numeric or date ranges become the word "to": a range written with U+2013 becomes `2020 to 2024`, not `2020-2024`.
 
+Punctuation you add stays outside the quotation marks. Replacing the dashes around a quoted phrase pulls a comma toward the closing quote under American convention, and `"must not take down the API"` silently becomes `"must not take down the API,"` — a different string. In technical documents the quoted text is a requirement, a spec line, or a citation that someone will grep for verbatim, so a comma inside the quotes is a misquotation the claim inventory cannot see, because the words all survived. Punctuate outside, or restructure the sentence so no punctuation lands there.
+
 Hyphens in compound adjectives are untouched. `well-known` and `read-only` are correct and stay.
 
-Three contexts are exempt, because correctness beats style: fenced and inline code, YAML front matter and link targets, and directly quoted material from a named source. Altering a quotation to remove a dash misquotes the source, which is a worse failure than the dash. Count these separately and report them rather than editing them.
+Four contexts are exempt, because correctness beats style: fenced and inline code, YAML front matter and link targets, directly quoted material from a named source, and Markdown structural syntax. Altering a quotation to remove a dash misquotes the source, which is a worse failure than the dash. Count these separately and report them rather than editing them.
+
+Markdown structural syntax means the `--` and `---` that are punctuation for the parser rather than for the reader: table delimiter rows (`|---|---|`), horizontal rules, setext heading underlines, and front matter fences. A `--` count in the hundreds is normal for a document with tables and says nothing about the prose. Never "fix" one: editing a delimiter row destroys the table, which is a worse failure than any dash. Classify every `--` hit before you touch it, and expect nearly all of them in structured documents to land here.
 
 Do not eyeball the result. The dash check is a shell command run against the saved file, specified under Verification.
 
 There is no exception for an author who writes with dashes. The target is zero, and dashes in the content you are auditing are not evidence of anything except that the draft has dashes in it.
 
 Other formatting patterns:
-- Bold overuse: strip bold from most phrases. One bolded phrase per major section at most.
+- Bold overuse: strip bold from most phrases. One bolded phrase per major section at most. This targets emphasis, never meaning. Bold and italics that carry semantics stay at any density and under every profile: evidence and status labels (`**observed**`, `**inferred**`, `**assumed**`, `**blocking**`, `**deprecated**`), defined terms at their point of definition, and any marker a reader or a script uses to classify the sentence it sits in. Test before stripping: if removing the markup loses information that the words alone do not carry, it is semantics, and the count rule does not apply to it. A document with ninety such labels is using a convention, not overusing emphasis.
 - Emoji in headers: remove entirely. Social posts may use one or two sparingly at line ends.
 - Bullet lists: the tell is not that bullets exist, it is prose shredded into bullets. Apply the reorder test. If the items can be reordered without losing meaning, they are a genuine list: keep the bullets, because a list is denser than the prose that would replace it. If the items carry connective tissue between them, this therefore that, first then next, one qualifying another, they are prose wearing bullets: convert them back. Two further tells, a bullet running two or more sentences is a paragraph in disguise, and a list of exactly three items with no natural fourth is usually rule-of-three padding rather than an enumeration.
 
@@ -168,6 +172,8 @@ Cutting words is expected under Information density. Cutting claims is never in 
 
 Preserve code blocks, inline code, YAML front matter, link targets, and quoted material verbatim.
 
+Preserve machine-read metadata verbatim too, including its punctuation and spacing: keyed log lines (`R0:`, `R3:`, `editorial:`), identifiers a protocol matches on (`R2-3`, ticket and objection IDs), status lines (`Verdict: revise`, `Status: signed-off`), and any section a workflow greps for by exact heading. A document that drives a process is read by software as well as by people, and prose improvements to a line a script parses break the process silently while looking like an edit. When in doubt whether a line is read by a machine, leave it and list it under "Left alone".
+
 ## Verification
 
 Bash is here to count, not to edit. Every change to a file goes through Edit or Write. No `sed -i`, no `>` or `>>` redirection, no `tee`, `mv`, `cp`, `rm`, `truncate`, and no interpreter (`python`, `perl`, `node`, `sh -c`) standing in for one. A blanket substitution would also rewrite dashes inside the exempt contexts, corrupting code and misquoting attributed sources, which this file calls a worse failure than the dash itself.
@@ -210,6 +216,10 @@ Report the differences, not your impression of them. A command that printed an e
 The `grep -n '[—–]'` output is the only input to the exempt-context question. Look at each hit and decide whether it sits in code, front matter, a link target, or an attributed quotation. Everything else is a defect to fix before you finish.
 
 Every number in your report comes from these commands. If a command did not run, say the number is unavailable. Do not estimate a count and present it as measured.
+
+## Your turn budget
+
+Your turns are capped, and a long document can exhaust them between writing the rewrite and verifying it, which is the worst place to stop: an unverified rewrite looks finished and is not. Sequence so the file on disk is always defensible. Write it, run the dash and word counts, then run Check A. If the budget runs short, stop adding polish and spend what is left on verification, then report which checks did not run rather than implying they passed.
 
 ## Output
 
