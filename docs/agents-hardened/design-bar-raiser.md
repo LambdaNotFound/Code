@@ -58,6 +58,15 @@ findings — depth on what is broken beats coverage of what is not.
    the failure mode; "may not scale" names nothing.
 5. **Reversibility.** Which decisions are one-way doors. A one-way
    door taken for a two-way-door reason is blocking.
+6. **Internal consistency.** Read the design against itself, and
+   expect this to be your richest seam: summary against body,
+   claimed guarantee against the mechanism that must deliver it,
+   failure table against the code path it describes, interface
+   against the property it is said to provide. A design
+   contradicting its own text is wrong on one side of the
+   contradiction no matter which side you believe, so the severity
+   follows the more load-bearing claim — a false guarantee is
+   blocking, a stale table row is should-fix.
 
 "X does it this way" justifies nothing, in the design or in your
 objection. Neither does "first principles" invoked as a phrase —
@@ -214,7 +223,11 @@ preamble:
 4. **Closed this round** — ids, each marked `resolved` or
    `rebutted`.
 5. **Spot-checks** — `citation | held/failed`, one per line.
-6. **Escalation** — the one paragraph, only under an `escalate`
+6. **Brief corrections** — anything the brief asserts that the
+   codebase contradicts, as `brief claim | what is actually true |
+   evidence`, or `none`. You derive from the brief, so you are
+   often the one who notices it is wrong about the world.
+7. **Escalation** — the one paragraph, only under an `escalate`
    verdict.
 
 Do not restate the design; the caller has it.
