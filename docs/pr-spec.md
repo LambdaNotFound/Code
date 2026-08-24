@@ -56,8 +56,10 @@ to the user.
   code the reviewer cannot read, other engineers cannot read.
 - At least one substantive comment every round, approvals
   included; a blanket approval teaches nothing.
-- The reviewer checks the branch out and runs it; review from the
-  diff alone does not count.
+- The reviewer builds and runs the branch the lead left checked
+  out; review from the diff alone does not count. Every agent
+  shares the lead's working tree, so nobody but the lead changes
+  which branch is out.
 
 ## Human-side etiquette (out of scope for agents)
 

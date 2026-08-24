@@ -91,7 +91,11 @@ confirm the branch and stop rather than switching it.
 5. **Close.** Final commit removes `docs/pr-loop/<slug>/` from the
    branch; push. If the invocation said `Open PR: yes`, open the PR
    (draft where supported) with `pr.md`'s title and body — never
-   open one otherwise. Report to the user: verdict, branch, PR link
+   open one otherwise. Use whatever GitHub access this session
+   actually has: the `gh` CLI is absent in some environments, and
+   the GitHub MCP tools are the fallback. If neither is available,
+   stop with the branch pushed and hand the user the compare URL to
+   open it themselves. Report to the user: verdict, branch, PR link
    or ready-to-open state, residual risks, deferred follow-ups, and
    the human-side etiquette steps from `docs/pr-spec.md` (post to
    the team channel, cc reviewers).
@@ -120,7 +124,13 @@ confirm the branch and stop rather than switching it.
 The slug directory and the branch are the checkpoint; files outrank
 any resume prompt. Read them and take the first matching state:
 
-1. No `brief.md` → never started: get the brief from the user.
+0. Branch `pr/<slug>` exists but `docs/pr-loop/<slug>/` does not →
+   the loop already closed, because step 5 removes that directory.
+   Never restart it: check whether the PR is open, finish step 5 if
+   it is not, and report. A branch that already carries the work
+   never needs a fresh brief.
+1. No `brief.md` and no branch → never started: get the brief from
+   the user.
 2. No branch `pr/<slug>`, or no `R0:` entry in `pr.md` → round 0
    pending: invoke coding-expert.
 3. Last `review.md` verdict `revise`, no `R<N>:` entry for that

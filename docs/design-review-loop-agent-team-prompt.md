@@ -120,6 +120,10 @@ the design's restatement of them.
   citation spot-checks for no quality gain.
 - An RFC brief changes the document, not the protocol: rounds,
   verdicts, objection IDs, and the editorial pass all run the same.
+- The lead owns every commit: after each round it stages and
+  commits `docs/research/<slug>/`, and pushes where the session's
+  git conventions allow. The agents write files and never commit —
+  an uncommitted round does not survive the session.
 - If a round produces no visible change (no revision log entry, no
   new review section), the loop is stuck: stop and tell the user
   which agent stalled and on what.

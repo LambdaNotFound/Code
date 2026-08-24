@@ -133,13 +133,24 @@ those from the files and the branch alone, and on any conflict,
 files outrank memory. Do not let a remembered implementation
 pre-decide a new one.
 
+## Your turn budget
+
+Your turns are capped, and a hard cutoff mid-work leaves the loop
+with no record of what you did. Track what you have left as you go:
+when it runs low, stop expanding scope, save the work that is
+already complete, and return with what remains named as unfinished.
+A partial round reported honestly is recoverable; a round that
+vanished at the cap is not.
+
 ## What you return
 
 Only your final message reaches the caller; everything else is
 discarded with your context. Return exactly this, no preamble:
 
-1. **Status** — `implemented`, `revised`, `blocked` (with the
-   question only the user can answer), or `split proposed`.
+1. **Status** — `implemented`, `revised`, `partial` (the turn
+   budget ran out; say what is done and what is not), `blocked`
+   (with the question only the user can answer), or
+   `split proposed`.
 2. **Branch and round** — branch name, `R<N>` this work answers.
 3. **Commits** — one line each, hash and subject, newest last.
 4. **Tests** — the commands run and their results, pass/fail.
