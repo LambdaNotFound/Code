@@ -120,26 +120,64 @@ line:
 
 ## Step 6 — Harden before shipping
 
-Review the finished set from first principles. Every item below was
-a real defect found and fixed in this repo's own loop; check each:
+Two passes, because they find different defects. Every item below
+was a real defect found and fixed in this repo's own loops, and the
+order matters: three review rounds there each turned up fresh
+majors, and the class shifted every round — inside single agents,
+then between an agent and its contract, then between loops. A
+component-only review will not find the last two kinds.
+
+**Pass A — each component alone.**
 
 1. **Entry point** — can a fresh session with no context discover
    and start it?
-2. **Contradictions** — can every pair of instructions hold at
-   once? (Reading order vs independence is the classic.)
+2. **Contradictions** — can every pair of instructions in the file
+   hold at once? (Reading order vs independence is the classic.)
 3. **State channels** — does memory or anything else bypass "the
    files are the state"? Scope it or drop it.
 4. **Amendment path** — can immutable inputs legally change when
    the user changes their mind?
 5. **Resume** — is the next action derivable from files alone?
-   Verdicts persisted? Log entries keyed?
+   Verdicts persisted, log entries keyed? Check the end states too:
+   if closing deletes state, a resume must not read the absence as
+   "never started" and redo finished work.
 6. **Append safety** — can a whole-file write silently clobber
-   append-only history?
-7. **Correlated blind spots** — same model on both sides of an
+   append-only history? An agent told to append needs `Edit`;
+   without it there is no append mechanism, only discipline.
+7. **Turn budget** — what happens at `maxTurns`? A hard cutoff
+   mid-work must degrade to saved work and a partial report, and
+   the return contract needs a slot to say so.
+8. **Correlated blind spots** — same model on both sides of an
    adversarial pair is procedural, not epistemic, independence;
-   acknowledge it and keep the human escape hatch.
-8. **Copy drift** — are dual copies actually identical?
+   acknowledge it and keep the human escape hatch. Check the
+   direction too: a reviewer weaker than the author it challenges
+   undoes the premise.
+9. **Copy drift** — are dual copies actually identical?
 
-Fix the majors before shipping. Report anything left open, ranked,
-with the concrete fix for each — the user decides, and an issue
-reported honestly beats one padded over.
+**Pass B — the system between components.**
+
+10. **Restatements** — after changing any rule, grep every file
+    that restates it. A rule fixed in the agent and left standing
+    in its contract is worse than never fixing it, because the two
+    now disagree and the agent reads both.
+11. **Contract versus implementation** — read each contract file
+    against the agents that consume it. A contract asserting what
+    no agent enforces is decoration; one forbidding what they all
+    allow is a trap.
+12. **Seams** — for every handoff, does the producer's output
+    actually satisfy the consumer's input contract, and is it
+    addressed so two runs cannot collide? Decomposition is the
+    usual failure: N pieces sharing one slug overwrite each other.
+    Check that the best input is not penalized by a check written
+    for the worst.
+13. **Shared resources** — subagents share the lead's filesystem
+    and working tree. Anything that switches branches, deletes, or
+    resets is acting on everyone; name one owner and forbid the
+    rest.
+
+Fix the majors before shipping — then re-run Pass A on the files
+you just edited. Fixes introduce defects at a high rate: in this
+repo's second review round, two of three majors were damage from
+the first round's fixes. Report anything left open, ranked, with
+the concrete fix for each — the user decides, and an issue reported
+honestly beats one padded over.
