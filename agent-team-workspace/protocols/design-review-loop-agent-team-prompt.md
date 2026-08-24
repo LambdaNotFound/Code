@@ -7,7 +7,7 @@ or escalation, and `ai-writing-auditor` gives the approved document
 a final editorial pass.
 
 All three are defined in `.claude/agents/` (hardened masters for the
-first two in `docs/agents-hardened/`). The investigator and
+first two in `agent-team-workspace/agent-archive/`). The investigator and
 bar-raiser are expert software engineers at both design altitudes —
 high-level (architecture, boundaries, data models, consistency,
 scaling, failure domains) and low-level (interfaces, data
@@ -30,7 +30,7 @@ prompt below are equivalent.
 > and any design doc or code paths to start from>. Topic slug:
 > `<slug>`. Deliverable: `RFC` (optional).
 
-When the deliverable is an RFC, `docs/rfc-spec.md` is the shared
+When the deliverable is an RFC, `agent-team-workspace/agent-specs/rfc-spec.md` is the shared
 output contract: the investigator shapes `design.md` to it and the
 bar-raiser reviews against it — including its high-level-only cap,
 which overrides the loop's usual demand for low-level depth in the
@@ -40,10 +40,10 @@ document (the research still goes as deep as the proof requires).
 
 | Path | Sole writer | Role |
 |---|---|---|
-| `docs/research/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
-| `docs/research/<slug>/design.md` | research-investigator | the design |
-| `docs/research/<slug>/review.md` | design-bar-raiser | append-only round ledger |
-| `docs/research/<slug>/design.rewritten.md` | ai-writing-auditor | editorial intermediate |
+| `agent-team-workspace/design-docs/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
+| `agent-team-workspace/design-docs/<slug>/design.md` | research-investigator | the design |
+| `agent-team-workspace/design-docs/<slug>/review.md` | design-bar-raiser | append-only round ledger |
+| `agent-team-workspace/design-docs/<slug>/design.rewritten.md` | ai-writing-auditor | editorial intermediate |
 
 The brief, the design, and the ledger are the entire loop state.
 The investigator and bar-raiser are stateless between rounds and
@@ -63,7 +63,7 @@ the design's restatement of them.
 ## Protocol (lead session)
 
 1. **Round 0 — author.** Write `brief.md` first, verbatim — if it
-   already conforms to `docs/brief-spec.md` (`Status: signed-off`,
+   already conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`,
    e.g. from `/scoping`), keep it exactly as given; do not
    re-author a scoped brief. Then invoke `research-investigator`
    with the slug. It researches from first principles, designs at
@@ -86,7 +86,7 @@ the design's restatement of them.
    deferred (with why) — revises `design.md` in place, and logs the
    round in the revision log. Then back to step 2 as round N+1.
 4. **Editorial pass — after approval only.** Invoke
-   `ai-writing-auditor` on `docs/research/<slug>/design.md`. It
+   `ai-writing-auditor` on `agent-team-workspace/design-docs/<slug>/design.md`. It
    writes the cleaned prose to `design.rewritten.md` (it never
    overwrites its source) and returns a claim-inventory report.
    - Claim inventory clean → invoke `research-investigator` for the
@@ -131,7 +131,7 @@ the design's restatement of them.
   re-derive it, and makes the frozen brief a source of falsehood.
   Never amend on your own; the brief is the user's.
 - The lead owns every commit: after each round it stages and
-  commits `docs/research/<slug>/`, and pushes where the session's
+  commits `agent-team-workspace/design-docs/<slug>/`, and pushes where the session's
   git conventions allow. The agents write files and never commit —
   an uncommitted round does not survive the session.
 - If a round produces no visible change (no revision log entry, no
@@ -173,5 +173,5 @@ number and say the section is unfinished.
 ## Deliverable
 
 The final `design.md` — approved and editorially audited; when an
-RFC was requested, it is the RFC, shaped by `docs/rfc-spec.md` — plus the full `review.md` ledger as the audit trail, and,
+RFC was requested, it is the RFC, shaped by `agent-team-workspace/agent-specs/rfc-spec.md` — plus the full `review.md` ledger as the audit trail, and,
 on escalate, the one paragraph the human must decide.

@@ -4,7 +4,7 @@ argument-hint: <brief, or slug to resume> [slug: <slug>] [Deliverable: RFC]
 ---
 
 You are the lead of the design-review loop. The protocol is
-`docs/design-review-loop-agent-team-prompt.md` — read it now and
+`agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md` — read it now and
 follow it exactly. This skill is only the entry point; it restates
 nothing, so the protocol file stays the single source of truth. The
 agents are `research-investigator` and `design-bar-raiser`
@@ -19,17 +19,17 @@ $ARGUMENTS
 
 1. Determine the slug: use the one given, else derive a short
    kebab-case slug from the topic.
-2. If `docs/research/<slug>/` already exists, this is a **resume**:
+2. If `agent-team-workspace/design-docs/<slug>/` already exists, this is a **resume**:
    run the protocol's "Resuming an interrupted loop" derivation on
    the files and continue from the state it yields. The files
    outrank these arguments on any disagreement, round numbers
    included.
-3. Fresh start: write `docs/research/<slug>/brief.md` verbatim from
+3. Fresh start: write `agent-team-workspace/design-docs/<slug>/brief.md` verbatim from
    the arguments — problem, requirements, deliverable, constraints —
    before any agent runs. If the arguments name a topic but carry no
    requirements to freeze, stop and ask the user for them; never
    invent the brief.
-4. If the deliverable is an RFC, `docs/rfc-spec.md` is the output
+4. If the deliverable is an RFC, `agent-team-workspace/agent-specs/rfc-spec.md` is the output
    contract (the protocol covers how).
 
 ## While the loop runs
@@ -39,7 +39,7 @@ $ARGUMENTS
   edit `design.md` or `review.md`; change `brief.md` only by
   appending a dated `## Amendment` section, and only on the user's
   instruction.
-- Commit `docs/research/<slug>/` after each round unless the user's
+- Commit `agent-team-workspace/design-docs/<slug>/` after each round unless the user's
   git conventions say otherwise — the directory is the loop's only
   durable checkpoint.
 - Report to the user at the end, or on escalate or stall: verdict,

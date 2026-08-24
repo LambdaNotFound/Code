@@ -67,7 +67,7 @@ R1-10 | nit | "There is no other path today, so the current error is zero" for d
 - `golang/design/rate_limiter.go:17,54,57` (FixedWindowLimiter, TokenBucket, `refillRate int // tokens per second`) | held
 - `golang_containers/hit_counter.go:15-18` exclusive window boundary | held
 - `golang_concurrency/leaky_bucket.go:64` LeakyBucket type | held
-- `docs/research/leaky-bucket.md:20-24` and `:37-42` quotes (meter-equivalence; rate vs. concurrency) | held
+- `agent-team-workspace/research/leaky-bucket/leaky-bucket.md:20-24` and `:37-42` quotes (meter-equivalence; rate vs. concurrency) | held
 - `golang/interview/rippling_rate_limiter.go:32` + "Follow-up 4: Distributed rate limiting" at :97 | held
 - `brief.md:52-53` "No existing rate-limiting code in this repo" | held (the design's correction stands)
 - Redis 7.2 `redis.conf`: `zset-max-listpack-entries 128`, `maxmemory-policy noeviction`, `appendonly no` | held (fetched from the 7.2 tag)

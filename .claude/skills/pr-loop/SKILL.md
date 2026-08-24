@@ -4,11 +4,11 @@ argument-hint: <brief or design-doc path, or slug to resume> [slug: <slug>] [ope
 ---
 
 You are the lead of the PR loop. The protocol is
-`docs/pr-loop-agent-team-prompt.md` — read it now and follow it
+`agent-team-workspace/protocols/pr-loop-agent-team-prompt.md` — read it now and follow it
 exactly. This skill is only the entry point; it restates nothing.
 The agents are `coding-expert` and `code-bar-raiser`
 (`.claude/agents/`), plus `ai-writing-auditor` for the PR
-description; the output contract is `docs/pr-spec.md`.
+description; the output contract is `agent-team-workspace/agent-specs/pr-spec.md`.
 
 ## Arguments
 
@@ -18,17 +18,17 @@ $ARGUMENTS
 
 1. Determine the slug: use the one given, else derive a short
    kebab-case slug from the change.
-2. If `docs/pr-loop/<slug>/` or branch `pr/<slug>` exists, this is
+2. If `agent-team-workspace/pull-requests/<slug>/` or branch `pr/<slug>` exists, this is
    a **resume**: run the protocol's resume derivation on the files
    and branch, and continue from the state it yields. Files outrank
    these arguments on any disagreement.
-3. Fresh start: write `docs/pr-loop/<slug>/brief.md` verbatim from
+3. Fresh start: write `agent-team-workspace/pull-requests/<slug>/brief.md` verbatim from
    the arguments — requirements or the named design doc's content,
    target area, constraints — and create branch `pr/<slug>` from
    the default branch, before any agent runs. When the argument is
    a design-loop `design.md`, copy it in as the brief unchanged and
    say so in the file's first line — it is a conforming input per
-   `docs/brief-spec.md`, not an informal one. If the arguments name
+   `agent-team-workspace/agent-specs/brief-spec.md`, not an informal one. If the arguments name
    a goal but no requirements to freeze, stop and ask; never invent
    the brief.
 4. Record whether the user authorized opening the PR (`open PR:
@@ -41,7 +41,7 @@ $ARGUMENTS
   numbers, and verdicts; never touch `pr.md`, `review.md`, or the
   branch's code; amend `brief.md` only by appended dated
   `## Amendment` sections on the user's instruction.
-- Commit `docs/pr-loop/<slug>/` as a `[loop]` commit and push the
+- Commit `agent-team-workspace/pull-requests/<slug>/` as a `[loop]` commit and push the
   branch after every round — the agents never commit loop state,
   and an uncommitted ledger does not survive the session.
 - Keep `pr/<slug>` checked out for the whole loop; the agents share
@@ -49,4 +49,4 @@ $ARGUMENTS
 - Report at the end, or on escalate, block, split-proposal, or
   stall: verdict, branch, PR link or ready state, residual risks,
   deferred follow-ups, and the human-side etiquette reminders from
-  `docs/pr-spec.md`. Not a play-by-play.
+  `agent-team-workspace/agent-specs/pr-spec.md`. Not a play-by-play.

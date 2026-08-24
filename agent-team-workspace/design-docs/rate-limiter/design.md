@@ -1,6 +1,6 @@
 # Design: Fleet-Wide API Rate Limiter
 
-Round 0 draft. Requirements: `docs/research/rate-limiter/brief.md`.
+Round 0 draft. Requirements: `agent-team-workspace/design-docs/rate-limiter/brief.md`.
 
 ## Answer up front
 
@@ -313,7 +313,7 @@ The two "obvious" answers fail:
 Leaky bucket is absent from the table deliberately: this repo's prior
 investigation established that leaky-bucket-as-a-meter is "mathematically
 equivalent to token bucket: same admit/reject decisions, described from
-opposite ends" (**observed**, `docs/research/leaky-bucket.md:20-24`), and its
+opposite ends" (**observed**, `agent-team-workspace/research/leaky-bucket/leaky-bucket.md:20-24`), and its
 shaping variant delays traffic rather than rejecting it, which G3's 429
 forbids.
 
@@ -632,7 +632,7 @@ G4; (5) metrics, shadow mode, runbook.
 | Token bucket in Redis | O(1) memory per client, smooth pacing, industry default | Measured 0 rejections on G1's spread test (table above) |
 | Fixed-window counter | Cheapest possible: one `INCR` + `EXPIRE` | Phase-dependent; 0 rejections when the test straddles a boundary; allows 2x limit across a boundary |
 | Sliding-window counter | O(1) memory, close to exact | Approximate by construction; G1 forbids approximation |
-| Leaky bucket (queueing) | Smooths bursts into a constant output rate | Delays instead of rejecting; G3 requires a 429. As a meter it is token bucket in other words (`docs/research/leaky-bucket.md:20-24`) |
+| Leaky bucket (queueing) | Smooths bursts into a constant output rate | Delays instead of rejecting; G3 requires a 429. As a meter it is token bucket in other words (`agent-team-workspace/research/leaky-bucket/leaky-bucket.md:20-24`) |
 | Per-server local limits at `limit/servers` | Zero added latency, no shared store, no new failure domain | Violates G2 under uneven LB distribution and during scale events; needs live fleet size |
 | Gossip / CRDT approximate counting | No central store; survives partitions | Approximate (fails G1) and O(n^2) chatter |
 | Dedicated rate-limit service (gRPC) | Language-independent, central policy, own scaling | Adds a hop inside a 5 ms budget while still needing the same shared store; no requirement needs it |
@@ -673,7 +673,7 @@ G4; (5) metrics, shadow mode, runbook.
 3. **The real constraint is concurrency, not rate.** This repo's prior
    research flags the distinction: "is the actual constraint a *rate* ... or a
    *concurrency* limit ... The two only coincide when request duration is
-   constant" (**observed**, `docs/research/leaky-bucket.md:37-42`). The brief
+   constant" (**observed**, `agent-team-workspace/research/leaky-bucket/leaky-bucket.md:37-42`). The brief
    fixes the rate form (100 requests/minute), so this design answers what was
    asked; if backend exhaustion is really about in-flight work, a rate limiter
    bounds the wrong quantity.
@@ -694,7 +694,7 @@ G4; (5) metrics, shadow mode, runbook.
 | 6 | Is the fleet single-region? | Ask the owner. A cross-region store makes the 5 ms budget unreachable and forces per-region limits |
 | 7 | Package placement: `ratelimit/` at repo root vs. under `golang/`? | Owner's call; `golang/` is documented as LeetCode categories (`CLAUDE.md`), which this is not |
 
-**Gaps in the brief** (it is `signed-off` and conforms to `docs/brief-spec.md`;
+**Gaps in the brief** (it is `signed-off` and conforms to `agent-team-workspace/agent-specs/brief-spec.md`;
 these are ambiguities rather than missing sections): G1 does not specify the
 arrival pattern of its 150 requests, which is the single most consequential
 unstated requirement here — it decides the algorithm (see the table). G4 does
@@ -705,7 +705,7 @@ the goal, and could be cut if the owner prefers pure fail-open.
 ## Finding: the brief's "no existing rate-limiting code" is not accurate
 
 The brief states "No existing rate-limiting code in this repo"
-(`docs/research/rate-limiter/brief.md:52-53`). Observed, there is:
+(`agent-team-workspace/design-docs/rate-limiter/brief.md:52-53`). Observed, there is:
 
 - `golang/design/rate_limiter.go:17` `FixedWindowLimiter` and `:54`
   `TokenBucket` — single-process, mutex-guarded.
@@ -719,7 +719,7 @@ The brief's operative conclusion still holds: none is distributed, none is
 HTTP-facing, and none satisfies G2. The correction matters in two places —
 `golang/design/rate_limiter.go:54` looks like a reusable local fallback but is
 not (integer refill rate, LeetCode package), and
-`docs/research/leaky-bucket.md` is prior art this design cites rather than
+`agent-team-workspace/research/leaky-bucket/leaky-bucket.md` is prior art this design cites rather than
 repeats.
 
 ## Sources
@@ -746,7 +746,7 @@ repeats.
   `golang_concurrency/leaky_bucket.go:64`,
   `golang_containers/hit_counter.go:15-18`,
   `golang/interview/rippling_rate_limiter.go:32`,
-  `docs/research/leaky-bucket.md:20-24,37-42`.
+  `agent-team-workspace/research/leaky-bucket/leaky-bucket.md:20-24,37-42`.
 - RFC 6585 §4 (429) and RFC 9110 §10.2.3 (`Retry-After`) — **not fetched**;
   every standards host was egress-blocked on 2026-08-24. Claims about them are
   labeled assumed.

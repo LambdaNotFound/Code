@@ -2,7 +2,7 @@
 
 This is a walkthrough of `rust/basics_examples/*.rs`, in the same Cargo
 binary crate (`tokio_hello_world`) as the Tokio tutorial. It's the
-companion to `docs/research/rust-tokio.md`, covering the ground that
+companion to `agent-team-workspace/research/rust-tokio/rust-tokio.md`, covering the ground that
 tutorial assumes: basic types, data structures, the type system, and move
 semantics. It's written for someone with deep Go experience and no prior
 Rust exposure. Every section leans on a Go idiom you already know and
@@ -284,7 +284,7 @@ the `T` simply isn't reachable without going through both arms (or a
 combinator). This section stays at the type level on purpose; the `?`
 operator, `anyhow::Result`, and `.context(...)` error-wrapping idioms used
 throughout the async examples are already covered in
-`docs/research/rust-tokio.md`'s "Error handling in async code" section,
+`agent-team-workspace/research/rust-tokio/rust-tokio.md`'s "Error handling in async code" section,
 so they're not repeated here.
 
 **Excerpt** (`rust/basics_examples/result_type.rs`):
@@ -306,7 +306,7 @@ impl std::error::Error for ParseError {}
 
 fn parse_even(input: &str) -> Result<i32, ParseError> {
     // `?`: on Err, returns early with the error; on Ok, unwraps and
-    // continues. Same operator docs/research/rust-tokio.md covers with
+    // continues. Same operator agent-team-workspace/research/rust-tokio/rust-tokio.md covers with
     // anyhow — here it's just propagating this function's own error type.
     let n: i32 = input
         .parse()

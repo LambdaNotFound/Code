@@ -1,5 +1,5 @@
 ---
-description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Ground the problem in the codebase, clarify and challenge requirements from first principles, break the big problem into loop-sized pieces, and converge on a signed-off brief (docs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
+description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Ground the problem in the codebase, clarify and challenge requirements from first principles, break the big problem into loop-sized pieces, and converge on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
 argument-hint: <the problem, idea, or area to scope> [slug: <slug>]
 ---
 
@@ -13,11 +13,11 @@ area is too large to read inline; its findings come back to this
 table, and you tell the user what it found.
 
 The deliverable is one brief per loop-sized piece, each meeting
-`docs/brief-spec.md` and signed off by the user. You produce
+`agent-team-workspace/agent-specs/brief-spec.md` and signed off by the user. You produce
 requirements; you do not produce the design or the code — when the
 briefs are signed off, hand off to the loops.
 
-The draft always starts at `docs/scoping/<slug>/brief.md`, a path no
+The draft always starts at `agent-team-workspace/requirements/<slug>/brief.md`, a path no
 loop owns, because you cannot know a brief's route until the
 decomposition in phase 4. At sign-off it lands where its route
 needs it, and each loop run owns its own state directory — two
@@ -25,10 +25,10 @@ pieces sharing one directory would overwrite each other's design
 and ledger:
 
 - **One piece.** Copy the signed-off brief into that route's loop
-  directory: `docs/research/<slug>/brief.md` for design-loop,
-  `docs/pr-loop/<slug>/brief.md` for pr-loop.
+  directory: `agent-team-workspace/design-docs/<slug>/brief.md` for design-loop,
+  `agent-team-workspace/pull-requests/<slug>/brief.md` for pr-loop.
 - **Several pieces.** The parent brief stays at
-  `docs/scoping/<slug>/brief.md` as the index, and each piece gets
+  `agent-team-workspace/requirements/<slug>/brief.md` as the index, and each piece gets
   its own slug, `<slug>-<piece>`, and its own brief in its route's
   directory. A piece brief is self-contained: its own goal, the
   constraints and context that bind it, its dependencies, and a
@@ -37,7 +37,7 @@ and ledger:
 
 ## State
 
-The draft brief at `docs/scoping/<slug>/brief.md` is the state,
+The draft brief at `agent-team-workspace/requirements/<slug>/brief.md` is the state,
 `Status: draft`, created in phase 1 and updated every turn. Resume
 = re-read it; if a draft exists for the slug, continue from it. End each of your turns by updating the
 draft and telling the user what changed in it — the user should
@@ -94,13 +94,13 @@ RFC, pr-loop for well-understood code changes, no-code for process
 or documentation outcomes. Order by dependency and risk —
 riskiest-first where possible so a failed assumption surfaces
 early. Each piece gets the one-line contract from
-`docs/brief-spec.md`, and each carries its own slug — the
+`agent-team-workspace/agent-specs/brief-spec.md`, and each carries its own slug — the
 decomposition table is what the handoff commands are built from, so
 a piece without a slug and a route is not decomposed yet.
 
 ## Phase 5 — Converge and sign off
 
-Walk the user through the draft against `docs/brief-spec.md`,
+Walk the user through the draft against `agent-team-workspace/agent-specs/brief-spec.md`,
 section by section. Every open question ends answered, defaulted
 with consent, or logged with an owner. When the user approves,
 stamp `Status: signed-off <date>`, write each brief out to the loop

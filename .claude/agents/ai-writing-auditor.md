@@ -154,7 +154,7 @@ No profile relaxes the dash rule. "Relaxed on formatting" for LinkedIn and "rela
 You cannot ask which profile applies, because subagents have no way to question the caller. Select it in this order and stop at the first that matches:
 
 1. The invoking prompt names the content type.
-2. The path decides it: `README*`, `CHANGELOG*`, `docs/**`, `*.rst`, API reference go to Documentation. `CONTRIBUTING*` and engineering blog posts with code blocks go to Technical blog.
+2. The path decides it: `README*`, `CHANGELOG*`, `docs/**`, `*.rst`, any agent-team workspace (`agent-team-workspace/**`, design docs, RFCs, PR descriptions, briefs, review ledgers), and API reference go to Documentation. `CONTRIBUTING*` and engineering blog posts with code blocks go to Technical blog.
 3. Default to Blog/newsletter.
 
 State the profile you applied and which rule selected it, in one line.
