@@ -8,15 +8,15 @@ design-review loop was built. The exemplars are the canon — read the
 relevant one before writing anything, and copy its shape, not its
 content:
 
-- Single agent: `docs/agents-hardened/research-investigator.md`
-- Adversarial counterpart: `docs/agents-hardened/design-bar-raiser.md`
-- Loop protocol: `docs/design-review-loop-agent-team-prompt.md`
-- Shared output contract: `docs/rfc-spec.md`
+- Single agent: `agent-team-workspace/agent-archive/research-investigator.md`
+- Adversarial counterpart: `agent-team-workspace/agent-archive/design-bar-raiser.md`
+- Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
+- Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
 - Entry-point skill: `.claude/skills/design-loop/SKILL.md`
 
 ## Step 0 — Survey before writing
 
-Check `.claude/agents/`, `docs/agents-hardened/`, and the built-in
+Check `.claude/agents/`, `agent-team-workspace/agent-archive/`, and the built-in
 agent types. If an existing agent covers the role, extend or harden
 it; do not create a near-duplicate. If the request is a team, first
 decide whether a team is warranted: a loop costs one context per
@@ -111,7 +111,7 @@ line:
 
 ## Step 5 — Deploy
 
-- Hardened master in `docs/agents-hardened/<name>.md`, identical
+- Hardened master in `agent-team-workspace/agent-archive/<name>.md`, identical
   live copy in `.claude/agents/<name>.md`; re-sync both on every
   edit.
 - Register: the entry-point skill for loops, and CLAUDE.md's

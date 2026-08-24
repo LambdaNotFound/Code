@@ -2,7 +2,7 @@
 
 When the design-review loop's deliverable is an RFC, this file is
 the output contract: `research-investigator` shapes
-`docs/research/<slug>/design.md` to it, and `design-bar-raiser`
+`agent-team-workspace/design-docs/<slug>/design.md` to it, and `design-bar-raiser`
 reviews against it. It also stands alone as the house definition of
 a complete RFC.
 

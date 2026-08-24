@@ -4,11 +4,11 @@ Goal: turn an engineering design or requirements brief into a
 high-quality Pull Request for human review, with three agents —
 `coding-expert` implements, `code-bar-raiser` challenges for up to
 **4 rounds**, and `ai-writing-auditor` audits the PR description.
-The output contract is `docs/pr-spec.md`; the human review the PR
+The output contract is `agent-team-workspace/agent-specs/pr-spec.md`; the human review the PR
 receives afterward is the backstop, not the excuse.
 
 Both engineering agents think from first principles and are defined
-in `.claude/agents/` (hardened masters in `docs/agents-hardened/`).
+in `.claude/agents/` (hardened masters in `agent-team-workspace/agent-archive/`).
 A full loop is deliberately expensive; use it for changes that
 deserve a real review, and use `golang-pro`/`rust-pro` directly for
 quick edits.
@@ -27,10 +27,10 @@ are equivalent.
 
 | Path | Sole writer | Role |
 |---|---|---|
-| `docs/pr-loop/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
-| `docs/pr-loop/<slug>/pr.md` | coding-expert | PR title/description, keyed revision log, objection responses |
-| `docs/pr-loop/<slug>/review.md` | code-bar-raiser | append-only round ledger with verdicts |
-| `docs/pr-loop/<slug>/pr.rewritten.md` | ai-writing-auditor | editorial intermediate |
+| `agent-team-workspace/pull-requests/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
+| `agent-team-workspace/pull-requests/<slug>/pr.md` | coding-expert | PR title/description, keyed revision log, objection responses |
+| `agent-team-workspace/pull-requests/<slug>/review.md` | code-bar-raiser | append-only round ledger with verdicts |
+| `agent-team-workspace/pull-requests/<slug>/pr.rewritten.md` | ai-writing-auditor | editorial intermediate |
 | branch `pr/<slug>` | coding-expert | the code, in digestible commits |
 
 The files plus the branch are the entire loop state; both
@@ -44,11 +44,11 @@ as brief plus amendments, latest winning). The lead never writes
 creating it, committing loop state, and pushing.
 
 The lead owns every loop-state commit: after each round it stages
-`docs/pr-loop/<slug>/`, commits it with a `[loop]` prefix so
+`agent-team-workspace/pull-requests/<slug>/`, commits it with a `[loop]` prefix so
 reviewers can skip those commits, and pushes. Agents never commit
 loop state — `coding-expert` commits code only, `code-bar-raiser`
 commits nothing at all. The branch's final commit removes
-`docs/pr-loop/<slug>/` so the PR's net diff carries only the change
+`agent-team-workspace/pull-requests/<slug>/` so the PR's net diff carries only the change
 itself.
 
 Every agent in this loop shares the lead's working tree. The lead
@@ -59,7 +59,7 @@ confirm the branch and stop rather than switching it.
 ## Protocol (lead session)
 
 1. **Round 0 — implement.** Write `brief.md` — if it already
-   conforms to `docs/brief-spec.md` (`Status: signed-off`, e.g.
+   conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`, e.g.
    from `/scoping`), keep it exactly as given; do not re-author a
    scoped brief. Create branch `pr/<slug>` from the default branch
    and leave it checked out, then invoke `coding-expert` with the
@@ -81,14 +81,14 @@ confirm the branch and stop rather than switching it.
    history, and logs `R<N>:` in `pr.md`. Back to step 2 as round
    N+1.
 4. **Editorial pass — after approval only.** Invoke
-   `ai-writing-auditor` on `docs/pr-loop/<slug>/pr.md`; it writes
+   `ai-writing-auditor` on `agent-team-workspace/pull-requests/<slug>/pr.md`; it writes
    `pr.rewritten.md` and returns a claim-inventory report. Clean →
    `coding-expert` adoption pass (meaning-diff, adopt, `editorial:`
    entry; corrections reported route the drifted sections back to
    the bar-raiser). Failed rewrite → keep `pr.md` as approved and
    tell the user. The auditor never touches code or comments —
    comment quality was the bar-raiser's job.
-5. **Close.** Final commit removes `docs/pr-loop/<slug>/` from the
+5. **Close.** Final commit removes `agent-team-workspace/pull-requests/<slug>/` from the
    branch; push. If the invocation said `Open PR: yes`, open the PR
    (draft where supported) with `pr.md`'s title and body — never
    open one otherwise. Use whatever GitHub access this session
@@ -97,7 +97,7 @@ confirm the branch and stop rather than switching it.
    stop with the branch pushed and hand the user the compare URL to
    open it themselves. Report to the user: verdict, branch, PR link
    or ready-to-open state, residual risks, deferred follow-ups, and
-   the human-side etiquette steps from `docs/pr-spec.md` (post to
+   the human-side etiquette steps from `agent-team-workspace/agent-specs/pr-spec.md` (post to
    the team channel, cc reviewers).
 6. **Round 4 is the floor for a decision, not a target.**
 
@@ -110,7 +110,7 @@ confirm the branch and stop rather than switching it.
   `brief.md`; the auditor touches `pr.md` prose only. Disagreement
   between author and reviewer is signal — surface it, never smooth
   it.
-- After every round, stage and commit `docs/pr-loop/<slug>/` as a
+- After every round, stage and commit `agent-team-workspace/pull-requests/<slug>/` as a
   `[loop]` commit and push the branch — the pushed branch carrying
   both the code and the state directory is the only durable
   checkpoint, so a round whose ledger was never committed is a
@@ -124,7 +124,7 @@ confirm the branch and stop rather than switching it.
 The slug directory and the branch are the checkpoint; files outrank
 any resume prompt. Read them and take the first matching state:
 
-0. Branch `pr/<slug>` exists but `docs/pr-loop/<slug>/` does not →
+0. Branch `pr/<slug>` exists but `agent-team-workspace/pull-requests/<slug>/` does not →
    the loop already closed, because step 5 removes that directory.
    Never restart it: check whether the PR is open, finish step 5 if
    it is not, and report. A branch that already carries the work
