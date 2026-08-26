@@ -38,10 +38,32 @@ and ledger:
 ## State
 
 The draft brief at `agent-team-workspace/requirements/<slug>/brief.md` is the state,
-`Status: draft`, created in phase 1 and updated every turn. Resume
-= re-read it; if a draft exists for the slug, continue from it. End each of your turns by updating the
-draft and telling the user what changed in it — the user should
-always be able to see the whole picture by reading one file.
+`Status: draft`, created in phase 1 and updated every turn. End each
+of your turns by updating the draft and telling the user what
+changed in it — the user should always be able to see the whole
+picture by reading one file.
+
+**Resuming.** The draft is the checkpoint; no conversation context is
+needed, and where the draft and a resume prompt disagree the draft
+wins. Read it and take the first matching state:
+
+1. No draft for the slug → nothing started. Begin at phase 1.
+2. `Status: signed-off` → scoping is done. Do not reopen it; the
+   brief now changes only through the loops' `## Amendment`
+   mechanism. Report where the briefs went and the handoff commands.
+3. No `## Questions asked` entries, and no `Mode: freeform` line →
+   phase 1 was interrupted before the interview. Re-open with the
+   frame questions. (In freeform the log stays empty by design, so
+   without that line this state would fire forever.)
+4. Questions logged, but Problem or Goals still carry gaps → phase 3
+   is unfinished. Re-read the log so you do not re-ask, then continue
+   the interrogation from the first uncovered row.
+5. Coverage rows all settled, no Decomposition section → phase 4
+   pending.
+6. Decomposition present, `Status: draft` → phase 5 pending: walk
+   the contract and the coverage list, then sign off.
+
+Announce which state you resumed into, so the user can correct it.
 
 The draft also carries a running `## Questions asked` log: each
 question, its answer, and the date. It is what stops a resumed
@@ -73,13 +95,16 @@ still in the interview.
 
 ## Phase 1 — Open the interview and take the dump
 
-Say what this is before you start: five phases, ending in a brief
-they sign off, and that you will interview them through it. Ask
-whether they want that or would rather work freeform. If they
-decline, work freeform and skip to what they want.
+Open in **one message**, not three: what this is, the offer, the
+frame questions, and the invitation to dump — all together. Three
+round-trips before you have read a line of code is how an interview
+loses its subject.
 
-Then ask the frame — the handful of things only the user knows, and
-which the repository cannot answer:
+That message says: five phases, ending in a brief they sign off,
+run as an interview; they can opt out and work freeform instead; and
+then, without waiting for that answer, the frame — the handful of
+things only the user knows, and which the repository cannot
+answer:
 
 1. What are we actually trying to change, in one or two sentences?
 2. Who is it for, and who else is affected?
@@ -98,6 +123,14 @@ Restate the problem in your own words and get that restatement
 corrected. Sort what is known into the brief's sections and mark
 every gap. Derive a slug; create the draft.
 
+If the user opts out of the interview, record `Mode: freeform` in
+the draft header — a resume has no other way to tell an opted-out
+session from an interrupted one — and you still owe them the
+deliverable: keep phases 2, 4, and 5, drop the rounds, and take the
+coverage list as a checklist you fill from what they tell you and
+what you read — asking only where a row would otherwise decide
+itself. A brief still gets signed off, or scoping produced nothing.
+
 ## Phase 2 — Ground in the codebase first
 
 Now read the code, before asking anything further. Phase 1's frame
@@ -110,6 +143,12 @@ already retries three times (`sr.py:141`), so the gap is X, not Y."
 Where the user's belief and the code disagree, say so plainly with
 the evidence; that disagreement is usually the most valuable thing
 scoping finds.
+
+Write what you read into the draft's **Context** section as you go —
+`path:line` pointers deep enough that a loop agent starts reading in
+the right place. That section is required by the contract and is the
+one part of the brief only this phase can produce; reconstructing it
+at sign-off from memory is how it ends up thin.
 
 ## Phase 3 — First-principles interrogation
 
@@ -180,6 +219,17 @@ open question with an owner and default, or written into the brief
 as a stated assumption. What must never happen is a row deciding
 itself in your head.
 
+Scale the list to the blast radius, because
+`agent-team-workspace/agent-specs/brief-spec.md` is explicit that this
+is a quality bar rather than a gate, and that full scoping "would
+cost more than it buys on small, well-understood work". For a change
+confined to one package with no callers outside it, rows like Scale,
+Operations, and Blast radius resolve in a clause — "single-process,
+no external callers, not applicable". Resolving a row cheaply is
+proportionality; skipping it silently is the failure this list
+exists to prevent. Say which rows you are collapsing and why, and
+let the user object.
+
 | Must be settled | The question underneath |
 |---|---|
 | Why now | What changes for whom when this ships, and why it beats waiting |
@@ -227,9 +277,13 @@ only through the loops' `## Amendment` mechanism.
 ## Hand off
 
 Give the user the literal command for each piece, in dependency
-order, first piece first — `/design-loop <slug>-<piece>` for pieces
-routed to design, `/pr-loop <slug>-<piece>` for pieces routed to
-code. Report every brief path, the routes, which pieces block which,
+order, first piece first. **The slug in the command is the directory
+the brief actually landed in**, so it is the bare `<slug>` when
+scoping produced one piece and `<slug>-<piece>` when it produced
+several. Get this wrong and the loop looks in an empty directory,
+decides it never started, and asks the user for a brief that already
+exists. `/design-loop <slug>` for pieces routed to design,
+`/pr-loop <slug>` for pieces routed to code. Report every brief path, the routes, which pieces block which,
 and the open questions that carried defaults.
 
 ## Improving this skill
