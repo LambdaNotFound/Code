@@ -43,6 +43,14 @@ The draft brief at `agent-team-workspace/requirements/<slug>/brief.md` is the st
 draft and telling the user what changed in it — the user should
 always be able to see the whole picture by reading one file.
 
+The draft also carries a running `## Questions asked` log: each
+question, its answer, and the date. It is what stops a resumed
+session from re-asking what the user already settled, and it is the
+evidence for the coverage check at sign-off. The log is scoping's
+working state, not part of the contract — it stays in the draft and
+is never copied into a piece brief, which a loop agent must be able
+to read without wading through how it was arrived at.
+
 ## Phase 1 — Intake
 
 Restate the problem in your own words and get that restatement
@@ -81,10 +89,62 @@ Work the problem, not the request:
   worse. Every challenge you raise cites code, a constraint, or a
   goal already agreed.
 
-Ask few, high-leverage questions: batch them (AskUserQuestion where
-available, at most four per batch), lead each with what you already
-found, and attach a proposed default so the user confirms or
-corrects rather than authors from scratch.
+### Ask in rounds, never in one pass
+
+One batch of questions is never enough, because the second-order
+questions do not exist until the first answers land. A single pass
+followed by a brief is the failure mode this phase exists to
+prevent.
+
+- **Round 1** — what you need to understand the problem at all: the
+  real goal, who it is for, what "done" means.
+- **Round 2 and beyond** — what the previous answers opened up. An
+  answer that names a scale, a deadline, or an existing system
+  almost always creates three new questions; ask them.
+- **Stop** when a full round produces no answer that changes the
+  draft. That, not a question count, is convergence. Two rounds is
+  the floor. A problem worth scoping usually takes three or four.
+
+Batch within a round — `AskUserQuestion` where available, at most
+four per call, several calls per round rather than one long list.
+Lead every question with what you already found, and attach a
+proposed default so the user corrects rather than authors from
+scratch.
+
+A default is a starting point for an answer, never a substitute for
+asking. Never silently adopt one on anything in the coverage list
+below.
+
+Two limits still bind, and they are about quality, not volume:
+never ask what the repository can answer, and never ask a question
+whose answer would not change the brief. Coverage is the goal;
+question count is not.
+
+### Coverage before you write the brief
+
+Every row below is either settled with the user, or recorded as an
+open question with an owner and default, or written into the brief
+as a stated assumption. What must never happen is a row deciding
+itself in your head.
+
+| Must be settled | The question underneath |
+|---|---|
+| Why now | What changes for whom when this ships, and why it beats waiting |
+| Who it serves | Who calls this, who operates it, who is affected when it breaks |
+| Done means | The check that proves it — a number, a test, an observable behavior |
+| Scale | How much data, how many callers, how often, and what growth is assumed |
+| Failure behavior | What happens when it breaks, what degradation is acceptable, who finds out |
+| Correctness bar | Can it lose data, serve stale reads, or double-process? Which of those is fatal |
+| Existing state | What is already live, what must be migrated or backfilled, how to roll back |
+| Blast radius | Who depends on the thing being changed, and what breaks if its contract moves |
+| Operations | What must be logged, measured, or alerted for this to be supportable |
+| Imposed constraints | Deadlines, team, budget, tools that must or must not be used |
+| The boundary | What is explicitly out of scope, stated as non-goals |
+| The null option | Why doing nothing loses |
+
+If the user tells you to stop asking and produce the brief, do it.
+Then name in the handoff exactly which rows went unanswered and
+what you assumed for each — their call, recorded honestly.
 
 ## Phase 4 — Decompose
 
@@ -101,8 +161,11 @@ a piece without a slug and a route is not decomposed yet.
 ## Phase 5 — Converge and sign off
 
 Walk the user through the draft against `agent-team-workspace/agent-specs/brief-spec.md`,
-section by section. Every open question ends answered, defaulted
-with consent, or logged with an owner. When the user approves,
+section by section, then walk the phase-3 coverage list out loud and
+say which rows were settled, which carry a default, and which were
+never asked. An unasked row is not an answered one; if any remain,
+you are still in phase 3. Every open question ends answered,
+defaulted with consent, or logged with an owner. When the user approves,
 stamp `Status: signed-off <date>`, write each brief out to the loop
 directory its route calls for, and commit them — an uncommitted
 brief does not survive the session. From then on a brief changes
