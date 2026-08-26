@@ -1,5 +1,5 @@
 ---
-description: Review a pull request's code changes, or work through the review comments on one. Two modes — review a PR, branch, or diff and return findings each carrying a severity, a path:line, and a concrete fix; or take the reviewer comments on a PR, triage them, implement the ones that hold, push back with evidence on the ones that do not, and reply and resolve thread by thread. Carries deep language-level review for Rust and C++ (ownership, lifetimes, unsafe, aliasing, UB, concurrency, cancellation safety) in reference files loaded only when the diff contains that language. Use when asked to review a PR or a diff before merge, to look over someone's changes, or to address, respond to, or work through code review feedback. Not for the PR loop's in-loop review (use pr-loop, whose code-bar-raiser owns rounds and ledgers). Not for writing the implementation (use pr-loop, golang-pro, or rust-pro). Not for a Go/Python convention pass on working-tree code (use review-code).
+description: Review a pull request's code changes, or work through the review comments on one. Two modes — review a PR, branch, or diff and return findings each carrying a severity, a path:line, and a concrete fix; or take the reviewer comments on a PR, triage them, implement the ones that hold, push back with evidence on the ones that do not, and reply and resolve thread by thread. Carries deep language-level review for Go, Rust, and C++ (goroutine lifetime and context, ownership, lifetimes, unsafe, aliasing, UB, concurrency, cancellation safety) in reference files loaded only when the diff contains that language. Use when asked to review a PR or a diff before merge, to look over someone's changes, or to address, respond to, or work through code review feedback. Not for the PR loop's in-loop review (use pr-loop, whose code-bar-raiser owns rounds and ledgers). Not for writing the implementation (use pr-loop, golang-pro, or rust-pro). Not for a quick convention pass over uncommitted working-tree code (use review-code).
 argument-hint: <PR number, branch, or diff target> | comments [PR number]
 ---
 
@@ -120,8 +120,15 @@ PR, that file does not apply.
 Run the general pass above first, then the language-specific one.
 Load the reference only for languages actually in the diff:
 
+- Go — [references/go.md](references/go.md)
 - Rust — [references/rust.md](references/rust.md)
 - C++ — [references/cpp.md](references/cpp.md)
+
+Read each reference's version-gate notes before flagging anything
+version-dependent. Several widely repeated rules in these languages
+are now obsolete — Go's loop-variable capture and timer leaks are
+both fixed in current releases — and a review that cites a stale
+rule spends credibility it needs for the real findings.
 
 For any other language, apply the same discipline the references
 model: name the failure mode, the mechanism, and the concrete fix,
