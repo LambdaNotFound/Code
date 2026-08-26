@@ -1,5 +1,5 @@
 ---
-description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Ground the problem in the codebase, clarify and challenge requirements from first principles, break the big problem into loop-sized pieces, and converge on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
+description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
 argument-hint: <the problem, idea, or area to scope> [slug: <slug>]
 ---
 
@@ -51,16 +51,59 @@ working state, not part of the contract — it stays in the draft and
 is never copied into a piece brief, which a loop agent must be able
 to read without wading through how it was arrived at.
 
-## Phase 1 — Intake
+## How this runs: as an interview
+
+You interview the user. That means numbered questions in plain
+text, not a form: `AskUserQuestion` caps at four questions of two
+to four options each, which bends requirements gathering into
+multiple choice. Use it only where the answer genuinely is a small
+closed set (which route, which of two designs). Everything else is
+an open question in a numbered list, five to ten at a time.
+
+Tell the user, every round, that shorthand is fine — `1: yes,
+2: see the sr workflow, 3: no, backwards compat` is a complete
+answer. They may also point you at a file, a PR, or a channel
+instead of typing, or keep dumping context and let you sort it. The
+cheapest thing for them to do is the right thing to do.
+
+**The exit condition for questioning is demonstrated understanding:
+you are done when you can ask about edge cases and trade-offs
+without needing the basics explained first.** Until you can, you are
+still in the interview.
+
+## Phase 1 — Open the interview and take the dump
+
+Say what this is before you start: five phases, ending in a brief
+they sign off, and that you will interview them through it. Ask
+whether they want that or would rather work freeform. If they
+decline, work freeform and skip to what they want.
+
+Then ask the frame — the handful of things only the user knows, and
+which the repository cannot answer:
+
+1. What are we actually trying to change, in one or two sentences?
+2. Who is it for, and who else is affected?
+3. What does done look like — what would you check?
+4. Anything that must or must not be used: deadline, tool, existing
+   system, prior decision?
+5. Anything else I should know before I go read the code?
+
+Then invite the dump, explicitly: everything they have, unorganized
+— background, why the obvious alternative is out, past incidents,
+timeline pressure, who objects and why. Tell them not to structure
+it; you will sort it. Say that clarifying questions come after you
+have read the code, so they know the interview is not over.
 
 Restate the problem in your own words and get that restatement
-corrected. Sort what is already known into the brief's sections and
-mark every gap. Derive a slug; create the draft.
+corrected. Sort what is known into the brief's sections and mark
+every gap. Derive a slug; create the draft.
 
 ## Phase 2 — Ground in the codebase first
 
-Before asking the user anything, read the code. Never ask the user
-a question the repository can answer; never assert about the
+Now read the code, before asking anything further. Phase 1's frame
+questions are about intent, which only the user holds; everything
+from here that the repository can answer, you answer yourself.
+Never ask the user a question the repository can answer; never assert about the
 codebase what you have not read — claims about the code carry
 `path:line`. Bring findings to the user as findings: "the scheduler
 already retries three times (`sr.py:141`), so the gap is X, not Y."
@@ -101,15 +144,25 @@ prevent.
 - **Round 2 and beyond** — what the previous answers opened up. An
   answer that names a scale, a deadline, or an existing system
   almost always creates three new questions; ask them.
-- **Stop** when a full round produces no answer that changes the
-  draft. That, not a question count, is convergence. Two rounds is
-  the floor. A problem worth scoping usually takes three or four.
+- **Stop** when both hold: a full round produced no answer that
+  changes the draft, and you can discuss the edge cases and
+  trade-offs without needing basics explained. That, not a question
+  count, is convergence. Two rounds is the floor. A problem worth
+  scoping usually takes three or four.
+- **Before leaving**, ask outright whether there is anything else
+  they want to add. The thing a user volunteers at that prompt is
+  routinely the constraint that would have invalidated the design.
 
-Batch within a round — `AskUserQuestion` where available, at most
-four per call, several calls per round rather than one long list.
-Lead every question with what you already found, and attach a
-proposed default so the user corrects rather than authors from
-scratch.
+Each round is five to ten numbered questions in plain text, led by
+what you already found in the code, each carrying a proposed
+default so the user corrects rather than authors from scratch:
+
+> 3. The scheduler already retries three times (`sr.py:141`), so a
+>    failed run is not silent today. Is the gap the retry count, or
+>    that nobody is told after the third? I assume the second.
+
+Repeat the shorthand invitation each round. Reserve
+`AskUserQuestion` for the genuinely closed choices.
 
 A default is a starting point for an answer, never a substitute for
 asking. Never silently adopt one on anything in the coverage list
