@@ -19,16 +19,26 @@ fails=[]; warns=[]; checks=0
 def ck(c,label,detail=""):
     global checks; checks+=1
     if not c: fails.append(f"{label}: {detail}")
+    return c   # several checks gate on this; without it they silently never run
 def warn(c,label,detail=""):
     if not c: warns.append(f"{label}: {detail}")
+def _load(block, p):
+    try:
+        return yaml.safe_load(block)
+    except yaml.YAMLError as e:
+        fails.append(f"invalid YAML frontmatter: {p} ({str(e).splitlines()[0]})")
+        return {}
 def frontmatter(p):
     t=io.open(p,encoding='utf-8').read()
     m=re.match(r'^---\n(.*?)\n---\n',t,re.S)
-    return yaml.safe_load(m.group(1)) if m else None
+    return _load(m.group(1), p) if m else None
 def fm_body(p):
     t=io.open(p,encoding='utf-8').read()
     m=re.match(r'^---\n(.*?)\n---\n',t,re.S)
-    return yaml.safe_load(m.group(1)), t[m.end():]
+    if not m: 
+        fails.append(f"no frontmatter block: {p}")
+        return {}, t
+    return _load(m.group(1), p), t[m.end():]
 
 print("=" * 62)
 print("1. AGENTS — frontmatter parses, name present")
@@ -207,10 +217,17 @@ for p in ['.claude/skills/scoping/SKILL.md',
     print(f"   {os.path.basename(p):<45} states {nums[0]}..{nums[-1]} ({len(nums)})")
 
 print("11. PROTOCOLS — every agent they name exists")
+# Hardcoding the agent names here would mean a renamed or deleted agent simply
+# stops matching and goes unchecked, so this is fail-closed instead: every
+# backticked kebab-case token must resolve to an agent, a skill, or a known
+# verdict value. An unknown one fails and a human decides which it is.
+VERDICTS={'approve-with-risks','reject-approach','split-proposed','approve-with-risk'}
 for p in glob.glob('agent-team-workspace/protocols/*.md'):
     t=io.open(p,encoding='utf-8').read()
-    for a in set(re.findall(r'`(research-investigator|design-bar-raiser|coding-expert|code-bar-raiser|ai-writing-auditor)`', t)):
-        ck(a in agents, "protocol names missing agent", f"{os.path.basename(p)} -> {a}")
+    for tok in sorted(set(re.findall(r'`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`', t))):
+        if tok in VERDICTS: continue
+        ck(tok in agents or tok in skills or tok in BUNDLED,
+           "protocol names an unknown agent/skill", f"{os.path.basename(p)} -> {tok}")
 print(f"   {len(glob.glob('agent-team-workspace/protocols/*.md'))} protocols checked")
 
 print("12. REFERENCES — no orphaned reference files")

@@ -107,6 +107,10 @@ Report what failed. Do not claim completion on a failing build.
 Benchmark before optimizing. Zero-copy, SIMD, custom allocators, and
 const generics need a profile behind them.
 
+Idiomatic beats optimal, and clarity beats clever. Neither is a
+licence to be vague: the clearest version of a correct design, not
+the simplest-looking one.
+
 ## What you return
 
 Only your final message reaches the caller. Return exactly this:
