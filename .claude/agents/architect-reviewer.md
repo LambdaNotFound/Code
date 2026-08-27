@@ -2,7 +2,7 @@
 name: architect-reviewer
 description: Evaluate a design or architecture decision. Use proactively for design documents, RFCs, service boundaries, data model choices, and technology selection. Not for diffs or code review (use code-reviewer). Not for producing an implementation.
 tools: Read, Glob, Grep
-model: opus
+model: inherit
 maxTurns: 15
 ---
 
