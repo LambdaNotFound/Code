@@ -62,6 +62,22 @@ for a in agents:
         ck(os.access(p, os.X_OK), "hook not executable", p)
 print(f"   {hooks} hook command(s) checked")
 
+print("3b. AGENTS — frontmatter grants carry the body rule they require")
+for a in agents:
+    front, body = fm_body(a)
+    if front.get('maxTurns'):
+        ck(re.search(r'turn budget|runs low', body, re.I),
+           "maxTurns without a cutoff degradation rule (agent-factory Pass A #7)", a)
+    if front.get('memory'):
+        ck(re.search(r'never hold|process lessons', body, re.I),
+           "memory grant without a scope rule (agent-factory Step 2)", a)
+        # the rule is stated two ways in this repo: "files outrank memory"
+        # and "the files win" — accept either, and any file-first phrasing
+        ck(re.search(r'outrank|files win|file[^.]{0,40}wins?\b', body, re.I),
+           "memory grant without a files-outrank-memory rule", a)
+print(f"   {sum(1 for a in agents if fm_body(a)[0].get('maxTurns'))} capped, "
+      f"{sum(1 for a in agents if fm_body(a)[0].get('memory'))} with memory")
+
 print("4. SKILLS — <name>/SKILL.md present, frontmatter parses")
 skdirs=sorted(d for d in glob.glob('.claude/skills/*') if os.path.isdir(d))
 for d in skdirs:
