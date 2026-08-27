@@ -6,8 +6,7 @@ plan) with three agents — `research-investigator` authors,
 or escalation, and `ai-writing-auditor` gives the approved document
 a final editorial pass.
 
-All three are defined in `.claude/agents/` (hardened masters for the
-first two in `agent-team-workspace/agent-archive/`). The investigator and
+All three are defined in `.claude/agents/`. The investigator and
 bar-raiser are expert software engineers at both design altitudes —
 high-level (architecture, boundaries, data models, consistency,
 scaling, failure domains) and low-level (interfaces, data

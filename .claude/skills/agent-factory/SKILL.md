@@ -8,15 +8,15 @@ design-review loop was built. The exemplars are the canon — read the
 relevant one before writing anything, and copy its shape, not its
 content:
 
-- Single agent: `agent-team-workspace/agent-archive/research-investigator.md`
-- Adversarial counterpart: `agent-team-workspace/agent-archive/design-bar-raiser.md`
+- Single agent: `.claude/agents/research-investigator.md`
+- Adversarial counterpart: `.claude/agents/design-bar-raiser.md`
 - Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
 - Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
 - Entry-point skill: `.claude/skills/design-loop/SKILL.md`
 
 ## Step 0 — Survey before writing
 
-Check `.claude/agents/`, `agent-team-workspace/agent-archive/`, and the built-in
+Check `.claude/agents/` and the built-in
 agent types. If an existing agent covers the role, extend or harden
 it; do not create a near-duplicate. If the request is a team, first
 decide whether a team is warranted: a loop costs one context per
@@ -111,9 +111,16 @@ line:
 
 ## Step 5 — Deploy
 
-- Hardened master in `agent-team-workspace/agent-archive/<name>.md`, identical
-  live copy in `.claude/agents/<name>.md`; re-sync both on every
-  edit.
+- **One copy, at `.claude/agents/<name>.md`.** That is the only
+  path Claude Code loads, and git already holds the history, the
+  authorship, and the rollback. This repo previously kept a second
+  "hardened master" mirror; 7 of its 20 files had silently
+  diverged before anyone noticed, and the one file it did not
+  duplicate was the hook nothing could resolve. If you need a
+  staging area for hardening you are not ready to deploy, use a
+  branch — a branch cannot silently diverge, because that is what
+  branches are for. The same holds for skills at
+  `.claude/skills/<name>/SKILL.md`.
 - Register: the entry-point skill for loops, and CLAUDE.md's
   skills/agents lists so fresh sessions can discover it.
 - Commit and push per the session's git conventions.
