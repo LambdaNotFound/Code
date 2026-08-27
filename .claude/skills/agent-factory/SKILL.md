@@ -182,6 +182,15 @@ component-only review will not find the last two kinds.
     resets is acting on everyone; name one owner and forbid the
     rest.
 
+Both passes are judgement. What is mechanical, run instead:
+`python3 agent-team-workspace/validate-definitions.py` checks
+frontmatter parses, agent names are unique (duplicates load by
+filesystem read order, not precedence), hook targets resolve and are
+executable, no repo path dangles, every "(use X)" boundary names
+something real, no skill shadows a bundled one, resume derivations
+are contiguous, and no reference file is orphaned. It exits non-zero
+on failure. Run it before you ship and after every fix.
+
 Fix the majors before shipping — then re-run Pass A on the files
 you just edited. Fixes introduce defects at a high rate: in this
 repo's second review round, two of three majors were damage from

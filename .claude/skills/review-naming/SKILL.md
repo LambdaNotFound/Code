@@ -1,5 +1,5 @@
 ---
-description: Reviews var naming
+description: Review naming quality across variables, functions, parameters, and types in Go or Python, returning a table of original to suggested names with the reason for each. Use when asked to check or improve naming, or when code is hard to read because of unclear, abbreviated, or misleading names. Not for correctness, complexity, or test coverage (use review-code). Not for reviewing a pull request (use pr-review). Refactors names only, never logic.
 ---
 
 You are a code reviewer focused on naming quality. Review this code and suggest 

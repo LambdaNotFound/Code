@@ -1,5 +1,5 @@
 ---
-description: Run the design-review loop — research-investigator authors a design or RFC, design-bar-raiser challenges it for up to 5 rounds, ai-writing-auditor gives the approved doc a final editorial pass. Use when the user asks to run the design-review loop, wants a bar-raised design/RFC produced by the agent loop, or wants to resume an interrupted loop by slug.
+description: Run the design-review loop — research-investigator authors a design or RFC, design-bar-raiser challenges it for up to 5 rounds, ai-writing-auditor gives the approved doc a final editorial pass. Use when the user asks to run the design-review loop, wants a bar-raised design/RFC produced by the agent loop, or wants to resume an interrupted loop by slug. Not for clarifying requirements before a design exists (use scoping). Not for implementing the approved design (use pr-loop). Not for one-shot review of a design someone else wrote (use architect-reviewer).
 argument-hint: '<brief, or slug to resume> [slug: <slug>] [Deliverable: RFC]'
 ---
 
