@@ -1,5 +1,5 @@
 ---
-description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
+description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, tests the result on a context-free reader, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
 argument-hint: <the problem, idea, or area to scope> [slug: <slug>]
 ---
 
@@ -48,20 +48,24 @@ needed, and where the draft and a resume prompt disagree the draft
 wins. Read it and take the first matching state:
 
 1. No draft for the slug → nothing started. Begin at phase 1.
-2. `Status: signed-off` → scoping is done. Do not reopen it; the
+2. `Status: closed` → the user took the early exit and the work
+   went straight to a loop. Do not reopen; report where it went.
+3. `Status: signed-off` → scoping is done. Do not reopen it; the
    brief now changes only through the loops' `## Amendment`
    mechanism. Report where the briefs went and the handoff commands.
-3. No `## Questions asked` entries, and no `Mode: freeform` line →
+4. No `## Questions asked` entries, and no `Mode: freeform` line →
    phase 1 was interrupted before the interview. Re-open with the
    frame questions. (In freeform the log stays empty by design, so
    without that line this state would fire forever.)
-4. Questions logged, but Problem or Goals still carry gaps → phase 3
+5. Questions logged, but Problem or Goals still carry gaps → phase 3
    is unfinished. Re-read the log so you do not re-ask, then continue
    the interrogation from the first uncovered row.
-5. Coverage rows all settled, no Decomposition section → phase 4
+6. Coverage rows all settled, no Decomposition section → phase 4
    pending.
-6. Decomposition present, `Status: draft` → phase 5 pending: walk
-   the contract and the coverage list, then sign off.
+7. Decomposition present, no reader-test result recorded → phase 5
+   pending: run the reader test.
+8. Reader test recorded, `Status: draft` → phase 6 pending: walk the
+   contract and the coverage list, then sign off.
 
 Announce which state you resumed into, so the user can correct it.
 
@@ -100,7 +104,7 @@ frame questions, and the invitation to dump — all together. Three
 round-trips before you have read a line of code is how an interview
 loses its subject.
 
-That message says: five phases, ending in a brief they sign off,
+That message says: six phases, ending in a brief they sign off,
 run as an interview; they can opt out and work freeform instead; and
 then, without waiting for that answer, the frame — the handful of
 things only the user knows, and which the repository cannot
@@ -126,7 +130,7 @@ every gap. Derive a slug; create the draft.
 If the user opts out of the interview, record `Mode: freeform` in
 the draft header — a resume has no other way to tell an opted-out
 session from an interrupted one — and you still owe them the
-deliverable: keep phases 2, 4, and 5, drop the rounds, and take the
+deliverable: keep phases 2, 4, 5, and 6, drop the rounds, and take the
 coverage list as a checklist you fill from what they tell you and
 what you read — asking only where a row would otherwise decide
 itself. A brief still gets signed off, or scoping produced nothing.
@@ -144,11 +148,36 @@ Where the user's belief and the code disagree, say so plainly with
 the evidence; that disagreement is usually the most valuable thing
 scoping finds.
 
+Label provenance on every claim that lands in the brief, the way
+the loop agents do: **observed** for what you read (with
+`path:line`), **inferred** for what follows from it, **assumed** for
+what the user asserted and neither of you verified. A user's
+recollection that an upstream service is going away is an
+assumption, not a constraint, and a loop that cannot tell the
+difference will build on it as if it were load-bearing.
+
 Write what you read into the draft's **Context** section as you go —
 `path:line` pointers deep enough that a loop agent starts reading in
 the right place. That section is required by the contract and is the
 one part of the brief only this phase can produce; reconstructing it
 at sign-off from memory is how it ends up thin.
+
+## After phase 2: is this worth scoping at all?
+
+Now that the dump and the code have shown you the shape, ask whether
+the process costs more than the mistake it prevents. If the work is
+one well-understood change, behind one interface, with a caller set
+you can enumerate and a rollback that is `git revert`, say so and
+offer the exit: a three-line informal brief and `/pr-loop` directly.
+`agent-team-workspace/agent-specs/brief-spec.md` is explicit that a
+loop handed an informal brief still runs and simply names the gaps.
+
+Recommending less process when less is right is the same judgement
+as demanding more when more is right, and it is the one that keeps
+the user willing to run this skill next time. If the user takes the
+exit, write `Status: closed — routed to <loop> without full scoping`
+into the draft so a later resume does not reopen an abandoned
+interview.
 
 ## Phase 3 — First-principles interrogation
 
@@ -186,8 +215,13 @@ prevent.
 - **Stop** when both hold: a full round produced no answer that
   changes the draft, and you can discuss the edge cases and
   trade-offs without needing basics explained. That, not a question
-  count, is convergence. Two rounds is the floor. A problem worth
-  scoping usually takes three or four.
+  count, is convergence.
+- **How many rounds is a consequence, not a rule.** A change behind
+  one interface with one caller can converge in a single round; a
+  new subsystem takes four. The reason to distrust a one-round
+  finish is that you can believe you understand and be wrong — so
+  one round is enough only when you can state the edge cases back
+  and the user confirms them. Otherwise keep going.
 - **Before leaving**, ask outright whether there is anything else
   they want to add. The thing a user volunteers at that prompt is
   routinely the constraint that would have invalidated the design.
@@ -206,11 +240,6 @@ Repeat the shorthand invitation each round. Reserve
 A default is a starting point for an answer, never a substitute for
 asking. Never silently adopt one on anything in the coverage list
 below.
-
-Two limits still bind, and they are about quality, not volume:
-never ask what the repository can answer, and never ask a question
-whose answer would not change the brief. Coverage is the goal;
-question count is not.
 
 ### Coverage before you write the brief
 
@@ -261,14 +290,49 @@ early. Each piece gets the one-line contract from
 decomposition table is what the handoff commands are built from, so
 a piece without a slug and a route is not decomposed yet.
 
-## Phase 5 — Converge and sign off
+## Phase 5 — Test the brief on a reader who was not here
+
+The brief exists to be executed by an agent that has none of this
+conversation. So the only test that means anything is a context-free
+read: everything else — the coverage list, the contract walk — checks
+the inputs, not the artifact.
+
+Do this before sign-off, without involving the user:
+
+1. Predict what a loop agent would need to ask to start work.
+   Five to ten questions, concrete.
+2. Dispatch `research-investigator` with the brief text and those
+   questions and nothing else — no conversation, no summary from
+   you. Ask it what it would build, and what it cannot tell from the
+   brief.
+3. Ask it separately for contradictions, ambiguities, and anything
+   the brief assumes without saying.
+
+**The gap between what comes back and what the user meant is the
+defect list.** A reader that would build the wrong thing is a brief
+that is wrong, no matter how well it reads to the two of you who
+already know the answer. Fix the brief and re-test the sections that
+failed.
+
+Report to the user what the reader got right and what it missed.
+Record the result in the draft; a resume needs to know this ran.
+
+## Phase 6 — Converge and sign off
 
 Walk the user through the draft against `agent-team-workspace/agent-specs/brief-spec.md`,
 section by section, then walk the phase-3 coverage list out loud and
 say which rows were settled, which carry a default, and which were
 never asked. An unasked row is not an answered one; if any remain,
 you are still in phase 3. Every open question ends answered,
-defaulted with consent, or logged with an owner. When the user approves,
+defaulted with consent, or logged with an owner.
+
+Then say what sign-off actually commits them to. Rank the defaults
+and assumptions by consequence: which of them, if wrong, means a
+loop builds the wrong thing and the round is wasted, and which are
+cosmetic. A signature is only worth something if the signer could
+have refused and knew what they were signing; a flat list of
+fifteen open items does not tell them that, and three ranked ones
+do. When the user approves,
 stamp `Status: signed-off <date>`, write each brief out to the loop
 directory its route calls for, and commit them — an uncommitted
 brief does not survive the session. From then on a brief changes
