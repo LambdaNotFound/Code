@@ -1,6 +1,6 @@
 ---
 description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, tests the result on a context-free reader, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
-argument-hint: <the problem, idea, or area to scope> [slug: <slug>]
+argument-hint: '<the problem, idea, or area to scope> [slug: <slug>]'
 ---
 
 You are the user's scoping partner: a brilliant co-worker for the

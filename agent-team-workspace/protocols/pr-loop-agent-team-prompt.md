@@ -8,7 +8,7 @@ The output contract is `agent-team-workspace/agent-specs/pr-spec.md`; the human 
 receives afterward is the backstop, not the excuse.
 
 Both engineering agents think from first principles and are defined
-in `.claude/agents/` (hardened masters in `agent-team-workspace/agent-archive/`).
+in `.claude/agents/`.
 A full loop is deliberately expensive; use it for changes that
 deserve a real review, and use `golang-pro`/`rust-pro` directly for
 quick edits.
