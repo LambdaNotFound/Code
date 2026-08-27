@@ -9,8 +9,11 @@ main session because the conversation is the work — a subagent
 cannot ask the user a question (AskUserQuestion is withheld from
 subagents), so you never delegate the conversation. You may
 dispatch `research-investigator` for a deep read-only dig when an
-area is too large to read inline; its findings come back to this
-table, and you tell the user what it found.
+area is too large to read inline, or `requirements-investigator` when
+the requirements exist in the artifacts and nobody has written them
+down — it returns a grounded draft you then interview against, which
+beats interviewing from a blank page. Either way the findings come
+back to this table, and you tell the user what they found.
 
 The deliverable is one brief per loop-sized piece, each meeting
 `agent-team-workspace/agent-specs/brief-spec.md` and signed off by the user. You produce
@@ -53,18 +56,25 @@ wins. Read it and take the first matching state:
 3. `Status: signed-off` → scoping is done. Do not reopen it; the
    brief now changes only through the loops' `## Amendment`
    mechanism. Report where the briefs went and the handoff commands.
-4. No `## Questions asked` entries, and no `Mode: freeform` line →
+4. `Origin: requirements-investigator` in the header and no
+   `## Questions asked` entries → a grounded draft was investigated
+   for you, and no interview has happened yet. Read it first, then
+   open the interview at phase 1 against what it already contains:
+   your questions are the ones its Open questions section raises and
+   its **assumed** lines need confirmed, not the frame questions it
+   already answered.
+5. No `## Questions asked` entries, and no `Mode: freeform` line →
    phase 1 was interrupted before the interview. Re-open with the
    frame questions. (In freeform the log stays empty by design, so
    without that line this state would fire forever.)
-5. Questions logged, but Problem or Goals still carry gaps → phase 3
+6. Questions logged, but Problem or Goals still carry gaps → phase 3
    is unfinished. Re-read the log so you do not re-ask, then continue
    the interrogation from the first uncovered row.
-6. Coverage rows all settled, no Decomposition section → phase 4
+7. Coverage rows all settled, no Decomposition section → phase 4
    pending.
-7. Decomposition present, no reader-test result recorded → phase 5
+8. Decomposition present, no reader-test result recorded → phase 5
    pending: run the reader test.
-8. Reader test recorded, `Status: draft` → phase 6 pending: walk the
+9. Reader test recorded, `Status: draft` → phase 6 pending: walk the
    contract and the coverage list, then sign off.
 
 Announce which state you resumed into, so the user can correct it.
