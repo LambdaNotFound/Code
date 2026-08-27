@@ -118,9 +118,11 @@ BUNDLED={'code-review','simplify','security-review','init','run','loop','learn',
          'import-memory','update-config','keybindings-help','claude-api','session-start-hook',
          'fewer-permission-prompts','canvas-design','artifact-design','artifact-diagramming',
          'artifact-capabilities'}
-BUILTIN_AGENTS={'general-purpose','Explore','Plan','claude','statusline-setup','claude-code-guide',
-                'architect-reviewer','code-reviewer','golang-pro','rust-pro','rust-engineer',
-                'kubernetes-specialist','multi-agent-coordinator','leetcode-reviewer'}
+# Only genuine Claude Code built-ins belong here. This repo's own agents are
+# resolved from .claude/agents/ above; listing them here too would vouch for an
+# agent after it is deleted, which is exactly the dangling route this check exists
+# to catch.
+BUILTIN_AGENTS={'general-purpose','Explore','Plan','claude','statusline-setup','claude-code-guide'}
 
 print("="*64)
 print("6. ROUTER CONTRACT — description carries 'Use when' and 'Not for'")
@@ -140,11 +142,23 @@ for n,p in sorted(list(skills.items())+list(agents.items())):
     d=fm_body(p)[0].get('description','')
     for m in re.finditer(r'\(use ([^)]+)\)', d):
         raw=m.group(1).strip()
-        # a parenthetical may name several targets: "use pr-loop, golang-pro, or rust-pro"
-        cands=[c.strip().strip('`.').split(' ')[0] for c in re.split(r',| or |/', raw)]
-        for tgt in [c for c in cands if c and c in known] or cands[:1]:
-            edges.append((n,tgt))
-            ck(tgt in known, "routes to unknown target", f"{n} -> '{tgt}'")
+        # '/' separates alternatives ("golang-pro/rust-pro") but also splits file
+        # paths, so drop any path-with-extension before treating '/' as a separator.
+        raw=re.sub(r'\S*/\S*\.\w+', ' ', raw)
+        # A parenthetical may name several targets: "use pr-loop, golang-pro, or
+        # rust-pro". Filtering candidates to ones already known would make this
+        # check unable to fail whenever any one target resolves, so decide what
+        # is a name by its shape instead: a kebab-case token always is, and a
+        # bare single word is only when the fragment is nothing else. Prose like
+        # "whose code-bar-raiser owns rounds" is skipped on the leading word.
+        for frag in re.split(r',| or |/', raw):
+            frag=frag.strip().strip('`.')
+            if not frag: continue
+            tok=frag.split(' ')[0]
+            kebab=re.fullmatch(r'[a-z][a-z0-9]*(-[a-z0-9]+)+', tok)
+            if not (kebab or frag==tok): continue
+            edges.append((n,tok))
+            ck(tok in known, "routes to unknown target", f"{n} -> '{tok}'")
 print(f"   {len(edges)} routing edges checked")
 
 print("8. ROUTING LOOPS — A defers to B while B defers to A")
