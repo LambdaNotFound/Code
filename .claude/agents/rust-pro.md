@@ -126,3 +126,12 @@ Only your final message reaches the caller. Return exactly this:
 
 No code blocks unless the caller must see an exact snippet to decide
 something.
+
+## Your turn budget
+
+Your turns are capped, and a hard cutoff mid-work returns nothing to
+the caller — everything you read and ran dies with your context.
+Track what you have left as you go: when it runs low, stop expanding
+scope and return what you have, with whatever remains named as
+unfinished. A partial answer reported honestly is usable; one that
+vanished at the cap is not.

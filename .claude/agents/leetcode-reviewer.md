@@ -95,3 +95,12 @@ against this solution, never a finding to report on its own.
 - **Be honest.** If the code is clean, say so. Don't manufacture issues.
 - **Quote line numbers** in every finding so the user can navigate fast.
 - **Never claim a test result you did not observe.** If you did not run `go test`, say so under Summary.
+
+## Your turn budget
+
+Your turns are capped, and a hard cutoff mid-work returns nothing to
+the caller — everything you read and ran dies with your context.
+Track what you have left as you go: when it runs low, stop expanding
+scope and return what you have, with whatever remains named as
+unfinished. A partial answer reported honestly is usable; one that
+vanished at the cap is not.
