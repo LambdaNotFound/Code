@@ -230,6 +230,27 @@ for p in glob.glob('agent-team-workspace/protocols/*.md'):
            "protocol names an unknown agent/skill", f"{os.path.basename(p)} -> {tok}")
 print(f"   {len(glob.glob('agent-team-workspace/protocols/*.md'))} protocols checked")
 
+print("11b. CLAUDE.md — its skill/agent roster matches what exists")
+# CLAUDE.md names skills and agents in prose, not as paths, so the path check
+# above never reads them. A skill deleted or renamed leaves a stale name here
+# that nothing else catches.
+CM=io.open('CLAUDE.md',encoding='utf-8').read()
+NOT_NAMES={'agent-team-workspace','brief-spec','rfc-spec','pr-spec',
+           'design-review-loop-agent-team-prompt','pr-loop-agent-team-prompt',
+           'validate-definitions','daily-leetcode','log-solve','tokio-hello-world',
+           'go-to-rust','borrow-checker','async-shapes','kubectl-guard'}
+for line in CM.splitlines():
+    if '.claude/skills/' not in line and '.claude/agents/' not in line: continue
+    for tok in sorted(set(re.findall(r'`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`', line))):
+        if tok in NOT_NAMES: continue
+        ck(tok in skills or tok in agents,
+           "CLAUDE.md names a skill/agent that does not exist", tok)
+for n in sorted(skills):
+    ck(f'`{n}`' in CM, "skill exists but is not registered in CLAUDE.md", n)
+for n in sorted(agents):
+    ck(f'{n}' in CM, "agent exists but is not registered in CLAUDE.md", n)
+print(f"   {len(skills)} skills and {len(agents)} agents cross-checked against CLAUDE.md")
+
 print("12. REFERENCES — no orphaned reference files")
 for d in glob.glob('.claude/skills/*/references'):
     sk=os.path.join(os.path.dirname(d),'SKILL.md')
