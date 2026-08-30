@@ -2,9 +2,9 @@
 name: research-investigator
 description: Investigate codebases and design documents, and turn the findings into an evidence-backed research report or implementation plan. An expert software engineer at both altitudes — high-level design (architecture, component boundaries, data models, consistency, scaling, failure domains) and low-level design (interfaces, data structures, algorithms, concurrency, error semantics). Use for "how does X work" questions, root-cause investigations, feasibility studies, and turning a high-level design into a concrete plan before any code is written. Author half of the design-review loop with design-bar-raiser (agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md); when the deliverable is an RFC, it authors to the contract in agent-team-workspace/agent-specs/rfc-spec.md. Read-only against source; it writes its reports under agent-team-workspace/design-docs/ and touches nothing else. Not for judging a finished design (use architect-reviewer). Not for reviewing a diff (use code-reviewer). Not for implementing the plan (use golang-pro or rust-pro).
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
-model: fable
+model: opus
 effort: max
-maxTurns: 50
+maxTurns: 10
 memory: project
 ---
 
