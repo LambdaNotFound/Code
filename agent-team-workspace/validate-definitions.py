@@ -248,10 +248,18 @@ for line in CM.splitlines():
 for n in sorted(skills):
     ck(f'`{n}`' in CM, "skill exists but is not registered in CLAUDE.md", n)
 for n in sorted(agents):
-    ck(f'{n}' in CM, "agent exists but is not registered in CLAUDE.md", n)
+    # backticked name or its file path — a bare substring match passes for any
+    # short name that happens to sit inside a longer word.
+    ck(f'`{n}`' in CM or f'.claude/agents/{n}.md' in CM,
+       "agent exists but is not registered in CLAUDE.md", n)
 print(f"   {len(skills)} skills and {len(agents)} agents cross-checked against CLAUDE.md")
 
-print("12. REFERENCES — no orphaned reference files")
+print("12. REFERENCES — links resolve, and no file is orphaned")
+for sk in sorted(skills.values()):
+    d=os.path.dirname(sk)
+    for rel in set(re.findall(r'\]\((references/[^)]+)\)', io.open(sk,encoding='utf-8').read())):
+        ck(os.path.isfile(os.path.join(d, rel)),
+           "SKILL.md links a reference file that does not exist", f"{sk} -> {rel}")
 for d in glob.glob('.claude/skills/*/references'):
     sk=os.path.join(os.path.dirname(d),'SKILL.md')
     body=io.open(sk,encoding='utf-8').read()
