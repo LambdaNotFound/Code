@@ -2,7 +2,7 @@
 
 Load before writing async code. This file is about **choosing the
 concurrency shape**; the pitfall checklist for async code already
-written lives in `.claude/skills/pr-review/references/rust.md`, and is
+written lives in `.claude/skills/review-pr/references/rust.md`, and is
 not repeated here.
 
 Pick the shape first. Almost every painful async refactor is a shape

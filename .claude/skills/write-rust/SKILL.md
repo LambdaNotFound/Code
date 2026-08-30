@@ -1,5 +1,5 @@
 ---
-description: 'Write Rust with the user, interactively — design the ownership and the type model before typing, then implement compiler-first and verify with fmt, clippy, and tests. Carries the two things the Rust agents do not write down: a borrow-checker error to design-fix triage, and a Go-to-Rust idiom mapping for an engineer whose primary language is Go. Use when writing or refactoring Rust, choosing an ownership or API shape, fixing a borrow-check or lifetime error, designing async and Tokio concurrency, or translating Go into Rust. Not for reviewing Rust someone else wrote (use pr-review, whose .claude/skills/pr-review/references/rust.md is the review checklist). Not for a self-contained Rust task you want dispatched to an isolated subagent (use rust-pro). Not for implementing a whole brief as a reviewed PR (use pr-loop).'
+description: 'Write Rust with the user, interactively — design the ownership and the type model before typing, then implement compiler-first and verify with fmt, clippy, and tests. Carries the two things the Rust agents do not write down: a borrow-checker error to design-fix triage, and a Go-to-Rust idiom mapping for an engineer whose primary language is Go. Use when writing or refactoring Rust, choosing an ownership or API shape, fixing a borrow-check or lifetime error, designing async and Tokio concurrency, or translating Go into Rust. Not for reviewing Rust someone else wrote (use review-pr, whose .claude/skills/review-pr/references/rust.md is the review checklist). Not for a self-contained Rust task you want dispatched to an isolated subagent (use rust-pro). Not for implementing a whole brief as a reviewed PR (use run-pr-loop).'
 argument-hint: <what to build, fix, or translate> [crate or path]
 ---
 
@@ -129,7 +129,7 @@ a performance claim with no measurement is labeled **inferred** or
 not made.
 
 Before handing work back, self-review the diff against
-`.claude/skills/pr-review/references/rust.md`, which is this repo's
+`.claude/skills/review-pr/references/rust.md`, which is this repo's
 Rust review checklist. Catching your own findings costs one turn;
 catching them in review costs a round trip.
 

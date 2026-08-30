@@ -1,7 +1,7 @@
 # Brief Output Contract
 
-A brief is the frozen input the loops build on — `/scoping` produces
-one with the user, `design-loop` and `pr-loop` consume it. This file
+A brief is the frozen input the loops build on — `/scope-problem` produces
+one with the user, `run-design-loop` and `run-pr-loop` consume it. This file
 defines what a finalized brief contains; a brief that meets it and
 carries the user's sign-off satisfies the loops' "verbatim from the
 user" requirement, because the user co-authored and approved every
@@ -14,8 +14,8 @@ session before every loop run would cost more than it buys on small,
 well-understood work.
 
 One input other than a scoped brief earns the same trust: a design
-that came out of the design-loop approved. It went through more
-rigor than a brief, not less, so a `design.md` handed to `/pr-loop`
+that came out of the run-design-loop approved. It went through more
+rigor than a brief, not less, so a `design.md` handed to `/run-pr-loop`
 as its brief is a conforming input, and the missing brief sections
 are not gaps to log.
 
@@ -53,7 +53,7 @@ marked as imposed rather than derived.
 
 **Decomposition.** The problem broken into independently
 deliverable pieces, ordered by dependency and risk. One line each:
-`piece | goal it serves | route (design-loop / pr-loop / no code) |
+`piece | goal it serves | route (run-design-loop / run-pr-loop / no code) |
 depends on`. A piece too big for its route gets split before
 sign-off, not discovered mid-loop.
 

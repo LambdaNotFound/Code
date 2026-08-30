@@ -77,10 +77,10 @@ for a in agents:
     front, body = fm_body(a)
     if front.get('maxTurns'):
         ck(re.search(r'turn budget|runs low', body, re.I),
-           "maxTurns without a cutoff degradation rule (agent-factory Pass A #7)", a)
+           "maxTurns without a cutoff degradation rule (build-agent Pass A #7)", a)
     if front.get('memory'):
         ck(re.search(r'never hold|process lessons', body, re.I),
-           "memory grant without a scope rule (agent-factory Step 2)", a)
+           "memory grant without a scope rule (build-agent Step 2)", a)
         # the rule is stated two ways in this repo: "files outrank memory"
         # and "the files win" — accept either, and any file-first phrasing
         ck(re.search(r'outrank|files win|file[^.]{0,40}wins?\b', body, re.I),
@@ -155,7 +155,7 @@ for n,p in sorted(list(skills.items())+list(agents.items())):
         # '/' separates alternatives ("golang-pro/rust-pro") but also splits file
         # paths, so drop any path-with-extension before treating '/' as a separator.
         raw=re.sub(r'\S*/\S*\.\w+', ' ', raw)
-        # A parenthetical may name several targets: "use pr-loop, golang-pro, or
+        # A parenthetical may name several targets: "use run-pr-loop, golang-pro, or
         # rust-pro". Filtering candidates to ones already known would make this
         # check unable to fail whenever any one target resolves, so decide what
         # is a name by its shape instead: a kebab-case token always is, and a
@@ -205,9 +205,13 @@ for n in sorted(skills):
 print(f"   {len(skills)} skill names checked against {len(BUNDLED)} bundled")
 
 print("10. RESUME DERIVATIONS — numbering contiguous, no duplicates")
-for p in ['.claude/skills/scoping/SKILL.md',
+for p in ['.claude/skills/scope-problem/SKILL.md',
           'agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md',
           'agent-team-workspace/protocols/pr-loop-agent-team-prompt.md']:
+    # a renamed or deleted file must fail this check, not raise out of the suite
+    # and take every later check with it
+    if not ck(os.path.isfile(p), "resume-derivation file missing", p):
+        continue
     t=io.open(p,encoding='utf-8').read()
     m=re.search(r'(first matching state|take the first matching state|Read them and take the first matching state)(.*?)\n\n[A-Z#]', t, re.S)
     if not m: warn(False,"no resume derivation found",p); continue

@@ -15,12 +15,12 @@ quick edits.
 
 ## Invocation
 
-The `/pr-loop` skill (`.claude/skills/pr-loop/`) is the entry point
+The `/run-pr-loop` skill (`.claude/skills/run-pr-loop/`) is the entry point
 that wraps this protocol; invoking it or writing the prompt below
 are equivalent.
 
 > Run the PR loop on: <brief — the requirements or design doc
-> (a design-loop `design.md` works as-is), target area of the
+> (a run-design-loop `design.md` works as-is), target area of the
 > codebase, constraints>. Slug: `<slug>`. Open PR: yes/no.
 
 ## State: single writer per file
@@ -60,7 +60,7 @@ confirm the branch and stop rather than switching it.
 
 1. **Round 0 — implement.** Write `brief.md` — if it already
    conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`, e.g.
-   from `/scoping`), keep it exactly as given; do not re-author a
+   from `/scope-problem`), keep it exactly as given; do not re-author a
    scoped brief. Create branch `pr/<slug>` from the default branch
    and leave it checked out, then invoke `coding-expert` with the
    slug. It implements in digestible commits, gets the suite green,
