@@ -10,12 +10,17 @@ All three are defined in `.claude/agents/`. The investigator and
 bar-raiser are expert software engineers at both design altitudes —
 high-level (architecture, boundaries, data models, consistency,
 scaling, failure domains) and low-level (interfaces, data
-structures, algorithms, concurrency, error semantics) — and both run
-`model: fable` at `effort: max`, so a full loop is deliberately
-expensive: use it for designs that matter. Budget in tens of
-minutes per round — a measured round 0 plus one review round on a
-small greenfield design ran about 27 minutes and 190k tokens at
-`opus`, and `fable` at `max` is slower still. For a cheap one-shot
+structures, algorithms, concurrency, error semantics) — and both run at
+`effort: max`, so a full loop is deliberately expensive: use it for
+designs that matter. The two are not configured alike: the
+investigator is `model: opus` with `maxTurns: 10`, the bar-raiser
+`model: fable` with `maxTurns: 50`. Budget in tens of minutes per
+round — a measured round 0 plus one review round on a small
+greenfield design ran about 27 minutes and 190k tokens at `opus`.
+That measurement predates the investigator's 10-turn cap, so round 0
+now stops earlier: if a design arrives with sections named unfinished,
+that is the cap, not the agent giving up, and the fix is to raise
+`maxTurns` rather than to re-prompt. For a cheap one-shot
 opinion on a human-authored design, use `architect-reviewer`
 instead.
 
