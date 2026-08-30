@@ -6,7 +6,8 @@
 # Wired in .claude/settings.json under hooks.PostToolUse, matcher
 # "Edit|Write|MultiEdit". Reads the hook payload on stdin and does its own
 # path filtering rather than relying on an `if` condition, so one entry
-# covers every editing tool and the logic stays testable in isolation:
+# covers editing tools and Bash (where deletes happen) and the logic stays
+# testable in isolation:
 #
 #   echo '{"tool_input":{"file_path":"/abs/path"}}' | .claude/hooks/validate-definitions.sh
 #
@@ -30,13 +31,25 @@ note() {  # non-blocking message to Claude, exit 0
 
 command -v jq >/dev/null 2>&1 || note "definition validator skipped: jq not installed"
 path=$(jq -r '.tool_input.file_path // ""' <<<"$payload")
-[ -z "$path" ] && exit 0
 
-# Only definitions and the files that register them.
-case "$path" in
-  */.claude/agents/*|*/.claude/skills/*|*/CLAUDE.md|*/validate-definitions.py) ;;
-  *) exit 0 ;;
-esac
+if [ -n "$path" ]; then
+  # Edit/Write/MultiEdit: decide on the file that was written.
+  case "$path" in
+    */.claude/agents/*|*/.claude/skills/*|*/CLAUDE.md|*/validate-definitions.py) ;;
+    *) exit 0 ;;
+  esac
+else
+  # Bash has no file_path. A delete or move goes through it, and deleting a
+  # definition leaves stale references that the write-side check never sees,
+  # so inspect the command instead. Anything naming .claude or the validator
+  # is worth one 174ms run; everything else leaves immediately.
+  cmd=$(jq -r '.tool_input.command // ""' <<<"$payload")
+  case "$cmd" in
+    *.claude/agents/*|*.claude/skills/*|*CLAUDE.md*|*validate-definitions*) ;;
+    *) exit 0 ;;
+  esac
+  path="$cmd"
+fi
 
 [ -f "$validator" ] || note "definition validator missing at $validator"
 command -v python3 >/dev/null 2>&1 || note "definition validator skipped: python3 not installed"
