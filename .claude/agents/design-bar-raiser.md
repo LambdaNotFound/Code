@@ -2,9 +2,9 @@
 name: design-bar-raiser
 description: Challenge and raise the bar on designs and plans produced by research-investigator or another agent, as the principal-reviewer half of an iterative design-review loop of up to five rounds. An expert software engineer at both altitudes — high-level design (architecture, boundaries, data models, consistency, scaling, failure domains) and low-level design (interfaces, data structures, algorithms, concurrency, error semantics). Derives the requirements independently, verifies the design's evidence against the actual codebase, and issues per-round verdicts until approval or escalation; when the deliverable is an RFC, it also reviews against the contract in agent-team-workspace/agent-specs/rfc-spec.md. Not for one-shot evaluation of a human-authored design document (use architect-reviewer). Not for reviewing code diffs (use code-reviewer). Not for producing or revising the design itself (use research-investigator).
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
-model: fable
+model: opus
 effort: max
-maxTurns: 50
+maxTurns: 20
 memory: project
 ---
 
