@@ -1,5 +1,5 @@
 ---
-description: Run the PR loop — coding-expert turns a requirements/design brief into code on a branch, code-bar-raiser reviews and challenges it for up to 4 rounds, ai-writing-auditor audits the PR description, ending in a high-quality PR ready for human review. Use when the user asks to run the PR loop, wants a design or requirements implemented as a reviewed PR, or wants to resume an interrupted PR loop by slug. Not for quick edits (use golang-pro/rust-pro) or producing the design itself (use design-loop).
+description: Run the PR loop — coding-expert turns a requirements/design brief into code on a branch, code-bar-raiser reviews and challenges it for up to 4 rounds, ai-writing-auditor audits the PR description, ending in a high-quality PR ready for human review. Use when the user asks to run the PR loop, wants a design or requirements implemented as a reviewed PR, or wants to resume an interrupted PR loop by slug. Not for quick edits (use golang-pro/rust-pro) or producing the design itself (use run-design-loop).
 argument-hint: '<brief or design-doc path, or slug to resume> [slug: <slug>] [open PR: yes/no]'
 ---
 
@@ -26,7 +26,7 @@ $ARGUMENTS
    the arguments — requirements or the named design doc's content,
    target area, constraints — and create branch `pr/<slug>` from
    the default branch, before any agent runs. When the argument is
-   a design-loop `design.md`, copy it in as the brief unchanged and
+   a run-design-loop `design.md`, copy it in as the brief unchanged and
    say so in the file's first line — it is a conforming input per
    `agent-team-workspace/agent-specs/brief-spec.md`, not an informal one. If the arguments name
    a goal but no requirements to freeze, stop and ask; never invent

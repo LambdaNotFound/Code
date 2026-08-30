@@ -1,5 +1,5 @@
 ---
-description: Review a pull request's code changes, or work through the review comments on one. Two modes — review a PR, branch, or diff and return findings each carrying a severity, a path:line, and a concrete fix; or take the reviewer comments on a PR, triage them, implement the ones that hold, push back with evidence on the ones that do not, and reply and resolve thread by thread. Carries deep language-level review for Go, Rust, and C++ (goroutine lifetime and context, ownership, lifetimes, unsafe, aliasing, UB, concurrency, cancellation safety) in reference files loaded only when the diff contains that language. Use when asked to review a PR or a diff before merge, to look over someone's changes, or to address, respond to, or work through code review feedback. Not for the PR loop's in-loop review (use pr-loop, whose code-bar-raiser owns rounds and ledgers). Not for writing the implementation (use pr-loop, golang-pro, or rust-pro). Not for a quick convention pass over uncommitted working-tree code (use review-code).
+description: Review a pull request's code changes, or work through the review comments on one. Two modes — review a PR, branch, or diff and return findings each carrying a severity, a path:line, and a concrete fix; or take the reviewer comments on a PR, triage them, implement the ones that hold, push back with evidence on the ones that do not, and reply and resolve thread by thread. Carries deep language-level review for Go, Rust, and C++ (goroutine lifetime and context, ownership, lifetimes, unsafe, aliasing, UB, concurrency, cancellation safety) in reference files loaded only when the diff contains that language. Use when asked to review a PR or a diff before merge, to look over someone's changes, or to address, respond to, or work through code review feedback. Not for the PR loop's in-loop review (use run-pr-loop, whose code-bar-raiser owns rounds and ledgers). Not for writing the implementation (use run-pr-loop, golang-pro, or rust-pro). Not for a quick convention pass over uncommitted working-tree code (use review-code).
 argument-hint: <PR number, branch, or diff target> | comments [PR number]
 ---
 
@@ -79,7 +79,7 @@ itself a blocking finding.
 
 If the branch is `pr/<slug>` and
 `agent-team-workspace/pull-requests/<slug>/` exists, an active
-`/pr-loop` owns both the branch and the tree.
+`/run-pr-loop` owns both the branch and the tree.
 Say so and stop; do not review alongside it, and do not commit.
 
 Never move a working tree you do not own. Confirm with
@@ -109,7 +109,7 @@ Depth on what is broken beats coverage of what is not.
    code, that is blocking; say what lost you. Comments explain why,
    not what. Commits atomic and digestible.
 
-If this PR came out of this repo's `/pr-loop`,
+If this PR came out of this repo's `/run-pr-loop`,
 `agent-team-workspace/agent-specs/pr-spec.md` is the binding
 contract for size, commit shape, and vendor isolation — review
 against it rather than against the general rules here. On any other

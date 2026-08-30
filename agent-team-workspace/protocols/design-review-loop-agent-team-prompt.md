@@ -25,7 +25,7 @@ instead.
 
 ## Invocation
 
-The `/design-loop` skill (`.claude/skills/design-loop/`) is the
+The `/run-design-loop` skill (`.claude/skills/run-design-loop/`) is the
 entry point that wraps this protocol; invoking it or writing the
 prompt below are equivalent.
 
@@ -67,7 +67,7 @@ the design's restatement of them.
 
 1. **Round 0 — author.** Write `brief.md` first, verbatim — if it
    already conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`,
-   e.g. from `/scoping`), keep it exactly as given; do not
+   e.g. from `/scope-problem`), keep it exactly as given; do not
    re-author a scoped brief. Then invoke `research-investigator`
    with the slug. It researches from first principles, designs at
    both altitudes, and writes `design.md` (with `## Revision log`

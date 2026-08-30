@@ -1,5 +1,5 @@
 ---
-description: Create new subagents and design multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter, minimal tool grants, file-based loop state with single writers, checkpoint/resume, convergence discipline, and a first-principles hardening review before shipping. Use when the user wants to create an agent, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the design-review loop itself (use design-loop).
+description: Create new subagents and design multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter, minimal tool grants, file-based loop state with single writers, checkpoint/resume, convergence discipline, and a first-principles hardening review before shipping. Use when the user wants to create an agent, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the design-review loop itself (use run-design-loop).
 argument-hint: <what the agent or team should do> [name(s)] [loop?]
 ---
 
@@ -12,7 +12,7 @@ content:
 - Adversarial counterpart: `.claude/agents/design-bar-raiser.md`
 - Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
 - Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
-- Entry-point skill: `.claude/skills/design-loop/SKILL.md`
+- Entry-point skill: `.claude/skills/run-design-loop/SKILL.md`
 
 ## Step 0 — Survey before writing
 

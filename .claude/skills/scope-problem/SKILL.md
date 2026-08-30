@@ -1,5 +1,5 @@
 ---
-description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, tests the result on a context-free reader, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for design-loop or pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use design-loop), the implementation (use pr-loop), or general document co-authoring (use doc-coauthoring).
+description: Interactive problem-scoping with the user — the co-worker phase before any loop runs. Interviews you in rounds of numbered questions (shorthand answers welcome) rather than one pass, grounds the problem in the codebase, clarifies and challenges requirements from first principles, breaks the big problem into loop-sized pieces, tests the result on a context-free reader, and converges on a signed-off brief (agent-team-workspace/agent-specs/brief-spec.md) ready for run-design-loop or run-pr-loop. Use when the user brings a fuzzy problem or idea, wants to clarify or scope requirements, or asks to think a problem through together before building. Not for producing the design (use run-design-loop), the implementation (use run-pr-loop), or general document co-authoring (use doc-coauthoring).
 argument-hint: '<the problem, idea, or area to scope> [slug: <slug>]'
 ---
 
@@ -31,8 +31,8 @@ pieces sharing one directory would overwrite each other's design
 and ledger:
 
 - **One piece.** Copy the signed-off brief into that route's loop
-  directory: `agent-team-workspace/design-docs/<slug>/brief.md` for design-loop,
-  `agent-team-workspace/pull-requests/<slug>/brief.md` for pr-loop.
+  directory: `agent-team-workspace/design-docs/<slug>/brief.md` for run-design-loop,
+  `agent-team-workspace/pull-requests/<slug>/brief.md` for run-pr-loop.
 - **Several pieces.** The parent brief stays at
   `agent-team-workspace/requirements/<slug>/brief.md` as the index, and each piece gets
   its own slug, `<slug>-<piece>`, and its own brief in its route's
@@ -198,7 +198,7 @@ Now that the dump and the code have shown you the shape, ask whether
 the process costs more than the mistake it prevents. If the work is
 one well-understood change, behind one interface, with a caller set
 you can enumerate and a rollback that is `git revert`, say so and
-offer the exit: a three-line informal brief and `/pr-loop` directly.
+offer the exit: a three-line informal brief and `/run-pr-loop` directly.
 `agent-team-workspace/agent-specs/brief-spec.md` is explicit that a
 loop handed an informal brief still runs and simply names the gaps.
 
@@ -311,8 +311,8 @@ what you assumed for each — their call, recorded honestly.
 ## Phase 4 — Decompose
 
 Break the problem into independently deliverable pieces sized for
-their route: design-loop for pieces needing a reviewed design or
-RFC, pr-loop for well-understood code changes, no-code for process
+their route: run-design-loop for pieces needing a reviewed design or
+RFC, run-pr-loop for well-understood code changes, no-code for process
 or documentation outcomes. Order by dependency and risk —
 riskiest-first where possible so a failed assumption surfaces
 early. Each piece gets the one-line contract from
@@ -376,12 +376,12 @@ the brief actually landed in**, so it is the bare `<slug>` when
 scoping produced one piece and `<slug>-<piece>` when it produced
 several. Get this wrong and the loop looks in an empty directory,
 decides it never started, and asks the user for a brief that already
-exists. `/design-loop <slug>` for pieces routed to design,
-`/pr-loop <slug>` for pieces routed to code. Report every brief path, the routes, which pieces block which,
+exists. `/run-design-loop <slug>` for pieces routed to design,
+`/run-pr-loop <slug>` for pieces routed to code. Report every brief path, the routes, which pieces block which,
 and the open questions that carried defaults.
 
 ## Improving this skill
 
 This skill is expected to be iterated: after a real scoping
 session, weaknesses found in the flow belong back in this file via
-the agent-factory process (Step 6 checklist applies).
+the build-agent process (Step 6 checklist applies).
