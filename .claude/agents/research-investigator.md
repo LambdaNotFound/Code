@@ -4,7 +4,7 @@ description: Investigate codebases and design documents, and turn the findings i
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
 model: opus
 effort: max
-maxTurns: 10
+maxTurns: 20
 memory: project
 ---
 
