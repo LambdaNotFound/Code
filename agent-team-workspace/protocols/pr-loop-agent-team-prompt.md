@@ -2,7 +2,7 @@
 
 Goal: turn an engineering design or requirements brief into a
 high-quality Pull Request for human review, with three agents —
-`coding-expert` implements, `code-bar-raiser` challenges for up to
+`coding-expert` implements, `coding-bar-raiser` challenges for up to
 **4 rounds**, and `ai-writing-auditor` audits the PR description.
 The output contract is `agent-team-workspace/agent-specs/pr-spec.md`; the human review the PR
 receives afterward is the backstop, not the excuse.
@@ -29,7 +29,7 @@ are equivalent.
 |---|---|---|
 | `agent-team-workspace/pull-requests/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
 | `agent-team-workspace/pull-requests/<slug>/pr.md` | coding-expert | PR title/description, keyed revision log, objection responses |
-| `agent-team-workspace/pull-requests/<slug>/review.md` | code-bar-raiser | append-only round ledger with verdicts |
+| `agent-team-workspace/pull-requests/<slug>/review.md` | coding-bar-raiser | append-only round ledger with verdicts |
 | `agent-team-workspace/pull-requests/<slug>/pr.rewritten.md` | ai-writing-auditor | editorial intermediate |
 | branch `pr/<slug>` | coding-expert | the code, in digestible commits |
 
@@ -46,7 +46,7 @@ creating it, committing loop state, and pushing.
 The lead owns every loop-state commit: after each round it stages
 `agent-team-workspace/pull-requests/<slug>/`, commits it with a `[loop]` prefix so
 reviewers can skip those commits, and pushes. Agents never commit
-loop state — `coding-expert` commits code only, `code-bar-raiser`
+loop state — `coding-expert` commits code only, `coding-bar-raiser`
 commits nothing at all. The branch's final commit removes
 `agent-team-workspace/pull-requests/<slug>/` so the PR's net diff carries only the change
 itself.
@@ -66,7 +66,7 @@ confirm the branch and stop rather than switching it.
    slug. It implements in digestible commits, gets the suite green,
    and writes `pr.md`. If it returns `blocked` or `split proposed`,
    stop and put that to the user.
-2. **Round N (1..4) — review.** Invoke `code-bar-raiser` with the
+2. **Round N (1..4) — review.** Invoke `coding-bar-raiser` with the
    slug and round number. It derives independently from the brief,
    builds and runs the branch you left checked out, appends
    `## Round N` with a `Verdict:` line to `review.md`:
@@ -135,7 +135,7 @@ any resume prompt. Read them and take the first matching state:
    pending: invoke coding-expert.
 3. Last `review.md` verdict `revise`, no `R<N>:` entry for that
    round in `pr.md` → response pending: invoke coding-expert.
-4. Same verdict, `R<N>:` entry exists → invoke code-bar-raiser as
+4. Same verdict, `R<N>:` entry exists → invoke coding-bar-raiser as
    round N+1.
 5. Verdict `approve`/`approve-with-risks`, no `pr.rewritten.md`,
    no `editorial:` entry → editorial pass pending.

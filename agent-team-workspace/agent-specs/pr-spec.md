@@ -1,7 +1,7 @@
 # PR Output Contract
 
 When the PR loop runs, this file is the output contract:
-`coding-expert` builds to it and `code-bar-raiser` reviews against
+`coding-expert` builds to it and `coding-bar-raiser` reviews against
 it. It distills the team's PR etiquette (background: Google's code
 review guidelines) into the parts agents can enforce; the
 human-process parts are listed at the end for the lead to hand back

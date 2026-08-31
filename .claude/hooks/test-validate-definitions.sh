@@ -69,8 +69,8 @@ run "rm an unrelated file"                       0 "$(bash_ 'rm /tmp/scratch.txt
 echo "=== UPDATE ==="
 run "break an agent's YAML frontmatter"          2 "$(edit .claude/agents/rust-pro.md)" \
     "sed -i '2i bad: \"unterminated' .claude/agents/rust-pro.md"
-run "strip a memory grant's scope rule"          2 "$(edit .claude/agents/code-bar-raiser.md)" \
-    "python3 -c \"import io,re;p='.claude/agents/code-bar-raiser.md';s=io.open(p).read();io.open(p,'w').write(re.sub(r'## Memory.*?(?=\n## )','',s,flags=re.S))\""
+run "strip a memory grant's scope rule"          2 "$(edit .claude/agents/coding-bar-raiser.md)" \
+    "python3 -c \"import io,re;p='.claude/agents/coding-bar-raiser.md';s=io.open(p).read();io.open(p,'w').write(re.sub(r'## Memory.*?(?=\n## )','',s,flags=re.S))\""
 run "strip a capped agent's turn budget"         2 "$(edit .claude/agents/rust-pro.md)" \
     "python3 -c \"import io,re;p='.claude/agents/rust-pro.md';s=io.open(p).read();io.open(p,'w').write(re.sub(r'## Your turn budget.*','',s,flags=re.S))\""
 run "point a boundary at a nonexistent agent"    2 "$(edit .claude/skills/write-rust/SKILL.md)" \
