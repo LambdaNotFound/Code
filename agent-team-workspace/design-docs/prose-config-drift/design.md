@@ -76,8 +76,9 @@ Two validators, one hook, one test suite, one claim corpus.
 
 - `agent-team-workspace/validate-definitions.py` — 287 lines, 13
   numbered check sections, 231 hard checks, exits non-zero on any
-  failure (`validate-definitions.py:287`). Measured 150–159 ms over
-  four runs including interpreter start; `231/231 hard checks passed, 0
+  failure (`validate-definitions.py:287`). Measured 150, 154, 156, 159 ms
+  over four runs including interpreter start, and 131-160 ms over five in
+  the round-1 review — call the baseline ~150 ms; `231/231 hard checks passed, 0
   advisories` on HEAD. **observed**
 - `agent-team-workspace/validate-skills.py` — 65 lines at HEAD `bfc9cec`,
   per-skill loop over the 8 skills, 0 failures. **observed**
@@ -102,8 +103,9 @@ Two validators, one hook, one test suite, one claim corpus.
 
 ## Findings
 
-**F1 — The claim corpus is 20 sentences, and a noun-anchored trigger
-finds exactly them.** The six patterns specified below, run over check 5's
+**F1 — The claim corpus is 20 claims in 19 sentences, and a
+noun-anchored trigger finds exactly them.** (`scope-problem/SKILL.md:18`
+states `effort` and `maxTurns` in one sentence.) The six patterns specified below, run over check 5's
 33-file scan list, fire on 8 configuration claims and 12 round-budget
 claims and on nothing else. The 8: `build-agent/SKILL.md:47` and `:48`
 (`` `model: fable` ``, `` `effort: max` ``), `scope-problem/SKILL.md:18`
@@ -163,17 +165,29 @@ at `effort: max`" (`:9-14`). What the rules can read is that
 member each of this file's own backticked roster. That is the rule F8
 measures. **observed**
 
-**F5 — The two loop-round classes partition cleanly with no hardcoded
-names.** Every file carrying a round-budget claim maps to exactly one
-protocol, via backticked-roster membership (the parse check 11 already
+**F5 — All 12 round claims resolve to exactly one protocol, with no
+hardcoded names, and all 12 agree.** Every claim-bearing file maps to one
+protocol via backticked-roster membership (the parse check 11 already
 does, `validate-definitions.py:229-234`) or via citing that protocol's
-path. Measured: `design-bar-raiser.md` → design roster;
-`design-investigator.md` → design roster and design path;
-`coding-bar-raiser.md`, `coding-expert.md` → pr roster and pr path;
-`run-design-loop/SKILL.md` → design path only; `run-pr-loop/SKILL.md`
-→ pr path only. The two genuinely ambiguous files —
-`ai-writing-auditor.md` (both rosters) and `CLAUDE.md` (both paths) —
-carry no round-budget claim, so nothing is lost. **observed**
+path. Measured: **observed**
+
+| file | claims | class |
+|---|---|---|
+| `design-review-loop-agent-team-prompt.md:5` | 5 | itself (source) |
+| `pr-loop-agent-team-prompt.md:5` | 4 | itself (source) |
+| `design-bar-raiser.md` description, `:160`, `:181`, `:220` | five, five, 5, 5 | design |
+| `design-investigator.md:218` | five | design |
+| `run-design-loop/SKILL.md` description | 5 | design |
+| `coding-bar-raiser.md:127`, `:144`, `:176` | four, 4, 4 | pr |
+| `run-pr-loop/SKILL.md` description | 4 | pr |
+
+Both protocol claims wrap across source lines and are found only after
+paragraph joining (F3). The genuinely ambiguous files —
+`ai-writing-auditor.md` (both rosters), `CLAUDE.md` (both paths) — and
+the classless ones (`review-pr/SKILL.md`, `scope-problem/SKILL.md`, which
+match neither) carry no round claim, so nothing is reported for them
+today. `coding-expert.md` maps to the PR class but carries no claim
+either.
 
 **F6 — The hook's sandbox stubs out the source trees, which kills any
 check against `rust/` or `spaced_repetition/` counts.**
@@ -296,7 +310,7 @@ sentence rather than from what is nearby.
 
 **Stage 4 — reconcile.** Exact comparison against the bound agent's
 frontmatter. A claim that did not bind is not compared at all; it is
-reported (stage 5). Round claims take their own path: comparison against
+reported as an advisory. Round claims take their own path: comparison against
 the loop protocol the claim's file resolves to.
 
 ### Data ownership
@@ -335,10 +349,18 @@ the tree.
 ### Operational surface
 
 No deploy, no migration, no rollback. Adding checks changes the printed
-total (`231/231`), which is stated in `CLAUDE.md:37` and must be
-updated in the same commit — the hook forces a validator run on
-`CLAUDE.md` edits (`validate-definitions.sh:38`), so the new number is
-displayed to whoever makes the change. Observability is the existing
+total (`231/231`), which is stated in `CLAUDE.md:37` and must be updated
+in the same commit — the hook forces a validator run on `CLAUDE.md` edits
+(`validate-definitions.sh:38`), so the new number is displayed to whoever
+makes the change.
+
+That total is now coupled to prose. `ck` increments per call
+(`validate-definitions.py:19-21`) and the new sections call it once per
+checked claim, so writing or deleting a sentence that states a
+configuration value moves the number in `CLAUDE.md:37`. The coupling
+already exists through checks 7, 11 and 11b; this enlarges it. It costs
+nothing while the number is only *displayed*, and it is the whole reason
+step 8 — which would make the number *enforced* — stays optional. Observability is the existing
 two-list summary: hard failures under `FAIL`, unparsed claims under
 `warn` (`validate-definitions.py:283-286`).
 
@@ -401,14 +423,21 @@ union and let an unrecognized level fall to `UNPARSED_EFFORT`.
 ### Claim record
 
 ```python
-Claim = collections.namedtuple('Claim', 'path line field claimed subjects raw')
+Claim = collections.namedtuple(
+    'Claim', 'path line field claimed subjects reason raw')
 # path      str   file the claim appears in
 # line      int   1-based line in the whole file, frontmatter included
 # field     str   'model' | 'effort' | 'maxTurns' | 'rounds'
 # claimed   str   normalized value: str(int) for maxTurns/rounds, lowercase token otherwise
 # subjects  tuple agent names, empty when unbound
+# reason    str   why binding declined; '' when subjects is non-empty
 # raw       str   the trimmed sentence, for the failure message
 ```
+
+Invariant: `subjects` and `reason` are never both empty and never both
+set. That is what makes "silently skipped" unrepresentable — every claim
+either reaches `ck` or reaches `warn` — which is goal 4 held by a data
+structure rather than by remembering to write the else branch.
 
 The line number is the paragraph's start line plus the newline count in
 the paragraph text before the match offset. Getting this wrong by one
@@ -420,93 +449,154 @@ unaffected, which is exactly how such a bug survives a spot check.
 
 ### Subject binding
 
+Binding never uses proximity or position. F4 measured five
+proximity/position rules and every one of them fails a line the brief
+requires to pass. The rule that works reads the words of the sentence
+against the file's own vocabulary.
+
 ```python
-def _bind(para: str, offset: int, names: frozenset[str], self_agent: str | None
-          ) -> tuple[tuple[str, ...], str]:
+NAME = re.compile(r'`([a-z0-9]+(?:-[a-z0-9]+)+)`')
+
+def _roster(text: str, names: frozenset[str]) -> tuple[str, ...]:
+    """Live agent names this file backticks anywhere, first-appearance order."""
+
+def _role_index(roster: Sequence[str]) -> dict[str, str]:
+    """Last kebab token -> the one roster member it identifies.
+    A token held by two or more roster members is omitted."""
+
+def _bind(sents: Sequence[str], i: int, names: frozenset[str],
+          role: Mapping[str, str]) -> tuple[tuple[str, ...], str]:
     """-> (subjects, reason). Empty subjects means unbound; reason names why."""
 ```
 
+Both inputs are computed per file at runtime, from the `.claude/agents/`
+glob and from the file's own text. Nothing is listed, so a swept rename
+rebinds with no edit to the checker (goal 2).
+
 The ladder, in order:
 
-1. **Same sentence.** Split the paragraph on sentence boundaries; if
-   the claim's sentence contains exactly one backticked token in
-   `names`, bind to it. Covers `scope-problem/SKILL.md:18`.
-2. **Same paragraph, unique.** If the paragraph contains exactly one
-   name from `names`, bind to it.
-3. **Self-reference.** If the file is an agent definition and the
-   sentence's subject is second person (`\b(you|your)\b` before the
-   property noun), bind to that agent. No current claim needs this; it
-   is here because agent bodies are the natural place for one to appear.
-4. **Cardinality-checked anaphor.** If the sentence opens with a plural
-   anaphor — `both`/`either`/`neither` ⇒ 2, `all three` ⇒ 3 — collect
-   distinct names from `names` mentioned in the enclosing section
-   (since the last `#`-heading line) *before* the claim, take the last
-   *k* by position, and bind only if exactly *k* are available. For
-   `design-review-loop-agent-team-prompt.md:15`, "Both" ⇒ 2, and the
-   two nearest preceding names are `design-bar-raiser` (`:5`) and
-   `design-investigator` (`:4`) — the correct pair. The section names a
-   third agent, `ai-writing-auditor` (`:6`), whose `model: sonnet`
-   would make a bind-to-all rule fail (F4); recency plus cardinality
-   excludes it.
-5. **Decline.** Return empty subjects with a reason string.
+1. **Named subject.** If the claim's sentence contains exactly one
+   backticked token in `names`, bind to it. Covers
+   `scope-problem/SKILL.md:18`, the brief's goal-1 target, which reads
+   "…the `design-investigator`… runs at max effort for up to twenty
+   turns…". Two or more names in the sentence fall through rather than
+   guessing.
+2. **Role noun.** If the sentence contains no backticked name, resolve
+   every token in `role` that appears in it as a whole word (`\braiser\b`
+   matches inside "bar-raiser", since the hyphen is a word boundary) and
+   bind to the set. Covers
+   `design-review-loop-agent-team-prompt.md:14` — "The investigator and
+   bar-raiser … both run at `effort: max`" — which resolves
+   `{design-investigator, design-bar-raiser}` against that file's roster
+   of four.
+3. **Cardinality-checked anaphor.** If the sentence opens with a plural
+   anaphor of known count — `both`/`either`/`neither`/`the two`/`the
+   pair` ⇒ 2, `all three` ⇒ 3 — apply rungs 1 and 2 to the immediately
+   preceding sentence of the same paragraph and bind only if it resolves
+   exactly *k*. Covers `design-review-loop-agent-team-prompt.md:15-16`,
+   "Both run `model: opus`, capped at `maxTurns: 20`.", whose antecedent
+   is the rung-2 sentence above and resolves exactly 2.
+4. **Decline.** Return empty subjects with a reason string.
 
-Rung 4 is the only heuristic in the design, and it is the one a
-reviewer should attack. It is included because without it goal 1 is
-only partly met: `design-review-loop-agent-team-prompt.md:15-16` is a
-sentence stating an agent's `model` and `maxTurns`, and under
-existence-checking alone its drift would not fail. It is bounded by
-cardinality so that it declines rather than guesses whenever the count
-does not match, and its one live instance is verified above. If a
-reviewer judges the risk unacceptable, deleting rung 4 costs exactly
-one site's precision and nothing else — the ladder degrades to rung 5.
+**Why each rung exists.** Rung 1 alone satisfies goal 1's stated check
+and leaves 6 of the 8 claims unchecked, including the whole
+`design-review-loop-agent-team-prompt.md` paragraph — the repo's most
+restated configuration statement and the one the brief's Context singles
+out. Rung 2 kills rung-1-only; it reaches `:14` but not `:15-16`, whose
+sentence contains no noun at all. Rung 3 kills rung-2-only. Nothing
+reaches `:19` or the two `build-agent` claims without guessing, so
+nothing tries.
+
+**Rungs deleted from the round-0 design, with the measurement that
+killed each.** *Same paragraph, unique name* — binds all four claims in
+`design-review-loop-agent-team-prompt.md`'s 16-line paragraph to
+`architect-reviewer` and fails all four (F4); over the whole corpus it
+binds nothing correctly, so it has no upside to trade against. *Last-*k*
+by position* — computes `{design-bar-raiser, ai-writing-auditor}` for
+`:15` and fails on `model: sonnet` (F4). *Self-reference* (a second-person
+sentence in an agent body binding to that agent) — no claim in the corpus
+has that shape, and an element with no live requirement is padding; it is
+a two-line addition the day such a sentence appears.
+
+**The residual risk, and its blast radius.** Rung 2 mis-binds if a role
+noun is also an ordinary English word in a sentence that happens to carry
+a configuration claim. Three things bound it. The index is per file, so
+only names the file itself backticks can be resolved. A token held by two
+roster members is omitted — which is why the index is built from the last
+kebab token only: `scope-problem/SKILL.md`'s roster
+(`requirements-investigator`, `design-investigator`) shares
+"investigator", so its index is **empty**, and the ordinary English words
+"design" and "requirements" that a whole-token index would have made
+bindable are not in it. Measured: last-token-only and all-token indices
+bind the same 5 claims to the same subjects, so the narrower one costs
+nothing today. And a mis-bind is a false *failure*, which surfaces
+loudly to whoever wrote the sentence, not a false pass that rots
+silently.
+
+Rungs 2 and 3 are the heuristics, and they are the ones a reviewer should
+attack. Each is separable: dropping rung 3 costs `:15-16`, dropping both
+costs `:14` as well, and in each case the claims become advisories rather
+than errors. The ladder degrades to rung 1 with no other change.
 
 ### Reconciliation
 
 ```python
 for c in claims:
-    if c.subjects:                                          # 4a exact
-        for s in c.subjects:
-            actual = AGENT_FM[s].get(c.field)
-            ck(actual is not None and _norm(actual) == c.claimed,
-               "prose contradicts agent frontmatter",
-               f"{c.path}:{c.line} claims {c.field}={c.claimed} for '{s}', "
-               f"frontmatter says {actual!r} | {c.raw}")
-    else:                                                   # 4b existence
-        pool = {_norm(fm[c.field]) for fm in AGENT_FM.values() if c.field in fm}
-        ck(c.claimed in pool,
-           "prose states a config value no agent has",
-           f"{c.path}:{c.line} claims {c.field}={c.claimed}; "
-           f"live values are {sorted(pool)} | {c.raw}")
+    if not c.subjects:
+        warn(False, "config claim not attributed",
+             f"{c.path}:{c.line} {c.reason} | {c.raw}")
+        continue
+    for s in c.subjects:
+        actual = AGENT_FM[s].get(c.field)
+        ck(actual is not None and _norm(actual) == c.claimed,
+           "prose contradicts agent frontmatter",
+           f"{c.path}:{c.line} claims {c.field}={c.claimed} for '{s}', "
+           f"frontmatter says {actual!r} | {c.raw}")
 ```
 
-The failure message carries file, line, claimed value, and actual
-value — goal 1's stated check verbatim. `ck` is used, not `warn`, and
-its return value is ignored here because nothing gates on it; the
-return still matters and must not be removed (`validate-definitions.py:19-22`).
+The failure message carries file, line, claimed value, and actual value —
+goal 1's stated check verbatim. `ck` is used, not `warn`, and its return
+value is ignored here because nothing gates on it; the return still
+matters and must not be removed (`validate-definitions.py:19-22`).
 
-4b's weakness is real and must be stated where a reader will see it:
-with `maxTurns: 20` on four agents today, an unbound claim of "20"
-passes even if the agent the sentence meant moved to 30. 4b catches
-only a value that has left the tree entirely — for example, if
-`model: fable` were retired, `build-agent/SKILL.md:47` would fail. That
-is a genuine class (it is how a renamed model tier would surface) and a
-narrow one.
+An agent that has no such field at all (9 of 13 carry no `effort`) fails
+on `actual is None` with `frontmatter says None`, which is the right
+answer: a sentence claiming an effort level for an agent that has none is
+exactly the drift being hunted.
 
-### Round-count agreement (open question 3: in scope, symmetric)
+**There is no existence fallback, and that is a deliberate cut.** The
+round-0 design compared an unbound claim's value against the pool of
+values some agent holds. No goal asks for that: goal 1 asks that a claim
+disagreeing with *that agent's* frontmatter fail, which a pool test
+cannot detect, and with `maxTurns: 20` on four agents today it passes an
+unbound "20" even when the agent the sentence meant moved to 30. What it
+does do is create a false-positive class of its own — its only live
+subjects are `build-agent/SKILL.md:47-48`, a parenthetical recording a
+past decision ("this repo's precedent: a request for an \"endgame\"
+ability became `model: fable` + `effort: max` after verification"), a
+sentence that stays true after `fable` is retired and that the pool test
+would then fail. Unforced, and net-negative; cut.
 
-Round budgets have no frontmatter field, so there is no source of
-truth. The brief's default anoints the protocol file as the source.
-Rejected: it requires a hardcoded path-to-class mapping, which is the
-failure mode the constraints name, and it buys nothing — under either
-rule, editing the protocol from 5 to 6 alone makes the class
-inconsistent and fails.
+### Round counts, reconciled against the protocol (open question 3: the brief's default)
 
-The symmetric rule: partition round claims into classes, require every
-claim in a class to state the same number.
+Round budgets have no frontmatter field. The brief's default anoints the
+loop protocol as the source; this design takes it.
+
+The round-0 draft rejected the default on the grounds that anointing
+"requires a hardcoded path-to-class mapping, which is the failure mode
+the constraints name". That reason is wrong, and the draft's own
+`_loop_class` refutes it: the mapping is computed from rosters and path
+citations with nothing hardcoded, and it already maps a protocol to
+itself. Anointing is one line on top of it. The draft's second reason —
+"it buys nothing" — is also wrong, in two places. A class whose only
+other member is the protocol is *unchecked* under symmetric agreement,
+because a set of one agrees with itself; under anointing it is checked.
+And a symmetric disagreement has no culprit to name, so its message can
+only list every member and leave the reader to work out which one moved.
 
 ```python
-def _loop_class(path: str, rosters: dict[str, set[str]],
-                cites: dict[str, set[str]]) -> str | None:
+def _loop_class(path: str, rosters: Mapping[str, set[str]],
+                cites: Mapping[str, set[str]]) -> str | None:
     """Protocol -> itself. Other file -> the single protocol whose backticked
     roster names it or whose path it cites. 0 or 2+ matches -> None."""
 ```
@@ -515,8 +605,28 @@ def _loop_class(path: str, rosters: dict[str, set[str]],
 (`validate-definitions.py:231`); `cites` is a substring test for each
 protocol path. Zero hardcoded names, zero hardcoded values, and it
 survives a rename because both inputs are computed from the tree.
-Verified on today's tree (F5): six claim-bearing files each map to
-exactly one class, and the two ambiguous files carry no claim.
+
+The rule, given a claim in file *f* with class *P*:
+
+- *f* is *P* itself → the claim **is** the source. It is recorded, not
+  compared. If a protocol states two different round numbers, those
+  disagree with each other and it is a hard failure against itself —
+  the one case where a protocol is checked.
+- *f* is not *P*, and *P* carries exactly one round claim → compare.
+  Disagreement is a hard failure naming both sites and both numbers.
+- *f* is not *P*, and *P* carries no round claim → advisory, reason
+  `loop protocol states no round budget`. Failing here would punish a
+  file for something absent from another file.
+- *P* is `None` → advisory, reason `no loop class`. This is R1-5's gap
+  in the round-0 draft, where such a claim was silently skipped, which
+  goal 4 forbids. It is not hypothetical: `CLAUDE.md` cites both
+  protocol paths and `review-pr/SKILL.md` and `scope-problem/SKILL.md`
+  match neither, so all three are classless — they simply carry no round
+  claim today (F5), which is why nothing is reported now.
+
+Measured on today's tree (F5): all 12 round claims classify, 2 are
+protocol sources, the other 10 compare and agree — 5 for the design
+loop, 4 for the PR loop.
 
 Trigger, measured against the round-noise this repo contains:
 
@@ -542,13 +652,13 @@ Known miss: "five rounds of drift is not rigor"
 (`design-bar-raiser.md:161`) states the budget value with no budget
 marker and is not extracted. Under-detection, not a false positive.
 
-Failure message names both the class and every member claim, because a
-disagreement has no single culprit:
+The failure message names the culprit and the source, which is what
+anointing buys over symmetric agreement:
 
 ```
-round budget disagrees within the design-review loop:
-  design-bar-raiser.md:160 says 5
-  run-design-loop/SKILL.md:description says 6
+round budget contradicts the loop protocol:
+  .claude/skills/run-design-loop/SKILL.md:description says 6
+  agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md:5 says 5
 ```
 
 ### Unparsed reporting (open question 2: advisory)
@@ -558,30 +668,57 @@ warn(False, "config claim not parsed",
      f"{path}:{line} {reason} | {sentence}")
 ```
 
-`reason` is one of `no numeral in bound phrase`, `unknown effort
-level`, `anaphor cardinality k, n candidates`, `no subject resolved and
-field absent from every agent`. The last is the only one that also
-fails; the rest are advisory only.
+`reason` is one of six, and none of them fails the run:
 
-Today's tree produces zero of these: all 8 configuration claims either
-bind (rungs 1 and 4) or pass existence, and the 11 round claims all
-resolve. Preserving the current `0 advisories` baseline is deliberate —
-an advisory list that is routinely non-empty is one nobody reads.
+| reason | stage | live today |
+|---|---|---|
+| `no numeral in bound phrase` | 2 | 0 |
+| `unknown effort level` | 2 | 0 |
+| `no agent name or role noun in sentence` | 3 rung 4 | 3 |
+| `anaphor wants k, antecedent resolves n` | 3 rung 3 | 0 |
+| `loop protocol states no round budget` | round | 0 |
+| `no loop class` | round | 0 |
+
+**The advisory baseline this design ships is 3, not 0.** They are
+`build-agent/SKILL.md:47` and `:48` — the parenthetical about a past
+`model: fable` decision, in a file that backticks no agent name at all —
+and `design-review-loop-agent-team-prompt.md:19`, "That measurement
+predates the 20-turn cap", whose sentence names nobody.
+
+The round-0 draft preserved a `0 advisories` baseline by sending unbound
+claims to the existence check, which passed them. Cutting that check
+(R1-4) converts three silent passes into three visible lines, and the
+argument that "an advisory list that is routinely non-empty is one nobody
+reads" does not survive contact with what the alternative was: three
+claims that looked checked and were not. Two facts keep the cost small.
+The set is enumerated here, so a fourth advisory is a signal rather than
+noise. And the hook discards validator output entirely on exit 0
+(`validate-definitions.sh:56-58`), so a standing advisory is invisible in
+the edit path and is read only by someone running the validator
+deliberately.
+
+Zero advisories come from stages 1-2 today: the `UNPARSED_*` patterns
+fire only on spans the strong patterns already consumed, and the
+suppression rule drops those (measured — `probe6.py`, 0 unparsed on
+HEAD).
 
 ### Complexity and cost
 
-Let *F* = 33 files, *L* ≈ 5,000 total lines, *A* = 13 agents.
-Normalization is O(*L*); triggering is O(*L*) with a fixed number of
-compiled patterns; binding is O(paragraph length × *A*) worst case,
-bounded by the section scan in rung 4; reconciliation is O(claims × *A*)
-= O(19 × 13). Space is O(*L*) for the paragraph list, dropped per file.
+Let *F* = 33 files, *L* ≈ 5,000 total lines, *A* = 13 agents, *R* = a
+file's roster size (4 at most today). Normalization is O(*L*);
+triggering is O(*L*) with a fixed number of compiled patterns; roster and
+role-index construction is one O(*L*) regex pass per file plus O(*R*);
+binding is O(sentence length × *R*) and looks back at most one sentence,
+so no rung scans a section or a paragraph; reconciliation is O(claims),
+each a dict lookup — 20 claims today. Space is O(*L*) for the paragraph
+list, dropped per file.
 
 Files are read once into memory and shared with check 5, which
 currently re-opens each file (`validate-definitions.py:112`); folding
 them into one read is a small net saving that partly offsets the new
 pass. The added wall time is **unmeasured**. The measurement that
 settles it — five runs of the validator before and after, comparing
-medians against the 150–159 ms baseline — is step 7 of the plan.
+medians against the ~150 ms baseline — is step 6 of the plan.
 
 ## What is deliberately out of scope, and why
 
@@ -629,12 +766,29 @@ must be true; no claim need exist.
   verbatim as agent and skill instructions, with no build step and no
   include mechanism; introducing one means every reader and every
   loader now needs the expander.
-- **Bind anaphors to every agent named in the enclosing section.**
-  Killed by F4 — it fails
-  `design-review-loop-agent-team-prompt.md:15` today.
-- **Anoint the protocol file as the round-count source.** The brief's
-  default. Killed by the hardcoded-mapping constraint; symmetric
-  agreement detects the same drift with nothing hardcoded.
+- **Bind a claim by proximity or position** — to every agent named in
+  the enclosing section, to the unique agent named in its paragraph, or
+  to the last *k* names before it. All three are what a reader would try
+  first, and the third is what the round-0 draft specified. Killed by
+  measurement, not by taste: executed over the scan set, each fails at
+  least one claim in `design-review-loop-agent-team-prompt.md:14-16`,
+  which the brief's Context requires to keep passing (F4). The
+  paragraph-unique variant is the worst of them — four false positives
+  against `architect-reviewer`, an agent the paragraph mentions only to
+  say what to use instead.
+- **Fall back to an existence check when no subject binds.** In the
+  round-0 draft. Killed by R1-4's argument, which no goal contradicts: it
+  cannot detect what goal 1 asks for, it passes an unbound claim whenever
+  any agent happens to hold the value, and its only live subjects are two
+  sentences about a past decision that it would fail the day the model
+  tier they name is retired.
+- **Symmetric agreement within a loop class for round counts.** In the
+  round-0 draft, in place of the brief's anointed-source default. Its
+  real advantage is that it presumes nothing about which file leads. But
+  it leaves a class of one unchecked and it cannot name a culprit, and
+  the mapping it was preferred for avoiding is computed either way by
+  `_loop_class`. Taking the brief's default costs one line and detects
+  strictly more.
 - **Put the check in `validate-skills.py`.** Killed by structure: it
   iterates one skill at a time and has no place for a protocol's claim
   about an agent.
@@ -651,84 +805,114 @@ practice than the prototype measured, the taxonomy is wrong and steps
 Files: `agent-team-workspace/validate-definitions.py`.
 Add stages 1 and 2 plus a temporary dump of every candidate with its
 file, line, field, and value. Depends on nothing.
-Verify: the dump lists exactly the 8 configuration claims and 12 round
-claims (11 from the probe plus `pr-loop-agent-team-prompt.md:5-6`,
-which paragraph joining must now catch, F3), and nothing else. Line
-numbers match: `scope-problem/SKILL.md:18`, `build-agent/SKILL.md:47`
-and `:48`, `design-review-loop-agent-team-prompt.md:14`, `:15`, `:16`,
-`:19`. Any extra candidate stops the plan.
+Verify: the dump lists exactly the 8 configuration claims of F1 and the
+12 round claims of F5, and nothing else. Line numbers match:
+`scope-problem/SKILL.md:18`, `build-agent/SKILL.md:47` and `:48`,
+`design-review-loop-agent-team-prompt.md:14`, `:15`, `:16`, `:19` — the
+first three are in files with frontmatter and are where an off-by-one in
+the body offset shows up. `pr-loop-agent-team-prompt.md:5` must appear,
+which is what proves paragraph joining works (F3). Any extra candidate
+stops the plan.
 
-**2. Subject binding, rungs 1–3 and 5.**
+**2. Rung 1, decline, reconciliation and the advisory tier — section 14.**
 Files: `agent-team-workspace/validate-definitions.py`.
-Depends on 1.
-Verify: `scope-problem/SKILL.md:18` binds to `design-investigator`;
-the four protocol claims and the two `build-agent` claims report
-unbound with a reason.
-
-**3. Reconciliation 4a and 4b, wired as section 14.**
-Files: `agent-team-workspace/validate-definitions.py`.
-Depends on 2.
-Verify: exit 0 on HEAD with the advisory list still empty; then edit
+Depends on 1. This is the whole of goal 1's stated check; steps 3 and 4
+add reach, not correctness.
+Verify: exit 0 on HEAD with exactly 3 advisories, all reason
+`no agent name or role noun in sentence`, at `build-agent/SKILL.md:47`,
+`:48` and `design-review-loop-agent-team-prompt.md:19`. Then edit
 `scope-problem/SKILL.md:18` to "fifty turns" in a scratch copy and
-confirm exit 1 with a message naming the file, line 18, claimed 50, and
-actual 20. Revert.
+confirm exit 1 with a message naming the file, line 18, claimed 50,
+actual 20, and the subject `design-investigator`. Revert.
 
-**4. Rung 4, the cardinality-checked anaphor.**
+**3. Rungs 2 and 3 — role noun and cardinality-checked anaphor.**
 Files: `agent-team-workspace/validate-definitions.py`.
-Depends on 3. Separated from step 2 so it can be dropped without
-unpicking the ladder.
-Verify: `design-review-loop-agent-team-prompt.md:15-16` binds to
-`{design-investigator, design-bar-raiser}` and passes; a scratch edit
-of `design-bar-raiser.md`'s `maxTurns` to 30 makes it fail naming both
-agents.
+Depends on 2. Separated so either can be dropped without unpicking the
+ladder; the design survives without both at the cost of three sites.
+Verify: `design-review-loop-agent-team-prompt.md:14` binds to
+`{design-investigator, design-bar-raiser}` by rung 2 and `:15-16` binds
+to the same pair by rung 3; all pass; the advisory count stays 3. Then a
+scratch edit of `design-bar-raiser.md`'s `maxTurns` to 30 fails all three
+sites naming `design-bar-raiser`, and `:19` stays advisory throughout.
+Also assert the negative the design leans on: with the role index built
+from whole kebab tokens instead of last tokens, the bound set for these
+three claims is unchanged — if it is not, the narrowing is load-bearing
+in a way this document has not measured.
 
-**5. Round-count classes, wired as section 15.**
+**4. Round counts against the protocol — section 15.**
 Files: `agent-team-workspace/validate-definitions.py`.
-Depends on 1 (not on 2–4; it uses its own subject rule).
-Verify: exit 0 on HEAD; a scratch edit of `run-pr-loop/SKILL.md`'s
-description from 4 to 5 rounds fails, listing every pr-class member and
-its number; the design class is unaffected.
+Depends on 1 (not on 2-3; it uses its own subject rule).
+Verify: exit 0 on HEAD, all 12 claims classified as F5 tabulates, 2
+recorded as sources and 10 compared. A scratch edit of
+`run-pr-loop/SKILL.md`'s description from 4 to 5 fails, naming that file
+and `pr-loop-agent-team-prompt.md:5` as the source; the design class is
+unaffected. A scratch edit of `pr-loop-agent-team-prompt.md:5` from 4 to
+6 fails all four PR-class members against it. Deleting the round claim
+from a protocol in a scratch copy turns its class's claims into
+advisories, not failures.
 
-**6. Unparsed advisory tier.**
-Files: `agent-team-workspace/validate-definitions.py`.
-Depends on 3.
-Verify: HEAD still prints `0 advisories`; a scratch edit to "up to a
-couple dozen turns" prints one advisory naming the file, line, and
-`no numeral in bound phrase`, and exit stays 0.
+**5. Rename verification — the amended goal 2.**
+Files: none (a scratch copy of the tree; no committed change).
+Depends on 2 and 3. This is the goal the repo has failed three times by
+hardcoding, and the round-0 plan tested it nowhere.
+Verify: in a scratch copy, rename `design-investigator` to
+`design-author` — the file, the `name:` field, and every reference the
+validator's checks 11 and 11b would otherwise flag — then run. Section 14
+must reconcile `scope-problem/SKILL.md:18` under the new name (rung 1
+binds the renamed backticked token) and
+`design-review-loop-agent-team-prompt.md:14-16` under it too (rung 2
+resolves "author" against the renamed roster, since the prose noun is
+swept with everything else); no check may report a missing subject for
+`design-investigator`; the advisory count stays 3. Then repeat the
+rename *without* sweeping the prose noun and confirm the sites degrade to
+advisories rather than to failures — a rename half-done must not
+manufacture a contradiction.
 
-**7. Hook test cases and the cost measurement.**
+**6. Hook test cases and the cost measurement.**
 Files: `.claude/hooks/test-validate-definitions.sh`.
-Depends on 3, 5, 6. Add five `run` cases under `=== UPDATE ===`, using
-the existing `run <desc> <exit> <payload> [setup]` contract
+Depends on 2, 3, 4. Add six `run` cases under `=== UPDATE ===`, using the
+existing `run <desc> <exit> <payload> [setup]` contract
 (`test-validate-definitions.sh:32-41`): the "fifty turns" regression
-(exit 2), a `model` drift in a bound claim (exit 2), a round-count
-drift in one class member (exit 2), an unparseable phrasing (exit 0,
-goal 4), and a benign prose edit near a claim (exit 0).
-Verify: the suite reports 29 passed, 0 failed. Separately, time five
-validator runs and compare the median against the 150–159 ms baseline;
-record the delta in the commit message.
+(exit 2), a `model` drift in a rung-1-bound claim (exit 2), a `maxTurns`
+drift caught through the anaphor rung (exit 2), a round-count drift in
+one class member (exit 2), an unparseable phrasing (exit 0, goal 4), and
+a swept rename (exit 0, goal 2 — the case whose absence R1-7 named).
+Verify: the suite reports 30 passed, 0 failed. Separately, time five
+validator runs and compare the median against the 150 ms baseline; record
+the delta in the commit message.
 
-**8. Update `CLAUDE.md`.**
+**7. Update `CLAUDE.md`.**
 Files: `CLAUDE.md`.
-Depends on 7. Change the `231` at `CLAUDE.md:37` to the new total, the
-`24 cases` at `:73` to 29, and extend the validator's one-line
+Depends on 6. Change the `231` at `CLAUDE.md:37` to the new total, the
+`24 cases` at `:73` to 30, and extend the validator's one-line
 description to name the prose-reconciliation checks.
 Verify: `python3 agent-team-workspace/validate-definitions.py` exits 0
 and its printed total equals the number now written at `:37`.
 
-**9. Optional — check the two self-counts.**
+**8. Optional — check the two self-counts.**
 Files: `agent-team-workspace/validate-definitions.py`, `CLAUDE.md`.
-Depends on 8. Compare `CLAUDE.md`'s stated check count against the
-final `checks` value and its stated case count against
-`grep -c '^run '`, appending to `fails` without incrementing `checks`.
+Depends on 7. Compare `CLAUDE.md`'s stated check count against the final
+`checks` value and its stated case count against `grep -c '^run '`,
+appending to `fails` without incrementing `checks`.
 Verify: exit 0; then decrement the number in a scratch copy and confirm
-exit 1. Drop this step if a reviewer judges the added edit-coupling not
-worth it.
+exit 1.
+The cost, which R1-9 named and which decides the step: sections 14 and 15
+call `ck` once per checked claim, so after this step the number at
+`CLAUDE.md:37` must be edited whenever anyone writes or deletes a
+sentence stating a configuration value — an ordinary prose edit now
+breaks the build. Two ways out if that is judged too expensive: drop the
+step and leave the number displayed rather than enforced, or have the two
+new sections contribute a fixed count (one `ck` for "all bound claims
+reconcile", one for "all round claims agree") so the total stops tracking
+corpus size. The second costs the per-claim failure detail in the `FAIL`
+line, which is where goal 1's file/line/claimed/actual lives, so it is
+not free.
 
 ### What would invalidate this plan
 
-- **Step 1's dump is noisier than 20 candidates.** The taxonomy is then
-  wrong, not the implementation. Verified by measurement in step 1.
+- **Step 1's dump is noisier than the measured 20 candidates.** The
+  taxonomy is then wrong, not the implementation. Verified by measurement
+  in step 1.
 - **The measured wall-time delta is large enough to matter.**
   **Unverified** — no measurement taken. Mitigation is sharing check
   5's file reads; if that is not enough, the pass can be gated behind a
@@ -739,10 +923,17 @@ worth it.
   It is silently unchecked, not falsely failed. This is the
   one-directional design the Non-goals chose; the advisory tier only
   catches near-misses of the existing patterns.
-- **Goal 2's stated verification measures the wrong check.** Renaming
-  an agent without sweeping references already fails checks 11 and 11b
-  (`validate-definitions.py:229-258`). The rename test must sweep
-  references, or it reports pre-existing failures as this check's.
+- **Goal 2's stated verification measures the wrong check.** Renaming an
+  agent without sweeping references already fails checks 11 and 11b
+  (`validate-definitions.py:229-258`), so the rename test must sweep
+  references or it reports pre-existing failures as this check's. Step 5
+  sweeps, and also runs the unswept variant to pin down what partial
+  sweeps do.
+- **Rung 2 mis-binds a role noun used as ordinary English.** Measured
+  zero times on today's 8 claims, and structurally bounded (per-file
+  roster, last token only, ambiguity declines) — but it is the assumption
+  most likely to break as prose is added. It fails loudly rather than
+  silently, and step 3 leaves the rung separable.
 
 ## Open questions
 
@@ -750,19 +941,26 @@ worth it.
    lead. This design scopes them out (derivation above), which leaves
    the brief's Problem statement partly unaddressed. Settled by the
    lead saying whether "231 checks" and "24 cases" drifting is a cost
-   worth an edit-coupling; step 9 implements it if so.
+   worth an edit-coupling; step 8 implements it if so, at the cost that
+   step names.
 2. **What is the added wall time?** Owner: implementer. Settled by
-   step 7's measurement — five runs before and after, median compared
-   to the 150–159 ms baseline measured here.
+   step 6's measurement — five runs before and after, median compared to
+   the baseline: 150, 154, 156, 159 ms over four runs here, and 131, 149,
+   156, 160, 152 over five in the round-1 review.
 3. **Does the `effort` level vocabulary need a source beyond the
    tree?** Owner: implementer. Only `max` and `xhigh` are in use, so a
    claim naming a valid-but-unused level falls to the advisory tier.
    Settled by checking the platform's documented `effort` values
    against what `build-agent/SKILL.md:42` says about verifying field
    values — not read for this design.
-4. **Is `validate-skills.py:62`'s `IndexError` (F8) worth fixing here?**
-   Owner: lead. Out of this brief's scope; it will crash the skills
-   validator the first time a ninth skill is added.
+4. **Does rung 2 hold as prose is added?** Owner: implementer, on an
+   ongoing basis. It binds by role noun, so the first sentence that uses
+   a role noun generically *and* states a configuration value will
+   mis-bind and fail. Zero such sentences exist today across all 8 claims
+   (F8), and the per-file roster plus last-token index keeps the
+   vocabulary small — `scope-problem/SKILL.md`'s index is empty. Settled
+   the first time step 6's suite fails on a sentence nobody meant as a
+   claim; the response is to drop rung 2, which costs one site.
 
 ## Brief corrections
 
@@ -784,8 +982,10 @@ worth it.
    ms on unrelated calls; whatever this design adds runs inside that
    budget"** — the ~13 ms is the hook's early-exit path for unrelated
    calls, which this design does not touch. The budget it must fit is
-   the validator's own run, measured here at 150–159 ms; the hook's own
-   comment cites 174 ms (`validate-definitions.sh:45`).
+   the validator's own run, measured here at ~150 ms. The hook's own
+   comment, "worth one 174ms run" (`validate-definitions.sh:45`), is
+   stale by the same measurement — not a brief error, but it will
+   mislead the next reader of that file.
 4. **Goal 2's check, "rename an agent and re-run; the check ... does
    not report the old name as missing"** — an unswept rename already
    fails checks 11 and 11b today, so the check as written will see
@@ -850,7 +1050,8 @@ attribution in the failure message, and a live check for a class whose only
 other member is the protocol.
 
 **R1-7 | accepted.** The amended goal-2 check is now plan step 5 (a swept
-rename executed against a scratch copy) and hook case 6 in step 8.
+rename against a scratch copy, plus the unswept variant to pin down what a
+partial sweep does) and the sixth hook case in step 6.
 
 **R1-8 | accepted.** Re-verified at HEAD `bfc9cec`: `validate-skills.py` is 65
 lines, `OLD2NEW` has 6 entries and no identity entries, and the check F8 cited
@@ -858,27 +1059,43 @@ is gone. F8 and open question 4 are deleted; the system map's line count is
 corrected. F8's slot now carries the role-token binding measurement, which is
 the evidence this round needed.
 
-**R1-9 | accepted.** The coupling is stated where step 9 is proposed and again
+**R1-9 | accepted.** The coupling is stated where step 8 is proposed and again
 in the operational surface: the new sections call `ck` once per checked claim,
-so `CLAUDE.md:37`'s total becomes a function of prose content and step 9 would
-fail on any prose edit that adds or removes a claim. Step 9 stays optional and
-now carries that cost explicitly.
+so `CLAUDE.md:37`'s total becomes a function of prose content and the optional
+self-count step would fail on any prose edit that adds or removes a claim. Step 8 (formerly 9) stays
+optional and now carries that cost explicitly, with two ways out.
 
 ## Sources
 
-All evidence is from the repository at commit `92a0545` (HEAD), with
-the tree state matching `8832723` for every file cited except
-`brief.md`. Commands run:
+Round 0 evidence is from commit `92a0545`. Round 1's revisions were
+re-measured at HEAD `bfc9cec`, after `1525e8a` deleted
+`validate-skills.py`'s content-integrity check; every citation in this
+document has been re-checked against that commit. Commands run:
 
 - `python3 agent-team-workspace/validate-definitions.py` — 231/231, 0
-  advisories, exit 0.
+  advisories, exit 0; prints `33 files scanned`.
 - `python3 agent-team-workspace/validate-skills.py` — 8 skills, 0
-  failures, exit 0.
-- Timing loop over four validator runs — 150, 154, 156, 159 ms.
+  failures, exit 0; `wc -l` → 65.
+- Timing loop over four validator runs — 150, 154, 156, 159 ms. The
+  round-1 review independently measured 131, 149, 156, 160, 152.
 - `git log -S'fifty turns' -- .claude/skills/scope-problem/SKILL.md` —
   introduced `a9471ca`, fixed `ea59d23`.
-- Prototype extractor run against the scan set — 8 configuration
-  triggers, 11 round triggers, 0 spurious.
+- `probe2.py` — the six specified trigger patterns over check 5's
+  33-file scan list: 8 configuration candidates, 0 spurious (F1).
+- `probe4.py` — the full binding ladder over all 8 configuration
+  candidates, under both the whole-token and last-token role index, and
+  under each of the four proximity and positional rules it replaces
+  (F4, F8). This is the run R1-1 and R1-2 asked for.
+- `probe5.py` — the `ROUND` pattern and `_loop_class` over the scan
+  list: 12 candidates, 0 spurious, every one classified (F5).
+- `probe6.py` — the `UNPARSED_*` patterns with the
+  consumed-span suppression rule: 0 advisories on HEAD.
+- Frontmatter dump of all 13 agents, used for every claimed-vs-actual
+  comparison in F4 and F8.
+
+The round-0 prototype (`probe.py`) is superseded; its output is cited
+nowhere in this document except to record the three defects that made it
+disagree with the specified patterns (F1).
 - `ls .claude/agents/*.md | wc -l` → 13; `ls -d .claude/skills/*/ | wc
   -l` → 8; `ls rust/tokio_examples/*.rs | wc -l` → 12;
   `ls rust/basics_examples/*.rs | wc -l` → 12;
