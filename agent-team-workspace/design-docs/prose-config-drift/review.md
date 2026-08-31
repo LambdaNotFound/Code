@@ -84,3 +84,110 @@ One small thing for the record: `.claude/hooks/validate-definitions.sh:45` still
 says "worth one 174ms run", which the same measurement makes stale.
 
 Verdict: revise
+
+## Round 3
+
+**Independent derivation (from brief + amendment + codebase, before reading design.md).**
+Invariants: (a) every in-scope prose claim resolves to a subject drawn from the
+filesystem/frontmatter at runtime — never a name list (brief constraint, three prior
+failures); (b) mismatch ⇒ non-zero exit naming file, line, claimed, actual (goal 1);
+(c) detection must be strictly wider than parsing, because a single regex that fails to
+match is silent and goal 4 forbids silence — so trigger-set minus parsed-set is the
+unparsed report, and open Q2's "warn" default keeps that report from breaking goal 3;
+(d) the corpus today must produce zero new *failures* (goal 3), which the
+`.../design-review-loop-agent-team-prompt.md:14-16` "both run..." anaphor stresses, since
+its subject is not in its own sentence.
+Constraints: Python 3, no new dependency (amendment 2, not stdlib-only); code lands in the
+two existing validators; `ck` must keep returning its condition; new cases in the 24-case
+hook suite; runtime inside the 146 ms full-run budget (amendment 3), not the 16 ms early exit.
+Minimum parts: reuse the existing scan corpus + `agents` frontmatter map; one subject
+resolver (nearest in-scope backticked agent name, with an explicit rule for multi-subject
+anaphora); per-attribute trigger regex + strict parse; digit-and-word number normalizer
+(Q1 default: both, the live defect was "fifty"); round-count claims reconciled against the
+protocol file as sole source (Q3 default); test cases. No new module, no sidecar registry,
+no annotation syntax in the prose, no NLP.
+
+**Diff against the proposal.** Same location, same corpus, same one-directional rule,
+same three-way outcome. The proposal carries two parts my derivation does not: role-token
+binding (rung 2) and the cardinality-checked anaphor (rung 3). Both are forced by the
+brief's must-keep-passing site at `design-review-loop-agent-team-prompt.md:14-16`, whose
+subject is not in its own sentence, and the design kills my simpler "nearest name"
+resolver with a measurement I reproduced in round 1 (F4). Different route, same place —
+no objection from the diff. What I did instead was re-measure the round-2 revision's
+central evidence, since every load-bearing claim in it is a measurement claim.
+
+**Re-measurement (independent reimplementation of the six specified patterns, the
+`ROUND` pattern, `_loop_class`, and the full binding ladder over check 5's 33-file scan
+list).** All of the following reproduced exactly, against HEAD `4df7121`:
+
+- 8 configuration candidates, 0 spurious — the sites F1 lists, with F1's line numbers.
+- 13 round-budget candidates, 0 spurious — the sites and values F5 tabulates, including
+  `design-review-loop-agent-team-prompt.md:108`, whose numeral sits on `:109` across a
+  line wrap. My round-1 count of 12 was the one that was wrong; R1-3 closes with the
+  author correcting the reviewer.
+- F8's binding table, row for row: rung 1 binds `scope-problem/SKILL.md:18` (both
+  claims), rung 2 binds `:14`, rung 3 binds `:15` and `:16`, three decline. 5 checked,
+  0 mis-binds, 3 advisories — the headline's stated baseline.
+- All 13 round claims classify; 3 protocol sources, 10 compared, 0 disagreements.
+- 0 unparsed from stages 1-2, with the consumed-span suppression rule.
+- Goal 1's stated check: on a scratch copy with "twenty turns" reverted to "fifty
+  turns", the ladder yields exactly one mismatch — `scope-problem/SKILL.md:18`,
+  `maxTurns` claimed 50, frontmatter 20, subject `design-investigator`.
+
+### Objections
+
+R3-1 | should-fix | Plan step 5 defines the swept rename as "the file, the `name:` field, and every reference the validator's checks 11 and 11b would otherwise flag", then asserts the outcome "rung 2 resolves 'author' against the renamed roster, since the prose noun is swept with everything else … the advisory count stays 3". Checks 11 and 11b match only backticked kebab tokens (`validate-definitions.py:231`, `:250`), so they never flag the bare English role noun in "The investigator and bar-raiser are expert software engineers…" (`design-review-loop-agent-team-prompt.md:9-10`). Measured on scratch copies both ways: renaming `design-investigator` → `design-author` across every token occurrence leaves `:15` and `:16` declining with `anaphor wants 2, antecedent resolves 1` and binds `:14` to `design-bar-raiser` alone — advisory count 5, not 3. Only when the untracked prose noun is *also* rewritten do all three rebind and reconcile. The mechanism is sound and the loss is reported, not silent, so amended goal 2 is met in substance; the plan's stated expected outcome is wrong on its own definition of the sweep. | Restate step 5's expected result for a token-only sweep (5 advisories, `:14` bound to one subject), and name English role nouns as a rename surface no check in this repo tracks — or widen the definition of "sweep" to include them and say what detects an unswept one.
+R3-2 | should-fix | Step 2's verification gate — "exit 0 on HEAD with exactly 3 advisories, all reason `no agent name or role noun in sentence`, at `build-agent/SKILL.md:47`, `:48` and `design-review-loop-agent-team-prompt.md:19`" — contradicts the design's own body, which says "Rung 1 alone satisfies goal 1's stated check and leaves 6 of the 8 claims unchecked, including the whole `design-review-loop-agent-team-prompt.md` paragraph". Step 2 ships rung 1 plus decline only, and none of `:14`, `:15`, `:16` contains a backticked live agent name in its sentence — that is precisely why they need rungs 2 and 3 — so all three decline at step 2. The correct gate is 6 advisories at step 2, dropping to 3 at step 3. An implementer who trusts the stated gate will read a correct step-2 build as broken, and the cheapest way out is to pull rungs 2-3 forward, collapsing the separability the design's fallback argument rests on. | Restate step 2's gate as 6 advisories with the three extra sites named, and step 3's as the drop from 6 to 3.
+R3-3 | should-fix | "**Every multi-word literal in every pattern uses `\s+`, never a literal space.**" is contradicted by three of the patterns printed in the same document: `_BOUND` (`up to`, `capped at`, `at most`, `a maximum of`, `maximum of`, `limit of`), `TURNS2` (`turn (?:cap|budget|limit)`), and `EFFORT` (`runs? at`). Only `ROUND` and `ECHO` comply. The prose two paragraphs later says the correction "applies to `up to` in `ROUND` and to every phrase in `_BOUND`", but the block a reader copies is the uncorrected one, and this is the exact defect class that hid `design-review-loop-agent-team-prompt.md:108` from two prior measurement rounds. | Print the patterns with `\s+` already applied, or label the block as pre-correction and state which alternatives are corrected where.
+R3-4 | nit | `Claim.line` is documented as "`int` 1-based line in the whole file, frontmatter included", but stage 1 scans `description` as a pseudo-paragraph and the design's own round-count failure message prints `.claude/skills/run-design-loop/SKILL.md:description`. 4 of the 13 round claims and 0 of the 8 configuration claims live in a description, so the field is `int | str` in practice. | Type the field for both cases and state what a description-borne claim reports as its locus.
+
+### Spot-checks
+
+- `validate-definitions.py:112` — check 5 re-opens each file per line | held
+- `validate-definitions.py:231` — check 11's backticked-kebab parse, reused by `_loop_class` | held
+- `validate-definitions.py:283-286` — two-list FAIL/warn summary | held
+- `validate-definitions.py:287` — `sys.exit(1 if fails else 0)`, file is 287 lines | held
+- `validate-definitions.sh:45` "worth one 174ms run" (brief correction 3's stale-figure note) | held
+- `validate-definitions.sh:56-58` — output discarded on exit 0 | held
+- `test-validate-definitions.sh:21-25` — copies only `.claude/`, `agent-team-workspace/`, `CLAUDE.md`, then stubs danglers (F6's basis) | held
+- `grep -c '^run '` = 24 | held
+- `CLAUDE.md:37` states "231 structural…checks"; `:73` states "24 cases" | held
+- `build-agent/SKILL.md:42` — "Verify field names, allowed values, and model capabilities" (open question 3's referent) | held
+- `design-review-loop-agent-team-prompt.md:108-109` — "by\nround 5" wraps; brief cites `:109`, design cites `:108` and says so | held
+- `design-review-loop-agent-team-prompt.md:19` — sentence names no agent and no role token | held
+- `build-agent/SKILL.md` backticks no live agent name; roster empty | held
+- F1's 8 configuration sites and F5's 13 round sites, reimplemented and re-run | held
+- F8's full binding table, all 8 rows | held
+- Headline's "advisory baseline is 3, not 0" | held (measured 3)
+- `231/231 hard checks passed, 0 advisories`, exit 0 at HEAD `4df7121` | held
+- Validator runtime | held (I measured 123/129/129/132/183 ms, median 129, against the design's ~150 and the amendment's 146 — same order, no claim rests on the difference)
+
+No citation failed this round; the sample was not widened.
+
+### Closed
+
+R1-1 resolved · R1-2 resolved · R1-3 resolved (and the author corrected my count: 13
+round claims, not 12) · R1-4 resolved · R1-5 resolved · R1-6 resolved · R1-7 resolved
+(step 5 and hook case 6 exist; their stated outcome is R3-1) · R1-8 resolved · R1-9
+resolved. No regressions.
+
+### Brief corrections
+
+None new. The four in the amendment all reconfirm, and the design records them.
+
+### Residual risks accepted with this approval
+
+1. **Role-noun coverage decays on rename.** Trigger: any agent rename. Symptom: the
+   advisory count rises above the enumerated 3, with reason `anaphor wants k, antecedent
+   resolves n`. Reported, not silent; costs detection, never soundness.
+2. **Plan gates state numbers the implementation will contradict** (R3-1, R3-2).
+   Trigger: running steps 2 and 5 as written. Fix is textual and must land before the
+   PR loop starts.
+3. **The printed patterns under-detect wrapped phrases** (R3-3). Trigger: any future
+   claim phrase that wraps a source line. Fix is textual.
+4. **Countable inventories stay unchecked**, which leaves the brief's Problem statement
+   partly unaddressed. Trigger: the lead answering open question 1 yes; step 8 exists
+   for it, with its edit-coupling cost stated.
+
+Verdict: approve-with-risks
+
