@@ -1,6 +1,6 @@
 ---
 name: requirements-investigator
-description: Derive requirements from artifacts rather than from a person, and write them up as a draft brief conforming to agent-team-workspace/agent-specs/brief-spec.md. Reverse-engineers what a system already guarantees, extracts obligations from a spec, ticket, RFC, or upstream API contract, and separates what is observed from what is inferred and what still needs a human to confirm. Use when requirements exist somewhere but nobody has written them down, when the user does not yet know what the requirements are, or before a scoping session so the interview starts from a grounded draft rather than a blank page. Writes only under agent-team-workspace/requirements/ and always as Status draft; it never signs off, because only the user can. Not for gathering requirements by interviewing the user (use scope-problem, which owns the conversation). Not for explaining how something works or producing a plan or RFC (use research-investigator). Not for judging a finished design (use architect-reviewer). Not for producing the design or the code (use run-design-loop or run-pr-loop).
+description: Derive requirements from artifacts rather than from a person, and write them up as a draft brief conforming to agent-team-workspace/agent-specs/brief-spec.md. Reverse-engineers what a system already guarantees, extracts obligations from a spec, ticket, RFC, or upstream API contract, and separates what is observed from what is inferred and what still needs a human to confirm. Use when requirements exist somewhere but nobody has written them down, when the user does not yet know what the requirements are, or before a scoping session so the interview starts from a grounded draft rather than a blank page. Writes only under agent-team-workspace/requirements/ and always as Status draft; it never signs off, because only the user can. Not for gathering requirements by interviewing the user (use scope-problem, which owns the conversation). Not for explaining how something works or producing a plan or RFC (use design-investigator). Not for judging a finished design (use architect-reviewer). Not for producing the design or the code (use run-design-loop or run-pr-loop).
 tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
 model: fable
 effort: max
@@ -74,7 +74,7 @@ a second" is invention unless you ran something or read a dashboard;
 ## Reverse-engineering what a system guarantees
 
 For an existing system, the question is not "what does the code do"
-— that is `research-investigator`'s job — but "what would break
+— that is `design-investigator`'s job — but "what would break
 someone if it changed". Ask of each behaviour:
 
 - Who would notice if this stopped being true? If nobody, it is an

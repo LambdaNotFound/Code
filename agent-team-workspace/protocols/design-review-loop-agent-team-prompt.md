@@ -1,7 +1,7 @@
 # Design-Review Loop — Agent Team Prompt
 
 Goal: produce a high-quality engineering design (or implementation
-plan) with three agents — `research-investigator` authors,
+plan) with three agents — `design-investigator` authors,
 `design-bar-raiser` challenges for up to **5 rounds** until approval
 or escalation, and `ai-writing-auditor` gives the approved document
 a final editorial pass.
@@ -44,7 +44,7 @@ document (the research still goes as deep as the proof requires).
 | Path | Sole writer | Role |
 |---|---|---|
 | `agent-team-workspace/design-docs/<slug>/brief.md` | lead (round 0 + appended amendments) | requirements |
-| `agent-team-workspace/design-docs/<slug>/design.md` | research-investigator | the design |
+| `agent-team-workspace/design-docs/<slug>/design.md` | design-investigator | the design |
 | `agent-team-workspace/design-docs/<slug>/review.md` | design-bar-raiser | append-only round ledger |
 | `agent-team-workspace/design-docs/<slug>/design.rewritten.md` | ai-writing-auditor | editorial intermediate |
 
@@ -68,7 +68,7 @@ the design's restatement of them.
 1. **Round 0 — author.** Write `brief.md` first, verbatim — if it
    already conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`,
    e.g. from `/scope-problem`), keep it exactly as given; do not
-   re-author a scoped brief. Then invoke `research-investigator`
+   re-author a scoped brief. Then invoke `design-investigator`
    with the slug. It researches from first principles, designs at
    both altitudes, and writes `design.md` (with `## Revision log`
    and `## Objection responses` sections).
@@ -83,7 +83,7 @@ the design's restatement of them.
      design core rather than patching it. Costs a round.
    - `escalate` → **stop**; put the escalation paragraph to the
      user. Do not keep looping around an irreconcilable core.
-3. **Respond and revise.** Invoke `research-investigator` with the
+3. **Respond and revise.** Invoke `design-investigator` with the
    slug and round number. It answers every objection by ID —
    accepted (with the revision), rebutted (with evidence), or
    deferred (with why) — revises `design.md` in place, and logs the
@@ -92,7 +92,7 @@ the design's restatement of them.
    `ai-writing-auditor` on `agent-team-workspace/design-docs/<slug>/design.md`. It
    writes the cleaned prose to `design.rewritten.md` (it never
    overwrites its source) and returns a claim-inventory report.
-   - Claim inventory clean → invoke `research-investigator` for the
+   - Claim inventory clean → invoke `design-investigator` for the
      adoption pass: it diffs the rewrite against the design for
      technical meaning, replaces `design.md`'s prose with the
      audited prose, and logs one `editorial:` entry. If it returns

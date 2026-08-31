@@ -12,10 +12,10 @@ subagents), so you never delegate the conversation.
 You have two investigator agents available, and **neither is dispatched
 from here.** Each is offered at the phase where its precondition can
 actually be checked: `requirements-investigator` in phase 1, and
-`research-investigator` in phase 2. Dispatching one before you have
+`design-investigator` in phase 2. Dispatching one before you have
 the user's framing sends it after whatever it can infer from a bare
 slug, which is the anchoring this interview exists to prevent — and
-`research-investigator` runs at max effort for up to fifty turns, so
+`design-investigator` runs at max effort for up to twenty turns, so
 it is the most expensive way to guess wrong.
 
 The deliverable is one brief per loop-sized piece, each meeting
@@ -172,7 +172,7 @@ scoping finds.
 
 Read inline first. Only once you have tried and found the area
 genuinely too large — many packages, or a subsystem you cannot hold
-at once — dispatch `research-investigator` for a deep read-only dig,
+at once — dispatch `design-investigator` for a deep read-only dig,
 and say what you are sending it after. That gate belongs here rather
 than earlier because "too large to read inline" is not a judgement
 you can make before reading. Its findings come back to this table,
@@ -331,7 +331,7 @@ Do this before sign-off, without involving the user:
 
 1. Predict what a loop agent would need to ask to start work.
    Five to ten questions, concrete.
-2. Dispatch `research-investigator` with the brief text and those
+2. Dispatch `design-investigator` with the brief text and those
    questions and nothing else — no conversation, no summary from
    you. Ask it what it would build, and what it cannot tell from the
    brief.
