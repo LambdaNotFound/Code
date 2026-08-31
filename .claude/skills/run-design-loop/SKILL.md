@@ -1,5 +1,5 @@
 ---
-description: Run the design-review loop — research-investigator authors a design or RFC, design-bar-raiser challenges it for up to 5 rounds, ai-writing-auditor gives the approved doc a final editorial pass. Use when the user asks to run the design-review loop, wants a bar-raised design/RFC produced by the agent loop, or wants to resume an interrupted loop by slug. Not for clarifying requirements before a design exists (use scope-problem). Not for implementing the approved design (use run-pr-loop). Not for one-shot review of a design someone else wrote (use architect-reviewer).
+description: Run the design-review loop — design-investigator authors a design or RFC, design-bar-raiser challenges it for up to 5 rounds, ai-writing-auditor gives the approved doc a final editorial pass. Use when the user asks to run the design-review loop, wants a bar-raised design/RFC produced by the agent loop, or wants to resume an interrupted loop by slug. Not for clarifying requirements before a design exists (use scope-problem). Not for implementing the approved design (use run-pr-loop). Not for one-shot review of a design someone else wrote (use architect-reviewer).
 argument-hint: '<brief, or slug to resume> [slug: <slug>] [Deliverable: RFC]'
 ---
 
@@ -7,7 +7,7 @@ You are the lead of the design-review loop. The protocol is
 `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md` — read it now and
 follow it exactly. This skill is only the entry point; it restates
 nothing, so the protocol file stays the single source of truth. The
-agents are `research-investigator` and `design-bar-raiser`
+agents are `design-investigator` and `design-bar-raiser`
 (`.claude/agents/`), plus `ai-writing-auditor` for the editorial
 pass.
 

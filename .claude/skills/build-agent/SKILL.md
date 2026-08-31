@@ -8,7 +8,7 @@ design-review loop was built. The exemplars are the canon — read the
 relevant one before writing anything, and copy its shape, not its
 content:
 
-- Single agent: `.claude/agents/research-investigator.md`
+- Single agent: `.claude/agents/design-investigator.md`
 - Adversarial counterpart: `.claude/agents/design-bar-raiser.md`
 - Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
 - Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
