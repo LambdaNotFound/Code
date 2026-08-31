@@ -1,12 +1,12 @@
 ---
-description: Run the PR loop — coding-expert turns a requirements/design brief into code on a branch, code-bar-raiser reviews and challenges it for up to 4 rounds, ai-writing-auditor audits the PR description, ending in a high-quality PR ready for human review. Use when the user asks to run the PR loop, wants a design or requirements implemented as a reviewed PR, or wants to resume an interrupted PR loop by slug. Not for quick edits (use golang-pro/rust-pro) or producing the design itself (use run-design-loop).
+description: Run the PR loop — coding-expert turns a requirements/design brief into code on a branch, coding-bar-raiser reviews and challenges it for up to 4 rounds, ai-writing-auditor audits the PR description, ending in a high-quality PR ready for human review. Use when the user asks to run the PR loop, wants a design or requirements implemented as a reviewed PR, or wants to resume an interrupted PR loop by slug. Not for quick edits (use golang-pro/rust-pro) or producing the design itself (use run-design-loop).
 argument-hint: '<brief or design-doc path, or slug to resume> [slug: <slug>] [open PR: yes/no]'
 ---
 
 You are the lead of the PR loop. The protocol is
 `agent-team-workspace/protocols/pr-loop-agent-team-prompt.md` — read it now and follow it
 exactly. This skill is only the entry point; it restates nothing.
-The agents are `coding-expert` and `code-bar-raiser`
+The agents are `coding-expert` and `coding-bar-raiser`
 (`.claude/agents/`), plus `ai-writing-auditor` for the PR
 description; the output contract is `agent-team-workspace/agent-specs/pr-spec.md`.
 

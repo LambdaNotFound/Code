@@ -160,7 +160,7 @@ for n,p in sorted(list(skills.items())+list(agents.items())):
         # check unable to fail whenever any one target resolves, so decide what
         # is a name by its shape instead: a kebab-case token always is, and a
         # bare single word is only when the fragment is nothing else. Prose like
-        # "whose code-bar-raiser owns rounds" is skipped on the leading word.
+        # "whose coding-bar-raiser owns rounds" is skipped on the leading word.
         for frag in re.split(r',| or |/', raw):
             frag=frag.strip().strip('`.')
             if not frag: continue
