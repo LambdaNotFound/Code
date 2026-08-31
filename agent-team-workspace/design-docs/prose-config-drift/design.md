@@ -18,7 +18,12 @@ default with a classless disposition (R1-5, R1-6). Headline corpus
 restated from the specified patterns rather than the prototype (R1-3).
 Rename verification added to the plan and the hook suite (R1-7). F8 and
 open question 4 dropped and citations re-verified at HEAD (R1-8).
-Self-count coupling stated (R1-9).
+Self-count coupling stated (R1-9). Independently of the objections,
+re-measuring the round corpus found a 13th claim
+(`design-review-loop-agent-team-prompt.md:108`, cited in the brief as
+`:109`) that literal spaces in two patterns had hidden; every count in
+the document moved from 12 to 13, and every multi-word literal now uses
+`\s+`.
 
 ## The question
 
@@ -33,11 +38,12 @@ specifies the check that enforces it.
 
 ## Answer up front
 
-**Three new checks in `validate-definitions.py` meet all four goals for
-the 5 of 8 configuration claims whose subject binds; the other 3 are
-reported, not checked.** The claim corpus measured by the patterns this
+**Two new numbered sections in `validate-definitions.py` meet all four
+goals for the 5 of 8 configuration claims whose subject binds and for all
+13 round-budget claims; the other 3 configuration claims are reported,
+not checked.** The claim corpus measured by the patterns this
 document specifies — not by the round-0 prototype, which was defective in
-three ways (F1) — is 8 configuration claims and 12 round-budget claims
+three ways (F1) — is 8 configuration claims and 13 round-budget claims
 across the 33 files check 5 already scans, with no spurious hits
 (`probe2.py`/`probe5.py`, run against HEAD `bfc9cec`; F1, F4, F5). That
 smallness is what makes the design safe.
@@ -103,14 +109,14 @@ Two validators, one hook, one test suite, one claim corpus.
 
 ## Findings
 
-**F1 — The claim corpus is 20 claims in 19 sentences, and a
+**F1 — The claim corpus is 21 claims in 20 sentences, and a
 noun-anchored trigger finds exactly them.** (`scope-problem/SKILL.md:18`
 states `effort` and `maxTurns` in one sentence.) The six patterns specified below, run over check 5's
-33-file scan list, fire on 8 configuration claims and 12 round-budget
+33-file scan list, fire on 8 configuration claims and 13 round-budget
 claims and on nothing else. The 8: `build-agent/SKILL.md:47` and `:48`
 (`` `model: fable` ``, `` `effort: max` ``), `scope-problem/SKILL.md:18`
 (two claims — `effort=max` and `maxTurns=twenty` in one sentence),
-`design-review-loop-agent-team-prompt.md:14`, `:15`, `:16`, `:19`. The 12
+`design-review-loop-agent-team-prompt.md:14`, `:15`, `:16`, `:19`. The 13
 round claims are listed in F5. **observed**
 
 The round-0 prototype reported 19 across 30 files, and all three
@@ -118,8 +124,10 @@ discrepancies were prototype defects, not corpus facts: it scanned line by
 line and missed the claim wrapping
 `pr-loop-agent-team-prompt.md:5-6` (F3); it added `+ 1` to the
 frontmatter offset and reported `scope-problem/SKILL.md:19` for a line-18
-claim; and it dropped a capture group so two round claims extracted
-`None`. The scan list is 33 files — the validator itself prints
+claim; it dropped a capture group so two round claims extracted `None`;
+and it wrote two multi-word literals with literal spaces, which
+under-detected `design-review-loop-agent-team-prompt.md:108` across a
+line wrap (see Trigger patterns). The scan list is 33 files — the validator itself prints
 `33 files scanned` (`validate-definitions.py:119`). Every number in this
 document is now from a run of the specified patterns. **observed**
 
@@ -165,15 +173,15 @@ at `effort: max`" (`:9-14`). What the rules can read is that
 member each of this file's own backticked roster. That is the rule F8
 measures. **observed**
 
-**F5 — All 12 round claims resolve to exactly one protocol, with no
-hardcoded names, and all 12 agree.** Every claim-bearing file maps to one
+**F5 — All 13 round claims resolve to exactly one protocol, with no
+hardcoded names, and all 13 agree.** Every claim-bearing file maps to one
 protocol via backticked-roster membership (the parse check 11 already
 does, `validate-definitions.py:229-234`) or via citing that protocol's
 path. Measured: **observed**
 
 | file | claims | class |
 |---|---|---|
-| `design-review-loop-agent-team-prompt.md:5` | 5 | itself (source) |
+| `design-review-loop-agent-team-prompt.md:5`, `:108` | 5, 5 | itself (source) |
 | `pr-loop-agent-team-prompt.md:5` | 4 | itself (source) |
 | `design-bar-raiser.md` description, `:160`, `:181`, `:220` | five, five, 5, 5 | design |
 | `design-investigator.md:218` | five | design |
@@ -627,18 +635,32 @@ The rule, given a claim in file *f* with class *P*:
   match neither, so all three are classless — they simply carry no round
   claim today (F5), which is why nothing is reported now.
 
-Measured on today's tree (F5): all 12 round claims classify, 2 are
-protocol sources, the other 10 compare and agree — 5 for the design
-loop, 4 for the PR loop.
+Measured on today's tree (F5): all 13 round claims classify, 3 are
+protocol sources, the other 10 compare and agree — 5 for the design loop,
+4 for the PR loop. The design protocol carries two of its own claims
+(`:5` and `:108`, both 5), which is the self-consistency case above
+exercised live and passing.
 
 Trigger, measured against the round-noise this repo contains:
 
 ```python
-ROUND = re.compile(rf'(?:up to|by|of)\s+\**({_NUM})\**\s*\**rounds?\b'
-                   rf'|\b({_NUM})\s+rounds? is the budget'
-                   rf'|\bN of (\d+)\b'
-                   rf'|\bby round\s+\**({_NUM})', re.I)
+ROUND = re.compile(rf'(?:up\s+to|by|of)\s+\**({_NUM})\**\s*\**rounds?\b'
+                   rf'|\b({_NUM})\s+rounds?\s+is\s+the\s+budget'
+                   rf'|\bN\s+of\s+(\d+)\b'
+                   rf'|\bby\s+round\s+\**({_NUM})', re.I)
 ```
+
+**Every multi-word literal in every pattern uses `\s+`, never a literal
+space.** This is not style. Stage 1 joins a paragraph's lines but does not
+collapse the source's indentation, so a phrase that wraps across lines
+arrives as `by    round 5` with a run of spaces. The round-1 draft wrote
+`\bby round\s+` with a literal space and under-detected
+`design-review-loop-agent-team-prompt.md:108` — a claim the brief's own
+Context cites (as `:109`, the line the numeral sits on). The same
+correction applies to `up to` in `ROUND` and to every phrase in `_BOUND`,
+which no live claim exercises today only because none of them wraps. The
+alternative — collapsing whitespace runs in stage 1 — is rejected because
+it destroys the offset-to-line arithmetic the `Claim` record depends on.
 
 The second alternative carries a capture group the prototype omitted,
 which is why `coding-bar-raiser.md:127` and `design-bar-raiser.md:160`
@@ -713,7 +735,7 @@ triggering is O(*L*) with a fixed number of compiled patterns; roster and
 role-index construction is one O(*L*) regex pass per file plus O(*R*);
 binding is O(sentence length × *R*) and looks back at most one sentence,
 so no rung scans a section or a paragraph; reconciliation is O(claims),
-each a dict lookup — 20 claims today. Space is O(*L*) for the paragraph
+each a dict lookup — 21 claims today. Space is O(*L*) for the paragraph
 list, dropped per file.
 
 Files are read once into memory and shared with check 5, which
@@ -744,9 +766,12 @@ allow leaves almost nothing:
   validates, so its correctness depends on being evaluated last. A
   non-self-referential form exists — compare after all checks have run,
   appending to `fails` without incrementing `checks` — and the plan
-  carries it as an optional final step so a reviewer can take it or
-  leave it. The argument against is that the true number is printed on
-  every run, to the same person the hook has just forced a run on.
+  carries it as an optional final step (step 8) so a reviewer can take it
+  or leave it. Two arguments against: the true number is printed on every
+  run, to the same person the hook has just forced a run on; and this
+  design makes the number track prose, because sections 14 and 15 call
+  `ck` once per checked claim, so enforcing it turns an ordinary prose
+  edit into a build break (R1-9).
 
 **`agent-team-workspace/design-docs/**` and `research/**`.** Frozen
 artifacts, and including them would make this document a claim source
@@ -800,22 +825,26 @@ must be true; no claim need exist.
 
 ## Plan
 
-Ordered by risk. Step 1 is the spike: if the trigger set is noisier in
-practice than the prototype measured, the taxonomy is wrong and steps
-2–8 do not survive.
+Eight steps, ordered by risk. Step 1 is the spike: if the trigger set is
+noisier in the validator than it was in `probe2.py`, the taxonomy is
+wrong and steps 2-8 do not survive. Step 2 delivers goal 1's stated check
+on its own; steps 3 and 4 add reach; step 5 is goal 2's amended check;
+step 8 is optional and carries a cost the reviewer should weigh.
 
 **1. Spike — extraction only, no reconciliation.**
 Files: `agent-team-workspace/validate-definitions.py`.
 Add stages 1 and 2 plus a temporary dump of every candidate with its
 file, line, field, and value. Depends on nothing.
 Verify: the dump lists exactly the 8 configuration claims of F1 and the
-12 round claims of F5, and nothing else. Line numbers match:
+13 round claims of F5, and nothing else. Line numbers match:
 `scope-problem/SKILL.md:18`, `build-agent/SKILL.md:47` and `:48`,
 `design-review-loop-agent-team-prompt.md:14`, `:15`, `:16`, `:19` — the
 first three are in files with frontmatter and are where an off-by-one in
 the body offset shows up. `pr-loop-agent-team-prompt.md:5` must appear,
-which is what proves paragraph joining works (F3). Any extra candidate
-stops the plan.
+which is what proves paragraph joining works (F3), and
+`design-review-loop-agent-team-prompt.md:108` must appear, which is what
+proves the `\s+` rule was applied to every multi-word literal. Any extra
+candidate stops the plan.
 
 **2. Rung 1, decline, reconciliation and the advisory tier — section 14.**
 Files: `agent-team-workspace/validate-definitions.py`.
@@ -845,8 +874,10 @@ in a way this document has not measured.
 **4. Round counts against the protocol — section 15.**
 Files: `agent-team-workspace/validate-definitions.py`.
 Depends on 1 (not on 2-3; it uses its own subject rule).
-Verify: exit 0 on HEAD, all 12 claims classified as F5 tabulates, 2
+Verify: exit 0 on HEAD, all 13 claims classified as F5 tabulates, 3
 recorded as sources and 10 compared. A scratch edit of
+`design-review-loop-agent-team-prompt.md:108` from 5 to 6 fails the
+protocol against itself. A scratch edit of
 `run-pr-loop/SKILL.md`'s description from 4 to 5 fails, naming that file
 and `pr-loop-agent-team-prompt.md:5` as the source; the design class is
 unaffected. A scratch edit of `pr-loop-agent-team-prompt.md:5` from 4 to
@@ -913,7 +944,7 @@ not free.
 
 ### What would invalidate this plan
 
-- **Step 1's dump is noisier than the measured 20 candidates.** The
+- **Step 1's dump is noisier than the measured 21 candidates.** The
   taxonomy is then wrong, not the implementation. Verified by measurement
   in step 1.
 - **The measured wall-time delta is large enough to matter.**
@@ -1029,8 +1060,14 @@ exactly one of its members. Measured: it binds 5 of the 8 configuration claims,
 all correctly, and declines on the other 3.
 
 **R1-3 | accepted.** The headline now states the corpus measured by the
-specified patterns — 8 configuration claims and 12 round-budget claims across
-33 files — and cites the run that produced it. The prototype's three defects
+specified patterns — 8 configuration claims and 13 round-budget claims across
+33 files — and cites the run that produced it. Re-running the specified
+`ROUND` pattern to check the reviewer's count of 12 turned up a 13th claim
+that both the prototype and the round-1 reimplementation missed: two
+multi-word literals were written with literal spaces, and
+`design-review-loop-agent-team-prompt.md:108` wraps across lines with
+indentation between the words. The pattern and the whitespace rule behind
+it are now stated in Trigger patterns. The prototype's three defects
 are why the old number was wrong; F1 now reports the specified patterns' output
 and keeps the prototype only as the thing whose defects the specification
 fixes.
@@ -1094,8 +1131,11 @@ document has been re-checked against that commit. Commands run:
   candidates, under both the whole-token and last-token role index, and
   under each of the four proximity and positional rules it replaces
   (F4, F8). This is the run R1-1 and R1-2 asked for.
-- `probe5.py` — the `ROUND` pattern and `_loop_class` over the scan
-  list: 12 candidates, 0 spurious, every one classified (F5).
+- `probe5.py` / `probe7.py` — the `ROUND` pattern and `_loop_class` over
+  the scan list: 13 candidates, 0 spurious, every one classified (F5).
+  `probe7.py` is `probe5.py` with the multi-word literals rewritten to
+  `\s+`, which is how the 13th claim
+  (`design-review-loop-agent-team-prompt.md:108`) was found.
 - `probe6.py` — the `UNPARSED_*` patterns with the
   consumed-span suppression rule: 0 advisories on HEAD.
 - Frontmatter dump of all 13 agents, used for every claimed-vs-actual
