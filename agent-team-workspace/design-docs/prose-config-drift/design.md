@@ -258,9 +258,12 @@ cross-file checks to `validate-definitions.py`.
 The hook needs no change. It already runs the definition validator on
 edits to agents, skills, `CLAUDE.md`, and the validator itself
 (`validate-definitions.sh:38`, `:48`) — which is precisely the set of
-files that can introduce or invalidate a claim. The ~13 ms
-early-exit path for unrelated calls is untouched, because this design
-adds nothing to the shell script.
+files that can introduce or invalidate a claim. The early-exit path for
+unrelated calls is untouched, because this design adds nothing to the
+shell script — so the brief's "~13 ms on unrelated calls" (the
+amendment's measured 16 ms) is not the budget this design spends
+against. The budget is the validator's own ~150 ms run, which is what
+step 6 measures.
 
 ### The pipeline
 
@@ -917,8 +920,13 @@ not free.
   **Unverified** — no measurement taken. Mitigation is sharing check
   5's file reads; if that is not enough, the pass can be gated behind a
   cheap substring pre-filter.
-- **Rung 4's recency binding is judged too clever.** The design
-  survives without it at the cost of one site (step 4 is separable).
+- **Rungs 2 and 3 are judged too clever.** They are the design's only
+  heuristics and the only place it reads English rather than structure.
+  The design survives without them: dropping rung 3 costs
+  `design-review-loop-agent-team-prompt.md:15-16`, dropping both costs
+  `:14` as well, and in each case those claims become advisories rather
+  than errors. Step 3 is separable for exactly this reason, and goal 1's
+  stated check is met by step 2 alone.
 - **A future claim shape appears that none of the six patterns match.**
   It is silently unchecked, not falsely failed. This is the
   one-directional design the Non-goals chose; the advisory tier only
