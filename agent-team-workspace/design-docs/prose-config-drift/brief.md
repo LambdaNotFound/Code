@@ -124,3 +124,50 @@ the numbers are what make the guidance actionable.
   `:241` (`CM`, the CLAUDE.md text used by cross-file checks).
 - The 13 agents' frontmatter is the source of truth for goal 1:
   `.claude/agents/*.md`.
+
+## Amendment 2026-08-31
+
+Four statements in the standing brief are false against the codebase.
+`design-investigator` reported them at the end of round 0; the lead
+verified each independently before recording it here. These are factual
+corrections, not requirements changes — the standing text above is not
+rewritten, and this section wins on conflict.
+
+1. **`CLAUDE.md` states neither "13 agents" nor "8 skills".** Goal 3
+   named eight countable claims there. Grep for either figure, in digit
+   or word form, adjacent to `agent` or `skill`, returns nothing. The
+   file's countable claims are 231 checks (`:37`), 24 hook cases
+   (`:73`), 165 problems (`:82`), 24 / 12 / 12 Rust examples (`:95`),
+   and 23 GoF patterns (`:65`). Every one is correct as stated. The
+   figures 13 and 8 are real but come from `ls`, not from the document;
+   the brief attributed a measurement to a text that does not contain
+   it.
+
+2. **Neither validator is standard-library only.** Both
+   `import yaml` — PyYAML, resolved at
+   `/usr/lib/python3/dist-packages/yaml/`. The operative constraint is
+   *no new dependency*, not *stdlib only*.
+
+3. **The ~13 ms figure was transplanted out of its context.** It
+   describes the hook's early-exit path, which a new check never
+   reaches. Measured on this tree: early exit **16 ms**, full
+   `validate-definitions.py` run **146 ms** (mean of four). The budget a
+   new check must fit inside is the 146 ms, not the 16. The brief moved
+   a number that was correct where it was written into a context where
+   it is wrong by an order of magnitude.
+
+4. **Goal 2's check does not test what it claims.**
+   `validate-definitions.py:229-236` already fails on an unswept
+   rename, so "rename an agent and re-run" exercises pre-existing
+   checks. Replacement check for goal 2: rename an agent, sweep every
+   reference, and confirm the new reconciliation check still reconciles
+   that agent's claims under its new name and reports no missing
+   subject for the old one.
+
+**One change to the tree since round 0.** The defect
+`design-investigator` reported outside the brief's scope — an
+`IndexError` in `validate-skills.py` — has been fixed by deleting the
+dead content-integrity check it sat in. `validate-skills.py:62` no
+longer exists, so `design.md`'s citation of it no longer resolves.
+`OLD2NEW` lost its two identity entries and the file lost its `git`
+column in the same commit.
