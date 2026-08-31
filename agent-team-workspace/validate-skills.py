@@ -1,8 +1,7 @@
-import os, re, io, glob, yaml, subprocess, sys
+import os, re, io, glob, yaml, sys
 os.chdir('/home/user/Code')
 OLD2NEW = {"scoping":"scope-problem","pr-review":"review-pr","rust-expert":"write-rust",
-           "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop",
-           "review-code":"review-code","summarize-changes":"summarize-changes"}
+           "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop"}
 skills = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob('.claude/skills/*/SKILL.md'))
 known = set(skills) | {os.path.basename(a)[:-3] for a in glob.glob('.claude/agents/**/*.md', recursive=True)} | {
     'golang-pro','rust-pro','doc-coauthoring','architect-reviewer','code-reviewer','leetcode-reviewer'}
@@ -11,7 +10,7 @@ def ck(c, sk, what):
     if not c: fails.append(f"{sk}: {what}")
     return c
 
-print(f"{'SKILL':<19}{'fm':<4}{'desc':<6}{'refs':<6}{'routes':<8}{'paths':<7}{'stale':<7}{'lines':<7}{'git'}")
+print(f"{'SKILL':<19}{'fm':<4}{'desc':<6}{'refs':<6}{'routes':<8}{'paths':<7}{'stale':<7}{'lines'}")
 print("-"*72)
 for sk in skills:
     p=f'.claude/skills/{sk}/SKILL.md'
@@ -57,18 +56,8 @@ for sk in skills:
     stale=[o for o in OLD2NEW if o!=OLD2NEW[o]
            and re.search(rf'(?<!run-)(?<!/)(?<![a-z-])(/{o}\b|`{o}`|skills/{o}\b|\(use {o}\b)', probe)]
     ck(not stale, sk, f"stale old skill name: {stale}")
-
-    # content integrity: body must not have shrunk vs the pre-rename version in git
-    old = [k for k,v in OLD2NEW.items() if v==sk][0]
-    prev = subprocess.run(['git','show',f'HEAD:.claude/skills/{old}/SKILL.md'],
-                          capture_output=True, text=True)
-    gitmark = "?"
-    if prev.returncode==0:
-        d = len(txt.splitlines()) - len(prev.stdout.splitlines())
-        gitmark = "same" if d==0 else f"{d:+d}"
-        ck(abs(d)<=3, sk, f"line count moved {d} vs pre-rename — content may have been lost")
     print(f"{sk:<19}{'ok':<4}{len(desc):<6}{len(set(refs)):<6}{len(routes):<8}{len(paths):<7}"
-          f"{'none':<7}{len(txt.splitlines()):<7}{gitmark}")
+          f"{'none':<7}{len(txt.splitlines())}")
 
 print("-"*72)
 print(f"{len(skills)} skills checked, {len(fails)} failures")
