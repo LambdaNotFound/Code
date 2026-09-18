@@ -95,10 +95,10 @@ the ledger pasted unchanged, and the list of what this skill did not
 look at. Every claim tagged; scenario probabilities and the
 recommendation are `[FRAME]` and never above LOW confidence.
 
-The recommendation is the script's stance, not your own. Report its
-label, score, the rows for and against, and the plan (entry, stop,
-target, reward-to-risk) exactly as printed, then add the one or two
-conditions that would flip it (the nearest level on each side). Do
+The recommendation is the script's stance, not your own. Paste its
+Stance table exactly as printed (label, score, entry, stop, target,
+reward-to-risk, rows for and against, the two closes that flip it)
+and add the template's last two rows. Do
 not override the label because the narrative feels different; if the
 ledger and the story disagree, say that in the verdict, which is
 where judgment lives. Close with the `[RULES I BROKE]` line.
