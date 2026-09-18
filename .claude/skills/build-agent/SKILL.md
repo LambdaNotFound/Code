@@ -1,5 +1,5 @@
 ---
-description: Create new subagents and design multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter, minimal tool grants, file-based loop state with single writers, checkpoint/resume, convergence discipline, and a first-principles hardening review before shipping. Use when the user wants to create an agent, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the design-review loop itself (use run-design-loop).
+description: Create new subagents, repo skills, and multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter and verified runtime, minimal tool grants, mechanical work in scripts rather than prose, file-based loop state with single writers, checkpoint/resume, convergence discipline, a first-principles hardening review, and one live run before shipping. Use when the user wants to create an agent or a skill, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the design-review loop itself (use run-design-loop).
 argument-hint: <what the agent or team should do> [name(s)] [loop?]
 ---
 
@@ -13,6 +13,10 @@ content:
 - Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
 - Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
 - Entry-point skill: `.claude/skills/run-design-loop/SKILL.md`
+- Skill backed by a script: `.claude/skills/draw-diagram/SKILL.md` —
+  the model keeps the judgement,
+  `.claude/skills/draw-diagram/scripts/build_excalidraw.py` owns
+  every number
 
 ## Step 0 — Survey before writing
 
@@ -24,6 +28,16 @@ agent per round and adds failure modes a single session does not
 have. Recommend one agent when the work is sequential, touches the
 same files, or fits one context. The cheapest correct design is
 often one agent — say so when it is true.
+
+When the user points at an external reference — a skill or agent from
+another repo — review it before copying anything. Say what to keep
+(its method: what it decides, in what order) and what to drop (its
+mechanism and its dependencies), and say which is which. A
+reference's structural choices are not requirements. Precedent: the
+Excalidraw reference behind `draw-diagram` forbade a generator
+script and hand-typed every coordinate; this repo's version keeps
+its design method and moves every number into a compiler, because
+hand arithmetic is where this repo's own agents slip.
 
 ## Step 1 — Define the role by its negative space
 
@@ -55,6 +69,12 @@ Fields to decide: `name`, `description`, `tools`, `model`,
 - Match capability to stakes: highest model and effort for
   judgment-heavy daily-use roles; cheaper settings for mechanical
   ones.
+- The same rule covers anything the agent or its scripts talk to: a
+  file format, a protocol, a CLI. Read the implementation, not your
+  memory of it — `draw-diagram`'s font ids, roundness types, and
+  load-time behaviour came from grepping the Excalidraw package
+  pulled from npm — and label what you could not find as inferred,
+  with what it affects if wrong.
 
 ## Step 3 — The body every hardened agent carries
 
@@ -71,6 +91,41 @@ line:
    numbered contract, no preamble. Anything that must survive
    longer than the caller's context goes in a file, not the
    message.
+
+## Step 3b — Prose or program
+
+Before writing an instruction, ask whether a script could do the
+work. Arithmetic, geometry, id bookkeeping, file formats, and any
+checklist item that can be computed go in `scripts/`, and the
+SKILL.md tells the model to run it. The model keeps the judgement
+(what to draw, what to say, what the reader must see) and gives up
+the bookkeeping (where, how wide, which id binds to which). The
+reference behind `draw-diagram` needed a three-phase workflow to get
+a few hundred hand-typed coordinates past the output limit, and a
+27-item checklist to catch what came out wrong; a compiler made most
+of that checklist mechanical and the workflow one command.
+
+Rules for a script:
+
+- Stdlib only unless the repo already depends on the package, so
+  the first run needs nothing installed.
+- Probe the machine before designing around it — which binaries,
+  which network hosts — and fail soft with a message naming what is
+  missing. The reference fetched Excalidraw from a CDN on every
+  render; that host is blocked by this session's egress policy, so
+  its mandatory validation step could not run here at all.
+- Measure environment quirks, never hardcode them. Chromium's new
+  headless mode returned a PNG shorter than the canvas; the fix
+  reads the PNG header and reshoots with the difference, not a
+  magic 86 px that the next Chromium changes.
+- Same input, same bytes. Seed anything random from stable ids so
+  a rebuild diffs cleanly.
+- Tests beside it (`test_<name>.py`, stdlib `unittest`), including
+  one that executes every example in the skill's references. That
+  test found a defect in
+  `.claude/skills/draw-diagram/references/visual-patterns.md`
+  minutes after it was written: a label overlapping the box it
+  pointed at, in a doc that claimed every snippet built clean.
 
 ## Step 4 — Team loops, when warranted
 
@@ -108,6 +163,15 @@ line:
   doc (restating nothing), handles naming and resume detection,
   freezes the input brief before round 0, and commits the state
   directory per round.
+- **The brief is evidence, not truth.** Give the author a first step
+  that verifies the brief's factual claims against the codebase and
+  returns corrections; the lead appends them as a dated amendment.
+  In this repo's first live design-loop run the lead's brief carried
+  four false statements in a page of text — a document quoted for
+  numbers it did not contain, a "standard library only" claim beside
+  an `import yaml`, a timing figure for the wrong code path, and a
+  goal whose check already existed — all caught by the investigator,
+  none by the lead who wrote it.
 
 ## Step 5 — Deploy
 
@@ -121,8 +185,17 @@ line:
   branch — a branch cannot silently diverge, because that is what
   branches are for. The same holds for skills at
   `.claude/skills/<name>/SKILL.md`.
+- **Build order.** Write `SKILL.md` before anything else in a new
+  skill directory. The PostToolUse hook validates after every write
+  under `.claude/`, and a directory without its `SKILL.md` fails
+  that validation on every subsequent write until it exists. Use
+  the Write tool for large files there: on failure the hook echoes
+  a Bash command's full text back, heredoc included.
 - Register: the entry-point skill for loops, and CLAUDE.md's
-  skills/agents lists so fresh sessions can discover it.
+  skills/agents lists so fresh sessions can discover it. Names,
+  never counts: CLAUDE.md said the validator ran "231 checks" and
+  was wrong the moment the next skill landed. A number a program
+  computes does not belong in prose; the program prints it.
 - Commit and push per the session's git conventions.
 
 ## Step 6 — Harden before shipping
@@ -153,7 +226,17 @@ component-only review will not find the last two kinds.
    without it there is no append mechanism, only discipline.
 7. **Turn budget** — what happens at `maxTurns`? A hard cutoff
    mid-work must degrade to saved work and a partial report, and
-   the return contract needs a slot to say so.
+   the return contract needs a slot to say so. The mechanism is
+   write-early: the agent writes its file first and refines it in
+   place, so a cutoff leaves a partial file rather than nothing.
+   Round 1 of this repo's first live design-loop run hit the cap
+   with its work only in the unsent final message and lost the
+   round; with write-early in the prompt, every later truncation
+   kept its work. Put the rule in the agent definition, not the
+   invoking prompt — as of this writing it lives only in the lead's
+   prompts. And a turn is a model response, not a tool call: 24
+   tool calls fit under a 20-turn cap once and 21 did not, so size
+   the cap with margin rather than by counting calls.
 8. **Correlated blind spots** — same model on both sides of an
    adversarial pair is procedural, not epistemic, independence;
    acknowledge it and keep the human escape hatch. Check the
@@ -182,14 +265,57 @@ component-only review will not find the last two kinds.
     resets is acting on everyone; name one owner and forbid the
     rest.
 
-Both passes are judgement. What is mechanical, run instead:
+**Pass C — run it once, for real.**
+
+14. **A live run on the smallest real input.** Passes A and B and
+    the validator were all green before this repo's first live
+    design-loop run. The run found six defects none of them could
+    see: a turn cap changed in frontmatter and not in the skill
+    prose that described it; a check that verified 0 of 8 skills
+    while printing `0 failures`; four false statements in the
+    lead's brief; a round claim hidden by literal spaces where text
+    wraps; English role nouns as a rename surface no check tracked;
+    and an arithmetic slip that survived two review rounds
+    (`agent-team-workspace/design-docs/prose-config-drift/design.md`
+    line 648 splits 10 claims as 5 and 4). Static review reads what
+    a definition says; only a run shows what it does.
+15. **Look at the artifact, not the exit code.** `draw-diagram`'s
+    first PNG was written, non-empty, and clipped at the bottom;
+    the tool exited 0. Only opening the image showed it. Whatever
+    the component produces — a file, a ledger, a render — open it.
+
+All three passes are judgement. What is mechanical, run instead:
 `python3 agent-team-workspace/validate-definitions.py` checks
 frontmatter parses, agent names are unique (duplicates load by
 filesystem read order, not precedence), hook targets resolve and are
 executable, no repo path dangles, every "(use X)" boundary names
 something real, no skill shadows a bundled one, resume derivations
-are contiguous, and no reference file is orphaned. It exits non-zero
-on failure. Run it before you ship and after every fix.
+are contiguous, no reference file is orphaned, and CLAUDE.md's
+roster matches the tree. `python3 agent-team-workspace/validate-skills.py`
+is the per-skill pass. Both exit non-zero on failure. Run them
+before you ship and after every fix.
+
+Three lessons from maintaining those checks, each a real defect:
+
+- **A check tolerates the states earlier checks report.** The
+  validator raised a traceback on a skill directory without its
+  `SKILL.md`, and the traceback took every later check with it:
+  check 4 had already recorded the failure; checks 5 and 12 opened
+  the missing file anyway. A check that raises on a state already
+  flagged hides everything after it.
+- **Skipped is not passed.** `validate-skills.py` carried a
+  git-based line-count check whose precondition stopped holding in
+  the commit that introduced it; it skipped 6 of 8 skills, compared
+  the other 2 to themselves, and printed `0 failures` every run
+  until it was deleted. A check that cannot run says so in the
+  summary line.
+- **Judge by structure, not prior knowledge.** The recurring defect
+  in this repo's checks is a hardcoded allowlist, a rename map, or
+  a regex that matches a name; each goes stale silently. Derive the
+  roster from the filesystem and frontmatter at run time. One such
+  list remains: each validator keeps its own set of bundled skills
+  a description may route to, so a new `(use X)` toward a bundled
+  skill edits both, and the day they disagree one of them is wrong.
 
 Fix the majors before shipping — then re-run Pass A on the files
 you just edited. Fixes introduce defects at a high rate: in this

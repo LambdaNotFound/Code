@@ -1,0 +1,32 @@
+{
+  "title": "Design-review loop: two agents, one gate, files as the only state",
+  "grid": {"colWidth": 460, "rowHeight": 140},
+  "elements": [
+    {"id": "brief", "kind": "ellipse", "role": "start", "text": "brief.md\nfrozen by the lead\nbefore round 0", "col": 0, "row": 0},
+    {"id": "investigator", "kind": "box", "role": "ai", "text": "design-investigator\nauthors design.md (round 0),\nrevises it by objection id", "col": 1, "row": 0},
+    {"id": "barraiser", "kind": "box", "role": "ai", "text": "design-bar-raiser\nderives requirements first,\nappends ## Round N to review.md", "col": 2, "row": 0},
+    {"id": "verdict", "kind": "diamond", "role": "decision", "text": "verdict?", "col": 3, "row": 0},
+    {"id": "user", "kind": "ellipse", "role": "external", "text": "user decides\n(designed exit)", "col": 3, "row": -1},
+    {"id": "auditor", "kind": "box", "role": "ai", "text": "ai-writing-auditor\nwrites design.rewritten.md\n(never design.md)", "col": 4, "row": 0},
+    {"id": "done", "kind": "ellipse", "role": "end", "text": "investigator adopts\nthe rewrite; design.md\napproved and audited", "col": 5, "row": 0},
+    {"id": "relay_note", "kind": "text", "level": "detail", "align": "center", "text": "lead relays only\nslug, round, verdict", "col": 3.5, "row": 0.55},
+    {"id": "floor_note", "kind": "text", "level": "detail", "align": "center", "text": "round 5 is the floor for a decision:\napprove, approve-with-risks, or escalate", "col": 2, "row": 1.4},
+    {"id": "brief_md", "kind": "box", "role": "data", "text": "brief.md\nwriter: lead\n(+ dated amendments)", "col": 0, "row": 3},
+    {"id": "design_md", "kind": "box", "role": "data", "text": "design.md\nwriter: design-investigator", "col": 1, "row": 3},
+    {"id": "review_md", "kind": "box", "role": "data", "text": "review.md\nwriter: design-bar-raiser\nappend-only ledger", "col": 2, "row": 3},
+    {"id": "excerpt", "kind": "code", "text": "## Round 3\nR3-1 | should-fix | Plan step 5 defines...\nVerdict: approve-with-risks", "col": 3, "row": 3},
+    {"id": "rewritten_md", "kind": "box", "role": "data", "dashed": true, "text": "design.rewritten.md\nwriter: ai-writing-auditor\ndeleted when the loop closes", "col": 4, "row": 3},
+    {"id": "files", "kind": "section", "label": "agent-team-workspace/design-docs/<slug>/: the only state, one writer per file",
+     "contains": ["brief_md", "design_md", "review_md", "excerpt", "rewritten_md"]}
+  ],
+  "edges": [
+    {"from": "brief", "to": "investigator", "label": "round 0"},
+    {"from": "investigator", "to": "barraiser", "label": "round N"},
+    {"from": "barraiser", "to": "verdict"},
+    {"from": "verdict", "to": "auditor", "label": "approve /\napprove-with-risks"},
+    {"from": "verdict", "to": "user", "label": "escalate"},
+    {"from": "verdict", "to": "investigator", "label": "revise /\nreject-approach", "via": [[1610, 210], [690, 210]]},
+    {"from": "auditor", "to": "done", "label": "adoption\npass"},
+    {"from": "excerpt", "to": "review_md", "dashed": true, "end": null}
+  ]
+}

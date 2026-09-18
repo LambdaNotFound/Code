@@ -1,0 +1,27 @@
+{
+  "_comment": "Single source of colour for draw-diagram. Roles name what a shape MEANS; build_excalidraw.py maps them to fill/stroke. Edit here, never in a spec.",
+  "background": "#ffffff",
+  "roles": {
+    "neutral":  {"fill": "#dbeafe", "stroke": "#1e40af", "text": "#1e3a5f", "about": "default process, component, step"},
+    "start":    {"fill": "#fed7aa", "stroke": "#c2410c", "text": "#7c2d12", "about": "trigger, entry point, input"},
+    "end":      {"fill": "#a7f3d0", "stroke": "#047857", "text": "#064e3b", "about": "result, output, success"},
+    "decision": {"fill": "#fef3c7", "stroke": "#b45309", "text": "#78350f", "about": "branch, condition, gate"},
+    "ai":       {"fill": "#ddd6fe", "stroke": "#6d28d9", "text": "#4c1d95", "about": "model call, agent, LLM step"},
+    "data":     {"fill": "#ccfbf1", "stroke": "#0f766e", "text": "#134e4a", "about": "store, queue, table, file"},
+    "external": {"fill": "#f1f5f9", "stroke": "#475569", "text": "#1e293b", "about": "third party, user, system outside the boundary"},
+    "error":    {"fill": "#fecaca", "stroke": "#b91c1c", "text": "#7f1d1d", "about": "failure, reject, dead letter"},
+    "inactive": {"fill": "#f8fafc", "stroke": "#94a3b8", "text": "#64748b", "about": "disabled, future, not on this path (drawn dashed)"}
+  },
+  "text": {
+    "title":    {"size": 28, "color": "#1e3a5f"},
+    "subtitle": {"size": 20, "color": "#1e40af"},
+    "section":  {"size": 18, "color": "#475569"},
+    "body":     {"size": 16, "color": "#334155"},
+    "detail":   {"size": 14, "color": "#64748b"},
+    "label":    {"size": 14, "color": "#475569"}
+  },
+  "code": {"fill": "#1e293b", "stroke": "#0f172a", "text": {"json": "#4ade80", "default": "#e2e8f0"}, "size": 14},
+  "line": "#64748b",
+  "dot": {"fill": "#3b82f6", "stroke": "#1e40af"},
+  "section": {"fill": "transparent", "stroke": "#94a3b8"}
+}
