@@ -312,10 +312,12 @@ Three lessons from maintaining those checks, each a real defect:
 - **Judge by structure, not prior knowledge.** The recurring defect
   in this repo's checks is a hardcoded allowlist, a rename map, or
   a regex that matches a name; each goes stale silently. Derive the
-  roster from the filesystem and frontmatter at run time. One such
-  list remains: each validator keeps its own set of bundled skills
-  a description may route to, so a new `(use X)` toward a bundled
-  skill edits both, and the day they disagree one of them is wrong.
+  roster from the filesystem and frontmatter at run time. Where a
+  list is unavoidable, keep exactly one: the two validators once held
+  separate sets of the bundled skills a description may route to, so
+  every new `(use X)` toward a bundled skill edited both;
+  `validate-skills.py` now reads `validate-definitions.py`'s literal
+  with `ast` instead of running it.
 
 Fix the majors before shipping — then re-run Pass A on the files
 you just edited. Fixes introduce defects at a high rate: in this

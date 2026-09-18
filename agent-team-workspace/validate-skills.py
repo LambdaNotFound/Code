@@ -1,10 +1,16 @@
-import os, re, io, glob, yaml, sys
+import os, re, io, glob, yaml, sys, ast
 os.chdir('/home/user/Code')
 OLD2NEW = {"scoping":"scope-problem","pr-review":"review-pr","rust-expert":"write-rust",
            "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop"}
 skills = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob('.claude/skills/*/SKILL.md'))
-known = set(skills) | {os.path.basename(a)[:-3] for a in glob.glob('.claude/agents/**/*.md', recursive=True)} | {
-    'golang-pro','rust-pro','doc-coauthoring','dataviz','design','architect-reviewer','code-reviewer','leetcode-reviewer'}
+# The bundled skills and built-in agents a description may route to are listed
+# once, in validate-definitions.py; read its two set literals without running it,
+# so the two validators cannot disagree.
+_defs = ast.parse(io.open('agent-team-workspace/validate-definitions.py', encoding='utf-8').read())
+_sets = {t.id: ast.literal_eval(n.value) for n in ast.walk(_defs) if isinstance(n, ast.Assign)
+         for t in n.targets if isinstance(t, ast.Name) and t.id in ('BUNDLED', 'BUILTIN_AGENTS')}
+known = set(skills) | {os.path.basename(a)[:-3] for a in glob.glob('.claude/agents/**/*.md', recursive=True)} \
+        | _sets['BUNDLED'] | _sets['BUILTIN_AGENTS']
 fails=[]
 def ck(c, sk, what):
     if not c: fails.append(f"{sk}: {what}")
