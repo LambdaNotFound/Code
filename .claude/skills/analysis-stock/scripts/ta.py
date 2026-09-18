@@ -11,7 +11,7 @@ Inputs it accepts, in any of three shapes:
     "Weekly Time Series")
 
 Usage:
-  ta.py --daily DAILY_FILE [--weekly WEEKLY_FILE] [--sma200 PRICE]
+  ta.py --daily DAILY_FILE [--weekly WEEKLY_FILE] [--sma200 PRICE | --sma200-file FILE]
         [--symbol SYM] [--json] [--pivot-window N]
         [--account EQUITY [--risk-pct 1.0] [--max-position-pct 10]]
   ta.py --fetch SYM --out-dir DIR      # needs ALPHAVANTAGE_API_KEY in the env
@@ -767,7 +767,7 @@ def ledger(f):
 # Trend rows count double; momentum and volume rows count once. The list is
 # the whole rule: a row not named here does not move the score.
 WEIGHTS = {
-    "MA stack (20/50/200)": 2, "MA stack (20/50)": 2, "Price vs 200-day": 2, "ADX14 / DI": 2,
+    "MA stack (20/50/200)": 2, "MA stack (20/50)": 2, "Price vs 200-day": 1, "ADX14 / DI": 2,
     "Swing structure (daily)": 2, "Weekly structure": 2, "Weekly price vs 50/200-week": 2,
     "RSI14": 1, "MACD histogram": 1, "Stochastic %K": 1, "Bollinger %B": 1, "RSI divergence": 1,
     "OBV vs price (20 bars)": 1, "Up/down volume (20 bars)": 1,
@@ -821,6 +821,13 @@ def stance(f):
         stop = (r1 + 0.5 * a) if r1 is not None else price + 2 * a
         target = s1
         rr = None if target is None or stop <= entry else (entry - target) / (stop - entry)
+        if rr is not None and rr < 1.5 and r1 is not None:
+            # Same logic as the long side: the exit is only worth taking from the
+            # resistance, so a holder trims into strength rather than at the close.
+            entry = r1
+            stop = r1 + 0.5 * a if a else r1 * 1.02
+            rr = (entry - target) / (stop - entry)
+            plan["note"] = f"reward/risk from the current price is under 1.5, so the exit moves up to resistance {r1:.2f} (trim into strength)"
         plan.update(entry=entry, stop=stop, target=target, reward_risk=rr)
         if target is None:
             plan["note"] = "no support below price in the data; target is open-ended"
@@ -971,7 +978,8 @@ def render(f, symbol):
         L.append(f"| Note | {pl['note']} |")
     L.append("")
     L.append("Bands: BUY >= +0.50, ACCUMULATE >= +0.20, HOLD > -0.20, REDUCE > -0.50, SELL otherwise. "
-             "Stops sit half an ATR beyond the nearest level; a BUY with reward:risk under 1.5 becomes an ACCUMULATE at support.")
+             "Stops sit half an ATR beyond the nearest level; a plan with reward:risk under 1.5 moves its entry to the nearest level "
+             "(a BUY becomes an ACCUMULATE at support; a REDUCE/SELL trims at resistance).")
     ps = f.get("position_size")
     if ps:
         L.append("")
@@ -1025,11 +1033,42 @@ def latest_sma_from_csv(path):
     return float(rows[0]["SMA"]) if rows else None
 
 
+def latest_sma_from_file(path):
+    """Newest SMA value from any shape the endpoint has arrived in: the CSV,
+    the raw Alpha Vantage JSON, the harness's {"result": ...} wrapper, or the
+    MCP server's preview ({"preview": true, "sample_data": "<json>"})."""
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    stripped = text.lstrip()
+    if not stripped.startswith("{"):
+        return latest_sma_from_csv(path)
+    d = json.loads(stripped)
+    for _ in range(3):
+        if isinstance(d.get("sample_data"), str):
+            d = json.loads(d["sample_data"])
+        elif isinstance(d.get("result"), str):
+            inner = d["result"].lstrip()
+            if not inner.startswith("{"):
+                rows = list(csv.DictReader(io.StringIO(inner.strip())))
+                return float(rows[0]["SMA"]) if rows else None
+            d = json.loads(inner)
+        else:
+            break
+    if "error" in d:
+        raise ValueError(f"Alpha Vantage error: {d['error']}")
+    series = d.get("Technical Analysis: SMA")
+    if not series:
+        raise ValueError("no 'Technical Analysis: SMA' block in file")
+    newest = max(series)
+    return float(series[newest]["SMA"])
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--daily", help="daily OHLCV file (CSV, {result: csv}, or AV JSON)")
     ap.add_argument("--weekly", help="weekly OHLCV file (same shapes)")
     ap.add_argument("--sma200", type=float, help="latest daily 200-SMA from the SMA endpoint")
+    ap.add_argument("--sma200-file", help="the SMA endpoint's saved result (CSV, JSON, {result}, or preview); newest value is used")
     ap.add_argument("--symbol", default="?", help="ticker, for the heading only")
     ap.add_argument("--json", action="store_true", help="emit the full JSON instead of markdown")
     ap.add_argument("--pivot-window", type=int, default=3, help="bars either side for a swing point (default 3)")
@@ -1046,6 +1085,8 @@ def main(argv=None):
         args.sma200 = latest_sma_from_csv(paths["sma200"])
     if not args.daily:
         ap.error("--daily is required (or --fetch)")
+    if args.sma200_file and args.sma200 is None:
+        args.sma200 = latest_sma_from_file(args.sma200_file)
 
     daily = load_bars(args.daily)
     weekly = load_bars(args.weekly) if args.weekly else None
