@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for usage.py against a local fake of the Admin API. Stdlib only.
 
-    python3 .claude/skills/token-usage/scripts/test_usage.py
+    python3 .claude/skills/check-usage/scripts/test_usage.py
 """
 import contextlib
 import datetime as dt
@@ -138,7 +138,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(q["group_by[]"], ["model"])
         self.assertEqual(req["headers"]["anthropic-version"], "2023-06-01")
         self.assertEqual(req["headers"]["x-api-key"], "sk-ant-admin01-test")
-        self.assertIn("token-usage-skill", req["headers"]["user-agent"])
+        self.assertIn("check-usage-skill", req["headers"]["user-agent"])
 
     def test_by_none_sends_no_group_by(self):
         run(self.api, ["--days", "1", "--by", "none"])

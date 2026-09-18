@@ -19,8 +19,8 @@ Map the request to flags and run the script. It owns the time math,
 the bucket choice, the pagination, and the table:
 
 ```
-python3 .claude/skills/token-usage/scripts/usage.py --hours 6
-python3 .claude/skills/token-usage/scripts/usage.py --days 3 --by api_key_id --cost
+python3 .claude/skills/check-usage/scripts/usage.py --hours 6
+python3 .claude/skills/check-usage/scripts/usage.py --days 3 --by api_key_id --cost
 ```
 
 - "last 6 hours" is `--hours 6`; "this week" is `--days 7`. With no

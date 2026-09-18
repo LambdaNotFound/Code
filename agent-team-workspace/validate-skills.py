@@ -1,7 +1,8 @@
 import os, re, io, glob, yaml, sys, ast
 os.chdir('/home/user/Code')
 OLD2NEW = {"scoping":"scope-problem","pr-review":"review-pr","rust-expert":"write-rust",
-           "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop"}
+           "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop",
+           "token-usage":"check-usage"}
 skills = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob('.claude/skills/*/SKILL.md'))
 # The bundled skills and built-in agents a description may route to are listed
 # once, in validate-definitions.py; read its two set literals without running it,

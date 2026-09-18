@@ -32,7 +32,7 @@ from decimal import Decimal
 
 API_VERSION = "2023-06-01"
 DEFAULT_BASE = "https://api.anthropic.com"
-USER_AGENT = "token-usage-skill/1.0 (https://github.com/LambdaNotFound/Code)"
+USER_AGENT = "check-usage-skill/1.0 (https://github.com/LambdaNotFound/Code)"
 PAGE_LIMIT = {"1m": 1440, "1h": 168, "1d": 31}
 WIDTH_SECONDS = {"1m": 60, "1h": 3600, "1d": 86400}
 GROUPS = ("model", "api_key_id", "workspace_id", "service_tier", "context_window", "inference_geo", "account_id")
