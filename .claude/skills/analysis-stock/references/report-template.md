@@ -22,7 +22,8 @@ one thing that would change the read, and the ledger tally. Tag it
 | Last MA cross | | |
 
 Two or three sentences: is this a trend or a range, and on which
-timeframe.
+timeframe. Then the trend template line: N/7 passed, which failed, and
+the approximations the script named.
 
 ## Momentum
 
@@ -33,8 +34,14 @@ divergence the script found. One read per indicator, each tagged
 ## Volatility and volume
 
 ATR as % of price, Bollinger position and bandwidth percentile, volume
-vs 20-day average, up/down volume ratio, OBV agreement. State whether
-volume confirms the price action or not.
+vs 20-day average, up/down volume ratio, OBV agreement, burst days in
+the last 20 bars. State whether volume confirms the price action or not.
+
+## Weekly reversal checks
+
+The script's read and each triggered check with its week and level, or
+"none in the last 8 completed weeks". If a check was vetoed, say what
+vetoed it.
 
 ## Levels
 
@@ -71,12 +78,16 @@ Paste the script's Stance table as is, then fill the last two rows.
 | Stop | |
 | Target | |
 | Reward:risk | |
+| 2R target | |
 | For | ledger rows that pulled the score up |
 | Against | ledger rows that pulled it down |
 | Flips up on | close above <resistance 1> |
 | Flips down on | close below <support 1> |
 | Confidence | LOW; fixed mechanical rule, no measured hit rate |
 | Not seen | earnings date, news, the account; size is the reader's |
+
+With an account size given, paste the script's Position size table
+under the recommendation.
 
 ## Signal ledger
 

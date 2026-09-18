@@ -13,6 +13,7 @@ Inputs it accepts, in any of three shapes:
 Usage:
   ta.py --daily DAILY_FILE [--weekly WEEKLY_FILE] [--sma200 PRICE]
         [--symbol SYM] [--json] [--pivot-window N]
+        [--account EQUITY [--risk-pct 1.0] [--max-position-pct 10]]
   ta.py --fetch SYM --out-dir DIR      # needs ALPHAVANTAGE_API_KEY in the env
 
 --daily is the 100-bar "compact" daily series (the free tier's ceiling).
@@ -390,7 +391,7 @@ def slope_sign(vals, n):
 # Analysis
 # --------------------------------------------------------------------------- #
 
-def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3):
+def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3, account=None, risk_pct=1.0, max_position_pct=10.0):
     closes = [b["close"] for b in daily]
     dates = [b["date"] for b in daily]
     n = len(daily)
@@ -478,10 +479,29 @@ def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3):
                       "recent_pivots": pivs[-6:]},
         "levels": {"supports": supports[:4], "resistances": resistances[:4]},
         "gaps_20d": gaps(daily),
+        "burst_days_20": burst_days(daily),
         "weekly": analyse_weekly(weekly) if weekly else None,
     }
+    out["trend_template"] = None
+    out["weekly_reversals"] = None
+    if weekly:
+        wc = [b["close"] for b in weekly]
+        w30, w40 = sma(wc, 30), sma(wc, 40)
+        approx = ["150-day taken as the 30-week SMA", "200-day slope taken from the 40-week SMA, now vs 4 weeks ago"]
+        if sma200_source == "daily":
+            approx = approx[:1] + ["200-day slope taken from the 40-week SMA, now vs 4 weeks ago (level is the true daily value)"]
+        out["trend_template"] = trend_template(
+            price, s50[-1], w30[-1], sma200_daily, w40[-5] if len(w40) > 4 else None,
+            out["weekly"]["range_52w"]["low"], out["weekly"]["range_52w"]["high"], approx)
+        out["weekly_reversals"] = weekly_reversals(weekly)
     out["ledger"] = ledger(out)
     out["stance"] = stance(out)
+    out["stance"]["plan"]["target_2r"] = None
+    pl = out["stance"]["plan"]
+    if pl["entry"] is not None and pl["stop"] is not None:
+        # two units of risk in the direction of the trade (long above, short below)
+        pl["target_2r"] = pl["entry"] + 2 * (pl["entry"] - pl["stop"])
+    out["position_size"] = position_size(pl, account, risk_pct, max_position_pct)
     return out
 
 
@@ -522,6 +542,141 @@ def analyse_weekly(weekly):
         "structure": {"label": label, "detail": detail},
         "levels": {"supports": sup[:3], "resistances": res[:3]},
     }
+
+
+def trend_template(price, sma50, sma150, sma200, sma200_month_ago, lo52, hi52, approx):
+    """Minervini's Stage 2 trend template, the seven price-based criteria. The
+    eighth (relative-strength rank >= 70) needs a universe and is not scored."""
+    if None in (sma50, sma150, sma200, sma200_month_ago, lo52, hi52):
+        return None
+    checks = [
+        ("price above 150-day and 200-day", price > sma150 and price > sma200),
+        ("150-day above 200-day", sma150 > sma200),
+        ("200-day rising over the last month", sma200 > sma200_month_ago),
+        ("50-day above 150-day above 200-day", sma50 > sma150 > sma200),
+        ("price above 50-day", price > sma50),
+        ("price at least 30% above 52-week low", price >= 1.3 * lo52),
+        ("price within 25% of 52-week high", price >= 0.75 * hi52),
+    ]
+    passed = sum(1 for _, ok in checks if ok)
+    return {"checks": [{"rule": r, "pass": ok} for r, ok in checks], "passed": passed, "of": len(checks),
+            "approximations": approx,
+            "rs_rank": "not scored: needs an index or universe series"}
+
+
+def weekly_reversals(weekly, extreme_weeks=52, recent_weeks=8, fail_within=3):
+    """Long-side and short-side trap checks on completed weeks: key reversal,
+    failed extreme, failed breakout, and a continuation veto. The last bar is
+    treated as the week in progress and left out."""
+    bars = weekly[:-1]
+    if len(bars) < extreme_weeks + recent_weeks + 1:
+        return {"insufficient": True, "completed_week": bars[-1]["date"] if bars else None}
+    n = len(bars)
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+    closes = [b["close"] for b in bars]
+
+    def prior_high(i):
+        return max(highs[i - extreme_weeks:i])
+
+    def prior_low(i):
+        return min(lows[i - extreme_weeks:i])
+
+    bear, bull = [], []
+    for i in range(n - recent_weeks, n):
+        ph, pl = prior_high(i), prior_low(i)
+        if highs[i] > ph and closes[i] < lows[i - 1]:
+            bear.append({"check": "key_reversal", "week": bars[i]["date"], "level": ph,
+                         "detail": f"new {extreme_weeks}w high {highs[i]:.2f}, closed {closes[i]:.2f} under prior week's low {lows[i-1]:.2f}"})
+        elif highs[i] > ph and closes[i] < ph:
+            bear.append({"check": "failed_extreme", "week": bars[i]["date"], "level": ph,
+                         "detail": f"traded above prior {extreme_weeks}w high {ph:.2f} (to {highs[i]:.2f}) but closed {closes[i]:.2f} below it"})
+        if lows[i] < pl and closes[i] > highs[i - 1]:
+            bull.append({"check": "key_reversal", "week": bars[i]["date"], "level": pl,
+                         "detail": f"new {extreme_weeks}w low {lows[i]:.2f}, closed {closes[i]:.2f} over prior week's high {highs[i-1]:.2f}"})
+        elif lows[i] < pl and closes[i] > pl:
+            bull.append({"check": "failed_extreme", "week": bars[i]["date"], "level": pl,
+                         "detail": f"traded below prior {extreme_weeks}w low {pl:.2f} (to {lows[i]:.2f}) but closed {closes[i]:.2f} above it"})
+    # failed breakout: a closing breakout at week b, then a close back through
+    # the level within fail_within weeks; dated on the failure week
+    for b in range(n - recent_weeks - fail_within, n - 1):
+        ph, pl = prior_high(b), prior_low(b)
+        if closes[b] > ph:
+            for f_ in range(b + 1, min(b + 1 + fail_within, n)):
+                if closes[f_] < ph and f_ >= n - recent_weeks:
+                    bear.append({"check": "failed_breakout", "week": bars[f_]["date"], "level": ph,
+                                 "detail": f"closed above {ph:.2f} on {bars[b]['date']}, back below on {bars[f_]['date']} ({closes[f_]:.2f})"})
+                    break
+        if closes[b] < pl:
+            for f_ in range(b + 1, min(b + 1 + fail_within, n)):
+                if closes[f_] > pl and f_ >= n - recent_weeks:
+                    bull.append({"check": "failed_breakout", "week": bars[f_]["date"], "level": pl,
+                                 "detail": f"closed below {pl:.2f} on {bars[b]['date']}, back above on {bars[f_]['date']} ({closes[f_]:.2f})"})
+                    break
+
+    def vetoed(signals, direction):
+        """A new closing extreme in the crowd's direction after the newest signal negates it."""
+        if not signals:
+            return False
+        newest = max(s["week"] for s in signals)
+        idx = next(i for i in range(n) if bars[i]["date"] == newest)
+        for i in range(idx + 1, n):
+            if direction == "bear" and closes[i] > max(closes[i - extreme_weeks:i]):
+                return True
+            if direction == "bull" and closes[i] < min(closes[i - extreme_weeks:i]):
+                return True
+        return False
+
+    bear_veto, bull_veto = vetoed(bear, "bear"), vetoed(bull, "bull")
+    read = "neutral"
+    if bear and not bear_veto and not (bull and not bull_veto):
+        read = "bearish"
+    elif bull and not bull_veto and not (bear and not bear_veto):
+        read = "bullish"
+    return {"insufficient": False, "completed_week": bars[-1]["date"], "window_weeks": recent_weeks,
+            "extreme_weeks": extreme_weeks, "bearish": bear, "bearish_vetoed": bear_veto,
+            "bullish": bull, "bullish_vetoed": bull_veto, "read": read}
+
+
+def burst_days(bars, lookback=20, min_pct=4.0):
+    """Stockbee-style momentum bursts in the last lookback bars: a close up at
+    least min_pct on volume above the prior day, or a range wider than each of
+    the prior three ranges when the prior day was not already extended."""
+    out = []
+    vol20 = sma([b["volume"] for b in bars], 20)
+    for i in range(max(3, len(bars) - lookback), len(bars)):
+        b, prev = bars[i], bars[i - 1]
+        chg = 100.0 * (b["close"] - prev["close"]) / prev["close"]
+        rng = b["high"] - b["low"]
+        prior_ranges = [bars[j]["high"] - bars[j]["low"] for j in range(i - 3, i)]
+        prev_chg = 100.0 * (prev["close"] - bars[i - 2]["close"]) / bars[i - 2]["close"]
+        tags = []
+        if chg >= min_pct and b["volume"] > prev["volume"]:
+            tags.append("4pct_breakout")
+        if chg <= -min_pct and b["volume"] > prev["volume"]:
+            tags.append("4pct_breakdown")
+        if rng > max(prior_ranges) and abs(prev_chg) < min_pct:
+            tags.append("range_expansion")
+        if tags:
+            out.append({"date": b["date"], "pct": chg, "vol_vs_avg20": (b["volume"] / vol20[i]) if vol20[i] else None,
+                        "close_in_range": None if rng == 0 else (b["close"] - b["low"]) / rng, "tags": tags})
+    return out
+
+
+def position_size(plan, account, risk_pct, max_position_pct):
+    """Fixed-fractional sizing: risk a fixed slice of the account between entry and
+    stop, then let the tighter of the risk budget and the position cap decide."""
+    entry, stop = plan.get("entry"), plan.get("stop")
+    if account is None or entry is None or stop is None or entry == stop:
+        return None
+    risk_dollars = account * risk_pct / 100.0
+    per_share = abs(entry - stop)
+    by_risk = int(risk_dollars // per_share)
+    by_cap = int((account * max_position_pct / 100.0) // entry)
+    shares = max(0, min(by_risk, by_cap))
+    return {"account": account, "risk_pct": risk_pct, "risk_dollars": risk_dollars, "risk_per_share": per_share,
+            "shares": shares, "position_value": shares * entry, "position_pct": 100.0 * shares * entry / account,
+            "actual_risk": shares * per_share, "binding": "risk budget" if by_risk <= by_cap else f"{max_position_pct:g}% position cap"}
 
 
 def ledger(f):
@@ -588,6 +743,19 @@ def ledger(f):
             add("Weekly price vs 50/200-week", f"{wk['ma']['pct_vs_sma50']:+.1f}% / {wk['ma']['pct_vs_sma200']:+.1f}%",
                 "bullish" if p > wk["ma"]["sma50"] > wk["ma"]["sma200"] else "bearish" if p < wk["ma"]["sma50"] < wk["ma"]["sma200"] else "neutral",
                 "bullish only if price > 50w > 200w")
+    tt = f.get("trend_template")
+    if tt:
+        add("Trend template (Minervini)", f"{tt['passed']}/{tt['of']}",
+            "bullish" if tt["passed"] >= 6 else "bearish" if tt["passed"] <= 2 else "neutral",
+            ">= 6 of 7 is a Stage 2 uptrend; <= 2 of 7 is not; between is neutral")
+    wr = f.get("weekly_reversals")
+    if wr and not wr["insufficient"]:
+        hits = [x for x in wr["bearish"] + wr["bullish"]]
+        value = "; ".join(f"{x['check']} {x['week']}" for x in hits) or "none"
+        if wr["bearish_vetoed"] or wr["bullish_vetoed"]:
+            value += " (vetoed by a later closing extreme)"
+        add(f"Weekly reversal checks ({wr['window_weeks']}w)", value, wr["read"],
+            "key reversal / failed extreme / failed breakout at a 52-week extreme, unless a later close makes a new extreme")
     tally = {k: sum(1 for r in rows if r["read"] == k) for k in ("bullish", "bearish", "neutral")}
     return {"rows": rows, "tally": tally}
 
@@ -603,6 +771,7 @@ WEIGHTS = {
     "Swing structure (daily)": 2, "Weekly structure": 2, "Weekly price vs 50/200-week": 2,
     "RSI14": 1, "MACD histogram": 1, "Stochastic %K": 1, "Bollinger %B": 1, "RSI divergence": 1,
     "OBV vs price (20 bars)": 1, "Up/down volume (20 bars)": 1,
+    "Trend template (Minervini)": 2, "Weekly reversal checks (8w)": 1,
 }
 # score is net weight / total weight, in [-1, 1]
 BANDS = (
@@ -729,6 +898,8 @@ def render(f, symbol):
     L.append("## Volume")
     L.append(f"- Last {_f(vl['last'], 0)} vs 20-day avg {_f(vl['avg20'], 0)} (x{_f(vl['ratio_vs_avg20'])})")
     L.append(f"- Up/down volume ratio (20 bars) {_f(vl['up_down_ratio_20'])}; OBV {vl['obv_trend_20'] or 'n/a'} while price {vl['price_trend_20'] or 'n/a'}")
+    bd = f.get("burst_days_20") or []
+    L.append("- Burst days (20d): " + ("; ".join(f"{b['date']} {b['pct']:+.1f}% on {_f(b['vol_vs_avg20'], 1)}x avg vol, close at {_f(b['close_in_range'], 2)} of range [{', '.join(b['tags'])}]" for b in bd) if bd else "none"))
     L.append("")
     L.append("## Levels (daily swing clusters, nearest first)")
     for kind in ("supports", "resistances"):
@@ -752,6 +923,27 @@ def render(f, symbol):
         L.append(f"- 20/50-week cross: {_cross(wm['cross_20_50'])}; weekly RSI14 {_f(wk['rsi14'], 1)}; weekly MACD hist {_f(wk['macd_hist'], 3)}; weekly MACD cross: {_cross(wk['macd_cross'])}")
         L.append(f"- Weekly swing structure: {wk['structure']['label']} ({wk['structure']['detail']})")
         L.append("")
+    tt = f.get("trend_template")
+    if tt:
+        L.append("## Trend template (Minervini Stage 2)")
+        L.append("| Criterion | Pass |")
+        L.append("|---|---|")
+        for c in tt["checks"]:
+            L.append(f"| {c['rule']} | {'yes' if c['pass'] else 'no'} |")
+        L.append(f"- {tt['passed']}/{tt['of']} passed. RS rank {tt['rs_rank']}. Approximations: {'; '.join(tt['approximations'])}.")
+        L.append("")
+    wr = f.get("weekly_reversals")
+    if wr:
+        L.append("## Weekly reversal checks (completed weeks)")
+        if wr["insufficient"]:
+            L.append("- insufficient weekly history")
+        else:
+            L.append(f"- Window: last {wr['window_weeks']} completed weeks through {wr['completed_week']}, extremes over {wr['extreme_weeks']} weeks. Read: {wr['read']}.")
+            for label, key, veto in (("Bearish (long-side traps)", "bearish", "bearish_vetoed"), ("Bullish (short-side traps)", "bullish", "bullish_vetoed")):
+                items = wr[key]
+                L.append(f"- {label}: " + ("; ".join(f"{x['check']} on {x['week']}: {x['detail']}" for x in items) if items else "none")
+                         + (" (vetoed: a later close made a new extreme in the crowd's direction)" if items and wr[veto] else ""))
+        L.append("")
     L.append("## Signal ledger")
     L.append("| Indicator | Value | Read | Rule |")
     L.append("|---|---|---|---|")
@@ -770,6 +962,7 @@ def render(f, symbol):
     L.append(f"| Stop | {_f(pl['stop'])} |")
     L.append(f"| Target | {_f(pl['target'])} |")
     L.append(f"| Reward:risk | {_f(pl['reward_risk'], 1)} |")
+    L.append(f"| 2R target | {_f(pl.get('target_2r'))} |")
     L.append(f"| For | {', '.join(st['for']) or 'none'} |")
     L.append(f"| Against | {', '.join(st['against']) or 'none'} |")
     L.append(f"| Flips up on | close above {_f(st['resistance_1'])} |")
@@ -779,6 +972,19 @@ def render(f, symbol):
     L.append("")
     L.append("Bands: BUY >= +0.50, ACCUMULATE >= +0.20, HOLD > -0.20, REDUCE > -0.50, SELL otherwise. "
              "Stops sit half an ATR beyond the nearest level; a BUY with reward:risk under 1.5 becomes an ACCUMULATE at support.")
+    ps = f.get("position_size")
+    if ps:
+        L.append("")
+        L.append("## Position size (fixed fractional)")
+        L.append("| | |")
+        L.append("|---|---|")
+        L.append(f"| Account | {_f(ps['account'], 0)} |")
+        L.append(f"| Risk per trade | {ps['risk_pct']:g}% = {_f(ps['risk_dollars'], 0)} |")
+        L.append(f"| Risk per share | {_f(ps['risk_per_share'])} (entry {_f(pl['entry'])} to stop {_f(pl['stop'])}) |")
+        L.append(f"| **Shares** | **{ps['shares']}** |")
+        L.append(f"| Position value | {_f(ps['position_value'], 0)} ({ps['position_pct']:.1f}% of account) |")
+        L.append(f"| Actual risk | {_f(ps['actual_risk'], 0)} |")
+        L.append(f"| Binding constraint | {ps['binding']} |")
     return "\n".join(L)
 
 
@@ -829,6 +1035,9 @@ def main(argv=None):
     ap.add_argument("--pivot-window", type=int, default=3, help="bars either side for a swing point (default 3)")
     ap.add_argument("--fetch", metavar="SYM", help="fetch daily/weekly/SMA200 with ALPHAVANTAGE_API_KEY, then analyse")
     ap.add_argument("--out-dir", default=".", help="where --fetch writes its CSV files")
+    ap.add_argument("--account", type=float, help="account equity; enables fixed-fractional position sizing")
+    ap.add_argument("--risk-pct", type=float, default=1.0, help="percent of account risked between entry and stop (default 1)")
+    ap.add_argument("--max-position-pct", type=float, default=10.0, help="cap on one position as percent of account (default 10)")
     args = ap.parse_args(argv)
 
     if args.fetch:
@@ -840,7 +1049,7 @@ def main(argv=None):
 
     daily = load_bars(args.daily)
     weekly = load_bars(args.weekly) if args.weekly else None
-    facts = analyse(daily, weekly, args.sma200, args.pivot_window)
+    facts = analyse(daily, weekly, args.sma200, args.pivot_window, args.account, args.risk_pct, args.max_position_pct)
     if args.json:
         print(json.dumps(facts, indent=2, default=str))
     else:

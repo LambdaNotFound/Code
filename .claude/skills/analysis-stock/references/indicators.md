@@ -101,15 +101,62 @@ invalidate it. Rank them on the ledger: the side with more confirming
 rows gets the higher number. Do not let the rank leak into confidence:
 the whole exercise is `[FRAME]`.
 
+## Trend template (Minervini Stage 2) `[COMMON]`
+
+Seven pass/fail checks: price above the 150- and 200-day; 150 above 200;
+200-day rising over the last month; 50 above 150 above 200; price above
+the 50-day; price at least 30% above the 52-week low; price within 25%
+of the 52-week high. The eighth (relative-strength rank of 70 or more)
+needs a universe and is not scored. Six or more of seven is a Stage 2
+uptrend and reads bullish; two or fewer reads bearish. Two inputs are
+approximated on the free tier and the script says so: the 150-day is the
+30-week SMA and the 200-day slope is the 40-week SMA now against four
+weeks ago.
+
+## Weekly reversal checks `[COMMON]`
+
+Run on completed weeks only (the last weekly bar is the week in
+progress). Extremes are the prior 52 weeks; the window is the last 8
+completed weeks.
+
+| Check | Long-side trap (bearish) | Short-side mirror (bullish) |
+|---|---|---|
+| Key reversal | new 52-week high intraweek, close below the prior week's low | new 52-week low, close above the prior week's high |
+| Failed extreme | traded above the prior 52-week high, closed back below it | traded below the prior low, closed back above it |
+| Failed breakout | a weekly close above the prior high, then a close back below within 3 weeks (dated on the failure week) | mirror on lows |
+| Continuation veto | a later weekly close at a new 52-week closing high negates the bearish signals | a new closing low negates the bullish ones |
+
+A signal that stands reads against the trend it interrupted. It is a
+warning about the crowd's position at an extreme, not a reversal by
+itself; it enters the ledger at weight 1.
+
+## Burst days `[COMMON]`
+
+A close up 4% or more on volume above the prior day, or a daily range
+wider than each of the prior three ranges when the prior day was not
+already extended. Listed with the volume ratio and where the close sat
+in the day's range (above 0.7 is strong). They are facts about
+participation, not a ledger row: a burst on 2x volume that closed near
+its high near a level is the evidence a breakout scenario needs.
+
+## Position size (only with an account size)
+
+Fixed fractional: risk dollars = account × risk percent (default 1);
+shares = risk dollars ÷ (entry − stop), capped so the position is at
+most 10% of the account by default. The tighter constraint wins and the
+script names it. Two percent risk per trade is the ceiling anyone should
+pass; the default stays at one.
+
 ## Stance (the buy/sell rule)
 
 The script turns the ledger into one label by a fixed rule so that
 two runs on the same data give the same answer:
 
 - Trend rows weigh 2 (MA stack, price vs 200-day, ADX/DI, daily and
-  weekly swing structure, weekly price vs 50/200-week). Momentum and
-  volume rows weigh 1 (RSI, MACD histogram, stochastic, %B, RSI
-  divergence, OBV agreement, up/down volume).
+  weekly swing structure, weekly price vs 50/200-week, trend
+  template). Momentum and volume rows weigh 1 (RSI, MACD histogram,
+  stochastic, %B, RSI divergence, OBV agreement, up/down volume, weekly
+  reversal checks).
 - Score = (bullish weight − bearish weight) / total weight, in [−1, 1].
 - BUY at +0.50 and above, ACCUMULATE from +0.20, HOLD between −0.20
   and +0.20, REDUCE from −0.20 down, SELL at −0.50 and below.
@@ -118,6 +165,9 @@ two runs on the same data give the same answer:
   on the other side. A BUY whose reward-to-risk from the close is
   under 1.5 becomes an ACCUMULATE with the entry moved to the support,
   because the same trade is only worth taking from there.
+- The plan also prints a 2R target (entry plus twice the risk) beside
+  the level target; when the level target is under 2R, the level is
+  the honest one.
 - HOLD carries no plan, only the two closes that would change it.
 
 What the rule is and is not: it is a transparent tally of textbook

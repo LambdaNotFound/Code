@@ -289,5 +289,113 @@ class StanceTests(unittest.TestCase):
         self.assertIn("open-ended", st["plan"]["note"])
 
 
+class ReferenceMethodTests(unittest.TestCase):
+    def test_trend_template_all_pass(self):
+        tt = ta.trend_template(100, 90, 85, 80, 78, 60, 110, ["x"])
+        self.assertEqual((tt["passed"], tt["of"]), (7, 7))
+
+    def test_trend_template_partial(self):
+        # price under the 50-day and far from the high, 200-day flat
+        tt = ta.trend_template(100, 105, 95, 90, 90, 60, 150, [])
+        self.assertEqual(tt["passed"], 4)
+        self.assertFalse(tt["checks"][2]["pass"])
+        self.assertFalse(tt["checks"][4]["pass"])
+        self.assertFalse(tt["checks"][6]["pass"])
+
+    def test_trend_template_needs_inputs(self):
+        self.assertIsNone(ta.trend_template(100, None, 85, 80, 78, 60, 110, []))
+
+    @staticmethod
+    def weekly(n=70):
+        """Flat 100 closes, highs 105, lows 95, one deep low at week 20 so the
+        52-week low (50) sits well under any week's low."""
+        bars = bars_from_closes([100.0] * n, spread=5.0)
+        for i, b in enumerate(bars):
+            b["date"] = f"W{i:04d}"
+        bars[20]["low"] = 50.0
+        return bars
+
+    def test_weekly_key_reversal_bearish(self):
+        bars = self.weekly()
+        # week 66: new 52w high intraweek, close under prior week's low (95); week 69 is in progress
+        bars[66]["high"], bars[66]["close"] = 120.0, 94.0
+        wr = ta.weekly_reversals(bars)
+        self.assertEqual(wr["read"], "bearish")
+        self.assertEqual([x["check"] for x in wr["bearish"]], ["key_reversal"])
+        self.assertEqual(wr["bearish"][0]["week"], "W0066")
+        self.assertEqual(wr["bullish"], [])
+
+    def test_weekly_failed_extreme_bullish(self):
+        bars = self.weekly()
+        bars[65]["low"], bars[65]["close"] = 40.0, 100.5  # under the 52w low (50), closes back above it
+        wr = ta.weekly_reversals(bars)
+        self.assertEqual(wr["read"], "bullish")
+        self.assertEqual(wr["bullish"][0]["check"], "failed_extreme")
+        self.assertEqual(wr["bullish"][0]["week"], "W0065")
+
+    def test_weekly_failed_breakout_dated_on_failure_week(self):
+        bars = self.weekly()
+        bars[62]["close"], bars[62]["high"] = 106.0, 107.0  # closing breakout above 105
+        # week 63 closes 100 < 105: the failure week is 63
+        wr = ta.weekly_reversals(bars)
+        fb = [x for x in wr["bearish"] if x["check"] == "failed_breakout"]
+        self.assertEqual(len(fb), 1)
+        self.assertEqual(fb[0]["week"], "W0063")
+        self.assertEqual(fb[0]["level"], 105.0)
+        self.assertEqual(wr["read"], "bearish")
+
+    def test_weekly_continuation_veto(self):
+        bars = self.weekly()
+        bars[62]["high"], bars[62]["close"] = 120.0, 94.0   # bearish key reversal
+        for i, c in ((66, 125.0), (67, 126.0), (68, 127.0)):  # then closes at new highs and stay there
+            bars[i]["close"], bars[i]["high"], bars[i]["low"] = c, c + 1, c - 1
+        wr = ta.weekly_reversals(bars)
+        self.assertEqual([x["check"] for x in wr["bearish"]], ["key_reversal"])
+        self.assertTrue(wr["bearish_vetoed"])
+        self.assertEqual(wr["read"], "neutral")
+
+    def test_weekly_reversals_insufficient(self):
+        self.assertTrue(ta.weekly_reversals(self.weekly(30))["insufficient"])
+
+    def test_burst_days(self):
+        closes = [100.0] * 25 + [105.0, 105.5]
+        bars = bars_from_closes(closes, spread=0.5, volume=100.0)
+        bars[25]["volume"] = 300.0
+        bars[25]["high"], bars[25]["low"] = 106.0, 100.0
+        out = ta.burst_days(bars)
+        self.assertEqual(out[0]["date"], bars[25]["date"])
+        self.assertIn("4pct_breakout", out[0]["tags"])
+        self.assertIn("range_expansion", out[0]["tags"])
+        self.assertAlmostEqual(out[0]["pct"], 5.0)
+
+    def test_position_size_risk_budget_binds(self):
+        ps = ta.position_size({"entry": 100.0, "stop": 95.0}, 100000, 1.0, 50.0)
+        self.assertEqual(ps["shares"], 200)
+        self.assertEqual(ps["binding"], "risk budget")
+        self.assertAlmostEqual(ps["actual_risk"], 1000.0)
+
+    def test_position_size_cap_binds(self):
+        ps = ta.position_size({"entry": 100.0, "stop": 99.0}, 100000, 1.0, 10.0)
+        self.assertEqual(ps["shares"], 100)
+        self.assertEqual(ps["binding"], "10% position cap")
+
+    def test_position_size_absent_without_account(self):
+        self.assertIsNone(ta.position_size({"entry": 100.0, "stop": 95.0}, None, 1.0, 10.0))
+        self.assertIsNone(ta.position_size({"entry": None, "stop": None}, 1000, 1.0, 10.0))
+
+    def test_analyse_carries_new_blocks(self):
+        daily = bars_from_closes([100.0 + i * 0.3 for i in range(100)])
+        weekly = bars_from_closes([50.0 + i * 0.5 for i in range(120)])
+        facts = ta.analyse(daily, weekly, sma200_daily=90.0, account=50000)
+        self.assertIsNotNone(facts["trend_template"])
+        self.assertFalse(facts["weekly_reversals"]["insufficient"])
+        self.assertIn("Trend template (Minervini)", [r["indicator"] for r in facts["ledger"]["rows"]])
+        self.assertIsNotNone(facts["stance"]["plan"]["target_2r"])
+        text = ta.render(facts, "T")
+        self.assertIn("## Trend template", text)
+        self.assertIn("## Weekly reversal checks", text)
+        self.assertIn("## Position size", text)
+
+
 if __name__ == "__main__":
     unittest.main()
