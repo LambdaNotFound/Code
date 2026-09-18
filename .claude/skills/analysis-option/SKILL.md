@@ -34,7 +34,12 @@ the skill is to judge the price the market is showing.
 
 The options-chain endpoints (`HISTORICAL_OPTIONS`, `REALTIME_OPTIONS`)
 are premium on the free key; do not call them unless the user says
-their key has them. The underlying's bars are free.
+their key has them. The underlying's bars are free. Limits, tiers, and
+the shapes a result arrives in are in
+[../analysis-stock/references/alphavantage-free-tier.md](../analysis-stock/references/alphavantage-free-tier.md);
+one Alpha Vantage call per turn, and reuse today's `<SYMBOL>_daily.csv`
+and `<SYMBOL>_ta.json` from the scratchpad before fetching (say so in
+the report).
 
 1. `mcp__alphavantage__TIME_SERIES_DAILY` with `outputsize=compact`,
    `datatype=csv`, `return_full_data=true`. Save an inline result to

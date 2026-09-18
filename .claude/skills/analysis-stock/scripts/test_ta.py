@@ -397,5 +397,50 @@ class ReferenceMethodTests(unittest.TestCase):
         self.assertIn("## Position size", text)
 
 
+class SessionLessonTests(unittest.TestCase):
+    def facts(self, reads, price=100.0, atr=2.0, sup=(90.0,), res=(120.0,)):
+        rows = [{"indicator": name, "value": "", "read": read, "rule": ""} for name, read in reads]
+        return {"price": price, "volatility": {"atr14": atr}, "weekly": None,
+                "levels": {"supports": [{"price": p} for p in sup], "resistances": [{"price": p} for p in res]},
+                "ledger": {"rows": rows}}
+
+    def test_short_side_poor_reward_risk_moves_exit_to_resistance(self):
+        # close 92, support 90, resistance 120: from the close the short makes 2 against 29 of risk
+        f = self.facts([("MA stack (20/50/200)", "bearish")], price=92.0, sup=(90.0,), res=(120.0,))
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "SELL")
+        self.assertEqual(st["plan"]["entry"], 120.0)
+        self.assertEqual(st["plan"]["stop"], 121.0)
+        self.assertEqual(st["plan"]["target"], 90.0)
+        self.assertAlmostEqual(st["plan"]["reward_risk"], 30.0)
+        self.assertIn("trim into strength", st["plan"]["note"])
+
+    def test_price_vs_200_weighs_one(self):
+        f = self.facts([("Price vs 200-day", "bullish"), ("RSI14", "bearish")])
+        self.assertEqual(ta.stance(f)["score"], 0.0)
+
+    def test_latest_sma_from_every_shape(self):
+        import tempfile
+        av = {"Meta Data": {}, "Technical Analysis: SMA": {"2026-09-16": {"SMA": "1.0"}, "2026-09-17": {"SMA": "2.5"}}}
+        shapes = {
+            "raw.json": json.dumps(av),
+            "wrapped.txt": json.dumps({"result": json.dumps(av)}),
+            "preview.json": json.dumps({"preview": True, "sample_data": json.dumps(av)}),
+            "plain.csv": "time,SMA\r\n2026-09-17,2.5\r\n2026-09-16,1.0\r\n",
+            "wrapped_csv.txt": json.dumps({"result": "time,SMA\r\n2026-09-17,2.5\r\n"}),
+        }
+        with tempfile.TemporaryDirectory() as d:
+            for name, body in shapes.items():
+                p = os.path.join(d, name)
+                with open(p, "w") as fh:
+                    fh.write(body)
+                self.assertEqual(ta.latest_sma_from_file(p), 2.5, name)
+            p = os.path.join(d, "err.json")
+            with open(p, "w") as fh:
+                fh.write(json.dumps({"error": {"type": "rate_limit"}}))
+            with self.assertRaises(ValueError):
+                ta.latest_sma_from_file(p)
+
+
 if __name__ == "__main__":
     unittest.main()
