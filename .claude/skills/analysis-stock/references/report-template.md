@@ -59,9 +59,22 @@ Same shape.
 ### 3. <name> — <p>%
 Same shape. Probabilities sum to 100. Confidence on any of them: LOW.
 
+## Recommendation `[FRAME]`
+
+**<LABEL>** (score <s>, net <n> of <t>). Confidence LOW.
+
+- Entry / stop / target / reward:risk, as the script printed them.
+- For: the ledger rows that pulled the score up. Against: the rows
+  that pulled it down.
+- Flips to <label> on a close above <resistance 1>; to <label> on a
+  close below <support 1>.
+- One sentence: the rule is fixed and mechanical, and it does not see
+  earnings, news, or the account; the decision and the size are the
+  reader's.
+
 ## Signal ledger
 
-Paste the script's ledger table and tally unchanged.
+Paste the script's ledger table, tally, and stance block unchanged.
 
 ## Not covered
 
