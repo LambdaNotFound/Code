@@ -4,7 +4,7 @@ OLD2NEW = {"scoping":"scope-problem","pr-review":"review-pr","rust-expert":"writ
            "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop"}
 skills = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob('.claude/skills/*/SKILL.md'))
 known = set(skills) | {os.path.basename(a)[:-3] for a in glob.glob('.claude/agents/**/*.md', recursive=True)} | {
-    'golang-pro','rust-pro','doc-coauthoring','architect-reviewer','code-reviewer','leetcode-reviewer'}
+    'golang-pro','rust-pro','doc-coauthoring','dataviz','design','architect-reviewer','code-reviewer','leetcode-reviewer'}
 fails=[]
 def ck(c, sk, what):
     if not c: fails.append(f"{sk}: {what}")
