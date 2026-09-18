@@ -209,9 +209,11 @@ class AnalyseTests(unittest.TestCase):
         self.assertIsNone(facts["weekly"])
         t = facts["ledger"]["tally"]
         self.assertEqual(sum(t.values()), len(facts["ledger"]["rows"]))
+        self.assertIn(facts["stance"]["label"], ("BUY", "ACCUMULATE", "HOLD", "REDUCE", "SELL"))
         text = ta.render(facts, "TEST")
         self.assertIn("# TA facts: TEST", text)
         self.assertIn("## Signal ledger", text)
+        self.assertIn("## Stance", text)
 
     def test_sma200_override_and_weekly(self):
         daily = bars_from_closes([100.0 + i for i in range(100)])
@@ -229,6 +231,62 @@ class AnalyseTests(unittest.TestCase):
         facts = ta.analyse(daily, weekly)
         self.assertEqual(facts["ma"]["sma200_source"], "approx-40-week")
         self.assertAlmostEqual(facts["ma"]["sma200"], 80.0)
+
+
+class StanceTests(unittest.TestCase):
+    def facts(self, reads, price=100.0, atr=2.0, sup=(90.0,), res=(120.0,)):
+        rows = [{"indicator": name, "value": "", "read": read, "rule": ""} for name, read in reads]
+        return {"price": price, "volatility": {"atr14": atr}, "weekly": None,
+                "levels": {"supports": [{"price": p} for p in sup], "resistances": [{"price": p} for p in res]},
+                "ledger": {"rows": rows}}
+
+    def test_all_bullish_is_buy_with_plan(self):
+        f = self.facts([("MA stack (20/50/200)", "bullish"), ("ADX14 / DI", "bullish"), ("RSI14", "neutral")])
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "BUY")
+        self.assertAlmostEqual(st["score"], 4 / 5)
+        self.assertEqual(st["plan"]["entry"], 100.0)
+        self.assertEqual(st["plan"]["stop"], 89.0)      # support minus half an ATR
+        self.assertEqual(st["plan"]["target"], 120.0)
+        self.assertAlmostEqual(st["plan"]["reward_risk"], 20 / 11)
+
+    def test_poor_reward_risk_demotes_to_accumulate_at_support(self):
+        f = self.facts([("MA stack (20/50/200)", "bullish")], price=118.0, sup=(90.0,), res=(120.0,))
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "ACCUMULATE")
+        self.assertEqual(st["plan"]["entry"], 90.0)
+        self.assertIn("reward/risk", st["plan"]["note"])
+
+    def test_all_bearish_is_sell(self):
+        f = self.facts([("MA stack (20/50/200)", "bearish"), ("MACD histogram", "bearish")])
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "SELL")
+        self.assertEqual(st["plan"]["stop"], 121.0)
+        self.assertEqual(st["plan"]["target"], 90.0)
+
+    def test_mixed_is_hold_with_no_plan(self):
+        f = self.facts([("MA stack (20/50/200)", "bullish"), ("Swing structure (daily)", "bearish"), ("RSI14", "neutral")])
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "HOLD")
+        self.assertEqual(st["score"], 0.0)
+        self.assertIsNone(st["plan"]["entry"])
+        self.assertIn("120.00", st["plan"]["note"])
+
+    def test_band_floor_is_inclusive(self):
+        # (+2 - 2 + 1) / 5 = 0.20 exactly -> ACCUMULATE, not HOLD
+        f = self.facts([("MA stack (20/50/200)", "bullish"), ("Swing structure (daily)", "bearish"), ("RSI14", "bullish")])
+        self.assertEqual(ta.stance(f)["label"], "ACCUMULATE")
+
+    def test_unknown_row_does_not_score(self):
+        f = self.facts([("Something new", "bullish")])
+        self.assertEqual(ta.stance(f)["label"], "HOLD")
+
+    def test_no_resistance_means_open_target(self):
+        f = self.facts([("MA stack (20/50/200)", "bullish")], res=())
+        st = ta.stance(f)
+        self.assertEqual(st["label"], "BUY")
+        self.assertIsNone(st["plan"]["target"])
+        self.assertIn("open-ended", st["plan"]["note"])
 
 
 if __name__ == "__main__":

@@ -481,6 +481,7 @@ def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3):
         "weekly": analyse_weekly(weekly) if weekly else None,
     }
     out["ledger"] = ledger(out)
+    out["stance"] = stance(out)
     return out
 
 
@@ -592,6 +593,79 @@ def ledger(f):
 
 
 # --------------------------------------------------------------------------- #
+# Stance: a deterministic buy/sell label from the ledger plus a trade plan
+# --------------------------------------------------------------------------- #
+
+# Trend rows count double; momentum and volume rows count once. The list is
+# the whole rule: a row not named here does not move the score.
+WEIGHTS = {
+    "MA stack (20/50/200)": 2, "MA stack (20/50)": 2, "Price vs 200-day": 2, "ADX14 / DI": 2,
+    "Swing structure (daily)": 2, "Weekly structure": 2, "Weekly price vs 50/200-week": 2,
+    "RSI14": 1, "MACD histogram": 1, "Stochastic %K": 1, "Bollinger %B": 1, "RSI divergence": 1,
+    "OBV vs price (20 bars)": 1, "Up/down volume (20 bars)": 1,
+}
+# score is net weight / total weight, in [-1, 1]
+BANDS = (
+    (0.5, "BUY"), (0.2, "ACCUMULATE"), (-0.2, "HOLD"), (-0.5, "REDUCE"), (-1.01, "SELL"),
+)
+
+
+def stance(f):
+    rows = f["ledger"]["rows"]
+    total = sum(WEIGHTS.get(r["indicator"], 0) for r in rows)
+    net = sum(WEIGHTS.get(r["indicator"], 0) * (1 if r["read"] == "bullish" else -1 if r["read"] == "bearish" else 0)
+              for r in rows)
+    score = net / total if total else 0.0
+    label = next(name for floor, name in BANDS if score >= floor)
+
+    price, a = f["price"], f["volatility"]["atr14"] or 0.0
+    sup = [c["price"] for c in f["levels"]["supports"]]
+    res = [c["price"] for c in f["levels"]["resistances"]]
+    # Nearest levels that are at least half an ATR away, so a stop or target is
+    # not sitting inside today's noise.
+    s1 = next((x for x in sup if price - x >= 0.5 * a), sup[0] if sup else None)
+    r1 = next((x for x in res if x - price >= 0.5 * a), res[0] if res else None)
+    wk = f["weekly"]
+    if r1 is None and wk:
+        r1 = wk["range_52w"]["high"] if wk["range_52w"]["high"] > price else None
+    if s1 is None and wk:
+        s1 = wk["range_52w"]["low"] if wk["range_52w"]["low"] < price else None
+
+    plan = {"entry": None, "stop": None, "target": None, "reward_risk": None, "note": ""}
+    if label in ("BUY", "ACCUMULATE"):
+        entry = price
+        stop = (s1 - 0.5 * a) if s1 is not None else price - 2 * a
+        target = r1
+        if target is None:
+            plan["note"] = "no resistance above price in the data (at highs); target is open-ended"
+        rr = None if target is None or entry <= stop else (target - entry) / (entry - stop)
+        if rr is not None and rr < 1.5 and s1 is not None:
+            # Chasing here pays badly; the same trade from the support is better.
+            label = "ACCUMULATE"
+            entry = s1
+            stop = s1 - 0.5 * a if a else s1 * 0.98
+            rr = (target - entry) / (entry - stop)
+            plan["note"] = f"reward/risk from the current price is under 1.5, so the entry moves down to support {s1:.2f}"
+        plan.update(entry=entry, stop=stop, target=target, reward_risk=rr)
+    elif label in ("SELL", "REDUCE"):
+        entry = price
+        stop = (r1 + 0.5 * a) if r1 is not None else price + 2 * a
+        target = s1
+        rr = None if target is None or stop <= entry else (entry - target) / (stop - entry)
+        plan.update(entry=entry, stop=stop, target=target, reward_risk=rr)
+        if target is None:
+            plan["note"] = "no support below price in the data; target is open-ended"
+    else:
+        plan["note"] = (f"no edge either way; a close above {r1:.2f} or below {s1:.2f} would change the label"
+                        if r1 is not None and s1 is not None else "no edge either way")
+
+    pulls = [r["indicator"] for r in rows if r["read"] == "bullish" and WEIGHTS.get(r["indicator"])]
+    drags = [r["indicator"] for r in rows if r["read"] == "bearish" and WEIGHTS.get(r["indicator"])]
+    return {"label": label, "score": score, "net": net, "total": total, "for": pulls, "against": drags,
+            "support_1": s1, "resistance_1": r1, "plan": plan}
+
+
+# --------------------------------------------------------------------------- #
 # Output
 # --------------------------------------------------------------------------- #
 
@@ -685,6 +759,16 @@ def render(f, symbol):
         L.append(f"| {row['indicator']} | {row['value']} | {row['read']} | {row['rule']} |")
     t = f["ledger"]["tally"]
     L.append(f"- Tally: {t['bullish']} bullish / {t['bearish']} bearish / {t['neutral']} neutral. A tally counts rows; it does not weight them.")
+    L.append("")
+    st, pl = f["stance"], f["stance"]["plan"]
+    L.append("## Stance (rule-based; trend rows x2, momentum and volume rows x1)")
+    L.append(f"- **{st['label']}** (score {st['score']:+.2f} = net {st['net']:+d} / total {st['total']})")
+    L.append(f"- For: {', '.join(st['for']) or 'none'}")
+    L.append(f"- Against: {', '.join(st['against']) or 'none'}")
+    L.append(f"- Entry {_f(pl['entry'])} / stop {_f(pl['stop'])} / target {_f(pl['target'])} / reward:risk {_f(pl['reward_risk'], 1)}"
+             + (f" ({pl['note']})" if pl['note'] else ""))
+    L.append("- Bands: BUY >= +0.50, ACCUMULATE >= +0.20, HOLD > -0.20, REDUCE > -0.50, SELL otherwise. "
+             "Stops sit half an ATR beyond the nearest level; a BUY with reward:risk under 1.5 becomes an ACCUMULATE at support.")
     return "\n".join(L)
 
 

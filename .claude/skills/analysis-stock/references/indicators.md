@@ -101,6 +101,33 @@ invalidate it. Rank them on the ledger: the side with more confirming
 rows gets the higher number. Do not let the rank leak into confidence:
 the whole exercise is `[FRAME]`.
 
+## Stance (the buy/sell rule)
+
+The script turns the ledger into one label by a fixed rule so that
+two runs on the same data give the same answer:
+
+- Trend rows weigh 2 (MA stack, price vs 200-day, ADX/DI, daily and
+  weekly swing structure, weekly price vs 50/200-week). Momentum and
+  volume rows weigh 1 (RSI, MACD histogram, stochastic, %B, RSI
+  divergence, OBV agreement, up/down volume).
+- Score = (bullish weight − bearish weight) / total weight, in [−1, 1].
+- BUY at +0.50 and above, ACCUMULATE from +0.20, HOLD between −0.20
+  and +0.20, REDUCE from −0.20 down, SELL at −0.50 and below.
+- Plan: entry at the close; stop half an ATR beyond the nearest
+  support (long) or resistance (short); target at the nearest level
+  on the other side. A BUY whose reward-to-risk from the close is
+  under 1.5 becomes an ACCUMULATE with the entry moved to the support,
+  because the same trade is only worth taking from there.
+- HOLD carries no plan, only the two closes that would change it.
+
+What the rule is and is not: it is a transparent tally of textbook
+reads, so it will be late at turns and wrong in ranges the way every
+trend rule is. It is not a forecast, it has no measured hit rate, and
+it knows nothing about earnings dates, news, or the user's account.
+Report it as `[FRAME]` at LOW confidence, and name the rows behind it.
+Never adjust the label by hand; if the story and the label disagree,
+the verdict is where to say so.
+
 ## What the script does not check
 
 Chart patterns (head and shoulders, cup and handle, flags, wedges),

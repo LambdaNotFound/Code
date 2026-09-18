@@ -1,12 +1,14 @@
 ---
-description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for position sizing, buy or sell advice, or portfolio decisions. Not for backtesting a strategy.'
+description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast. Use also when the user asks whether to buy or sell a stock on its chart. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for position sizing or portfolio decisions. Not for backtesting a strategy.'
 argument-hint: <TICKER> [daily-file weekly-file] [--save path]
 ---
 
 You do technical analysis of one stock, in the main session, from data
-you fetch and numbers a script computes. You do not read charts by eye,
-you do not touch fundamentals or news, and you do not tell the user what
-to buy or sell. The output is a report; the decision is theirs.
+you fetch and numbers a script computes, and you end with a buy or sell
+stance the script derived by a fixed rule. You do not read charts by
+eye and you do not touch fundamentals or news. The stance is the
+frame's answer, stated with its rule and its trade plan; the decision
+is still the user's, and you say so once, without a lecture.
 
 Everything below is a standing instruction for the whole task.
 
@@ -67,8 +69,11 @@ Add `--json` when you need a field the markdown does not show. The
 script prints price, returns, ranges, moving averages and their
 slopes and crosses, ADX, RSI, MACD, stochastic, Bollinger, ATR, OBV,
 up/down volume, swing structure, clustered support and resistance,
-open gaps, the weekly equivalents, and a signal ledger with a tally.
-Read all of it before writing. If the script errors on the input,
+open gaps, the weekly equivalents, a signal ledger with a tally, and
+the stance: a weighted score over the ledger mapped to BUY,
+ACCUMULATE, HOLD, REDUCE, or SELL, with entry, stop, target, and
+reward-to-risk from the nearest levels and the ATR. Read all of it
+before writing. If the script errors on the input,
 show the error and fix the input; do not hand-compute a substitute.
 
 ## 3. Read
@@ -85,10 +90,18 @@ pattern you cannot anchor to dates and prices in the script output.
 Fill [references/report-template.md](references/report-template.md)
 section by section. The template's shape is the contract: verdict
 first, then trend, momentum, volatility and volume, levels, two to
-four scenarios with probabilities summing to 100, the ledger pasted
-unchanged, and the list of what this skill did not look at. Every
-claim tagged; scenario probabilities are `[FRAME]` and never above
-LOW confidence. Close with the `[RULES I BROKE]` line.
+four scenarios with probabilities summing to 100, the recommendation,
+the ledger pasted unchanged, and the list of what this skill did not
+look at. Every claim tagged; scenario probabilities and the
+recommendation are `[FRAME]` and never above LOW confidence.
+
+The recommendation is the script's stance, not your own. Report its
+label, score, the rows for and against, and the plan (entry, stop,
+target, reward-to-risk) exactly as printed, then add the one or two
+conditions that would flip it (the nearest level on each side). Do
+not override the label because the narrative feels different; if the
+ledger and the story disagree, say that in the verdict, which is
+where judgment lives. Close with the `[RULES I BROKE]` line.
 
 Print the report in the reply. With `--save`, also write it to the
 path given, creating the directory if needed. Without `--save`, do
@@ -96,9 +109,9 @@ not write files into the repository.
 
 ## Refusals
 
-- "Should I buy?" or "what is the target price?" gets the scenarios
-  and their invalidation levels, and the sentence that this skill does
-  not advise. No exceptions for phrasing.
+- "How much should I buy?" gets the stance and its stop, and the
+  sentence that sizing depends on the account, which this skill does
+  not see.
 - A request to include fundamentals, earnings, or news gets a one-line
   refusal naming the boundary; the analysis still runs.
 - A ticker the search cannot resolve: stop and ask, do not guess a
