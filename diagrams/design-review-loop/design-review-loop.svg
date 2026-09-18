@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2721" height="832" viewBox="33.5 -224 2721 832">
+<rect x="33.5" y="-224" width="2721" height="832" fill="#ffffff"/>
+<rect id="files" x="78" y="377" width="2182.5" height="191" rx="32" fill="transparent" stroke="#94a3b8" stroke-width="1" stroke-dasharray="8 6"/>
+<text x="90" y="387.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="18" fill="#475569" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">agent-team-workspace/design-docs/&lt;slug&gt;/: the only state, one writer per file</text>
+<ellipse id="brief" cx="230" cy="70" rx="156.5" ry="65.5" fill="#fed7aa" stroke="#c2410c" stroke-width="2"/>
+<text x="230" y="42" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">brief.md</text>
+<text x="230" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">frozen by the lead</text>
+<text x="230" y="82" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">before round 0</text>
+<rect id="investigator" x="531.5" y="24" width="317" height="92" rx="23" fill="#ddd6fe" stroke="#6d28d9" stroke-width="2"/>
+<text x="690" y="42" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">design-investigator</text>
+<text x="690" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">authors design.md (round 0),</text>
+<text x="690" y="82" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">revises it by objection id</text>
+<rect id="barraiser" x="977" y="24" width="346" height="92" rx="23" fill="#ddd6fe" stroke="#6d28d9" stroke-width="2"/>
+<text x="1150" y="42" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">design-bar-raiser</text>
+<text x="1150" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">derives requirements first,</text>
+<text x="1150" y="82" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">appends ## Round N to review.md</text>
+<polygon id="verdict" points="1610,34 1711,70 1610,106 1509,70" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1610" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#78350f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">verdict?</text>
+<ellipse id="user" cx="1610" cy="-70" rx="136" ry="51" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+<text x="1610" y="-88" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e293b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">user decides</text>
+<text x="1610" y="-68" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e293b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">(designed exit)</text>
+<rect id="auditor" x="1921" y="24" width="298" height="92" rx="23" fill="#ddd6fe" stroke="#6d28d9" stroke-width="2"/>
+<text x="2070" y="42" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">ai-writing-auditor</text>
+<text x="2070" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">writes design.rewritten.md</text>
+<text x="2070" y="82" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#4c1d95" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">(never design.md)</text>
+<ellipse id="done" cx="2530" cy="70" rx="184" ry="65.5" fill="#a7f3d0" stroke="#047857" stroke-width="2"/>
+<text x="2530" y="42" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#064e3b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">investigator adopts</text>
+<text x="2530" y="62" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#064e3b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">the rewrite; design.md</text>
+<text x="2530" y="82" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#064e3b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">approved and audited</text>
+<text x="1840" y="131.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">lead relays only</text>
+<text x="1840" y="148.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">slug, round, verdict</text>
+<text x="1150" y="250.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">round 5 is the floor for a decision:</text>
+<text x="1150" y="267.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">approve, approve-with-risks, or escalate</text>
+<rect id="brief_md" x="110" y="444" width="240" height="92" rx="23" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+<text x="230" y="462" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">brief.md</text>
+<text x="230" y="482" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">writer: lead</text>
+<text x="230" y="502" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">(+ dated amendments)</text>
+<rect id="design_md" x="536" y="454" width="308" height="72" rx="18" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+<text x="690" y="472" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">design.md</text>
+<text x="690" y="492" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">writer: design-investigator</text>
+<rect id="review_md" x="1006" y="444" width="288" height="92" rx="23" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+<text x="1150" y="462" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">review.md</text>
+<text x="1150" y="482" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">writer: design-bar-raiser</text>
+<text x="1150" y="502" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">append-only ledger</text>
+<rect id="excerpt" x="1417.5" y="447.5" width="385" height="85" rx="21.25" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+<text x="1433.5" y="465.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">## Round 3</text>
+<text x="1433.5" y="482.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">R3-1 | should-fix | Plan step 5 defines...</text>
+<text x="1433.5" y="500.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">Verdict: approve-with-risks</text>
+<rect id="rewritten_md" x="1911.5" y="444" width="317" height="92" rx="23" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="2070" y="462" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">design.rewritten.md</text>
+<text x="2070" y="482" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">writer: ai-writing-auditor</text>
+<text x="2070" y="502" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">deleted when the loop closes</text>
+<text x="73.5" y="-180.5" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="28" fill="#1e3a5f" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">Design-review loop: two agents, one gate, files as the only state</text>
+<polyline id="brief-&gt;investigator" points="390.5,70 527.5,70" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="513,63.24 527.5,70 513,76.76" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="425.5" y="59" width="67" height="22" fill="#ffffff"/>
+<text x="459" y="62.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">round 0</text>
+<polyline id="investigator-&gt;barraiser" points="852.5,70 973,70" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="958.5,63.24 973,70 958.5,76.76" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="879.25" y="59" width="67" height="22" fill="#ffffff"/>
+<text x="912.75" y="62.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">round N</text>
+<polyline id="barraiser-&gt;verdict" points="1327,70 1505,70" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1490.5,63.24 1505,70 1490.5,76.76" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="verdict-&gt;auditor" points="1715,70 1917,70" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1902.5,63.24 1917,70 1902.5,76.76" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1736" y="50.5" width="160" height="39" fill="#ffffff"/>
+<text x="1816" y="54.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">approve /</text>
+<text x="1816" y="71.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">approve-with-risks</text>
+<polyline id="verdict-&gt;user" points="1610,30 1610,-15" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1603.24,-0.5 1610,-15 1616.76,-0.5" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1572" y="-3.5" width="76" height="22" fill="#ffffff"/>
+<text x="1610" y="0.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">escalate</text>
+<polyline id="verdict-&gt;investigator" points="1610,110 1610,210 690,210 690,120" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="683.24,134.5 690,120 696.76,134.5" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1088" y="190.5" width="134" height="39" fill="#ffffff"/>
+<text x="1155" y="194.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">revise /</text>
+<text x="1155" y="211.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">reject-approach</text>
+<polyline id="auditor-&gt;done" points="2223,70 2342,70" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="2327.5,63.24 2342,70 2327.5,76.76" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="2244.5" y="50.5" width="76" height="39" fill="#ffffff"/>
+<text x="2282.5" y="54.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">adoption</text>
+<text x="2282.5" y="71.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">pass</text>
+<polyline id="excerpt-&gt;review_md" points="1413.5,490 1298,490" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="8 6" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

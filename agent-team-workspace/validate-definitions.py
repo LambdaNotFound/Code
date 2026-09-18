@@ -103,7 +103,9 @@ print(f"   {len(skdirs)} skills checked")
 print("5. ALL FILES — every referenced repo path resolves")
 ROOTS=('agent-team-workspace/','.claude/','golang/','python/','rust/','spaced_repetition/','fixtures/','notes/','system_design/','.github/')
 TOK=re.compile(r'[A-Za-z0-9_.<>*-]+(?:/[A-Za-z0-9_.<>*-]+)+')
-scan=agents+[os.path.join(d,'SKILL.md') for d in skdirs] \
+# a skill dir without SKILL.md already failed check 4; opening it here would raise
+# and take every later check with it
+scan=agents+[s for s in (os.path.join(d,'SKILL.md') for d in skdirs) if os.path.isfile(s)] \
      +sorted(glob.glob('.claude/skills/*/references/*.md')) \
      +sorted(glob.glob('agent-team-workspace/protocols/*.md')) \
      +sorted(glob.glob('agent-team-workspace/agent-specs/*.md'))+['CLAUDE.md']
@@ -266,6 +268,7 @@ for sk in sorted(skills.values()):
            "SKILL.md links a reference file that does not exist", f"{sk} -> {rel}")
 for d in glob.glob('.claude/skills/*/references'):
     sk=os.path.join(os.path.dirname(d),'SKILL.md')
+    if not os.path.isfile(sk): continue   # already a check-4 failure; do not raise here
     body=io.open(sk,encoding='utf-8').read()
     for f in glob.glob(os.path.join(d,'*.md')):
         rel='references/'+os.path.basename(f)
