@@ -762,12 +762,22 @@ def render(f, symbol):
     L.append("")
     st, pl = f["stance"], f["stance"]["plan"]
     L.append("## Stance (rule-based; trend rows x2, momentum and volume rows x1)")
-    L.append(f"- **{st['label']}** (score {st['score']:+.2f} = net {st['net']:+d} / total {st['total']})")
-    L.append(f"- For: {', '.join(st['for']) or 'none'}")
-    L.append(f"- Against: {', '.join(st['against']) or 'none'}")
-    L.append(f"- Entry {_f(pl['entry'])} / stop {_f(pl['stop'])} / target {_f(pl['target'])} / reward:risk {_f(pl['reward_risk'], 1)}"
-             + (f" ({pl['note']})" if pl['note'] else ""))
-    L.append("- Bands: BUY >= +0.50, ACCUMULATE >= +0.20, HOLD > -0.20, REDUCE > -0.50, SELL otherwise. "
+    L.append("| | |")
+    L.append("|---|---|")
+    L.append(f"| **Stance** | **{st['label']}** |")
+    L.append(f"| Score | {st['score']:+.2f} (net {st['net']:+d} of {st['total']}) |")
+    L.append(f"| Entry | {_f(pl['entry'])} |")
+    L.append(f"| Stop | {_f(pl['stop'])} |")
+    L.append(f"| Target | {_f(pl['target'])} |")
+    L.append(f"| Reward:risk | {_f(pl['reward_risk'], 1)} |")
+    L.append(f"| For | {', '.join(st['for']) or 'none'} |")
+    L.append(f"| Against | {', '.join(st['against']) or 'none'} |")
+    L.append(f"| Flips up on | close above {_f(st['resistance_1'])} |")
+    L.append(f"| Flips down on | close below {_f(st['support_1'])} |")
+    if pl["note"]:
+        L.append(f"| Note | {pl['note']} |")
+    L.append("")
+    L.append("Bands: BUY >= +0.50, ACCUMULATE >= +0.20, HOLD > -0.20, REDUCE > -0.50, SELL otherwise. "
              "Stops sit half an ATR beyond the nearest level; a BUY with reward:risk under 1.5 becomes an ACCUMULATE at support.")
     return "\n".join(L)
 

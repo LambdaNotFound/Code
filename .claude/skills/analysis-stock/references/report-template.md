@@ -61,16 +61,22 @@ Same shape. Probabilities sum to 100. Confidence on any of them: LOW.
 
 ## Recommendation `[FRAME]`
 
-**<LABEL>** (score <s>, net <n> of <t>). Confidence LOW.
+Paste the script's Stance table as is, then fill the last two rows.
 
-- Entry / stop / target / reward:risk, as the script printed them.
-- For: the ledger rows that pulled the score up. Against: the rows
-  that pulled it down.
-- Flips to <label> on a close above <resistance 1>; to <label> on a
-  close below <support 1>.
-- One sentence: the rule is fixed and mechanical, and it does not see
-  earnings, news, or the account; the decision and the size are the
-  reader's.
+| | |
+|---|---|
+| **Stance** | **<LABEL>** |
+| Score | <s> (net <n> of <t>) |
+| Entry | |
+| Stop | |
+| Target | |
+| Reward:risk | |
+| For | ledger rows that pulled the score up |
+| Against | ledger rows that pulled it down |
+| Flips up on | close above <resistance 1> |
+| Flips down on | close below <support 1> |
+| Confidence | LOW; fixed mechanical rule, no measured hit rate |
+| Not seen | earnings date, news, the account; size is the reader's |
 
 ## Signal ledger
 
