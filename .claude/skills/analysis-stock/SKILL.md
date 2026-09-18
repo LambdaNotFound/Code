@@ -1,6 +1,6 @@
 ---
-description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast. Use also when the user asks whether to buy or sell a stock on its chart. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for position sizing or portfolio decisions. Not for backtesting a strategy.'
-argument-hint: <TICKER> [daily-file weekly-file] [--save path]
+description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Also scores Minervini''s Stage 2 trend template, runs weekly key-reversal, failed-extreme, and failed-breakout checks at 52-week extremes, and lists momentum-burst days. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, 2R target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast, plus fixed-fractional share count when the user gives an account size. Use also when the user asks whether to buy or sell a stock on its chart, or how many shares a given risk budget allows. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for portfolio-level decisions. Not for backtesting a strategy.'
+argument-hint: <TICKER> [daily-file weekly-file] [--account equity [--risk-pct 1]] [--save path]
 ---
 
 You do technical analysis of one stock, in the main session, from data
@@ -20,8 +20,11 @@ The first token is the ticker. If the user gave a company name instead,
 resolve it with `mcp__alphavantage__SYMBOL_SEARCH` and confirm the
 match in one line before spending any more calls. Two file paths after
 the ticker mean the user already has the daily and weekly data on disk
-(any shape the script accepts); skip the fetch. `--save <path>` writes
-the finished report there as well as printing it.
+(any shape the script accepts); skip the fetch. `--account <equity>`
+turns on position sizing, with `--risk-pct` (default 1) and
+`--max-position-pct` (default 10) passed through to the script.
+`--save <path>` writes the finished report there as well as printing
+it.
 
 ## 1. Fetch (three MCP calls, in this order)
 
@@ -69,11 +72,13 @@ Add `--json` when you need a field the markdown does not show. The
 script prints price, returns, ranges, moving averages and their
 slopes and crosses, ADX, RSI, MACD, stochastic, Bollinger, ATR, OBV,
 up/down volume, swing structure, clustered support and resistance,
-open gaps, the weekly equivalents, a signal ledger with a tally, and
-the stance: a weighted score over the ledger mapped to BUY,
-ACCUMULATE, HOLD, REDUCE, or SELL, with entry, stop, target, and
-reward-to-risk from the nearest levels and the ATR. Read all of it
-before writing. If the script errors on the input,
+open gaps, momentum-burst days, the weekly equivalents, the Minervini
+trend template (7 checks), the weekly reversal checks on completed
+weeks, a signal ledger with a tally, and the stance: a weighted score
+over the ledger mapped to BUY, ACCUMULATE, HOLD, REDUCE, or SELL, with
+entry, stop, target, 2R target, and reward-to-risk from the nearest
+levels and the ATR. With `--account` it adds a fixed-fractional share
+count. Read all of it before writing. If the script errors on the input,
 show the error and fix the input; do not hand-compute a substitute.
 
 ## 3. Read
@@ -109,9 +114,9 @@ not write files into the repository.
 
 ## Refusals
 
-- "How much should I buy?" gets the stance and its stop, and the
-  sentence that sizing depends on the account, which this skill does
-  not see.
+- "How much should I buy?" without an account size gets the stance
+  and its stop, and one line asking for the equity and risk per trade
+  so the script can size it.
 - A request to include fundamentals, earnings, or news gets a one-line
   refusal naming the boundary; the analysis still runs.
 - A ticker the search cannot resolve: stop and ask, do not guess a
