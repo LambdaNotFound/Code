@@ -1,6 +1,7 @@
 """Tests for ta.py. Run from this directory: python3 -m unittest test_ta -v"""
 
 import json
+import math
 import os
 import sys
 import unittest
@@ -440,6 +441,115 @@ class SessionLessonTests(unittest.TestCase):
                 fh.write(json.dumps({"error": {"type": "rate_limit"}}))
             with self.assertRaises(ValueError):
                 ta.latest_sma_from_file(p)
+
+
+class MonthlyAndMoveTests(unittest.TestCase):
+    def weekly_series(self, n=160, start=100.0, step=0.5, amp=0.0, period=40):
+        """One bar per week from 2020-01-03, so 4-5 land in each calendar month.
+        amp adds a cycle so the monthly bars have swing points to detect; a purely
+        monotonic series has no local highs or lows and reads as undetermined."""
+        import datetime
+        d0 = datetime.date(2020, 1, 3)
+        out = []
+        for i in range(n):
+            d = d0 + datetime.timedelta(weeks=i)
+            c = start + i * step + amp * math.sin(2 * math.pi * i / period)
+            out.append({"date": d.isoformat(), "open": c - 0.5, "high": c + 1.0, "low": c - 1.0,
+                        "close": c, "volume": 100.0, "adjusted": True})
+        return out
+
+    def test_to_monthly_aggregates_ohlcv(self):
+        bars = [
+            {"date": "2026-01-05", "open": 10, "high": 12, "low": 9, "close": 11, "volume": 5, "adjusted": True},
+            {"date": "2026-01-26", "open": 11, "high": 15, "low": 8, "close": 14, "volume": 7, "adjusted": True},
+            {"date": "2026-02-02", "open": 14, "high": 16, "low": 13, "close": 15, "volume": 3, "adjusted": True},
+        ]
+        m = ta.to_monthly(bars)
+        self.assertEqual([b["date"] for b in m], ["2026-01", "2026-02"])
+        self.assertEqual((m[0]["open"], m[0]["high"], m[0]["low"], m[0]["close"], m[0]["volume"]), (10, 15, 8, 14, 12))
+        self.assertEqual(m[1]["close"], 15)
+
+    def test_to_monthly_adjusted_flag_is_and(self):
+        bars = [{"date": "2026-01-05", "open": 1, "high": 1, "low": 1, "close": 1, "volume": 1, "adjusted": True},
+                {"date": "2026-01-12", "open": 1, "high": 1, "low": 1, "close": 1, "volume": 1, "adjusted": False}]
+        self.assertFalse(ta.to_monthly(bars)[0]["adjusted"])
+
+    def test_analyse_monthly_uptrend(self):
+        # drift per cycle (40) exceeds the swing amplitude (30 peak to trough), so
+        # each swing high and each swing low is above the one before it
+        mo = ta.analyse_monthly(self.weekly_series(step=1.0, amp=15.0))
+        self.assertFalse(mo["insufficient"])
+        self.assertGreater(mo["bars"], 30)
+        self.assertEqual(mo["structure"]["label"], "uptrend")
+        self.assertIn("HH/HL", mo["structure"]["detail"])
+        self.assertGreater(mo["ma"]["sma12"], mo["ma"]["sma24"])
+        self.assertEqual(mo["ma"]["sma12_slope"], "rising")
+        self.assertGreater(mo["range_all"]["pct_from_low"], 0.0)
+
+    def test_analyse_monthly_downtrend(self):
+        mo = ta.analyse_monthly(self.weekly_series(start=300.0, step=-1.0, amp=15.0))
+        self.assertEqual(mo["structure"]["label"], "downtrend")
+
+    def test_monotonic_series_has_no_swings(self):
+        mo = ta.analyse_monthly(self.weekly_series())
+        self.assertEqual(mo["structure"]["label"], "undetermined")
+
+    def test_analyse_monthly_insufficient(self):
+        self.assertTrue(ta.analyse_monthly(self.weekly_series(n=20))["insufficient"])
+
+    def test_realized_vol_matches_formula(self):
+        closes = [100.0]
+        for i in range(40):
+            closes.append(closes[-1] * math.exp(0.01 if i % 2 == 0 else -0.01))
+        self.assertAlmostEqual(ta.realized_vol(closes, 20), 0.01 * math.sqrt(20 / 19) * math.sqrt(252), places=9)
+        self.assertAlmostEqual(ta.realized_vol([7.0] * 30, 20), 0.0)
+        self.assertIsNone(ta.realized_vol([1.0, 2.0], 20))
+
+    def test_third_friday_known_dates(self):
+        import datetime
+        self.assertEqual(ta.third_friday(2026, 9), datetime.date(2026, 9, 18))
+        self.assertEqual(ta.third_friday(2026, 10), datetime.date(2026, 10, 16))
+        self.assertEqual(ta.third_friday(2026, 1), datetime.date(2026, 1, 16))
+        for y in range(2024, 2030):
+            for m in range(1, 13):
+                d = ta.third_friday(y, m)
+                self.assertEqual(d.weekday(), 4)
+                self.assertTrue(15 <= d.day <= 21)
+
+    def test_next_expiries_are_future_and_ordered(self):
+        import datetime
+        out = ta.next_expiries(datetime.date(2026, 9, 17), 3)
+        self.assertEqual([d.isoformat() for d in out], ["2026-09-18", "2026-10-16", "2026-11-20"])
+        after = ta.next_expiries(datetime.date(2026, 12, 20), 2)
+        self.assertEqual([d.isoformat() for d in after], ["2027-01-15", "2027-02-19"])
+
+    def test_expected_moves_scale_with_root_time(self):
+        import datetime
+        em = ta.expected_moves(100.0, 0.40, datetime.date(2026, 9, 17))
+        by = {r["label"]: r for r in em["horizons"]}
+        self.assertAlmostEqual(by["30d"]["sigma_pct"], 100 * 0.40 * math.sqrt(30 / 365), places=9)
+        # doubling the horizon multiplies sigma by sqrt(2)
+        self.assertAlmostEqual(by["60d"]["sigma_pct"] / by["30d"]["sigma_pct"], math.sqrt(2), places=9)
+        self.assertLess(by["30d"]["low"], 100.0)
+        self.assertGreater(by["30d"]["high"], 100.0)
+        self.assertLess(by["30d"]["low_2s"], by["30d"]["low"])
+        self.assertEqual(len(em["expiries"]), 3)
+
+    def test_expected_moves_none_without_vol(self):
+        import datetime
+        self.assertIsNone(ta.expected_moves(100.0, None, datetime.date(2026, 9, 17)))
+
+    def test_analyse_carries_monthly_and_expected_move(self):
+        daily = bars_from_closes([100.0 + i * 0.3 for i in range(100)])
+        for i, b in enumerate(daily):
+            b["date"] = f"2026-{1 + i // 28:02d}-{1 + i % 28:02d}"
+        facts = ta.analyse(daily, self.weekly_series(), sma200_daily=90.0)
+        self.assertFalse(facts["monthly"]["insufficient"])
+        self.assertIsNotNone(facts["expected_move"])
+        self.assertIn("Monthly structure", [r["indicator"] for r in facts["ledger"]["rows"]])
+        text = ta.render(facts, "T")
+        self.assertIn("## Monthly", text)
+        self.assertIn("## Expected move", text)
 
 
 if __name__ == "__main__":

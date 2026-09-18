@@ -32,6 +32,7 @@ import os
 import sys
 import urllib.parse
 import urllib.request
+from datetime import date, datetime
 
 # --------------------------------------------------------------------------- #
 # Input
@@ -494,6 +495,16 @@ def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3, account=None,
             price, s50[-1], w30[-1], sma200_daily, w40[-5] if len(w40) > 4 else None,
             out["weekly"]["range_52w"]["low"], out["weekly"]["range_52w"]["high"], approx)
         out["weekly_reversals"] = weekly_reversals(weekly)
+        out["monthly"] = analyse_monthly(weekly)
+    else:
+        out["monthly"] = None
+    hv20, hv60 = realized_vol(closes, 20), realized_vol(closes, 60)
+    out["realized_vol"] = {"hv20": hv20, "hv60": hv60}
+    try:
+        asof_d = datetime.strptime(last["date"][:10], "%Y-%m-%d").date()
+    except ValueError:
+        asof_d = None
+    out["expected_move"] = expected_moves(price, hv60 or hv20, asof_d) if asof_d else None
     out["ledger"] = ledger(out)
     out["stance"] = stance(out)
     out["stance"]["plan"]["target_2r"] = None
@@ -679,6 +690,119 @@ def position_size(plan, account, risk_pct, max_position_pct):
             "actual_risk": shares * per_share, "binding": "risk budget" if by_risk <= by_cap else f"{max_position_pct:g}% position cap"}
 
 
+def to_monthly(bars):
+    """Group bars into calendar months. A bar is assigned to the month its date
+    falls in, so a week straddling a month boundary lands in the month it ended
+    in; the first and last months of the series are partial."""
+    months, order = {}, []
+    for b in bars:
+        key = b["date"][:7]
+        if key not in months:
+            months[key] = {"date": key, "open": b["open"], "high": b["high"], "low": b["low"],
+                           "close": b["close"], "volume": b["volume"], "adjusted": b["adjusted"]}
+            order.append(key)
+        else:
+            m = months[key]
+            m["high"] = max(m["high"], b["high"])
+            m["low"] = min(m["low"], b["low"])
+            m["close"] = b["close"]
+            m["volume"] += b["volume"]
+            m["adjusted"] = m["adjusted"] and b["adjusted"]
+    return [months[k] for k in order]
+
+
+def analyse_monthly(weekly):
+    """Multi-year structure from monthly bars resampled off the weekly series."""
+    bars = to_monthly(weekly)
+    if len(bars) < 14:
+        return {"insufficient": True, "bars": len(bars)}
+    closes = [b["close"] for b in bars]
+    dates = [b["date"] for b in bars]
+    price = closes[-1]
+    s6, s12, s24 = sma(closes, 6), sma(closes, 12), sma(closes, 24)
+    r = rsi(closes) if len(closes) > 14 else [None] * len(closes)
+    m_line, m_sig, m_hist = macd(closes)
+    pivs = pivots(bars, 2)
+    label, detail = trend_structure(pivs[-8:])
+    sup, res = cluster_levels(pivs, price, tol=0.03)
+    hi_all = max(b["high"] for b in bars)
+    lo_all = min(b["low"] for b in bars)
+    up = sum(1 for i, b in enumerate(bars[-12:]) if i and b["close"] > bars[len(bars) - 12 + i - 1]["close"])
+    return {
+        "insufficient": False, "bars": len(bars), "as_of": dates[-1],
+        "partial_month": True,
+        "returns_pct": {
+            "6m": pct(price, closes[-7]) if len(closes) > 6 else None,
+            "12m": pct(price, closes[-13]) if len(closes) > 12 else None,
+            "36m": pct(price, closes[-37]) if len(closes) > 36 else None,
+            "60m": pct(price, closes[-61]) if len(closes) > 60 else None,
+        },
+        "ma": {"sma6": s6[-1], "sma12": s12[-1], "sma24": s24[-1],
+               "pct_vs_sma6": pct(price, s6[-1]), "pct_vs_sma12": pct(price, s12[-1]), "pct_vs_sma24": pct(price, s24[-1]),
+               "sma12_slope": slope_sign(s12, 3), "sma24_slope": slope_sign(s24, 6),
+               "cross_6_12": last_cross(s6, s12, dates)},
+        "range_all": {"high": hi_all, "low": lo_all, "pct_from_high": pct(price, hi_all), "pct_from_low": pct(price, lo_all)},
+        "rsi14": r[-1], "macd_hist": m_hist[-1], "macd_cross": last_cross(m_line, m_sig, dates),
+        "structure": {"label": label, "detail": detail},
+        "levels": {"supports": sup[:3], "resistances": res[:3]},
+        "up_months_12": up, "of": min(12, len(bars)) - 1,
+    }
+
+
+# --------------------------------------------------------------------------- #
+# Expected move: what realized volatility implies over an option's horizon
+# --------------------------------------------------------------------------- #
+
+def realized_vol(closes, n):
+    """Annualised standard deviation of daily log returns over the last n bars."""
+    if len(closes) <= n:
+        return None
+    rets = [math.log(closes[i] / closes[i - 1]) for i in range(len(closes) - n, len(closes))]
+    m = sum(rets) / n
+    var = sum((x - m) ** 2 for x in rets) / (n - 1)
+    return math.sqrt(var) * math.sqrt(252)
+
+
+def third_friday(year, month):
+    """The standard US monthly option expiry."""
+    d = date(year, month, 1)
+    # weekday(): Monday 0 ... Friday 4
+    first_friday = 1 + (4 - d.weekday()) % 7
+    return date(year, month, first_friday + 14)
+
+
+def next_expiries(asof, count=3):
+    out, y, m = [], asof.year, asof.month
+    while len(out) < count:
+        e = third_friday(y, m)
+        if e > asof:
+            out.append(e)
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return out
+
+
+def expected_moves(price, hv, asof, horizons=(7, 14, 30, 60, 90)):
+    """One-sigma ranges implied by realized volatility, at fixed day counts and at
+    the next three monthly expiries. This is what the stock has been doing, not
+    what the options market is pricing; only a quote gives implied vol."""
+    if hv is None or price is None:
+        return None
+    rows = []
+    for days in horizons:
+        sd = hv * math.sqrt(days / 365.0)
+        rows.append({"label": f"{days}d", "days": days, "sigma_pct": 100.0 * sd,
+                     "low": price * math.exp(-sd), "high": price * math.exp(sd),
+                     "low_2s": price * math.exp(-2 * sd), "high_2s": price * math.exp(2 * sd)})
+    exp_rows = []
+    for e in next_expiries(asof):
+        days = (e - asof).days
+        sd = hv * math.sqrt(days / 365.0)
+        exp_rows.append({"label": e.isoformat(), "days": days, "sigma_pct": 100.0 * sd,
+                         "low": price * math.exp(-sd), "high": price * math.exp(sd),
+                         "low_2s": price * math.exp(-2 * sd), "high_2s": price * math.exp(2 * sd)})
+    return {"hv": hv, "horizons": rows, "expiries": exp_rows}
+
+
 def ledger(f):
     """One row per indicator: (name, value, read). read in {bullish, bearish, neutral}."""
     rows = []
@@ -756,6 +880,11 @@ def ledger(f):
             value += " (vetoed by a later closing extreme)"
         add(f"Weekly reversal checks ({wr['window_weeks']}w)", value, wr["read"],
             "key reversal / failed extreme / failed breakout at a 52-week extreme, unless a later close makes a new extreme")
+    mo = f.get("monthly")
+    if mo and not mo.get("insufficient"):
+        add("Monthly structure", mo["structure"]["label"],
+            {"uptrend": "bullish", "downtrend": "bearish"}.get(mo["structure"]["label"], "neutral"),
+            "HH/HL vs LH/LL of monthly swings; the slowest timeframe the data supports")
     tally = {k: sum(1 for r in rows if r["read"] == k) for k in ("bullish", "bearish", "neutral")}
     return {"rows": rows, "tally": tally}
 
@@ -772,6 +901,7 @@ WEIGHTS = {
     "RSI14": 1, "MACD histogram": 1, "Stochastic %K": 1, "Bollinger %B": 1, "RSI divergence": 1,
     "OBV vs price (20 bars)": 1, "Up/down volume (20 bars)": 1,
     "Trend template (Minervini)": 2, "Weekly reversal checks (8w)": 1,
+    "Monthly structure": 2,
 }
 # score is net weight / total weight, in [-1, 1]
 BANDS = (
@@ -929,6 +1059,38 @@ def render(f, symbol):
         L.append(f"| 200-week | {_f(wm['sma200'])} | {_p(wm['pct_vs_sma200'])} | n/a |")
         L.append(f"- 20/50-week cross: {_cross(wm['cross_20_50'])}; weekly RSI14 {_f(wk['rsi14'], 1)}; weekly MACD hist {_f(wk['macd_hist'], 3)}; weekly MACD cross: {_cross(wk['macd_cross'])}")
         L.append(f"- Weekly swing structure: {wk['structure']['label']} ({wk['structure']['detail']})")
+        L.append("")
+    mo = f.get("monthly")
+    if mo and not mo.get("insufficient"):
+        mm, ra = mo["ma"], mo["range_all"]
+        L.append(f"## Monthly (multi-year, {mo['bars']} months resampled from the weekly series)")
+        L.append("| MA | Value | Price vs MA | Slope |")
+        L.append("|---|---|---|---|")
+        L.append(f"| 6-month | {_f(mm['sma6'])} | {_p(mm['pct_vs_sma6'])} | n/a |")
+        L.append(f"| 12-month | {_f(mm['sma12'])} | {_p(mm['pct_vs_sma12'])} | {mm['sma12_slope'] or 'n/a'} |")
+        L.append(f"| 24-month | {_f(mm['sma24'])} | {_p(mm['pct_vs_sma24'])} | {mm['sma24_slope'] or 'n/a'} |")
+        mr = mo["returns_pct"]
+        L.append(f"- Returns: 6m {_p(mr['6m'])}, 12m {_p(mr['12m'])}, 36m {_p(mr['36m'])}, 60m {_p(mr['60m'])}")
+        L.append(f"- Full-history range {_f(ra['low'])} - {_f(ra['high'])} (from high {_p(ra['pct_from_high'])}, from low {_p(ra['pct_from_low'])})")
+        L.append(f"- 6/12-month cross: {_cross(mm['cross_6_12'])}; monthly RSI14 {_f(mo['rsi14'], 1)}; monthly MACD hist {_f(mo['macd_hist'], 3)}; monthly MACD cross: {_cross(mo['macd_cross'])}")
+        L.append(f"- Monthly swing structure: {mo['structure']['label']} ({mo['structure']['detail']})")
+        L.append(f"- Up months in the last {mo['of']}: {mo['up_months_12']}")
+        for kind in ("supports", "resistances"):
+            items = mo["levels"][kind]
+            L.append(f"- Monthly {kind}: " + (", ".join(f"{_f(c['price'])} ({c['touches']}, last {c['last']})" for c in items) if items else "none"))
+        L.append("- The newest month is partial, and a week straddling a month end counts in the month it closed in.")
+        L.append("")
+    em = f.get("expected_move")
+    if em:
+        rv = f.get("realized_vol") or {}
+        L.append("## Expected move (realized volatility basis)")
+        L.append(f"- Realized vol: 20-day {_f(100*rv['hv20'] if rv.get('hv20') else None, 1, '%')}, 60-day {_f(100*rv['hv60'] if rv.get('hv60') else None, 1, '%')}; the table uses {_f(100*em['hv'], 1, '%')}.")
+        L.append("| Horizon | Days | 1 sigma | 1-sigma range | 2-sigma range |")
+        L.append("|---|---|---|---|---|")
+        for row in em["horizons"] + em["expiries"]:
+            L.append(f"| {row['label']} | {row['days']} | {row['sigma_pct']:.1f}% | {_f(row['low'])} - {_f(row['high'])} | {_f(row['low_2s'])} - {_f(row['high_2s'])} |")
+        L.append("- These are what the stock has been doing, not what the options market is pricing. "
+                 "Only a live quote gives implied vol; pass one to the analysis-option skill to compare the two.")
         L.append("")
     tt = f.get("trend_template")
     if tt:

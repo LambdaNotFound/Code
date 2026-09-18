@@ -1,5 +1,5 @@
 ---
-description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Also scores Minervini''s Stage 2 trend template, runs weekly key-reversal, failed-extreme, and failed-breakout checks at 52-week extremes, and lists momentum-burst days. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, 2R target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast, plus fixed-fractional share count when the user gives an account size. Use also when the user asks whether to buy or sell a stock on its chart, or how many shares a given risk budget allows. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for portfolio-level decisions. Not for backtesting a strategy.'
+description: 'Technical analysis of one stock from live Alpha Vantage price data across daily, weekly and monthly timeframes: trend, momentum, volatility, volume, support and resistance, the Minervini Stage 2 trend template, weekly key-reversal and failed-breakout checks, momentum-burst days, ranked scenarios, and the expected move to the next option expiries from realized volatility. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every number deterministically with scripts/ta.py, renders a three-panel SVG candlestick chart with scripts/chart.py, and writes the report to references/report-template.md with every claim tagged per this repo''s epistemic rules. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance carrying entry, stop, target, 2R target and reward-to-risk, labelled as the frame''s output rather than a forecast, plus a fixed-fractional share count when given an account size. Use when the user names a ticker and asks for technical analysis, a chart, support and resistance, trend or momentum, whether a stock is overbought or oversold, whether to buy or sell it on its chart, or how many shares a risk budget allows. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for portfolio-level decisions. Not for backtesting a strategy.'
 argument-hint: <TICKER> [daily-file weekly-file] [--account equity [--risk-pct 1]] [--save path]
 ---
 
@@ -80,14 +80,33 @@ Add `--json` when you need a field the markdown does not show. The
 script prints price, returns, ranges, moving averages and their
 slopes and crosses, ADX, RSI, MACD, stochastic, Bollinger, ATR, OBV,
 up/down volume, swing structure, clustered support and resistance,
-open gaps, momentum-burst days, the weekly equivalents, the Minervini
+open gaps, momentum-burst days, the weekly equivalents, a monthly
+multi-year view resampled from the weekly series, the Minervini
 trend template (7 checks), the weekly reversal checks on completed
-weeks, a signal ledger with a tally, and the stance: a weighted score
-over the ledger mapped to BUY, ACCUMULATE, HOLD, REDUCE, or SELL, with
-entry, stop, target, 2R target, and reward-to-risk from the nearest
-levels and the ATR. With `--account` it adds a fixed-fractional share
-count. Read all of it before writing. If the script errors on the input,
-show the error and fix the input; do not hand-compute a substitute.
+weeks, the expected move to fixed horizons and the next three monthly
+expiries from realized volatility, a signal ledger with a tally, and
+the stance: a weighted score over the ledger mapped to BUY,
+ACCUMULATE, HOLD, REDUCE, or SELL, with entry, stop, target, 2R
+target, and reward-to-risk from the nearest levels and the ATR. With
+`--account` it adds a fixed-fractional share count. Read all of it
+before writing. If the script errors on the input, show the error and
+fix the input; do not hand-compute a substitute.
+
+Then render the chart, from the same files, so the picture cannot
+disagree with the numbers:
+
+```
+python3 .claude/skills/analysis-stock/scripts/chart.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL> --out <scratchpad>/<SYMBOL>_chart.svg
+```
+
+It writes a standalone SVG with three stacked panels: daily
+candlesticks with SMA20/50/200, the support and resistance clusters
+labelled at the right edge, gap markers and a volume strip; weekly
+with the 20- and 50-week averages; monthly with the 12- and 24-month
+averages. `--theme dark` inverts the palette, `--daily-bars` changes
+the daily window. Send the file to the user with the report and say
+it is an SVG. Never hand-draw a chart or describe one you did not
+render.
 
 ## 3. Read
 
@@ -105,7 +124,9 @@ section by section. The template's shape is the contract: verdict
 first, then trend, momentum, volatility and volume, levels, two to
 four scenarios with probabilities summing to 100, the recommendation,
 the ledger pasted unchanged, and the list of what this skill did not
-look at. Every claim tagged; scenario probabilities and the
+look at. The chart goes at the top, right under the verdict; the
+monthly view goes with the other timeframes; the expected-move table
+goes after volatility. Every claim tagged; scenario probabilities and the
 recommendation are `[FRAME]` and never above LOW confidence.
 
 The recommendation is the script's stance, not your own. Paste its
@@ -134,5 +155,6 @@ not write files into the repository.
 
 1. The report, in the template's order, in the reply.
 2. The path, if `--save` was given.
-3. The number of Alpha Vantage calls used, so the user can track the
+3. The chart file, sent to the user, and its path.
+4. The number of Alpha Vantage calls used, so the user can track the
    daily budget.

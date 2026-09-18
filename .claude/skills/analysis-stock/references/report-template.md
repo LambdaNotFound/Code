@@ -10,6 +10,11 @@ One paragraph. Primary trend (weekly), the daily posture inside it, the
 one thing that would change the read, and the ledger tally. Tag it
 `[INFERRED]`, confidence LOW or lower.
 
+## Chart
+
+The rendered SVG, sent as a file. One line naming what is on it and
+the one thing worth looking at.
+
 ## Price and trend
 
 | | Daily | Weekly |
@@ -36,6 +41,19 @@ divergence the script found. One read per indicator, each tagged
 ATR as % of price, Bollinger position and bandwidth percentile, volume
 vs 20-day average, up/down volume ratio, OBV agreement, burst days in
 the last 20 bars. State whether volume confirms the price action or not.
+
+## Monthly (multi-year)
+
+The 12- and 24-month averages and price against them, the returns, the
+full-history range, monthly swing structure, and the monthly levels.
+State the two caveats the script prints: partial newest month, and
+weeks assigned to the month they closed in.
+
+## Expected move
+
+Paste the script's table. One sentence that this is realized
+volatility, not what the options market is pricing, and that
+analysis-option with a live quote gives the comparison.
 
 ## Weekly reversal checks
 

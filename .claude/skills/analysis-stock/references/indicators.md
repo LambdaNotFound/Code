@@ -147,13 +147,52 @@ most 10% of the account by default. The tighter constraint wins and the
 script names it. Two percent risk per trade is the ceiling anyone should
 pass; the default stays at one.
 
+## Monthly (multi-year) `[COMMON]`
+
+Resampled from the weekly series, so each monthly bar is the weeks
+that closed inside that calendar month. Two consequences to state:
+the newest month is partial, and a week straddling a month end counts
+in the month it closed in. Read it for the slowest structure only:
+
+- Price against the 12- and 24-month averages is the multi-year trend.
+  Above both and rising is a bull market in that name; below both is a
+  bear market, whatever the daily says.
+- Monthly swing structure enters the ledger at trend weight. It is the
+  slowest signal available and it changes rarely, which is the point.
+- The full-history range says where price sits against everything the
+  series has seen. A stock far under an old high has overhead supply
+  that no daily level captures.
+- Up months out of the last twelve is a crude persistence measure. It
+  is context, not a signal, and has no ledger row.
+
+## Expected move `[COMMON]`
+
+One-sigma ranges implied by realized volatility at 7, 14, 30, 60 and
+90 days and at the next three monthly expiries (the third Friday).
+Sigma scales with the square root of time, so a 60-day move is about
+1.41 times a 30-day move, not twice it.
+
+This is what the stock has been doing, not what the options market is
+pricing. The gap between the two is the whole options trade, and this
+skill cannot see it: implied volatility needs a live quote. When the
+user asks about options, give them the realized-vol range so they know
+which strikes to go and quote, then hand the quote to the
+analysis-option skill, which compares implied against realized and
+prices the contract. Never call a realized-vol range an expected move
+"the market" is pricing.
+
+The table uses 60-day realized vol when there are enough bars, else
+20-day. When the two differ a lot, say so: a 20-day well above the
+60-day means the stock has sped up recently, and the near horizons are
+understated.
+
 ## Stance (the buy/sell rule)
 
 The script turns the ledger into one label by a fixed rule so that
 two runs on the same data give the same answer:
 
-- Trend rows weigh 2 (MA stack, ADX/DI, daily and weekly swing
-  structure, weekly price vs 50/200-week, trend template). Momentum
+- Trend rows weigh 2 (MA stack, ADX/DI, daily, weekly and monthly
+  swing structure, weekly price vs 50/200-week, trend template). Momentum
   and volume rows weigh 1 (RSI, MACD histogram, stochastic, %B, RSI
   divergence, OBV agreement, up/down volume, weekly reversal checks),
   and so does price vs 200-day, because the MA stack and the trend
@@ -182,6 +221,16 @@ it knows nothing about earnings dates, news, or the user's account.
 Report it as `[FRAME]` at LOW confidence, and name the rows behind it.
 Never adjust the label by hand; if the story and the label disagree,
 the verdict is where to say so.
+
+## The chart
+
+`scripts/chart.py` draws the same bars from the same files, so the
+picture and the numbers cannot disagree. Read it for what a table
+hides: where the gaps sit relative to the levels, whether the moving
+averages are converging or fanning, and whether the volume spikes
+line up with the burst days. If something in the chart contradicts a
+number in the report, the report is wrong; check the input before
+believing the chart.
 
 ## What the script does not check
 
