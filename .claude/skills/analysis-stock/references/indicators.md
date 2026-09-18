@@ -152,11 +152,13 @@ pass; the default stays at one.
 The script turns the ledger into one label by a fixed rule so that
 two runs on the same data give the same answer:
 
-- Trend rows weigh 2 (MA stack, price vs 200-day, ADX/DI, daily and
-  weekly swing structure, weekly price vs 50/200-week, trend
-  template). Momentum and volume rows weigh 1 (RSI, MACD histogram,
-  stochastic, %B, RSI divergence, OBV agreement, up/down volume, weekly
-  reversal checks).
+- Trend rows weigh 2 (MA stack, ADX/DI, daily and weekly swing
+  structure, weekly price vs 50/200-week, trend template). Momentum
+  and volume rows weigh 1 (RSI, MACD histogram, stochastic, %B, RSI
+  divergence, OBV agreement, up/down volume, weekly reversal checks),
+  and so does price vs 200-day, because the MA stack and the trend
+  template already count it; at weight 2 a clean Stage 2 stock carried
+  four trend votes for one fact.
 - Score = (bullish weight − bearish weight) / total weight, in [−1, 1].
 - BUY at +0.50 and above, ACCUMULATE from +0.20, HOLD between −0.20
   and +0.20, REDUCE from −0.20 down, SELL at −0.50 and below.
@@ -164,7 +166,10 @@ two runs on the same data give the same answer:
   support (long) or resistance (short); target at the nearest level
   on the other side. A BUY whose reward-to-risk from the close is
   under 1.5 becomes an ACCUMULATE with the entry moved to the support,
-  because the same trade is only worth taking from there.
+  because the same trade is only worth taking from there. The short
+  side mirrors it: a REDUCE or SELL whose reward-to-risk from the close
+  is under 1.5 moves the exit up to the resistance, which for a holder
+  means trim into strength, not at the close.
 - The plan also prints a 2R target (entry plus twice the risk) beside
   the level target; when the level target is under 2R, the level is
   the honest one.

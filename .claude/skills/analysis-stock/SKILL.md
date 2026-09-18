@@ -26,36 +26,44 @@ turns on position sizing, with `--risk-pct` (default 1) and
 `--save <path>` writes the finished report there as well as printing
 it.
 
-## 1. Fetch (three MCP calls, in this order)
+## 1. Fetch (three MCP calls, one per turn, in this order)
 
-The free Alpha Vantage tier allows 25 requests a day and one a second.
-Every call below costs one; do not add exploratory ones. Adjusted daily
-data and the full daily history are premium, which is why the daily
-view is 100 bars and the long view comes from the weekly feed.
+The free tier's limits, what is premium, and the three shapes a result
+can arrive in are in
+[references/alphavantage-free-tier.md](references/alphavantage-free-tier.md).
+The short version: 25 calls a day, one a second, so never fire two
+Alpha Vantage calls in the same turn; adjusted daily and the full daily
+history are premium, which is why the daily view is 100 bars and the
+long view comes from the weekly feed.
+
+Before any call, look in the scratchpad for a `<SYMBOL>_daily.csv`,
+weekly file, and `<SYMBOL>_ta.json` from today and reuse them; say so
+in the report.
 
 1. `mcp__alphavantage__TIME_SERIES_DAILY` with `outputsize=compact`,
-   `datatype=csv`, `return_full_data=true`. 100 bars. If the result
-   arrives inline, write it to a file in the scratchpad directory
-   named `<SYMBOL>_daily.csv`. If it arrives as a saved file, use
-   that path.
+   `datatype=csv`, `return_full_data=true`. 100 bars, arrives inline:
+   write the whole `{"result": ...}` reply to `<SYMBOL>_daily.csv` in
+   the scratchpad (the script unwraps it).
 2. `mcp__alphavantage__TIME_SERIES_WEEKLY_ADJUSTED` with
-   `datatype=csv`, `return_full_data=true`. Twenty-plus years; it
-   always arrives as a saved file (the harness writes oversized
-   results to a tool-results folder under the user's Claude projects
-   directory and prints the path). Use that path directly. Fall back to
-   `TIME_SERIES_WEEKLY` only if the adjusted endpoint is refused, and
-   then say in the report that the long-range levels are unadjusted.
+   `datatype=csv`, `return_full_data=true`. For most stocks this is
+   saved by the harness and the reply gives the path; pass it straight
+   to `--weekly`. For a stock listed only a few years it arrives
+   inline; write it to `<SYMBOL>_weekly.csv` the same way as the daily.
+   Fall back to `TIME_SERIES_WEEKLY` only if the adjusted endpoint is
+   refused, and then say in the report that the long-range levels are
+   unadjusted.
 3. `mcp__alphavantage__SMA` with `interval=daily`, `time_period=200`,
-   `series_type=close`, `datatype=json`. The preview shows the latest
-   value; that number is `--sma200`. Skip the `return_full_data` flag
-   here; the preview is all you need.
+   `series_type=close`, `datatype=json`, no `return_full_data`. It
+   arrives either as a server preview showing the two newest values
+   (read the newest into `--sma200`) or as a file saved by the harness
+   (pass the path to `--sma200-file`; the script takes every shape).
 
 If a call returns `{"error": {"type": "rate_limit", ...}}` read the
-message: "premium endpoint" means the endpoint is not available on
-this key (pick the fallback above); anything else means wait a few
-seconds and retry once. Two failures on the same call: stop, report
-which call failed and what it said, and offer to run from a file the
-user supplies.
+message: "premium endpoint" or "premium feature" means not available on
+this key (pick the fallback above); "1 request per second" means retry
+once next turn; the 25-a-day message means stop for the day. Two
+failures on the same call: stop, report which call failed and what it
+said, and offer to run from a file the user supplies.
 
 If the user set `ALPHAVANTAGE_API_KEY` in the environment, the script
 can fetch on its own instead: `python3 .claude/skills/analysis-stock/scripts/ta.py --fetch <SYMBOL> --out-dir <scratchpad>`.
@@ -65,7 +73,7 @@ it is there.
 ## 2. Compute
 
 ```
-python3 .claude/skills/analysis-stock/scripts/ta.py --daily <daily> --weekly <weekly> --sma200 <value> --symbol <SYMBOL>
+python3 .claude/skills/analysis-stock/scripts/ta.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL>
 ```
 
 Add `--json` when you need a field the markdown does not show. The
