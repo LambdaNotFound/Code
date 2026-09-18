@@ -192,7 +192,17 @@ Rules for a script:
   the Write tool for large files there: on failure the hook echoes
   a Bash command's full text back, heredoc included.
 - Register: the entry-point skill for loops, and CLAUDE.md's
-  skills/agents lists so fresh sessions can discover it. Names,
+  skills/agents lists so fresh sessions can discover it.
+- Order of writes when creating a skill: `SKILL.md` first, then its
+  scripts and references, then the CLAUDE.md entry. The PostToolUse
+  hook re-validates on every write under `.claude/skills/`, and a
+  directory without a `SKILL.md` fails it, so writing the script first
+  means every subsequent write reports the same failure until the
+  skill file exists.
+- The validator treats any backticked or linked token that starts with
+  `.claude/` or `agent-team-workspace/` as a repo path that must exist.
+  Describe a location outside the repo (a harness folder, a user
+  directory) in words rather than as a backticked path. Names,
   never counts: CLAUDE.md said the validator ran "231 checks" and
   was wrong the moment the next skill landed. A number a program
   computes does not belong in prose; the program prints it.
