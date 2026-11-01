@@ -43,11 +43,20 @@ The script's read and each triggered check with its week and level, or
 "none in the last 8 completed weeks". If a check was vetoed, say what
 vetoed it.
 
+## Position cost distribution
+
+Paste the script's cost-distribution table (daily and 52-week rows).
+Then two or three sentences per the reading rules in
+references/indicators.md: where the peak band sits against price, what
+the profit ratio says about supply, and whether price is over or under
+the daily average cost. Say once that it is volume at price with no
+turnover decay, an approximation of holders' cost.
+
 ## Levels
 
 | Level | Price | Kind | Evidence |
 |---|---|---|---|
-| Resistance 2 | | swing cluster / MA / 52w high / gap | touches, last date |
+| Resistance 2 | | swing cluster / MA / cost peak / 52w high / gap | touches, last date |
 | Resistance 1 | | | |
 | **Current** | | | |
 | Support 1 | | | |

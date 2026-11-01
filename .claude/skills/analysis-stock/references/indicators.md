@@ -139,6 +139,36 @@ in the day's range (above 0.7 is strong). They are facts about
 participation, not a ledger row: a burst on 2x volume that closed near
 its high near a level is the evidence a breakout scenario needs.
 
+## Position cost distribution `[COMMON]`
+
+The script spreads each bar's volume evenly over its low-high range and
+sums it by price, twice: over the 100 daily bars and over the last 52
+weekly bars. Bins are the largest round step at or under 1% of price.
+There is no turnover decay, so old volume counts as much as new: it
+shows where shares changed hands, an approximation of holders' cost,
+not a measured cost basis. Say that once in the report. Reading it:
+
+- **Peak band and heaviest bands** are volume levels. One under price is
+  support (buyers there are in profit and tend to defend it); one over
+  price is resistance (holders there are trapped and tend to sell into a
+  return to break-even). Add them to the Levels table with "cost peak"
+  as the kind.
+- **Profit ratio** is the share of the window's volume below the close.
+  Above 80% after an advance: most holders are in profit, so
+  profit-taking supply grows. Under 20% after a decline: most are
+  underwater, so overhead supply caps rallies until it is absorbed.
+- **Average cost vs price:** price under the daily average means the
+  average recent buyer is losing; reclaiming it is a level to watch.
+- **70% / 90% ranges and concentration** (width over the sum of the
+  ends): a tight range (concentration under about 10%) means cost has
+  converged and the next break out of it tends to run; a wide one means
+  holders are spread out.
+- Daily and weekly disagreeing (for example a low daily profit ratio and
+  a high weekly one) means recent buyers are trapped while longer
+  holders still sit on gains. Say which group sits where.
+
+It is not a ledger row and does not move the stance.
+
 ## Position size (only with an account size)
 
 Fixed fractional: risk dollars = account × risk percent (default 1);

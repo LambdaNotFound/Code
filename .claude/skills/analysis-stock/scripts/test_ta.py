@@ -397,6 +397,62 @@ class ReferenceMethodTests(unittest.TestCase):
         self.assertIn("## Position size", text)
 
 
+class CostDistributionTests(unittest.TestCase):
+    @staticmethod
+    def bar(lo, hi, v, d="2026-01-01"):
+        return {"date": d, "open": lo, "high": hi, "low": lo, "close": hi, "volume": v, "adjusted": False}
+
+    def test_bin_size_scales_with_price(self):
+        self.assertEqual(ta.cost_bin_size(204.64), 2)
+        self.assertEqual(ta.cost_bin_size(755.72), 5)
+        self.assertEqual(ta.cost_bin_size(345.0), 2.5)
+        self.assertEqual(ta.cost_bin_size(0.5), 0.01)
+
+    def test_uniform_bar_spreads_evenly(self):
+        cd = ta.cost_distribution([self.bar(100, 110, 1000)], 105, bin_size=2)
+        self.assertAlmostEqual(cd["average_cost"], 105.0)
+        self.assertAlmostEqual(cd["profit_ratio"], 0.5)
+        self.assertEqual([round(b["share"], 6) for b in cd["bins"]], [0.2] * 5)
+        self.assertAlmostEqual(cd["range_70"]["low"], 101.5)
+        self.assertAlmostEqual(cd["range_70"]["high"], 108.5)
+        self.assertAlmostEqual(cd["range_90"]["low"], 100.5)
+        self.assertAlmostEqual(cd["range_90"]["high"], 109.5)
+
+    def test_volume_weights_peak_and_average(self):
+        bars = [self.bar(100, 102, 100), self.bar(110, 112, 300, "2026-01-02")]
+        cd = ta.cost_distribution(bars, 106, bin_size=2)
+        self.assertAlmostEqual(cd["average_cost"], (101 * 100 + 111 * 300) / 400)
+        self.assertAlmostEqual(cd["profit_ratio"], 0.25)
+        self.assertEqual((cd["peak"]["low"], cd["peak"]["high"]), (110, 112))
+        self.assertAlmostEqual(cd["peak"]["share"], 0.75)
+        self.assertAlmostEqual(sum(b["share"] for b in cd["bins"]), 1.0)
+
+    def test_price_outside_range(self):
+        bars = [self.bar(100, 110, 50)]
+        self.assertEqual(ta.cost_distribution(bars, 120, bin_size=5)["profit_ratio"], 1.0)
+        self.assertEqual(ta.cost_distribution(bars, 90, bin_size=5)["profit_ratio"], 0.0)
+
+    def test_zero_range_bar_and_empty_input(self):
+        cd = ta.cost_distribution([self.bar(50, 50, 10)], 50, bin_size=1)
+        self.assertEqual(cd["profit_ratio"], 1.0)
+        self.assertEqual(cd["peak"]["low"], 50)
+        self.assertIsNone(ta.cost_distribution([self.bar(50, 51, 0)], 50))
+        self.assertIsNone(ta.cost_distribution([], 50))
+
+    def test_analyse_and_render_include_both_windows(self):
+        daily = bars_from_closes([100.0 + i * 0.3 for i in range(100)])
+        weekly = bars_from_closes([50.0 + i * 0.5 for i in range(120)])
+        facts = ta.analyse(daily, weekly, sma200_daily=90.0)
+        cd = facts["cost_distribution"]
+        self.assertEqual(cd["daily"]["bars"], 100)
+        self.assertEqual(cd["weekly_52w"]["bars"], 52)
+        self.assertGreater(cd["daily"]["profit_ratio"], 0.9)  # steady uptrend: nearly all volume below the close
+        text = ta.render(facts, "T")
+        self.assertIn("## Position cost distribution", text)
+        self.assertIn("Weekly (52 weeks)", text)
+        self.assertIsNone(ta.analyse(daily)["cost_distribution"]["weekly_52w"])
+
+
 class SessionLessonTests(unittest.TestCase):
     def facts(self, reads, price=100.0, atr=2.0, sup=(90.0,), res=(120.0,)):
         rows = [{"indicator": name, "value": "", "read": read, "rule": ""} for name, read in reads]

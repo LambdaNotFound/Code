@@ -481,6 +481,10 @@ def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3, account=None,
         "gaps_20d": gaps(daily),
         "burst_days_20": burst_days(daily),
         "weekly": analyse_weekly(weekly) if weekly else None,
+        "cost_distribution": {
+            "daily": cost_distribution(daily, price),
+            "weekly_52w": cost_distribution(weekly[-52:], price) if weekly else None,
+        },
     }
     out["trend_template"] = None
     out["weekly_reversals"] = None
@@ -661,6 +665,79 @@ def burst_days(bars, lookback=20, min_pct=4.0):
             out.append({"date": b["date"], "pct": chg, "vol_vs_avg20": (b["volume"] / vol20[i]) if vol20[i] else None,
                         "close_in_range": None if rng == 0 else (b["close"] - b["low"]) / rng, "tags": tags})
     return out
+
+
+NICE_STEPS = (0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20, 25, 50, 100, 200, 250, 500)
+
+
+def cost_bin_size(price):
+    """Bin width for the cost distribution: the largest round step at or under
+    1% of price, so a $200 stock gets $2 bins and a $750 one gets $5."""
+    target = price / 100.0
+    fit = [s for s in NICE_STEPS if s <= target]
+    return fit[-1] if fit else NICE_STEPS[0]
+
+
+def cost_distribution(bars, price, bin_size=None, sub=10):
+    """Estimated position cost distribution (chip distribution): each bar's
+    volume is spread evenly over its low-high range and summed by price. No
+    turnover decay, so older volume weighs as much as recent volume; read it as
+    where shares changed hands in the window, an approximation of holders' cost.
+
+    Returns the bin width, the peak band, the volume-weighted average cost, the
+    profit ratio (share of volume that traded below the close), and the central
+    70% and 90% cost ranges with their concentration (width / sum of ends), plus
+    the bins themselves (low edge, share of volume)."""
+    bars = [b for b in bars if b["volume"] > 0]
+    if not bars or price is None:
+        return None
+    step = bin_size or cost_bin_size(price)
+    fine = step / sub
+    lo_all = min(b["low"] for b in bars)
+    base = math.floor(lo_all / step) * step
+    hist = {}
+    total = profit = wsum = 0.0
+    for b in bars:
+        lo, hi, v = b["low"], b["high"], b["volume"]
+        total += v
+        wsum += v * (lo + hi) / 2.0
+        if hi <= lo:
+            hist[int((lo - base) // fine)] = hist.get(int((lo - base) // fine), 0.0) + v
+            profit += v if lo <= price else 0.0
+            continue
+        profit += v * min(1.0, max(0.0, (price - lo) / (hi - lo)))
+        i0, i1 = int((lo - base) // fine), int((hi - base) // fine)
+        for i in range(i0, i1 + 1):
+            a, z = max(lo, base + i * fine), min(hi, base + (i + 1) * fine)
+            if z > a:
+                hist[i] = hist.get(i, 0.0) + v * (z - a) / (hi - lo)
+    keys = sorted(hist)
+
+    def quantile(q):
+        target, run = q * total, 0.0
+        for i in keys:
+            if run + hist[i] >= target:
+                frac = (target - run) / hist[i] if hist[i] else 0.0
+                return base + (i + frac) * fine
+            run += hist[i]
+        return base + (keys[-1] + 1) * fine
+
+    def band(q_lo, q_hi):
+        a, z = quantile(q_lo), quantile(q_hi)
+        return {"low": a, "high": z, "concentration": (z - a) / (z + a) if z + a else None}
+
+    coarse = {}
+    for i in keys:
+        j = int(i // sub)
+        coarse[j] = coarse.get(j, 0.0) + hist[i]
+    bins = [{"low": base + j * step, "high": base + (j + 1) * step, "share": coarse[j] / total} for j in sorted(coarse)]
+    peak = max(bins, key=lambda x: x["share"])
+    return {
+        "bars": len(bars), "from": bars[0]["date"], "to": bars[-1]["date"], "bin_size": step,
+        "peak": peak, "average_cost": wsum / total, "profit_ratio": profit / total,
+        "range_70": band(0.15, 0.85), "range_90": band(0.05, 0.95),
+        "price_vs_average_pct": pct(price, wsum / total), "bins": bins,
+    }
 
 
 def position_size(plan, account, risk_pct, max_position_pct):
@@ -918,6 +995,24 @@ def render(f, symbol):
             L.append(f"- Weekly {kind} (3y): " + (", ".join(f"{_f(c['price'])} ({c['touches']}, last {c['last']})" for c in items) if items else "none"))
     L.append(f"- Gaps (20d, >=2%): " + ("; ".join(f"{g['date']} {g['pct']:+.1f}% from {_f(g['from'])} ({'filled' if g['filled'] else 'open'})" for g in f["gaps_20d"]) if f["gaps_20d"] else "none"))
     L.append("")
+    cd = f.get("cost_distribution") or {}
+    windows = [(label, cd.get(key)) for label, key in (("Daily (100 bars)", "daily"), ("Weekly (52 weeks)", "weekly_52w")) if cd.get(key)]
+    if windows:
+        L.append("## Position cost distribution (volume at price, no turnover decay)")
+        L.append("| Window | Bin | Peak band | Average cost | Price vs avg | Profit ratio | 70% range | 90% range |")
+        L.append("|---|---|---|---|---|---|---|---|")
+        for label, c in windows:
+            pk, r70, r90 = c["peak"], c["range_70"], c["range_90"]
+            L.append(f"| {label}, {c['from']} to {c['to']} | {c['bin_size']:g} | {_f(pk['low'])}-{_f(pk['high'])} ({100 * pk['share']:.1f}%) "
+                     f"| {_f(c['average_cost'])} | {_p(c['price_vs_average_pct'])} | {100 * c['profit_ratio']:.1f}% "
+                     f"| {_f(r70['low'])}-{_f(r70['high'])} (conc. {100 * r70['concentration']:.1f}%) "
+                     f"| {_f(r90['low'])}-{_f(r90['high'])} (conc. {100 * r90['concentration']:.1f}%) |")
+        label, c = windows[0]
+        top = sorted(c["bins"], key=lambda x: -x["share"])[:5]
+        L.append(f"- {label} heaviest bands: " + ", ".join(f"{_f(x['low'])}-{_f(x['high'])} {100 * x['share']:.1f}%" for x in top))
+        L.append("- Profit ratio = share of the window's volume that traded below the close. Each bar's volume is spread evenly over its range; "
+                 "older volume is not decayed, so this approximates holders' cost.")
+        L.append("")
     if wk:
         L.append("## Weekly")
         wm = wk["ma"]

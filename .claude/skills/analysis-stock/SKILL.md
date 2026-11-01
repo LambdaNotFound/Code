@@ -80,7 +80,9 @@ Add `--json` when you need a field the markdown does not show. The
 script prints price, returns, ranges, moving averages and their
 slopes and crosses, ADX, RSI, MACD, stochastic, Bollinger, ATR, OBV,
 up/down volume, swing structure, clustered support and resistance,
-open gaps, momentum-burst days, the weekly equivalents, the Minervini
+open gaps, momentum-burst days, the position cost distribution (daily
+and 52-week volume at price: peak band, average cost, profit ratio, 70%
+and 90% cost ranges), the weekly equivalents, the Minervini
 trend template (7 checks), the weekly reversal checks on completed
 weeks, a signal ledger with a tally, and the stance: a weighted score
 over the ledger mapped to BUY, ACCUMULATE, HOLD, REDUCE, or SELL, with
