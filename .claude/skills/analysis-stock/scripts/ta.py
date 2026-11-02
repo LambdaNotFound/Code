@@ -21,14 +21,25 @@ Usage:
 52-week range, the 20/50/200-week averages, and the long trend.
 --sma200 is the latest daily 200-SMA from the SMA endpoint; without it the
 script substitutes a 40-week SMA and labels it approximate.
+
+The short-term outlook printed last is statistical and sits outside the chart
+frame: a seeded Monte Carlo of driftless daily returns (plus an earnings jump
+when --earnings or --earnings-file puts a report inside 20 sessions) gives
+ranges and the odds of reaching each level, and the stock's own weekly history
+gives a base rate for direction. Its flags:
+        [--earnings DATE [--earnings-after-close] | --earnings-file FILE]
+        [--earnings-move PCT] [--no-outlook]
 """
 
 import argparse
 import csv
+import datetime
 import io
 import json
 import math
 import os
+import random
+import statistics
 import sys
 import urllib.parse
 import urllib.request
@@ -964,6 +975,259 @@ def stance(f):
 
 
 # --------------------------------------------------------------------------- #
+# Short-term outlook: a statistical layer, outside the chart frame
+# --------------------------------------------------------------------------- #
+
+OUTLOOK_DAYS = (5, 10, 20)        # sessions: about 1, 2 and 4 weeks
+OUTLOOK_WEEKS = {5: 1, 10: 2, 20: 4}
+OUTLOOK_PATHS = 20000
+OUTLOOK_SEED = 7                  # fixed, so the same data always prints the same odds
+BASE_MIN_EPISODES = 8             # a base-rate sample counts only with this many separate runs
+BASE_SHRINK = 10                  # pseudo-episodes at 50% blended into a base rate
+
+
+def add_weekdays(date, n):
+    """The date n weekdays after `date` (YYYY-MM-DD). Market holidays are not counted."""
+    d = datetime.date.fromisoformat(date)
+    while n > 0:
+        d += datetime.timedelta(days=1)
+        if d.weekday() < 5:
+            n -= 1
+    return d.isoformat()
+
+
+def trading_day_index(last_date, report_date, after_close=False):
+    """The simulated session (1 = the first after last_date) that opens on the
+    earnings news: the report day for a pre-market report, the next weekday for
+    an after-close one. None when the news is already in the data."""
+    d, t = datetime.date.fromisoformat(last_date), datetime.date.fromisoformat(report_date)
+    if t < d or (t == d and not after_close):
+        return None
+    n = 0
+    while d < t:
+        d += datetime.timedelta(days=1)
+        if d.weekday() < 5:
+            n += 1
+    return n + (1 if after_close or t.weekday() >= 5 else 0)
+
+
+def earnings_from_file(path):
+    """(report date, after_close) from an EARNINGS_CALENDAR result, as CSV or in
+    the {"result": csv} wrapper; None when it lists no report. The soonest row wins."""
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    stripped = text.lstrip()
+    if stripped.startswith("{"):
+        d = json.loads(stripped)
+        if "error" in d:
+            raise ValueError(f"Alpha Vantage error: {d['error']}")
+        text = d.get("result", "")
+    rows = [r for r in csv.DictReader(io.StringIO(text.strip())) if (r.get("reportDate") or "").strip()]
+    if not rows:
+        return None
+    r = min(rows, key=lambda r: r["reportDate"])
+    return r["reportDate"].strip(), (r.get("timeOfTheDay") or "").strip().lower().startswith("post")
+
+
+def daily_sigma(bars, n=60):
+    """Standard deviation of the last n daily log returns, with the largest one
+    dropped so a single earnings jump is not counted twice when the outlook adds
+    one of its own."""
+    closes = [b["close"] for b in bars[-(n + 1):]]
+    rets = [math.log(b / a) for a, b in zip(closes, closes[1:]) if a > 0 and b > 0]
+    if len(rets) < 10:
+        return None
+    rets.remove(max(rets, key=abs))
+    return statistics.stdev(rets)
+
+
+def jump_sigma(bars, sd, lookback=100):
+    """Default size (one sigma, as a log return) of an earnings jump: the largest
+    move on a heavy-volume day (at least 1.5x its prior 20-day average volume) in
+    the window, and never less than 2.5 daily sigmas. Returns (sigma, the date of
+    that day, or None when the floor applies)."""
+    best, when = 0.0, None
+    for i in range(max(20, len(bars) - lookback), len(bars)):
+        prev = bars[i - 1]["close"]
+        avg = sum(b["volume"] for b in bars[i - 20:i]) / 20
+        if prev > 0 and avg > 0 and bars[i]["volume"] >= 1.5 * avg:
+            r = abs(math.log(bars[i]["close"] / prev))
+            if r > best:
+                best, when = r, bars[i]["date"]
+    return (best, when) if best >= 2.5 * sd else (2.5 * sd, None)
+
+
+def _touch_prob(o, c, level, s, up):
+    """Brownian-bridge chance that a session running from o to c touched level."""
+    if up:
+        if max(o, c) >= level:
+            return 1.0
+        return math.exp(-2 * math.log(level / o) * math.log(level / c) / (s * s)) if s > 0 else 0.0
+    if min(o, c) <= level:
+        return 1.0
+    return math.exp(-2 * math.log(o / level) * math.log(c / level) / (s * s)) if s > 0 else 0.0
+
+
+def simulate_outlook(price, sd, levels, days=OUTLOOK_DAYS, jump_day=None, jump_sd=0.0,
+                     paths=OUTLOOK_PATHS, seed=OUTLOOK_SEED):
+    """Monte Carlo of daily closes with no drift: log returns N(0, sd), plus an
+    N(0, jump_sd) gap at the open of session jump_day. `levels` holds (price, up)
+    pairs, up meaning above the start. For each horizon in `days`: close
+    quantiles, the share of paths that end above the start, and for each level
+    the chance it traded there (intraday, by the Brownian bridge) and the chance
+    of a daily close beyond it."""
+    rng = random.Random(seed)
+    closes = {h: [] for h in days}
+    touched = {h: [0.0] * len(levels) for h in days}
+    beyond = {h: [0] * len(levels) for h in days}
+    for _ in range(paths):
+        p = price
+        untouched = [1.0] * len(levels)
+        closed = [False] * len(levels)
+        for d in range(1, max(days) + 1):
+            o = p * math.exp(rng.gauss(0.0, jump_sd)) if d == jump_day and jump_sd > 0 else p
+            c = o * math.exp(rng.gauss(0.0, sd))
+            for j, (lvl, up) in enumerate(levels):
+                if untouched[j]:
+                    untouched[j] *= 1.0 - _touch_prob(o, c, lvl, sd, up)
+                if not closed[j] and (c >= lvl if up else c <= lvl):
+                    closed[j] = True
+            if d in closes:
+                closes[d].append(c)
+                for j in range(len(levels)):
+                    touched[d][j] += 1.0 - untouched[j]
+                    beyond[d][j] += closed[j]
+            p = c
+    out = []
+    for h in days:
+        cs = sorted(closes[h])
+        q = {f: cs[min(len(cs) - 1, int(f * len(cs)))] for f in (0.05, 0.16, 0.5, 0.84, 0.95)}
+        out.append({"days": h, "q05": q[0.05], "q16": q[0.16], "q50": q[0.5], "q84": q[0.84], "q95": q[0.95],
+                    "p_up": sum(1 for x in cs if x > price) / paths,
+                    "touch": [t / paths for t in touched[h]], "close_beyond": [b / paths for b in beyond[h]]})
+    return out
+
+
+def _episodes(idx):
+    """Separate runs in a sorted list of week indexes."""
+    return sum(1 for k, i in enumerate(idx) if k == 0 or i != idx[k - 1] + 1)
+
+
+def weekly_base_rates(weekly, horizons=(1, 2, 4)):
+    """How the stock's own weekly closes moved after past weeks in the same state
+    as the last one. Trend state: the close above or below the 20- and 50-week
+    SMAs, and each SMA up or down over 4 weeks. Zone: within 5% of the 52-week
+    closing low, within 5% of the high, or neither. Rows: all weeks, the same
+    trend state, and the same trend state and zone."""
+    c = [b["close"] for b in weekly]
+    last = len(c) - 1
+    if last < 60:
+        return None
+    s20, s50 = sma(c, 20), sma(c, 50)
+
+    def state(i):
+        trend = (c[i] > s20[i], s20[i] > s20[i - 4], c[i] > s50[i], s50[i] > s50[i - 4])
+        lo, hi = min(c[i - 51:i + 1]), max(c[i - 51:i + 1])
+        return trend, ("low" if c[i] <= lo * 1.05 else "high" if c[i] >= hi * 0.95 else "mid")
+
+    states = {i: state(i) for i in range(54, last + 1)}
+    now = states[last]
+    past = list(range(54, last))
+    rows = []
+    for name, idx in (("all weeks", past),
+                      ("same trend state", [i for i in past if states[i][0] == now[0]]),
+                      ("same trend state and zone", [i for i in past if states[i] == now])):
+        hz = {}
+        for h in horizons:
+            fwd = [c[i + h] / c[i] - 1 for i in idx if i + h <= last]
+            hz[h] = {"n": len(fwd), "p_up": sum(1 for x in fwd if x > 0) / len(fwd) if fwd else None,
+                     "median": statistics.median(fwd) if fwd else None}
+        rows.append({"sample": name, "weeks": len(idx), "episodes": _episodes(idx), "horizons": hz})
+    t, zone = now
+    words = (f"{'above' if t[0] else 'under'} a {'rising' if t[1] else 'falling'} 20-week, "
+             f"{'above' if t[2] else 'under'} a {'rising' if t[3] else 'falling'} 50-week"
+             + {"low": ", within 5% of the 52-week low", "high": ", within 5% of the 52-week high", "mid": ""}[zone])
+    return {"since": weekly[54]["date"], "state": words, "rows": rows}
+
+
+def direction_estimate(rates, weeks):
+    """The up share in the most specific base-rate sample with enough separate
+    episodes, blended with 50%: 0.5 + (rate - 0.5) * e / (e + BASE_SHRINK).
+    Returns (estimate, sample name or None when no sample qualifies)."""
+    if rates:
+        for row in reversed(rates["rows"][1:]):
+            h = row["horizons"].get(weeks)
+            if h and h["p_up"] is not None and row["episodes"] >= BASE_MIN_EPISODES:
+                e = row["episodes"]
+                return 0.5 + (h["p_up"] - 0.5) * e / (e + BASE_SHRINK), row["sample"]
+    return 0.5, None
+
+
+def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTLOOK_PATHS, seed=OUTLOOK_SEED):
+    """Ranges, level odds and a direction estimate for the next 5, 10 and 20
+    sessions. `earnings` is (report date, after_close); `earnings_move` is a
+    one-sigma jump in percent that overrides the estimate from the daily bars."""
+    sd = daily_sigma(daily)
+    if sd is None:
+        return None
+    price, st = f["price"], f["stance"]
+    jump = {"date": None, "after_close": False, "day": None, "sigma": 0.0, "source": None}
+    if earnings:
+        jump.update(date=earnings[0], after_close=earnings[1])
+        day = trading_day_index(f["as_of"], earnings[0], earnings[1])
+        if day is not None and day <= max(OUTLOOK_DAYS):
+            if earnings_move:
+                sigma, source = math.log(1 + earnings_move / 100), "given"
+            else:
+                sigma, when = jump_sigma(daily, sd)
+                source = (f"the largest heavy-volume move in the daily window, on {when}" if when
+                          else "2.5 daily sigmas; no heavy-volume move in the window was larger")
+            jump.update(day=day, sigma=sigma, source=source)
+
+    levels = []
+
+    def add(lvl, label):
+        if lvl is None or lvl <= 0 or abs(lvl - price) < 1e-9:
+            return
+        for x in levels:
+            if abs(x["price"] - lvl) < 1e-6:
+                x["label"] += "; " + label
+                return
+        levels.append({"price": lvl, "label": label, "up": lvl > price})
+
+    s1, r1, pl = st["support_1"], st["resistance_1"], st["plan"]
+    wl = (f.get("weekly") or {}).get("levels") or {}
+    sup = [x["price"] for x in f["levels"]["supports"] + wl.get("supports", [])]
+    res = [x["price"] for x in f["levels"]["resistances"] + wl.get("resistances", [])]
+    add(r1, "resistance 1, the flip-up level")
+    add(s1, "support 1, the flip-down level")
+    if r1 is not None:
+        add(min((x for x in res if x > r1 * 1.005), default=None), "resistance 2")
+    if s1 is not None:
+        add(max((x for x in sup if x < s1 * 0.995), default=None), "support 2")
+    add(pl["entry"], "the plan's entry")
+    add(pl["stop"], "the plan's stop")
+    levels.sort(key=lambda x: -x["price"])
+
+    sim = simulate_outlook(price, sd, [(x["price"], x["up"]) for x in levels], OUTLOOK_DAYS,
+                           jump["day"], jump["sigma"], paths, seed)
+    for j, x in enumerate(levels):
+        x["touch"] = [s["touch"][j] for s in sim]
+        x["close_beyond"] = [s["close_beyond"][j] for s in sim]
+    rates = weekly_base_rates(weekly) if weekly else None
+    horizons = []
+    for s in sim:
+        w = OUTLOOK_WEEKS[s["days"]]
+        est, source = direction_estimate(rates, w)
+        base = next(r for r in rates["rows"] if r["sample"] == source)["horizons"][w]["p_up"] if source else None
+        horizons.append({**{k: v for k, v in s.items() if k not in ("touch", "close_beyond")},
+                         "date": add_weekdays(f["as_of"], s["days"]), "weeks": w,
+                         "p_up_base": base, "p_up_estimate": est, "estimate_from": source})
+    return {"price": price, "daily_sigma": sd, "earnings": jump, "paths": paths, "seed": seed,
+            "horizons": horizons, "levels": levels, "base_rates": rates}
+
+
+# --------------------------------------------------------------------------- #
 # Output
 # --------------------------------------------------------------------------- #
 
@@ -1133,6 +1397,50 @@ def render(f, symbol):
         L.append(f"| Position value | {_f(ps['position_value'], 0)} ({ps['position_pct']:.1f}% of account) |")
         L.append(f"| Actual risk | {_f(ps['actual_risk'], 0)} |")
         L.append(f"| Binding constraint | {ps['binding']} |")
+    if f.get("outlook"):
+        L.append("")
+        L.append(render_outlook(f["outlook"]))
+    return "\n".join(L)
+
+
+def render_outlook(o):
+    e, days = o["earnings"], "/".join(str(h["days"]) for h in o["horizons"])
+    if e["day"]:
+        jump = (f"Earnings {e['date']} ({'after the close' if e['after_close'] else 'before the open'}): "
+                f"a {100 * e['sigma']:.1f}% jump sigma at the open of session {e['day']} ({e['source']}).")
+    elif e["date"]:
+        jump = f"Earnings {e['date']} fall outside the {max(OUTLOOK_DAYS)} sessions or are already in the data: no jump."
+    else:
+        jump = "No earnings date given: the ranges ignore earnings."
+    L = ["## Short-term outlook (statistical; outside the chart frame)",
+         f"- Model: a driftless random walk, so no view on direction. Daily sigma {100 * o['daily_sigma']:.2f}% "
+         f"(last 60 bars, largest move dropped). {jump}",
+         f"- {o['paths']:,} paths, fixed seed; intraday highs and lows by the Brownian-bridge rule; normal tails "
+         "understate large moves; sessions are weekdays, holidays not counted.",
+         "",
+         f"| Horizon | 68% range | 90% range | Close above {_f(o['price'])}: model / base rate / estimate |",
+         "|---|---|---|---|"]
+    for h in o["horizons"]:
+        base = "n/a" if h["p_up_base"] is None else f"{100 * h['p_up_base']:.0f}%"
+        L.append(f"| {h['days']} sessions (about {h['date']}) | {_f(h['q16'])}-{_f(h['q84'])} | {_f(h['q05'])}-{_f(h['q95'])} "
+                 f"| {100 * h['p_up']:.0f}% / {base} / {100 * h['p_up_estimate']:.0f}% |")
+    L += ["", f"| Level | What it is | Trades there by {days} sessions | A daily close beyond it by {days} sessions |",
+          "|---|---|---|---|"]
+    for x in o["levels"]:
+        L.append(f"| {_f(x['price'])} | {x['label']} ({'above' if x['up'] else 'below'}) | "
+                 + " / ".join(f"{100 * v:.0f}%" for v in x["touch"]) + " | "
+                 + " / ".join(f"{100 * v:.0f}%" for v in x["close_beyond"]) + " |")
+    br = o.get("base_rates")
+    if br:
+        L += ["", f"- Base rates from weekly closes since {br['since']}. The last week: {br['state']}.", "",
+              "| Sample | Weeks (episodes) | Up after 1 / 2 / 4 weeks | 4-week median |", "|---|---|---|---|"]
+        for row in br["rows"]:
+            hz = row["horizons"]
+            ups = " / ".join("n/a" if hz[w]["p_up"] is None else f"{100 * hz[w]['p_up']:.0f}%" for w in (1, 2, 4))
+            med = hz[4]["median"]
+            L.append(f"| {row['sample']} | {row['weeks']} ({row['episodes']}) | {ups} | {_p(None if med is None else 100 * med)} |")
+        L += ["", f"- Estimate = 50% + (base rate - 50%) x e / (e + {BASE_SHRINK}), e = episodes, from the most specific "
+                  f"sample with at least {BASE_MIN_EPISODES} episodes; 50% when none has that many."]
     return "\n".join(L)
 
 
@@ -1217,6 +1525,11 @@ def main(argv=None):
     ap.add_argument("--account", type=float, help="account equity; enables fixed-fractional position sizing")
     ap.add_argument("--risk-pct", type=float, default=1.0, help="percent of account risked between entry and stop (default 1)")
     ap.add_argument("--max-position-pct", type=float, default=10.0, help="cap on one position as percent of account (default 10)")
+    ap.add_argument("--earnings", metavar="DATE", help="next earnings report date (YYYY-MM-DD), for the outlook's jump")
+    ap.add_argument("--earnings-after-close", action="store_true", help="the report comes after the close, so the jump lands at the next open")
+    ap.add_argument("--earnings-file", help="EARNINGS_CALENDAR result (CSV or {result: csv}); its soonest row sets --earnings")
+    ap.add_argument("--earnings-move", type=float, metavar="PCT", help="one-sigma earnings move in percent, e.g. an options-implied move; default: estimated from the daily bars")
+    ap.add_argument("--no-outlook", action="store_true", help="skip the short-term outlook")
     args = ap.parse_args(argv)
 
     if args.fetch:
@@ -1231,6 +1544,10 @@ def main(argv=None):
     daily = load_bars(args.daily)
     weekly = load_bars(args.weekly) if args.weekly else None
     facts = analyse(daily, weekly, args.sma200, args.pivot_window, args.account, args.risk_pct, args.max_position_pct)
+    if not args.no_outlook:
+        earnings = (args.earnings, args.earnings_after_close) if args.earnings else (
+            earnings_from_file(args.earnings_file) if args.earnings_file else None)
+        facts["outlook"] = outlook(facts, daily, weekly, earnings, args.earnings_move)
     if args.json:
         print(json.dumps(facts, indent=2, default=str))
     else:

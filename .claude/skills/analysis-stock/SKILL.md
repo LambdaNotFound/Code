@@ -1,5 +1,5 @@
 ---
-description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Also scores Minervini''s Stage 2 trend template, runs weekly key-reversal, failed-extreme, and failed-breakout checks at 52-week extremes, and lists momentum-burst days. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, 2R target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast, plus fixed-fractional share count when the user gives an account size. Use also when the user asks whether to buy or sell a stock on its chart, or how many shares a given risk budget allows. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for portfolio-level decisions. Not for backtesting a strategy.'
+description: 'Technical analysis of one stock from live Alpha Vantage price data — trend, momentum, volatility, volume, support and resistance on daily and weekly timeframes, then two to four ranked scenarios with triggers and invalidation levels. Fetches with the alphavantage MCP tools (three calls, inside the free tier''s 25-a-day cap), computes every indicator deterministically with scripts/ta.py, and writes the report to the template in references/report-template.md with every claim tagged per this repo''s epistemic rules. Use when the user names a ticker and asks for technical analysis, a chart read, support and resistance, trend or momentum, or whether a stock is overbought or oversold. Also scores Minervini''s Stage 2 trend template, runs weekly key-reversal, failed-extreme, and failed-breakout checks at 52-week extremes, and lists momentum-burst days. Ends with a rule-based BUY / ACCUMULATE / HOLD / REDUCE / SELL stance with entry, stop, target, 2R target, and reward-to-risk, derived from the same ledger and labelled as the frame''s output, not a forecast, plus fixed-fractional share count when the user gives an account size. Closes with a statistical short-term outlook: ranges, level odds, and a base-rate direction estimate. Use also when the user asks whether to buy or sell a stock on its chart, or how many shares a given risk budget allows. Not for fundamentals, valuation, earnings, or news (say so and stop). Not for portfolio-level decisions. Not for backtesting a strategy.'
 argument-hint: <TICKER> [daily-file weekly-file] [--account equity [--risk-pct 1]] [--save path]
 ---
 
@@ -58,6 +58,14 @@ in the report.
    (read the newest into `--sma200`) or as a file saved by the harness
    (pass the path to `--sma200-file`; the script takes every shape).
 
+An optional fourth call feeds the short-term outlook:
+`mcp__alphavantage__EARNINGS_CALENDAR` with `symbol=<SYMBOL>` and
+`horizon=3month`. Write the reply to `<SYMBOL>_earnings.csv` and pass it
+as `--earnings-file`; a report inside 20 sessions widens the outlook's
+ranges by an earnings jump. A reply with only the header means no date
+is listed yet, not that no report is coming. When the budget is short,
+skip it and say in the report that the ranges ignore earnings.
+
 If a call returns `{"error": {"type": "rate_limit", ...}}` read the
 message: "premium endpoint" or "premium feature" means not available on
 this key (pick the fallback above); "1 request per second" means retry
@@ -73,7 +81,7 @@ it is there.
 ## 2. Compute
 
 ```
-python3 .claude/skills/analysis-stock/scripts/ta.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL>
+python3 .claude/skills/analysis-stock/scripts/ta.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL> [--earnings-file <path>]
 ```
 
 Add `--json` when you need a field the markdown does not show. The
@@ -91,6 +99,20 @@ levels and the ATR. With `--account` it adds a fixed-fractional share
 count. Read all of it before writing. If the script errors on the input,
 show the error and fix the input; do not hand-compute a substitute.
 
+It ends with a short-term outlook, which is statistical and sits
+outside the chart frame:
+- A seeded Monte Carlo of daily returns with no drift gives the 68%
+  and 90% ranges at 5, 10 and 20 sessions. It also gives the odds that
+  each nearby level trades, and that a daily close lands beyond it.
+- An earnings report inside 20 sessions adds a jump: pass
+  `--earnings-file`, or `--earnings DATE [--earnings-after-close]`. The
+  jump is sized from the daily bars unless `--earnings-move PCT` gives
+  one, such as an options-implied move.
+- The stock's own weekly history, in weeks like the last one, gives a
+  base rate for direction, blended with 50%.
+
+The outlook takes about a second; `--no-outlook` skips it.
+
 ## 3. Read
 
 Apply [references/indicators.md](references/indicators.md) to the
@@ -105,10 +127,13 @@ pattern you cannot anchor to dates and prices in the script output.
 Fill [references/report-template.md](references/report-template.md)
 section by section. The template's shape is the contract: verdict
 first, then trend, momentum, volatility and volume, levels, two to
-four scenarios with probabilities summing to 100, the recommendation,
-the ledger pasted unchanged, and the list of what this skill did not
-look at. Every claim tagged; scenario probabilities and the
-recommendation are `[FRAME]` and never above LOW confidence.
+four scenarios with probabilities summing to 100, the short-term
+predictions with their check dates, the recommendation, the ledger
+pasted unchanged, and the list of what this skill did not look at.
+Every claim tagged. Scenario probabilities and the recommendation are
+`[FRAME]` and never above LOW confidence. The outlook's ranges and
+level odds are `[COMPUTED]` model output, MED confidence at most, and
+its direction estimate is `[INFERRED]`, LOW.
 
 The recommendation is the script's stance, not your own. Paste its
 Stance table exactly as printed (label, score, entry, stop, target,

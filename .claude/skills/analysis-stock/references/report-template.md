@@ -75,6 +75,29 @@ Same shape.
 ### 3. <name> — <p>%
 Same shape. Probabilities sum to 100. Confidence on any of them: LOW.
 
+## Short-term predictions
+
+Built from the script's "Short-term outlook" section, which is
+statistical and sits outside the chart frame. Paste its three tables:
+horizons, levels, and base rates. Name the earnings date the ranges
+include, or say they ignore earnings. Then number the predictions:
+
+| # | Prediction | Probability | Check |
+|---|---|---:|---|
+| P1 | close above <price> on <5-session date> | <estimate> | that close |
+| P2 | close inside <68% range> on <20-session date> | 68% | that close |
+| P3 | <the plan's entry, or for a HOLD the nearest level> trades by <10-session date> | <touch odds> | daily highs or lows |
+| P4 | a daily close beyond <the flip level that would end the plan> by <10-session date> | <close-beyond odds> | daily closes |
+| P5 | close above <price> on <20-session date> | <estimate> | that close |
+
+Add one line for the call: the direction estimate per horizon, with its
+sample's weeks and episodes, next to the frame's lean. Say when they
+disagree, and say when a plan level sits inside the noise (see
+references/indicators.md). Tags:
+- Ranges and level odds: `[COMPUTED]`, MED confidence at most.
+- The direction estimate: `[INFERRED]`, LOW.
+- Score every prediction after its check date.
+
 ## Recommendation `[FRAME]`
 
 Paste the script's Stance table as is, then fill the last two rows.

@@ -1,9 +1,13 @@
 """Tests for ta.py. Run from this directory: python3 -m unittest test_ta -v"""
 
+import datetime
 import json
+import math
 import os
 import sys
+import tempfile
 import unittest
+from statistics import NormalDist
 
 sys.path.insert(0, os.path.dirname(__file__))
 import ta  # noqa: E402
@@ -536,6 +540,121 @@ class SessionLessonTests(unittest.TestCase):
                 fh.write(json.dumps({"error": {"type": "rate_limit"}}))
             with self.assertRaises(ValueError):
                 ta.latest_sma_from_file(p)
+
+
+def weekday_bars(log_rets, last="2026-10-30", start=100.0, volume=1000.0, spread=0.01):
+    """Bars on consecutive weekdays ending at `last`, one per return plus the first."""
+    closes = [start]
+    for r in log_rets:
+        closes.append(closes[-1] * math.exp(r))
+    dates, d = [], datetime.date.fromisoformat(last)
+    while len(dates) < len(closes):
+        if d.weekday() < 5:
+            dates.append(d.isoformat())
+        d -= datetime.timedelta(days=1)
+    vols = volume if isinstance(volume, list) else [volume] * len(closes)
+    return [{"date": dt, "open": c, "high": c * (1 + spread), "low": c * (1 - spread), "close": c,
+             "volume": v, "adjusted": False} for dt, c, v in zip(reversed(dates), closes, vols)]
+
+
+class OutlookTests(unittest.TestCase):
+    def test_add_weekdays_skips_weekends(self):
+        self.assertEqual(ta.add_weekdays("2026-10-30", 1), "2026-11-02")
+        self.assertEqual(ta.add_weekdays("2026-10-30", 5), "2026-11-06")
+        self.assertEqual(ta.add_weekdays("2026-10-30", 20), "2026-11-27")
+
+    def test_trading_day_index(self):
+        self.assertEqual(ta.trading_day_index("2026-10-30", "2026-11-04"), 3)         # pre-market: that open
+        self.assertEqual(ta.trading_day_index("2026-10-30", "2026-11-17", True), 13)  # after the close: next open
+        self.assertEqual(ta.trading_day_index("2026-10-30", "2026-10-30", True), 1)
+        self.assertEqual(ta.trading_day_index("2026-10-30", "2026-10-31"), 1)         # a Saturday: next session
+        self.assertIsNone(ta.trading_day_index("2026-10-30", "2026-10-30"))           # already in the last bar
+        self.assertIsNone(ta.trading_day_index("2026-10-30", "2026-10-20"))
+
+    def test_earnings_from_file_every_shape(self):
+        hdr = "symbol,name,reportDate,fiscalDateEnding,estimate,currency,timeOfTheDay\r\n"
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "e.csv")
+            for body, want in ((hdr + "NVDA,NVIDIA,2026-11-17,2026-10-31,2.49,USD,post-market\r\n", ("2026-11-17", True)),
+                               (json.dumps({"result": hdr + "UBER,UBER,2026-11-04,2026-09-30,0.94,USD,pre-market\r\n"}),
+                                ("2026-11-04", False)),
+                               (hdr, None)):
+                with open(p, "w") as fh:
+                    fh.write(body)
+                self.assertEqual(ta.earnings_from_file(p), want)
+
+    def test_daily_sigma_drops_the_largest_move(self):
+        rets = [0.01, -0.01] * 30
+        rets[40] = 0.20
+        self.assertAlmostEqual(ta.daily_sigma(weekday_bars(rets)), 0.01, delta=0.001)
+        self.assertIsNone(ta.daily_sigma(weekday_bars([0.01] * 5)))
+
+    def test_jump_sigma_takes_the_heavy_volume_move_or_the_floor(self):
+        rets = [0.01, -0.01] * 40
+        rets[60] = 0.08
+        vols = [1000.0] * 81
+        vols[61] = 3000.0  # bar 61 carries return 60
+        bars = weekday_bars(rets, volume=vols)
+        sigma, when = ta.jump_sigma(bars, 0.01)
+        self.assertAlmostEqual(sigma, 0.08, places=9)
+        self.assertEqual(when, bars[61]["date"])
+        self.assertEqual(ta.jump_sigma(weekday_bars(rets), 0.01), (0.025, None))  # no heavy-volume day
+
+    def test_simulation_matches_the_closed_forms(self):
+        sd, n = 0.02, 20
+        out = ta.simulate_outlook(100.0, sd, [(105.0, True), (95.0, False)], days=(5, n), paths=4000, seed=1)[-1]
+        self.assertAlmostEqual(out["p_up"], 0.5, delta=0.03)
+        self.assertAlmostEqual(out["q16"], 100 * math.exp(-sd * math.sqrt(n)), delta=1.5)
+        self.assertAlmostEqual(out["q84"], 100 * math.exp(sd * math.sqrt(n)), delta=1.5)
+        reflection = 2 * (1 - NormalDist().cdf(math.log(1.05) / (sd * math.sqrt(n))))  # a touch, monitored continuously
+        self.assertAlmostEqual(out["touch"][0], reflection, delta=0.03)
+        for t, c in zip(out["touch"], out["close_beyond"]):
+            self.assertLessEqual(c, t)  # a close beyond a level means it traded there
+
+    def test_an_earnings_jump_widens_the_range(self):
+        calm = ta.simulate_outlook(100.0, 0.02, [], days=(5,), paths=4000, seed=2)[0]
+        event = ta.simulate_outlook(100.0, 0.02, [], days=(5,), jump_day=3, jump_sd=0.07, paths=4000, seed=2)[0]
+        self.assertGreater(event["q84"] / event["q16"], calm["q84"] / calm["q16"])
+        self.assertAlmostEqual(event["q84"], 100 * math.exp(math.sqrt(5 * 0.02 ** 2 + 0.07 ** 2)), delta=2.0)
+
+    def test_episodes_and_the_direction_estimate(self):
+        self.assertEqual(ta._episodes([1, 2, 3, 7, 8, 10]), 3)
+        rows = [{"sample": "all weeks", "episodes": 1, "horizons": {1: {"p_up": 0.5}}},
+                {"sample": "same trend state", "episodes": 20, "horizons": {1: {"p_up": 0.6}}},
+                {"sample": "same trend state and zone", "episodes": 5, "horizons": {1: {"p_up": 0.9}}}]
+        est, src = ta.direction_estimate({"rows": rows}, 1)
+        self.assertAlmostEqual(est, 0.5 + 0.1 * 20 / 30)  # the zone sample is too thin, so the trend sample is used
+        self.assertEqual(src, "same trend state")
+        self.assertEqual(ta.direction_estimate({"rows": rows[:1]}, 1), (0.5, None))
+        self.assertEqual(ta.direction_estimate(None, 1), (0.5, None))
+
+    def test_weekly_base_rates_name_the_state(self):
+        weekly = weekday_bars([0.01] * 120)  # a steady climb: every week sits above rising averages, near its high
+        br = ta.weekly_base_rates(weekly)
+        self.assertEqual(br["state"], "above a rising 20-week, above a rising 50-week, within 5% of the 52-week high")
+        same = br["rows"][2]
+        self.assertEqual((same["weeks"], same["episodes"]), (120 - 54, 1))
+        self.assertEqual(same["horizons"][4]["p_up"], 1.0)
+        self.assertIsNone(ta.weekly_base_rates(weekday_bars([0.01] * 30)))
+
+    def test_outlook_end_to_end(self):
+        rets = [0.012 * math.sin(i / 3.0) for i in range(99)]
+        daily = weekday_bars(rets, spread=0.015)
+        weekly = weekday_bars([0.02 * math.sin(i / 5.0) for i in range(150)])
+        facts = ta.analyse(daily, weekly)
+        o = ta.outlook(facts, daily, weekly, earnings=("2026-11-04", False), paths=300)
+        self.assertEqual(o["earnings"]["day"], 3)
+        self.assertGreater(o["earnings"]["sigma"], 0)
+        self.assertEqual([h["days"] for h in o["horizons"]], [5, 10, 20])
+        self.assertEqual([h["date"] for h in o["horizons"]], ["2026-11-06", "2026-11-13", "2026-11-27"])
+        self.assertTrue(o["levels"] and all(len(x["touch"]) == 3 for x in o["levels"]))
+        self.assertTrue(all(x["up"] == (x["price"] > facts["price"]) for x in o["levels"]))
+        facts["outlook"] = o
+        text = ta.render(facts, "X")
+        self.assertIn("## Short-term outlook (statistical; outside the chart frame)", text)
+        self.assertIn("Earnings 2026-11-04 (before the open)", text)
+        far = ta.outlook(facts, daily, weekly, earnings=("2027-01-14", False), paths=50)
+        self.assertIsNone(far["earnings"]["day"])  # outside 20 sessions: no jump
 
 
 if __name__ == "__main__":

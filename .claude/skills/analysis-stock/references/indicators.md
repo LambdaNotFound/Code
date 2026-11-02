@@ -213,6 +213,42 @@ Report it as `[FRAME]` at LOW confidence, and name the rows behind it.
 Never adjust the label by hand; if the story and the label disagree,
 the verdict is where to say so.
 
+## Short-term outlook (statistical, outside the frame)
+
+The script's last section is not technical analysis. It answers two
+different questions, and they carry different tags.
+
+- **How far, not which way.**
+  - The 68% and 90% ranges and the level odds come from a seeded Monte
+    Carlo of daily returns with no drift. It uses the stock's own
+    recent volatility, plus an earnings jump when a report falls inside
+    20 sessions.
+  - Tag them `[COMPUTED]`, MED confidence at most: normal tails
+    understate large moves, and volatility changes.
+  - If a report is coming and the script wasn't given its date, the
+    ranges are too narrow. Say so.
+- **A level inside the noise is weak evidence.**
+  - When the model puts a daily close beyond a level at better than
+    even odds within 10 sessions, a close there will usually be chance.
+  - Say so when the plan's flip level or stop sits there.
+  - Before a decision that costs tax, prefer a weekly close as the
+    test.
+- **Direction.**
+  - The estimate is the stock's own weekly base rate in the same state:
+    the close against the 20- and 50-week SMAs, their 4-week slopes, and
+    whether it sits within 5% of a 52-week extreme.
+  - It is blended with 50% by episodes: 0.5 + (rate − 0.5) × e / (e + 10).
+  - Tag it `[INFERRED]`, LOW, and give the sample's weeks and episodes.
+  - A rate's standard error is about 0.5/√e, so 11 episodes leave
+    about ±15 points.
+- **The frame and the outlook can disagree.** The stance follows the
+  trend, while short-horizon base rates often lean to a reversal.
+  Report both, and don't average them.
+- **Predictions get scored.**
+  - Each one carries a check date. After it, mark hit or miss.
+  - Then compute the Brier score: the mean of (probability − outcome)².
+    A coin flip scores 0.25, and lower is better.
+
 ## What the script does not check
 
 Chart patterns (head and shoulders, cup and handle, flags, wedges),

@@ -23,6 +23,7 @@ endpoint" reply is the authority when it disagrees with this page.
 | `TIME_SERIES_WEEKLY` and `TIME_SERIES_WEEKLY_ADJUSTED` | full history since listing; prefer adjusted (it carries an `adjusted close`; the scripts scale open/high/low by the same factor) |
 | Indicator endpoints (`SMA`, `RSI`, `MACD`, ...) | full history; without `return_full_data` the server sends a preview with the two newest values, which is all `--sma200` needs |
 | `GLOBAL_QUOTE` | latest price |
+| `EARNINGS_CALENDAR` with `symbol` and `horizon=3month` | CSV of upcoming reports with `reportDate` and `timeOfTheDay` (pre-market or post-market); a reply with only the header means no date is listed yet. Returned data on 2026-11-01 and 2026-11-02, after the 2026-09-18 "Information" reply below |
 
 ## Premium on this key
 
@@ -32,7 +33,8 @@ endpoint" reply is the authority when it disagrees with this page.
 | `TIME_SERIES_DAILY` with `outputsize=full` | premium feature (the parameter, not the endpoint) |
 | `HISTORICAL_OPTIONS`, with or without `expiration` | premium endpoint |
 | `REALTIME_OPTIONS` | not tested; assume premium |
-| `EARNINGS_CALENDAR` | returned a one-line "Information" message split into CSV cells, not data; treat as unavailable |
+| `COMPANY_OVERVIEW` | premium endpoint (2026-11-02) |
+| `EARNINGS_CALENDAR` | on 2026-09-18, a one-line "Information" message split into CSV cells, not data; it has worked since (see above), so read the reply before using it |
 
 ## How results arrive
 
