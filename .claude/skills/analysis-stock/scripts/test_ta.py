@@ -41,6 +41,46 @@ class ParseTests(unittest.TestCase):
         self.assertTrue(b["adjusted"])
         self.assertEqual((b["open"], b["high"], b["low"], b["close"]), (100.0, 110.0, 95.0, 100.0))
 
+    WEEKLY = "timestamp,open,high,low,close,adjusted close,volume,dividend amount\r\n"
+
+    def test_mid_week_split_repairs_pre_split_open_and_high(self):
+        # TSLA's 3-for-1 took effect Thursday 2022-08-25: that week's open and high
+        # are pre-split prices, its low and close post-split.
+        csv = self.WEEKLY + ("2022-09-02,282.83,288.48,266.15,270.21,270.21,249374939,0\r\n"
+                             "2022-08-26,875.74,910.94,287.47,288.09,288.09,169020694,0\r\n"
+                             "2022-08-19,905.36,944.00,877.50,890.00,296.6667,118385794,0\r\n")
+        bars = ta.parse_bars(csv)
+        week, k_pre = bars[1], 296.6667 / 890.00
+        self.assertAlmostEqual(week["open"], 875.74 * k_pre, places=6)
+        self.assertAlmostEqual(week["high"], 910.94 * k_pre, places=6)  # about 303.65, not 910.94
+        self.assertEqual((week["low"], week["close"]), (287.47, 288.09))
+        self.assertAlmostEqual(bars[0]["high"], 944.00 * k_pre, places=6)  # wholly pre-split: plain scaling
+        self.assertEqual(bars[2]["high"], 288.48)
+        self.assertTrue(all("_k" not in b for b in bars))
+
+    def test_split_at_the_week_open_is_left_alone(self):
+        # TSLA's 5-for-1 took effect Monday 2020-08-31, so that week is post-split throughout.
+        csv = self.WEEKLY + ("2020-09-04,444.61,502.49,372.0201,418.32,139.44,500060538,0\r\n"
+                             "2020-08-28,2126.275,2318.49,1927.52,2213.40,147.56,88736115,0\r\n")
+        week, k = ta.parse_bars(csv)[1], 139.44 / 418.32
+        self.assertAlmostEqual(week["open"], 444.61 * k, places=6)
+        self.assertAlmostEqual(week["high"], 502.49 * k, places=6)
+
+    def test_mid_week_reverse_split_repairs_pre_split_open_and_low(self):
+        # 1-for-10 mid-week: the open and low are pre-split prices, the high and close post-split.
+        csv = self.WEEKLY + ("2026-01-16,2.00,21.00,1.90,20.50,20.50,1000,0\r\n"
+                             "2026-01-09,2.10,2.20,1.80,2.00,20.00,1000,0\r\n")
+        week = ta.parse_bars(csv)[1]
+        self.assertAlmostEqual(week["open"], 20.0)
+        self.assertAlmostEqual(week["low"], 19.0)
+        self.assertEqual((week["high"], week["close"]), (21.0, 20.5))
+
+    def test_dividend_factor_change_is_not_a_split(self):
+        csv = self.WEEKLY + ("2026-01-16,100,104,99,103,103,1000,0.5\r\n"
+                             "2026-01-09,101,102,98,100,99.5,1000,0\r\n")
+        week = ta.parse_bars(csv)[1]
+        self.assertEqual((week["open"], week["high"], week["low"]), (100.0, 104.0, 99.0))
+
     def test_error_payload_raises(self):
         with self.assertRaises(ValueError):
             ta.parse_bars(json.dumps({"error": {"type": "rate_limit"}}))

@@ -39,16 +39,61 @@ import urllib.request
 
 FIELDS = ("date", "open", "high", "low", "close", "volume")
 
+# A change this large in the adjustment factor between two consecutive bars is a
+# split (a 5-for-4 is 1.25); an ordinary dividend moves it by a few percent.
+SPLIT_JUMP = 1.25
+
 
 def _bar(date, o, h, l, c, adj, v):
     """One bar. When an adjusted close is present, scale open/high/low by the same
-    factor so splits do not show up as cliffs; the "adjusted" flag records it."""
+    factor so splits do not show up as cliffs; the "adjusted" flag records it. The
+    factor rides along as "_k" until _fix_split_bars has used it."""
     o, h, l, c = float(o), float(h), float(l), float(c)
     adjusted = adj not in (None, "")
+    k = 1.0
     if adjusted and c:
         k = float(adj) / c
         o, h, l, c = o * k, h * k, l * k, float(adj)
-    return {"date": date, "open": o, "high": h, "low": l, "close": c, "volume": float(v), "adjusted": adjusted}
+    return {"date": date, "open": o, "high": h, "low": l, "close": c, "volume": float(v),
+            "adjusted": adjusted, "_k": k}
+
+
+def _fix_split_bars(bars):
+    """Repair bars whose session spans a split, then drop the "_k" factors. Bars
+    are oldest first.
+
+    A week with a mid-week split mixes two price scales: its open and one extreme
+    are pre-split prices, its close is post-split, and the adjusted close scales
+    all of them by the post-split factor. A forward split leaves the open and the
+    high too high by the split ratio (TSLA's 3-for-1, week of 2022-08-26: a 910.94
+    high instead of about 303.65); a reverse split leaves the open and the low too
+    low. Such a bar shows a factor jump of r against the bar before, yet its raw
+    open still sits by the previous raw close, not at 1/r of it. Its pre-split
+    prices are rescaled with the previous bar's factor. A post-split extreme that
+    the bar does not show stays lost, so a repaired range can be slightly narrow.
+    Volume is left as reported: Alpha Vantage does not split-adjust it."""
+    for prev, b in zip(bars, bars[1:]):
+        if not (prev["adjusted"] and b["adjusted"]) or prev["_k"] <= 0 or b["_k"] <= 0:
+            continue
+        r = b["_k"] / prev["_k"]
+        if 1 / SPLIT_JUMP < r < SPLIT_JUMP:
+            continue
+        raw_open, raw_prev_close = b["open"] / b["_k"], prev["close"] / prev["_k"]
+        if raw_open <= 0 or raw_prev_close <= 0:
+            continue
+        if abs(math.log(raw_open / raw_prev_close)) >= abs(math.log(r)) / 2:
+            continue  # the split took effect at the open, so the whole bar is post-split
+        k_pre = prev["_k"]
+        b["open"] = raw_open * k_pre
+        if r > 1:  # forward split: the pre-split prices are the larger raw ones
+            b["high"] = b["high"] / b["_k"] * k_pre
+        else:      # reverse split: the pre-split prices are the smaller raw ones
+            b["low"] = b["low"] / b["_k"] * k_pre
+        b["high"] = max(b["high"], b["open"], b["close"])
+        b["low"] = min(b["low"], b["open"], b["close"])
+    for b in bars:
+        b.pop("_k", None)
+    return bars
 
 
 def _bars_from_csv(text):
@@ -93,7 +138,7 @@ def parse_bars(text):
     else:
         bars = _bars_from_csv(text)
     bars.sort(key=lambda b: b["date"])
-    return bars
+    return _fix_split_bars(bars)
 
 
 def load_bars(path):
