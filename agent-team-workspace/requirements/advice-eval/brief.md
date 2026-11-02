@@ -45,8 +45,9 @@ Nothing checks those conclusions systematically:
 
 **Why doing nothing loses (inferred):**
 
-- About 70 predictions a week would go unscored, so how far to trust
-  a call stays a guess.
+- About 70 predictions from this week's reports alone would go
+  unscored, and each week adds more. How far to trust a call would stay
+  a guess.
 - Errors like the four above keep reaching decisions that cost tax,
   and each one is caught only if someone happens to re-read the report.
 - The null option costs nothing up front. That's the only thing it has
@@ -66,55 +67,88 @@ code, and auditing the reports already written.
 
 ## Goals
 
-Confirmed by the user in rounds 1–6. Each goal carries its check.
+Confirmed by the user in rounds 1–7. Each goal carries its check.
+Revised after the reader test (see "Reader test").
 
-1. **Faithfulness:** every number a report states traces to a source:
-   the data files, the script's JSON, or the positions file. Check: one
-   command grades a report and lists every untraceable or mismatched
-   number.
-   - Tolerance (user, round 5): the source value, rounded to the digits
-     the report prints, must equal the report's number. So 65.25
-     matches 65.2500, and 1.98% matches 1.9812%.
-   - A number with no source is reported as "untraceable", not as
-     wrong.
+1. **Faithfulness:** every number a report states traces to a source.
+   - Sources: the data files, the script's JSON, the positions file,
+     any other fi file (accounts, profile, monthly costs, watchlist), a
+     dated web page, or a derivation from other claims (its inputs and
+     formula).
+   - Tolerance (user, round 5): the printed value must sit within half
+     a unit of its last printed digit of the source value. So 65.25
+     matches 65.2500, and 1.98% matches 1.9812%. Either rounding mode
+     passes.
+   - Each claim records its unit, because the script's JSON stores some
+     percentages as percent points and others as fractions
+     (`.claude/skills/analysis-stock/scripts/ta.py:1316`).
+   - The printed value must also appear verbatim in the report's text.
+     That catches an extraction that copied the source value instead
+     of what the report says.
+   - A number with no source is reported as "untraceable", not as wrong.
+   - Check: one command grades a report and lists every untraceable or
+     mismatched number.
 2. **Rule compliance:** reports meet the fi repo's written rules:
    required sections, tags, a chart reason for every trade suggestion,
-   and the account and tax rules. Check: the same command lists every
-   rule a report breaks.
+   and the account and tax rules.
+   - Each report is graded against the rules in force when it was
+     committed, read from fi's git history. A rule added later is listed
+     as "not yet required", not as a failure.
+   - The required-sections rule applies to stock reports only.
+   - Check: the same command lists every rule a report breaks.
 3. **Outcomes:** predictions and trade suggestions are scored after
-   their check dates against what happened.
-   - Predictions: hit or miss, a Brier score, and calibration over time.
-   - Trades: the result over 1–4 weeks against three baselines (user,
-     round 2): no trade, SPY over the same dates, and the rule's own
-     entry, stop and target applied mechanically.
-   - Taxes (user, round 2): show both. Every trade gets a pre-tax
-     result; taxable-account trades also get an after-tax one, from the
-     lot basis and the plan's tax rate.
-   - Verdicts (user, round 4): hit rates and Brier scores carry 95%
-     intervals. The scorecard calls a verdict ("better than a coin
-     flip", "beats SPY") only when the interval excludes the baseline;
-     until then it says "too few to tell".
+   their check dates against what happened. Predictions answer two
+   different questions, scored separately:
+   - **Are the odds honest?** Ranges, level touches, closes beyond a
+     level and order-fill odds come from a model with no view on
+     direction. They carry no edge by construction, so they're scored
+     for calibration: how often the event happened against the stated
+     probability, by probability bucket.
+   - **Is there skill?** Direction calls ("close above X on a date")
+     are scored with a Brier skill score against the no-edge reference
+     of 50%.
+   - Never a hit rate against a coin flip: a calibrated 68% range hits
+     68% of the time with no skill at all.
+   - **Verdicts** (user, round 4): every score carries a 95% interval.
+     A verdict ("the odds are honest", "skill above no edge", "beats
+     SPY") is called only when the interval excludes the baseline.
+     Until then the scorecard says "too few to tell".
+   - **Correlation:** calls on the same date across tickers move
+     together, so intervals come from resampling whole check dates, with
+     a fixed seed. Intervals that assume independent calls would be too
+     narrow.
+   - **Edge test** (user, round 6): a live test with a power target.
+     The scorecard reports each edge with its interval, and how many
+     more scored calls a given edge would need. There is no historical
+     replay, and no premium data is bought.
+   - **Trades:** each suggestion's result over 1, 2 and 4 weeks. The
+     actual result, from the imported fills, is compared with no trade,
+     with SPY over the same dates, and with the rule's own entry, stop
+     and target simulated from the bars.
+   - **Taxes** (user, round 2): every trade gets a pre-tax result.
+     Taxable-account trades also get an after-tax one, using the rates
+     in `fi/profile.md` and the tax rules in `fi/CLAUDE.md`, with basis
+     and holding period from the lots in the trade-history import.
+   - About 70 predictions from this week's reports alone come due on
+     11-06, 11-13 and 11-27, and each week's reports add more. The
+     scorecard is the first deliverable (user, round 4); piece 1 is its
+     prerequisite.
    - Check: a scorecard report in fi.
-   - Built first (user, round 4). About 70 predictions come due on
-     11-06, 11-13 and 11-27.
-   - Edge test (user, round 6): a live test with a power target. The
-     scorecard reports the edge over each baseline with its 95%
-     interval, and how many more scored calls a given edge would need
-     before it could be detected. There is no historical replay, and no
-     premium data is bought.
 4. **Regression:** a change to the skills is caught if it moves the
-   stance, the levels or the plan on frozen inputs. Check: automated
-   tests that re-run the analysis on frozen data.
+   stance, the levels, the plan or the outlook on frozen inputs. Check:
+   automated tests that re-run the analysis on frozen data.
 5. **Audit:** the checks in goals 1 and 2 run over every report already
-   in fi. Check: an audit report listing every finding.
+   in fi: 30 reports, since `to-do.md` is not a report (`fi/CLAUDE.md:31`).
    - Method (user, round 3): Claude reads each old report once and
      writes its claims, trades and predictions to a JSON file under
      `fi/reports/evals/`. The grader runs on that file.
    - Old reports stay unedited.
-6. **Machine-readable calls** (user, round 2): every new report ends
-   with a fenced JSON block. It lists the report's numeric claims (each
-   with its source), its trade suggestions and its predictions. Check:
-   the grader reads the block, and a report without one fails.
+   - Check: an audit report listing every finding.
+6. **Machine-readable calls** (user, round 2): every new report carries
+   a fenced JSON block, placed just before its closing `[RULES I BROKE]`
+   line. It lists the report's numeric claims, trade suggestions and
+   predictions, with the inputs the report was written from. Check: the
+   grader reads the block, and a report without one fails.
 7. **Judgment rules** (user, round 3): scripts check what's exact;
    a Claude grader scores the judgment rules.
    - Exact checks: numbers, sections, tags, and triggers inside the
@@ -130,7 +164,10 @@ Confirmed by the user in rounds 1–6. Each goal carries its check.
      changes.
 8. **Actual fills** (user, round 3): the broker's trade-history CSVs
    are imported by a redacting script, like the positions import.
-   - They feed the "rule applied mechanically" baseline.
+   - Fills give each trade's actual result. The mechanical baseline is
+     simulated from bars, not from fills.
+   - The import also gives each lot's basis and acquisition date, which
+     the after-tax results need.
    - This also closes the open "get the trade history" to-do item.
 9. **Fundamentals and news** (user, round 6). Three checks:
    - **Cited facts:** when advice cites a P/E, an analyst target, an
@@ -189,8 +226,18 @@ Out of scope as a consequence of those answers:
   (`.claude/skills/analysis-stock/references/alphavantage-free-tier.md`).
   Scoring outcomes needs bars from after each check date. The fi data
   rule caches every pull (`fi/CLAUDE.md:88`).
-- **Observed:** scripts are Python, standard library only (the fi
-  scripts rule, and the skills' scripts).
+  - Caching began on 2026-11-02, with fi commit 45dcbee. That commit
+    holds the 2026-10-30 close that every report so far was written
+    from (observed).
+- **Inferred:** the Alpha Vantage MCP tools exist only inside a Claude
+  session, and `ta.py --fetch` needs a key the user hasn't set
+  (`fi/CLAUDE.md:110-114`).
+  - So the eval scripts work offline, from `data/`.
+  - Before a run, Claude fetches any missing bars under the cache rule
+    and records the calls it spent in the run report.
+- **Observed:** fi's scripts are Python 3, "standard library first"
+  (`fi/CLAUDE.md:61`). The skills' scripts use the standard library
+  only.
 - **Observed:** `ta.py` is deterministic. The outlook uses a fixed seed
   (`.claude/skills/analysis-stock/scripts/ta.py:984`), so frozen inputs
   give identical output.
@@ -282,24 +329,46 @@ Order: dependency first, then the deadline, then risk.
 
 Goal: a machine-readable record of every report's calls.
 
-- **The block:** a fenced JSON block that ends each new report. It has
-  three lists:
-  - **claims:** each with the value as printed, its source (a file and
-    a field, or a URL and a date), and its kind (price, percent, count,
-    date);
-  - **trades:** each with the account type (taxable, Roth, HSA, 401k),
-    side, quantity, order type and price, trigger, fallback, the stance
-    it rests on, and its chart reason or "no technical reason";
-  - **predictions:** each with its kind (close above, close inside a
-    range, trades at a level, daily close beyond a level), level or
-    range, probability and check date.
+- **The block:** a fenced JSON block placed just before a report's
+  closing `[RULES I BROKE]` line. The exact field names are piece 1's
+  output, approved by the user before piece 2 starts. At a minimum it
+  records:
+  - **the report:** its path, its date, the close its data ends at (the
+    as-of date), and its inputs: the fi commit holding the `data/` files
+    used, the `ta.py` commit, and the flags passed;
+  - **each claim:** an id, the printed text exactly as it appears, the
+    value, its unit (price, percent points, fraction, count or date),
+    its tag, and its source. A source is one of:
+    - a file, with a locator (a field, a JSON path, a row key or a
+      line);
+    - the script's JSON, with a JSON path;
+    - a web page, with its URL and date;
+    - a derivation, with the ids of its inputs and the formula;
+  - **each trade:** an id, the ticker, the account type (taxable, Roth,
+    HSA, 401k), side, quantity, order type, prices, trigger, fallback,
+    horizon, and the stance it rests on (label and score). Also either
+    its chart reason, or "no technical reason" with the real reason;
+  - **each prediction:** an id, the ticker, its kind, the level or range
+    and the direction (above or below), and the probability. Also the
+    no-edge probability (50% for a direction call; for a model-derived
+    odd, the same as its probability), the as-of close, the check date,
+    and which table it came from.
+- **Prediction kinds:**
+  - close above a level on a date;
+  - close inside a range on a date;
+  - trades at a level by a date;
+  - a daily close beyond a level by a date;
+  - a Friday (weekly) close beyond a level by a date.
 - **Validator:** a script that checks a block against the schema.
-- **Rule:** a rule in `fi/CLAUDE.md` making the block required, which
-  is edited at the user's request.
+- **Rule:** a rule in `fi/CLAUDE.md` making the block required, edited
+  at the user's request.
 - **First extraction:** the two prediction reports dated 2026-11-02
   under `fi/reports/stocks/` (one for a single ticker, one for 13
-  tickers) are extracted into calls files under `fi/reports/evals/`, so piece 2 can score them
-  on 11-06.
+  tickers).
+  - Every probability with a check date is extracted, from the numbered
+    predictions and from the odds tables, each tagged with its table.
+  - The calls files go under `fi/reports/evals/`, so piece 2 can score
+    them on 11-06.
 - **Done when:** both files validate; a deliberately broken block fails
   with a message naming the field; and the user approves the schema.
 
@@ -307,23 +376,34 @@ Goal: a machine-readable record of every report's calls.
 
 Goal: prediction outcomes, with honest uncertainty.
 
-- **Inputs:** the calls files, plus daily bars covering each check date.
-  The bars come from `data/` when it's current; otherwise the scorecard
-  spends calls under the cache rule, or marks the prediction pending.
-- **Hit or miss, by kind:**
-  - "close above" and "close inside a range" use the close on the
-    check date;
-  - "trades at a level" uses each session's high and low up to the
-    check date;
-  - "close beyond a level" uses the daily closes up to the check date.
-- **Output:** the Brier score, hit rates with Wilson 95% intervals, and
-  the edge over a coin flip and over the no-edge model's probabilities.
-  - A verdict is printed only when the interval excludes the baseline.
-  - It also states how many more scored calls it would take to detect
-    the edge.
+- **Inputs:** the calls files, plus daily bars covering each check date,
+  read from `data/`.
+  - The script runs offline.
+  - Before a run, Claude fetches any missing bars under the cache rule.
+    If it can't, the prediction is marked pending.
+- **Windows:**
+  - date kinds ("close above", "close inside a range") use the close on
+    the check date;
+  - path kinds ("trades at", "daily close beyond", "Friday close
+    beyond") use every session from the first one after the as-of close
+    through the check date. "Trades at" uses highs and lows; the others
+    use closes;
+  - a check date that isn't a trading day falls back to the last session
+    before it.
+  - The printed date governs, not a count of sessions. `ta.py` counts
+    weekdays and ignores holidays
+    (`.claude/skills/analysis-stock/scripts/ta.py:990`).
+- **Output:**
+  - a calibration table of observed frequency against stated
+    probability, by bucket, for the model-derived odds;
+  - for direction calls, the Brier score and the Brier skill score
+    against 50%;
+  - 95% intervals from resampling whole check dates, with a fixed seed;
+  - the verdict rule from goal 3;
+  - the number of further scored calls a given edge would need.
 - **Report:** a dated report under `fi/reports/evals/`.
-- **Done when:** a test fixture with known outcomes scores to hand-
-  computed values, and the 11-06 predictions are scored that day.
+- **Done when:** a test fixture with known outcomes scores to
+  hand-computed values, and the 11-06 predictions are scored that day.
 
 ### 3. `advice-eval-grader`
 
@@ -333,23 +413,37 @@ Goal: one command that grades one report.
   - every claim matches its source at the printed precision, and a
     claim with no source is reported as "untraceable";
   - the required sections are present (`fi/CLAUDE.md:119`);
-  - every claim carries a tag;
+  - every claim's tag, read from the block, is one of `[KNOWN]`,
+    `[COMPUTED]`, `[INFERRED]`, `[COMMON]`, `[FRAME]` or `[GUESS]`, the
+    user's tag set;
   - every trade has a chart reason or "no technical reason"
     (`fi/CLAUDE.md:51`);
   - every recommendation has its reason, main risk and rules check
     (`fi/CLAUDE.md:48`);
-  - no plan level or flip level has better-than-even odds, in `ta.py`'s
-    outlook, of a daily close beyond it within 10 sessions;
+  - any trade price (limit, trigger, fallback) or flip level with
+    better-than-even odds of a daily close beyond it within 10
+    sessions is flagged in the report, as the rule requires
+    (`fi/CLAUDE.md:147-149`).
+    - The grader computes those odds itself with `ta.py`'s simulation,
+      for any price, not only `ta.py`'s own levels.
+    - It fails a report only when such a level goes unflagged.
   - the account rules hold (`fi/profile.md:36`), for example covered
     calls only and the leveraged-ETF cap.
 - **Claude grader:** a written rubric for the judgment rules, applied
   with quoted evidence.
-  - Its scores count only after agreeing with the user's 20 labels.
+  - Its scores count only after agreeing with the user's labels:
+    matching the user's pass or fail on at least 16 of 20 (report,
+    rule) items.
+  - The rubric lives at `fi/scripts/eval/rubric.md`, and the labels at
+    `fi/reports/evals/labels.json` (defaults).
+- **Rules in force:** each report is graded against the rules in force
+  when it was committed (goal 2).
 - **Findings:** each one names the file, the claim, the expected value,
   the value found, and the source.
 - **Done when:**
   - seeded broken reports (a changed number, a missing section, a
-    missing chart reason, a trigger inside the noise) each produce
+    missing chart reason, an unflagged trigger inside the noise) each
+    produce
     exactly their finding;
   - a clean report produces none;
   - the grader meets the agreement bar on the labels.
@@ -365,6 +459,10 @@ Goal: catch changes to the analysis code that move its outputs.
     outlook.
   - Expected changes are accepted by re-pinning, with a commit message
     saying why.
+  - The first pin is the fi commit whose `data/` holds the 2026-10-30
+    close for all 14 cached tickers.
+  - Expected outputs go under `fi/scripts/eval/golden/`, once
+    `git check-ignore` passes.
 - **Done when:** the run passes today, and fails after a deliberate
   one-line change to the stance bands.
 
@@ -372,9 +470,10 @@ Goal: catch changes to the analysis code that move its outputs.
 
 Goal: grade every existing report.
 
-- **How:** Claude reads each of the 31 reports once and writes its calls
+- **How:** Claude reads each of the 30 reports once and writes its calls
   file under `fi/reports/evals/`. Then the grader runs on all of them,
-  and the result is an audit report.
+  against the rules in force when each was committed, and the result is
+  an audit report.
 - **Fixes:** made under the auto-fix rules:
   - a correction report for each wrong number or misread source;
   - automatic revisions of prices and triggers, from exact findings
@@ -412,11 +511,17 @@ Goal: actual fills, without exposing account numbers.
 
 Goal: trade results against the three baselines.
 
-- **Baselines:** each trade suggestion's result over 1, 2 and 4 weeks,
-  compared with no trade, with SPY over the same dates, and with the
-  rule's own entry, stop and target applied mechanically.
-- **Taxes:** pre-tax for every trade. Taxable-account trades also get
-  an after-tax result, from the lot basis and the plan's tax rate.
+- **Baselines:** each trade's actual result over 1, 2 and 4 weeks, from
+  the imported fills. It's compared with no trade, with SPY over the
+  same dates, and with the rule's own entry, stop and target simulated
+  from the bars.
+- **Taxes:** pre-tax for every trade. Taxable-account trades also get an
+  after-tax result from three sources:
+  - the rates in `fi/profile.md`;
+  - the tax rules in `fi/CLAUDE.md`;
+  - each lot's basis and holding period, from the import.
+  - When a holding period is unknown, both the short-term and the
+    long-term results are shown, labeled.
 - **Edge test:** the same intervals, verdict rule and power target as
   piece 2.
 - **Done when:** a fixture with known fills and bars gives hand-
@@ -424,25 +529,31 @@ Goal: trade results against the three baselines.
 
 ## Open questions
 
-Rounds 1–7 are answered (see the log). Each question below has an owner and a default that applies if it isn't
-answered.
+Rounds 1–7 are answered (see the log). Each question below has an owner
+and a default that applies if it isn't answered.
 
 1. **What agreement with the user's labels makes the grader count?**
    Owner: the user. Default: at least 16 of 20 (80%), re-checked when
    the rubric changes.
 2. **What edge should the power target aim at?** Owner: the user.
-   Default: a 5-point gain in hit rate over the no-edge model's
-   probabilities, at 80% power and a 95% confidence level.
-3. **How are check dates counted around market holidays?** Owner:
-   Claude, in piece 2. Default: by trading sessions, using the bars
-   that actually exist. A prediction whose date falls on a holiday is
-   scored on the last session before it.
-4. **What if a source is unavailable when a claim is checked?** Owner:
-   Claude, in piece 3. Default: mark the claim "unverified" and list
-   it, but don't count it as a failure.
-5. **Where do outputs go?** Owner: Claude. Default:
-   `fi/reports/evals/`, one dated report per run. Each lists its
-   findings, its revisions, what's pending, and the calls it spent.
+   - The reader test computed that a 5-point gain over 50%, at 80%
+     power, needs about 620–780 independent calls (checked: about 616
+     one-sided, 782 two-sided).
+   - Same-date calls aren't independent, so in practice that's well
+     over a year of weekly reports.
+   - A 10-point target needs about a quarter as many.
+   - Default: report both, with progress toward each.
+3. **What if a source is unavailable when a claim is checked?** Owner:
+   Claude, in piece 3. Default: mark the claim "unverified" and list it,
+   but don't count it as a failure.
+4. **Where do outputs go, and what shape is the tool?** Owner: Claude.
+   Default:
+   - one CLI, `fi/scripts/advice_eval.py`, with subcommands: validate,
+     score, grade, regress and audit;
+   - tested with `unittest` in `fi/scripts/test_advice_eval.py`;
+   - one dated report per run under `fi/reports/evals/`, listing its
+     findings, its revisions, what's pending and the calls it spent;
+   - every new path passes `git check-ignore` first.
 
 Settled with less questioning, because the blast radius is small:
 
@@ -455,6 +566,43 @@ Settled with less questioning, because the blast radius is small:
 - **Deadline and budget:** the only deadline is piece 2 by 11-06. The
   budget is the free tier's calls, with no paid services (round 6).
   The Claude grader runs inside the session.
+
+## Reader test (phase 5)
+
+Run on 2026-11-02. A design-investigator agent read the brief with no
+conversation context.
+
+- **What it got right:**
+  - the shape of pieces 1 and 2: a standard-library schema and
+    validator, and an offline scorer with Brier scores, intervals and a
+    dated report;
+  - the privacy split;
+  - the build route.
+- **What it missed, now fixed in the brief:**
+  - Goal 3 scored range and touch odds against a coin flip, which a
+    calibrated model beats with no skill. Calibration and skill are now
+    scored separately.
+  - The intervals assumed independent calls. They now resample whole
+    check dates.
+  - The schema had no field list, no weekly-close kind, no as-of date
+    or window start, no tag or unit fields, and no derived or non-data
+    sources.
+  - Holidays: the printed check date now governs, not a count of
+    sessions.
+  - The noise check would have failed reports that follow the rule. It
+    now fails only unflagged levels, and covers any order price.
+  - Old reports are graded against the rules in force when they were
+    committed.
+  - Several things were undefined and are now stated: fills versus the
+    mechanical baseline, the tax-rate source, holding periods, the CLI
+    shape, and where the rubric, labels and golden files live.
+  - Small corrections:
+    - 30 reports, not 31;
+    - "standard library first";
+    - caching began on 2026-11-02;
+    - about 70 predictions due across three dates, not 70 a week;
+    - the block sits just before `[RULES I BROKE]`.
+- **Still open:** the power target (open question 2).
 
 ## Context
 
