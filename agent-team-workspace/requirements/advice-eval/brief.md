@@ -1,6 +1,6 @@
 # Brief: advice-eval: an eval framework for the advice written into the fi repo
 
-Status: draft
+Status: signed-off 2026-11-02
 Slug: advice-eval
 Started: 2026-11-02
 
@@ -567,13 +567,15 @@ Goal: trade results against the three baselines.
 
 ## Open questions
 
-Rounds 1–7 are answered (see the log). Each question below has an owner
-and a default that applies if it isn't answered.
+Rounds 1–8 are answered (see the log). At sign-off the user accepted
+the defaults for questions 1, 2 and 5. Questions 3 and 4 are Claude's
+to settle while building, under their defaults.
 
 1. **What agreement with the user's labels makes the grader count?**
-   Owner: the user. Default: at least 16 of 20 (80%), re-checked when
-   the rubric changes.
-2. **Which skill test drives the power target?** Owner: the user. At
+   Answered at sign-off: at least 16 of 20 (80%), re-checked when the
+   rubric changes.
+2. **Which skill test drives the power target?** Answered at sign-off:
+   report both. At
    80% power and 95% confidence:
    - **Direction accuracy against 50%:** for a true 55% hit rate, about
      620–780 independent calls (616 one-sided, 782 two-sided).
@@ -597,8 +599,8 @@ and a default that applies if it isn't answered.
      findings, its revisions, what's pending and the calls it spent;
    - every new path passes `git check-ignore` first.
 5. **What calibration margin, and how many check dates before a
-   verdict?** Owner: the user. Default: plus or minus 5 points, and at
-   least 8 distinct check dates.
+   verdict?** Answered at sign-off: plus or minus 5 points, and at least
+   8 distinct check dates.
 
 Settled with less questioning, because the blast radius is small:
 
@@ -752,3 +754,10 @@ Round 7, 2026-11-02, interactive:
 1. **How do the pieces get built?** Directly in fi, in the main
    session, with no agent loops.
 2. **May the trade-history pattern go into fi's `.gitignore`?** Yes.
+
+Round 8, sign-off, 2026-11-02, interactive:
+
+1. **Sign off?** Yes.
+2. **Skill test?** Report both.
+3. **Thresholds?** Plus or minus 5 points, and 8 check dates.
+4. **Grader bar?** 16 of 20.
