@@ -1,6 +1,8 @@
 """Tests for ta.py. Run from this directory: python3 -m unittest test_ta -v"""
 
+import contextlib
 import datetime
+import io
 import json
 import math
 import os
@@ -655,6 +657,62 @@ class OutlookTests(unittest.TestCase):
         self.assertIn("Earnings 2026-11-04 (before the open)", text)
         far = ta.outlook(facts, daily, weekly, earnings=("2027-01-14", False), paths=50)
         self.assertIsNone(far["earnings"]["day"])  # outside 20 sessions: no jump
+
+    def test_parse_outlook_days_and_level(self):
+        self.assertEqual(ta.parse_outlook_days("20,1, 5,5"), (1, 5, 20))
+        for bad in ("", "0", "-1", "61", "1.5", "x"):
+            with self.assertRaises(ValueError):
+                ta.parse_outlook_days(bad)
+        self.assertEqual(ta.parse_level("105.50:sell order"), (105.5, "sell order"))
+        self.assertEqual(ta.parse_level("97"), (97.0, "given level"))
+        for bad in ("abc", "-5:x", "0", "nan", "inf:x"):
+            with self.assertRaises(ValueError):
+                ta.parse_level(bad)
+
+    def test_one_session_outlook_with_an_order_level(self):
+        rets = [0.012 * math.sin(i / 3.0) for i in range(99)]
+        daily = weekday_bars(rets, spread=0.015)
+        weekly = weekday_bars([0.02 * math.sin(i / 5.0) for i in range(150)])
+        facts = ta.analyse(daily, weekly)
+        order = round(facts["price"] * 1.01, 2)
+        o = ta.outlook(facts, daily, weekly, days=(1,), extra_levels=[(order, "sell order")], paths=4000)
+        (h,) = o["horizons"]
+        self.assertEqual((h["days"], h["date"], h["weeks"]), (1, "2026-11-02", None))
+        self.assertEqual((h["p_up_estimate"], h["estimate_from"], h["p_up_base"]), (0.5, None, None))
+        self.assertAlmostEqual(h["q84"], facts["price"] * math.exp(o["daily_sigma"]), delta=0.02 * facts["price"])
+        x = next(x for x in o["levels"] if "sell order" in x["label"])
+        self.assertTrue(x["up"])
+        reflection = 2 * (1 - NormalDist().cdf(math.log(order / facts["price"]) / o["daily_sigma"]))
+        self.assertAlmostEqual(x["touch"][0], reflection, delta=0.03)  # one session, monitored continuously
+        self.assertLessEqual(x["close_beyond"][0], x["touch"][0])
+        hit = ta.outlook(facts, daily, weekly, earnings=("2026-11-02", False), days=(1,), paths=50)
+        self.assertEqual(hit["earnings"]["day"], 1)  # a pre-market report on the next session
+        miss = ta.outlook(facts, daily, weekly, earnings=("2026-11-03", False), days=(1,), paths=50)
+        self.assertIsNone(miss["earnings"]["day"])  # two sessions out: outside a one-session horizon
+        facts["outlook"] = o
+        text = ta.render(facts, "X")
+        self.assertIn("| 1 session (about 2026-11-02) |", text)
+        self.assertIn("| Trades there by 1 session |", text)
+        self.assertIn("the others' estimates stay at 50%", text)
+
+    def test_cli_takes_outlook_days_and_levels(self):
+        daily = weekday_bars([0.012 * math.sin(i / 3.0) for i in range(99)], spread=0.015)
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "daily.csv")
+            with open(p, "w") as fh:
+                fh.write("timestamp,open,high,low,close,volume\n")
+                for b in reversed(daily):
+                    fh.write(f"{b['date']},{b['open']},{b['high']},{b['low']},{b['close']},{b['volume']}\n")
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                ta.main(["--daily", p, "--json", "--outlook-days", "1,5", "--level", "1.0:far below"])
+            o = json.loads(buf.getvalue())["outlook"]
+            self.assertEqual([h["days"] for h in o["horizons"]], [1, 5])
+            self.assertEqual(o["levels"][-1]["label"], "far below")
+            self.assertEqual(o["levels"][-1]["touch"], [0.0, 0.0])
+            for bad in (["--outlook-days", "0"], ["--level", "x"]):
+                with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+                    ta.main(["--daily", p] + bad)
 
 
 if __name__ == "__main__":

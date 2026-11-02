@@ -241,6 +241,9 @@ different questions, and they carry different tags.
   - Tag it `[INFERRED]`, LOW, and give the sample's weeks and episodes.
   - A rate's standard error is about 0.5/√e, so 11 episodes leave
     about ±15 points.
+  - A horizon other than 5, 10 or 20 sessions (`--outlook-days`) has no
+    base rate, so its estimate is 50%: no direction call. Don't fill
+    that gap with the frame's lean.
 - **The frame and the outlook can disagree.** The stance follows the
   trend, while short-horizon base rates often lean to a reversal.
   Report both, and don't average them.

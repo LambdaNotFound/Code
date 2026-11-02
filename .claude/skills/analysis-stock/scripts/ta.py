@@ -979,11 +979,37 @@ def stance(f):
 # --------------------------------------------------------------------------- #
 
 OUTLOOK_DAYS = (5, 10, 20)        # sessions: about 1, 2 and 4 weeks
-OUTLOOK_WEEKS = {5: 1, 10: 2, 20: 4}
+OUTLOOK_WEEKS = {5: 1, 10: 2, 20: 4}  # horizons with a weekly base rate
+OUTLOOK_MAX_DAYS = 60             # longest horizon --outlook-days accepts
 OUTLOOK_PATHS = 20000
 OUTLOOK_SEED = 7                  # fixed, so the same data always prints the same odds
 BASE_MIN_EPISODES = 8             # a base-rate sample counts only with this many separate runs
 BASE_SHRINK = 10                  # pseudo-episodes at 50% blended into a base rate
+
+
+def parse_outlook_days(text):
+    """'1,5,10,20' -> (1, 5, 10, 20): whole numbers of sessions, sorted and
+    deduplicated, each from 1 to OUTLOOK_MAX_DAYS. Raises ValueError otherwise."""
+    try:
+        days = sorted({int(x) for x in text.split(",") if x.strip()})
+    except ValueError:
+        raise ValueError(f"--outlook-days takes whole numbers separated by commas, not {text!r}") from None
+    if not days or days[0] < 1 or days[-1] > OUTLOOK_MAX_DAYS:
+        raise ValueError(f"--outlook-days takes horizons from 1 to {OUTLOOK_MAX_DAYS} sessions, not {text!r}")
+    return tuple(days)
+
+
+def parse_level(text):
+    """'105.50:sell order' -> (105.5, 'sell order'). A bare price is labelled
+    'given level'. Raises ValueError unless the price is a positive number."""
+    price, _, label = text.partition(":")
+    try:
+        p = float(price)
+    except ValueError:
+        raise ValueError(f"--level takes PRICE or PRICE:LABEL, not {text!r}") from None
+    if not (p > 0 and math.isfinite(p)):
+        raise ValueError(f"--level needs a positive price, not {text!r}")
+    return p, label.strip() or "given level"
 
 
 def add_weekdays(date, n):
@@ -1163,10 +1189,15 @@ def direction_estimate(rates, weeks):
     return 0.5, None
 
 
-def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTLOOK_PATHS, seed=OUTLOOK_SEED):
-    """Ranges, level odds and a direction estimate for the next 5, 10 and 20
-    sessions. `earnings` is (report date, after_close); `earnings_move` is a
-    one-sigma jump in percent that overrides the estimate from the daily bars."""
+def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTLOOK_PATHS, seed=OUTLOOK_SEED,
+            days=OUTLOOK_DAYS, extra_levels=()):
+    """Ranges, level odds and a direction estimate for the next `days` sessions
+    (default 5, 10 and 20). `earnings` is (report date, after_close);
+    `earnings_move` is a one-sigma jump in percent that overrides the estimate
+    from the daily bars. `extra_levels` holds (price, label) pairs, such as open
+    orders, that get odds beside the chart's levels. Only the 5-, 10- and
+    20-session horizons have a weekly base rate; any other horizon's direction
+    estimate stays at 50%."""
     sd = daily_sigma(daily)
     if sd is None:
         return None
@@ -1175,7 +1206,7 @@ def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTL
     if earnings:
         jump.update(date=earnings[0], after_close=earnings[1])
         day = trading_day_index(f["as_of"], earnings[0], earnings[1])
-        if day is not None and day <= max(OUTLOOK_DAYS):
+        if day is not None and day <= max(days):
             if earnings_move:
                 sigma, source = math.log(1 + earnings_move / 100), "given"
             else:
@@ -1207,9 +1238,11 @@ def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTL
         add(max((x for x in sup if x < s1 * 0.995), default=None), "support 2")
     add(pl["entry"], "the plan's entry")
     add(pl["stop"], "the plan's stop")
+    for lvl, label in extra_levels:
+        add(lvl, label)
     levels.sort(key=lambda x: -x["price"])
 
-    sim = simulate_outlook(price, sd, [(x["price"], x["up"]) for x in levels], OUTLOOK_DAYS,
+    sim = simulate_outlook(price, sd, [(x["price"], x["up"]) for x in levels], days,
                            jump["day"], jump["sigma"], paths, seed)
     for j, x in enumerate(levels):
         x["touch"] = [s["touch"][j] for s in sim]
@@ -1217,8 +1250,8 @@ def outlook(f, daily, weekly=None, earnings=None, earnings_move=None, paths=OUTL
     rates = weekly_base_rates(weekly) if weekly else None
     horizons = []
     for s in sim:
-        w = OUTLOOK_WEEKS[s["days"]]
-        est, source = direction_estimate(rates, w)
+        w = OUTLOOK_WEEKS.get(s["days"])
+        est, source = direction_estimate(rates, w) if w else (0.5, None)
         base = next(r for r in rates["rows"] if r["sample"] == source)["horizons"][w]["p_up"] if source else None
         horizons.append({**{k: v for k, v in s.items() if k not in ("touch", "close_beyond")},
                          "date": add_weekdays(f["as_of"], s["days"]), "weeks": w,
@@ -1403,13 +1436,19 @@ def render(f, symbol):
     return "\n".join(L)
 
 
+def _sessions(n):
+    return f"{n} session" + ("" if n == 1 else "s")
+
+
 def render_outlook(o):
     e, days = o["earnings"], "/".join(str(h["days"]) for h in o["horizons"])
+    longest = max(h["days"] for h in o["horizons"])
+    unit = "session" if days == "1" else "sessions"
     if e["day"]:
         jump = (f"Earnings {e['date']} ({'after the close' if e['after_close'] else 'before the open'}): "
                 f"a {100 * e['sigma']:.1f}% jump sigma at the open of session {e['day']} ({e['source']}).")
     elif e["date"]:
-        jump = f"Earnings {e['date']} fall outside the {max(OUTLOOK_DAYS)} sessions or are already in the data: no jump."
+        jump = f"Earnings {e['date']} fall outside the {_sessions(longest)} or are already in the data: no jump."
     else:
         jump = "No earnings date given: the ranges ignore earnings."
     L = ["## Short-term outlook (statistical; outside the chart frame)",
@@ -1422,9 +1461,11 @@ def render_outlook(o):
          "|---|---|---|---|"]
     for h in o["horizons"]:
         base = "n/a" if h["p_up_base"] is None else f"{100 * h['p_up_base']:.0f}%"
-        L.append(f"| {h['days']} sessions (about {h['date']}) | {_f(h['q16'])}-{_f(h['q84'])} | {_f(h['q05'])}-{_f(h['q95'])} "
+        L.append(f"| {_sessions(h['days'])} (about {h['date']}) | {_f(h['q16'])}-{_f(h['q84'])} | {_f(h['q05'])}-{_f(h['q95'])} "
                  f"| {100 * h['p_up']:.0f}% / {base} / {100 * h['p_up_estimate']:.0f}% |")
-    L += ["", f"| Level | What it is | Trades there by {days} sessions | A daily close beyond it by {days} sessions |",
+    if any(h["weeks"] is None for h in o["horizons"]):
+        L += ["", "- Only the 5-, 10- and 20-session horizons have a weekly base rate; the others' estimates stay at 50%."]
+    L += ["", f"| Level | What it is | Trades there by {days} {unit} | A daily close beyond it by {days} {unit} |",
           "|---|---|---|---|"]
     for x in o["levels"]:
         L.append(f"| {_f(x['price'])} | {x['label']} ({'above' if x['up'] else 'below'}) | "
@@ -1530,7 +1571,16 @@ def main(argv=None):
     ap.add_argument("--earnings-file", help="EARNINGS_CALENDAR result (CSV or {result: csv}); its soonest row sets --earnings")
     ap.add_argument("--earnings-move", type=float, metavar="PCT", help="one-sigma earnings move in percent, e.g. an options-implied move; default: estimated from the daily bars")
     ap.add_argument("--no-outlook", action="store_true", help="skip the short-term outlook")
+    ap.add_argument("--outlook-days", default="5,10,20", metavar="N[,N...]",
+                    help=f"the outlook's horizons in sessions, e.g. 1 for the next session (default 5,10,20; at most {OUTLOOK_MAX_DAYS})")
+    ap.add_argument("--level", action="append", default=[], metavar="PRICE[:LABEL]",
+                    help="an extra price for the outlook's level odds, such as an open order (repeatable)")
     args = ap.parse_args(argv)
+    try:
+        outlook_days = parse_outlook_days(args.outlook_days)
+        extra_levels = [parse_level(x) for x in args.level]
+    except ValueError as e:
+        ap.error(str(e))
 
     if args.fetch:
         paths = fetch(args.fetch, args.out_dir)
@@ -1547,7 +1597,8 @@ def main(argv=None):
     if not args.no_outlook:
         earnings = (args.earnings, args.earnings_after_close) if args.earnings else (
             earnings_from_file(args.earnings_file) if args.earnings_file else None)
-        facts["outlook"] = outlook(facts, daily, weekly, earnings, args.earnings_move)
+        facts["outlook"] = outlook(facts, daily, weekly, earnings, args.earnings_move,
+                                   days=outlook_days, extra_levels=extra_levels)
     if args.json:
         print(json.dumps(facts, indent=2, default=str))
     else:

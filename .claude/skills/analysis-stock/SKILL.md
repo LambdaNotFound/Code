@@ -110,6 +110,11 @@ outside the chart frame:
   one, such as an options-implied move.
 - The stock's own weekly history, in weeks like the last one, gives a
   base rate for direction, blended with 50%.
+- `--outlook-days 1` (or a list such as `1,5,10,20`) changes the
+  horizons, e.g. to the next session. Only 5, 10 and 20 sessions have a
+  weekly base rate; any other horizon's direction estimate stays at 50%.
+- `--level PRICE[:LABEL]`, repeatable, adds a price such as an open
+  order to the level odds. Quote a label that has spaces.
 
 The outlook takes about a second; `--no-outlook` skips it.
 
