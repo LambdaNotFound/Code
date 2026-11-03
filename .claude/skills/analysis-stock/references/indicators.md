@@ -244,6 +244,19 @@ different questions, and they carry different tags.
   - A horizon other than 5, 10 or 20 sessions (`--outlook-days`) has no
     base rate, so its estimate is 50%: no direction call. Don't fill
     that gap with the frame's lean.
+- **How the odds have scored.** A walk-forward replay of the
+  next-session outlook (2,114 predictions over 40 sessions, 14
+  large-cap US stocks and ETFs, June to November 2026) found:
+  - 90% ranges held 91% of the time;
+  - 68% ranges held 74%, so they run a little wide (fat tails: most
+    days are calmer than a normal curve says);
+  - touch odds stated at 30–50% came true about 31% of the time.
+  It's one period, so treat it as a lean, not a correction factor.
+- **Reproducing the odds.** The simulation is seeded, and its paths
+  depend on the horizon set and the earnings jump, though not on the
+  levels. Re-running with the same `--outlook-days` list and earnings
+  file gives the same odds. The same horizon run on its own, or inside
+  another list, gives slightly different odds.
 - **The frame and the outlook can disagree.** The stance follows the
   trend, while short-horizon base rates often lean to a reversal.
   Report both, and don't average them.

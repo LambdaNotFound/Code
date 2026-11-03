@@ -51,6 +51,27 @@ expiry, most likely when it is in the money near an ex-dividend date or
 with little extrinsic value left. The script does not model early
 exercise; say so when the position is short and in the money.
 
+## Limit orders and deep in-the-money calls
+
+- **Will a limit fill?** The script prices one quote; it doesn't give
+  fill odds.
+  - Solve the implied vol from a current quote.
+  - Find the underlying price where the model value equals the limit
+    on each date. A buy limit on a call needs the stock at or below it.
+  - Pass that price to the analysis-stock script's `--level` for the
+    odds of trading there.
+  - Time decay raises that price a little each day.
+- **Implied vol dominates fill odds.** Two vol points can halve them.
+  Implied vol usually rises when the stock falls, which works against a
+  buy-to-close limit. And a buy fills at the ask, not the mid.
+  - Treat the odds as upper bounds.
+  - Ask for a fresh quote, rather than reuse an old mark.
+- **Deep in-the-money short calls** carry almost no extrinsic value.
+  Assignment at expiry is near certain, and early assignment is
+  unlikely unless a dividend exceeds the extrinsic value. Buying them
+  back costs about their intrinsic value: the same as buying the shares'
+  upside back. There's no time decay left to wait for.
+
 ## Earnings and events
 
 An earnings date inside the window changes the meaning of every

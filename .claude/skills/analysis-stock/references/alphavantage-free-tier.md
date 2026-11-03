@@ -9,7 +9,14 @@ endpoint" reply is the authority when it disagrees with this page.
 - 25 requests a day and one a second. The per-second limit bites when
   two Alpha Vantage calls go out in the same turn: the second one comes
   back `rate_limit` and has to be retried, and both count. Fire them
-  one per turn.
+  one per turn, even when the calls are independent. Firing three at
+  once on 2026-11-02 lost two of them.
+- The 25 are a rolling 24-hour window, not a calendar day: a call frees
+  about 24 hours after it was made. On 2026-11-02, three calls made at
+  23:16 UTC the day before freed at 23:16 UTC, and the rest stayed
+  blocked. Before a batch, count the successful calls of the last 24
+  hours. If the batch won't fit, say when the calls free instead of
+  starting it.
 - A daily-limit reply names the 25-a-day cap in its message; a
   per-second reply says "1 request per second"; a tier reply says
   "premium endpoint" or "premium feature". Read the message before
