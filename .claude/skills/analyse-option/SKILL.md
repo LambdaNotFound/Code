@@ -62,7 +62,7 @@ more than two weeks out).
 ## 2. Compute
 
 ```
-python3 .claude/skills/analysis-option/scripts/opt.py --symbol <SYM> --expiry <date> --strike <K> --type <call|put> --side <buy|sell> \
+python3 .claude/skills/analyse-option/scripts/opt.py --symbol <SYM> --expiry <date> --strike <K> --type <call|put> --side <buy|sell> \
   --daily <daily file> --quote bid=<b>,ask=<a>[,iv=,oi=,volume=] [--earnings <date>] [--ta-json <SYM>_ta.json] [--covered] [--contracts N] [--account E]
 ```
 

@@ -25,7 +25,7 @@ Nothing checks those conclusions systematically:
 
 - **Observed:** the computation scripts have unit tests:
   `fi/.claude/skills/analyse-stock/scripts/test_ta.py` (75 tests) and
-  `.claude/skills/analysis-option/scripts/test_opt.py` (23). Nothing
+  `.claude/skills/analyse-option/scripts/test_opt.py` (23). Nothing
   checks the reports written from their output.
 - **Observed:** this session, four kinds of error reached a written
   report or a piece of advice, and each was caught by hand:
@@ -684,7 +684,7 @@ conversation context.
   section contract. Short-term predictions start at `:78`.
 - `fi/.claude/skills/analyse-stock/references/indicators.md`: the tags
   and confidence caps a rule checker would enforce.
-- `.claude/skills/analysis-option/scripts/opt.py`: the GOOD, FAIR and
+- `.claude/skills/analyse-option/scripts/opt.py`: the GOOD, FAIR and
   POOR option verdicts.
 - The fi repo, private, at `/home/user/fi`:
   - `CLAUDE.md`: the rules;

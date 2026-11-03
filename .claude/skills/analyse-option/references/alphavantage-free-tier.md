@@ -72,5 +72,5 @@ symbol's history length, so the scripts accept all of them.
 A daily or weekly file fetched earlier the same day is still current
 until the next close. Before spending a call, look in the scratchpad
 for `<SYMBOL>_daily.csv`, the weekly file, and `<SYMBOL>_ta.json`, and
-say in the report which were reused. The analysis-option run on AAPL
+say in the report which were reused. The analyse-option run on AAPL
 cost zero calls for this reason.
