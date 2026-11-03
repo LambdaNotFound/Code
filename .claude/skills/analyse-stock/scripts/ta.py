@@ -222,7 +222,8 @@ def rsi(closes, n=14):
         g, l = ag[i - 1], al[i - 1]
         if g is None:
             continue
-        out[i] = 100.0 if l == 0 else 100.0 - 100.0 / (1.0 + g / l)
+        # no move at all is no signal (50), not "overbought"
+        out[i] = 50.0 if g == 0 and l == 0 else 100.0 if l == 0 else 100.0 - 100.0 / (1.0 + g / l)
     return out
 
 
@@ -481,7 +482,7 @@ def analyse(daily, weekly=None, sma200_daily=None, pivot_window=3, account=None,
     pct_b = None if bb_u[-1] is None or bb_u[-1] == bb_l[-1] else (price - bb_l[-1]) / (bb_u[-1] - bb_l[-1])
 
     vol20 = sma([b["volume"] for b in daily], 20)[-1]
-    win = daily[-20:]
+    win = daily[-20:] if n >= 20 else []  # a "20-bar" ratio needs 20 bars, not whatever exists
     up_vol = sum(b["volume"] for i, b in enumerate(win) if i and b["close"] > win[i - 1]["close"])
     dn_vol = sum(b["volume"] for i, b in enumerate(win) if i and b["close"] < win[i - 1]["close"])
 
@@ -845,9 +846,9 @@ def ledger(f):
             ">= 70 overbought (bearish), <= 30 oversold (bullish); in-between is no signal")
     if mo["macd_hist"] is not None:
         h, hp = mo["macd_hist"], mo["macd_hist_prev"]
-        read = "bullish" if h > 0 else "bearish"
+        read = "bullish" if h > 0 else "bearish" if h < 0 else "neutral"
         add("MACD histogram", f"{h:+.3f} (prev {hp:+.3f})" if hp is not None else f"{h:+.3f}", read,
-            "sign of histogram; watch whether it is expanding or contracting")
+            "sign of histogram (exactly zero reads neutral); watch whether it is expanding or contracting")
     if mo["stoch_k"] is not None:
         k = mo["stoch_k"]
         add("Stochastic %K", f"{k:.1f}", "bearish" if k >= 80 else "bullish" if k <= 20 else "neutral",

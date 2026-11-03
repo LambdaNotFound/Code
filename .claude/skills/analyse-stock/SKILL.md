@@ -168,3 +168,23 @@ not write files into the repository.
 2. The path, if `--save` was given.
 3. The number of Alpha Vantage calls used, so the user can track the
    daily budget.
+
+## Changing the script
+
+Run the whole suite after any change to `scripts/ta.py`:
+
+```
+python3 -m unittest discover -s .claude/skills/analyse-stock/scripts -p 'test_*.py'
+```
+
+It runs 104 tests in about 35 seconds:
+- `test_ta.py`: unit tests, one behaviour each.
+- `test_ta_reference.py`: every reported number, re-computed by code written
+  apart from `ta.py`, on seeded synthetic markets from `market.py`.
+- `test_ta_mutations.py`: 14 planted one-line errors, each of which the
+  reference tests must catch.
+- `test_ta_properties.py`: invariants, edge cases, the command line, the
+  markdown, and the golden outputs in `golden/`.
+
+A change that is meant to move the golden outputs gets re-pinned with
+`UPDATE_GOLDEN=1`, and the commit message says why.
