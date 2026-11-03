@@ -1,5 +1,5 @@
 ---
-description: 'Risk/reward analysis of one listed stock option contract: is this call or put, bought or sold, a good deal at the quoted price. Takes the contract quote from the user (bid, ask, and optionally IV, open interest, volume; the free Alpha Vantage tier has no options chain) or from a chain file, fetches the underlying''s daily bars through the alphavantage MCP server, and computes with scripts/opt.py: implied vol solved from the mid, realized vol, Black-Scholes greeks and model value, theta burn, break-even in sigmas, expected move, payoff scenarios, P(profit) and expected value, reward-to-risk, a ledger, and a GOOD / FAIR / POOR verdict with the rows behind it. Can take the analyse-stock JSON to score alignment with the chart stance. Use when the user names an option (ticker, expiry, strike, call or put) and asks whether to buy or sell it, whether the premium is cheap or rich, what the break-even or odds are, or whether the risk/reward is worth it. Not for the stock''s own chart read (use analyse-stock). Not for multi-leg strategies, portfolio hedging, or margin and tax questions. Not for fundamentals or news.'
+description: 'Risk/reward analysis of one listed stock option contract: is this call or put, bought or sold, a good deal at the quoted price. Takes the contract quote from the user (bid, ask, and optionally IV, open interest, volume; the free Alpha Vantage tier has no options chain) or from a chain file, fetches the underlying''s daily bars through the alphavantage MCP server, and computes with scripts/opt.py: implied vol solved from the mid, realized vol, Black-Scholes greeks and model value, theta burn, break-even in sigmas, expected move, payoff scenarios, P(profit) and expected value, reward-to-risk, a ledger, and a GOOD / FAIR / POOR verdict with the rows behind it. Can take a stock-analysis JSON from the analyse-stock skill, which lives in its owner''s private finance repo, to score alignment with the chart stance. Use when the user names an option (ticker, expiry, strike, call or put) and asks whether to buy or sell it, whether the premium is cheap or rich, what the break-even or odds are, or whether the risk/reward is worth it. Not for the stock''s own chart read: that is the analyse-stock skill, kept outside this repo. Not for multi-leg strategies, portfolio hedging, or margin and tax questions. Not for fundamentals or news.'
 argument-hint: <TICKER> <YYYY-MM-DD> <STRIKE> <call|put> [buy|sell] --quote bid=,ask=[,iv=,oi=,volume=] [--earnings date] [--with-stance] [--account equity]
 ---
 
@@ -21,8 +21,8 @@ optional `buy` (default) or `sell`. Flags: `--quote bid=,ask=[,iv=,oi=,volume=,l
 (IV as a decimal, 0.32 not 32), `--chain <file>` instead of `--quote`,
 `--earnings <date>`, `--covered` for a short call backed by stock,
 `--contracts N`, `--account <equity>`, `--rate` and `--div-yield`
-(decimals; defaults 0.04 and 0), `--with-stance` to run the
-analyse-stock script first and score chart alignment, `--save <path>`.
+(decimals; defaults 0.04 and 0), `--with-stance` to score chart
+alignment from the analyse-stock skill's JSON, `--save <path>`.
 
 If the user named the option in prose ("the October 340 call on
 Apple") resolve it to those tokens and confirm in one line. If they
@@ -36,7 +36,7 @@ The options-chain endpoints (`HISTORICAL_OPTIONS`, `REALTIME_OPTIONS`)
 are premium on the free key; do not call them unless the user says
 their key has them. The underlying's bars are free. Limits, tiers, and
 the shapes a result arrives in are in
-[../analyse-stock/references/alphavantage-free-tier.md](../analyse-stock/references/alphavantage-free-tier.md);
+[references/alphavantage-free-tier.md](references/alphavantage-free-tier.md);
 one Alpha Vantage call per turn, and reuse today's `<SYMBOL>_daily.csv`
 and `<SYMBOL>_ta.json` from the scratchpad before fetching (say so in
 the report).
@@ -45,13 +45,15 @@ the report).
    `datatype=csv`, `return_full_data=true`. Save an inline result to
    the scratchpad as `<SYMBOL>_daily.csv`; use the saved path if the
    harness wrote one.
-2. With `--with-stance`: also `TIME_SERIES_WEEKLY_ADJUSTED` and the
-   daily 200-`SMA`, exactly as [../analyse-stock/SKILL.md](../analyse-stock/SKILL.md)
-   describes, then run that skill's script with `--json` and save the
-   output as `<SYMBOL>_ta.json`. Skip this when the user already ran
-   analyse-stock this session and the JSON is in the scratchpad.
+2. With `--with-stance`: the stance comes from the analyse-stock
+   skill's `ta.py --json` output. That skill moved out of this repo on
+   2026-11-03, into its owner's private finance repo, where it also
+   lives under `~/.claude/skills/`. If it's installed, run it as its own
+   SKILL.md says (weekly adjusted bars and the daily 200-SMA, two more
+   calls) and save the JSON as `<SYMBOL>_ta.json`; if the user already
+   has that JSON, use it. Otherwise say the stance row was skipped.
 
-Rate-limit handling is the same as analyse-stock: "premium endpoint"
+Rate-limit handling, from the free-tier notes: "premium endpoint"
 means pick the fallback; anything else, wait a few seconds and retry
 once. The earnings calendar endpoint has not returned usable data on
 this key; ask the user for the date instead when it matters (expiry

@@ -24,7 +24,7 @@ conclusions come in several kinds:
 Nothing checks those conclusions systematically:
 
 - **Observed:** the computation scripts have unit tests:
-  `.claude/skills/analyse-stock/scripts/test_ta.py` (75 tests) and
+  `fi/.claude/skills/analyse-stock/scripts/test_ta.py` (75 tests) and
   `.claude/skills/analysis-option/scripts/test_opt.py` (23). Nothing
   checks the reports written from their output.
 - **Observed:** this session, four kinds of error reached a written
@@ -81,7 +81,7 @@ Revised after the reader test (see "Reader test").
      passes.
    - Each claim records its unit, because the script's JSON stores some
      percentages as percent points and others as fractions
-     (`.claude/skills/analyse-stock/scripts/ta.py:1316`).
+     (`fi/.claude/skills/analyse-stock/scripts/ta.py:1316`).
    - The printed value must also appear verbatim in the report's text.
      That catches an extraction that copied the source value instead
      of what the report says.
@@ -236,7 +236,7 @@ Out of scope as a consequence of those answers:
   - investment strategy (`fi/CLAUDE.md:199`);
   - "My rules" (`fi/profile.md:36`).
 - **Observed:** the Alpha Vantage free tier allows 25 calls a day
-  (`.claude/skills/analyse-stock/references/alphavantage-free-tier.md`).
+  (`fi/.claude/skills/analyse-stock/references/alphavantage-free-tier.md`).
   Scoring outcomes needs bars from after each check date. The fi data
   rule caches every pull (`fi/CLAUDE.md:88`).
   - Caching began on 2026-11-02, with fi commit 45dcbee. That commit
@@ -252,7 +252,7 @@ Out of scope as a consequence of those answers:
   (`fi/CLAUDE.md:61`). The skills' scripts use the standard library
   only.
 - **Observed:** `ta.py` is deterministic. The outlook uses a fixed seed
-  (`.claude/skills/analyse-stock/scripts/ta.py:984`), so frozen inputs
+  (`fi/.claude/skills/analyse-stock/scripts/ta.py:984`), so frozen inputs
   give identical output.
 - **User, round 1:** the results go to the user, and Claude fixes what
   fails without asking each time.
@@ -413,7 +413,7 @@ Goal: prediction outcomes, with honest uncertainty.
     before it.
   - The printed date governs, not a count of sessions. `ta.py` counts
     weekdays and ignores holidays
-    (`.claude/skills/analyse-stock/scripts/ta.py:990`).
+    (`fi/.claude/skills/analyse-stock/scripts/ta.py:990`).
 - **Splits:** the daily bars are unadjusted. When the weekly adjusted
   series shows a split inside a window, the level is scaled by the split
   ratio before scoring, and the report says so.
@@ -675,14 +675,14 @@ conversation context.
 
 ## Context
 
-- `.claude/skills/analyse-stock/scripts/ta.py`:
+- `fi/.claude/skills/analyse-stock/scripts/ta.py`:
   - `analyse()` at `:450`, `ledger()` at `:815`, `stance()` at `:915`;
   - `outlook()` at `:1166`, `render()` at `:1251`, `main()` at `:1514`.
   - The `--json` output is the machine-readable source a faithfulness
     check would compare a report against.
-- `.claude/skills/analyse-stock/references/report-template.md`: the
+- `fi/.claude/skills/analyse-stock/references/report-template.md`: the
   section contract. Short-term predictions start at `:78`.
-- `.claude/skills/analyse-stock/references/indicators.md`: the tags
+- `fi/.claude/skills/analyse-stock/references/indicators.md`: the tags
   and confidence caps a rule checker would enforce.
 - `.claude/skills/analysis-option/scripts/opt.py`: the GOOD, FAIR and
   POOR option verdicts.
