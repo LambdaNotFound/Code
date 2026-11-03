@@ -181,7 +181,7 @@ class AnalyseTests(unittest.TestCase):
         f = opt.analyse("T", "2026-06-01", 100.0, "call", "buy", self.daily(), {"bid": 2.0, "ask": 2.2}, asof="2026-04-01",
                         ta=ta, earnings="2026-05-01")
         rows = {r["check"]: r["read"] for r in f["ledger"]["rows"]}
-        self.assertEqual(rows["Alignment with analysis-stock stance"], "bad")
+        self.assertEqual(rows["Alignment with analyse-stock stance"], "bad")
         self.assertEqual(rows["Earnings inside the window"], "neutral")
         self.assertIn("support 95.00", [r["scenario"] for r in f["scenarios"]])
         g = opt.analyse("T", "2026-06-01", 100.0, "put", "sell", self.daily(), {"bid": 2.0, "ask": 2.2}, asof="2026-04-01", earnings="2026-05-01")

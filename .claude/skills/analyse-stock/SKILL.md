@@ -74,14 +74,14 @@ failures on the same call: stop, report which call failed and what it
 said, and offer to run from a file the user supplies.
 
 If the user set `ALPHAVANTAGE_API_KEY` in the environment, the script
-can fetch on its own instead: `python3 .claude/skills/analysis-stock/scripts/ta.py --fetch <SYMBOL> --out-dir <scratchpad>`.
+can fetch on its own instead: `python3 .claude/skills/analyse-stock/scripts/ta.py --fetch <SYMBOL> --out-dir <scratchpad>`.
 Do not go looking for the key; use this route only when the user says
 it is there.
 
 ## 2. Compute
 
 ```
-python3 .claude/skills/analysis-stock/scripts/ta.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL> [--earnings-file <path>]
+python3 .claude/skills/analyse-stock/scripts/ta.py --daily <daily> --weekly <weekly> (--sma200 <value> | --sma200-file <path>) --symbol <SYMBOL> [--earnings-file <path>]
 ```
 
 Add `--json` when you need a field the markdown does not show. The

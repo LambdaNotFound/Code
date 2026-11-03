@@ -34,7 +34,7 @@ about what the trade will make is capped at LOW confidence.
 | P(profit) at HV | the chance the position ends above zero at expiry under the driftless lognormal. It is not the chance of making money before expiry, which is higher for a buyer who can exit on a move |
 | EV at HV | expected P&L under the same model. It is near zero by construction for a fairly priced option; the sign comes from IV/HV and the spread. Over +5% of premium is an edge in the model's terms, under -10% is paying up |
 | Reward to risk | buyer: P&L at a one-sigma move in your favour divided by max loss. Seller: premium divided by the loss at a two-sigma move against. Neither is a forecast |
-| Scenarios | P&L at expiry at plus and minus one and two sigma, the strike, the break-even, and the analysis-stock levels when a TA JSON was given |
+| Scenarios | P&L at expiry at plus and minus one and two sigma, the strike, the break-even, and the analyse-stock levels when a TA JSON was given |
 
 ## Position types
 
@@ -58,7 +58,7 @@ exercise; say so when the position is short and in the money.
   - Solve the implied vol from a current quote.
   - Find the underlying price where the model value equals the limit
     on each date. A buy limit on a call needs the stock at or below it.
-  - Pass that price to the analysis-stock script's `--level` for the
+  - Pass that price to the analyse-stock script's `--level` for the
     odds of trading there.
   - Time decay raises that price a little each day.
 - **Implied vol dominates fill odds.** Two vol points can halve them.
@@ -97,7 +97,7 @@ say so.
 
 ## Alignment with the chart
 
-With a `--ta-json` from the analysis-stock script, the ledger scores
+With a `--ta-json` from the analyse-stock script, the ledger scores
 whether the position's direction matches the chart stance: long call or
 short put is bullish, long put or short call is bearish. A HOLD stance
 is neutral. This row is one vote among many; the chart stance is itself

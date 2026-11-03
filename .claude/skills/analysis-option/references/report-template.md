@@ -61,7 +61,7 @@ One sentence on what P(profit) does and does not mean here.
 ## Scenarios at expiry
 
 Paste the script's scenario table. Add one line on which scenario the
-analysis-stock stance favours, if a TA JSON was given.
+analyse-stock stance favours, if a TA JSON was given.
 
 ## Recommendation `[FRAME]`
 

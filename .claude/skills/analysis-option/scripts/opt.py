@@ -18,7 +18,7 @@ file, or Alpha Vantage JSON). It supplies the spot, realized volatility, and ATR
 --quote is the contract quote from your broker. --chain is an options-chain file
 in Alpha Vantage's column layout (contractID, expiration, strike, type, bid, ask,
 volume, open_interest, implied_volatility, ...); the contract is picked from it.
---ta-json is the output of the analysis-stock script with --json; it adds the
+--ta-json is the output of the analyse-stock script with --json; it adds the
 stance and the support/resistance levels to the scenario table.
 """
 
@@ -31,7 +31,7 @@ import sys
 from datetime import date, datetime
 
 # --------------------------------------------------------------------------- #
-# Underlying bars (same three shapes the analysis-stock script accepts)
+# Underlying bars (same three shapes the analyse-stock script accepts)
 # --------------------------------------------------------------------------- #
 
 
@@ -467,7 +467,7 @@ def ledger(f):
         bull = st in ("BUY", "ACCUMULATE")
         bear = st in ("SELL", "REDUCE")
         read = "good" if (bullish_pos and bull) or (not bullish_pos and bear) else "bad" if (bullish_pos and bear) or (not bullish_pos and bull) else "neutral"
-        add("Alignment with analysis-stock stance", st, read, "position direction vs the chart stance")
+        add("Alignment with analyse-stock stance", st, read, "position direction vs the chart stance")
     if f["earnings_inside"] is not None:
         if f["earnings_inside"]:
             add("Earnings inside the window", f["earnings"], "bad" if side == "sell" else "neutral",
@@ -585,7 +585,7 @@ def main(argv=None):
     ap.add_argument("--asof", help="valuation date YYYY-MM-DD (default: last daily bar)")
     ap.add_argument("--rate", type=float, default=0.04, help="risk-free rate, decimal (default 0.04)")
     ap.add_argument("--div-yield", type=float, default=0.0, help="continuous dividend yield, decimal")
-    ap.add_argument("--ta-json", help="analysis-stock --json output for stance and levels")
+    ap.add_argument("--ta-json", help="analyse-stock --json output for stance and levels")
     ap.add_argument("--earnings", help="next earnings date YYYY-MM-DD, if known")
     ap.add_argument("--covered", action="store_true", help="short call is covered by stock")
     ap.add_argument("--contracts", type=int, default=1)
