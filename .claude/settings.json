@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/validate-definitions.sh",
+            "command": "f=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/validate-definitions.sh\"; [ -x \"$f\" ] || exit 0; exec \"$f\"",
             "timeout": 30,
             "statusMessage": "validating agent/skill definitions"
           }
