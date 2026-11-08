@@ -1,0 +1,46 @@
+{
+  "title": "URL shortener: cache-first reads; on writes, the primary key is the only lock",
+  "grid": {"colWidth": 360, "rowHeight": 150},
+  "elements": [
+    {"id": "resp_301", "kind": "code", "text": "HTTP/1.1 301 Moved Permanently\nLocation: https://example.com/very/long/path", "col": 1, "row": -1.2},
+    {"id": "note_301", "kind": "text", "level": "detail", "text": "301, not 302: edge and browser may cache it,\nsafe only while a code never changes or expires", "col": 2.2, "row": -1.2},
+
+    {"id": "get_req", "kind": "ellipse", "role": "start", "text": "GET /abc1234", "col": 0, "row": 0},
+    {"id": "cdn", "kind": "box", "text": "CDN edge\nserves cached 301s", "col": 1, "row": 0},
+    {"id": "redirect_svc", "kind": "box", "text": "redirect service\nstateless, cache-aside", "col": 2, "row": 0},
+    {"id": "redis", "kind": "box", "role": "data", "text": "Redis\nshort_code → long_url\nLRU eviction", "col": 3, "row": 0},
+    {"id": "read_lane", "kind": "section", "label": "read path: ~100x the traffic, cache-first",
+     "contains": ["get_req", "cdn", "redirect_svc", "redis"]},
+
+    {"id": "store", "kind": "box", "role": "data", "bold": true, "text": "url_mappings\nPK short_code\nDynamoDB / Cassandra / PG", "col": 3, "row": 1.6},
+    {"id": "sql", "kind": "code", "text": "INSERT INTO url_mappings (short_code, long_url)\nVALUES ($1, $2)\nON CONFLICT (short_code) DO NOTHING;\n-- nothing inserted? read the winner back\nSELECT long_url FROM url_mappings\nWHERE short_code = $1;", "col": 4.6, "row": 1.6},
+    {"id": "lock_note", "kind": "text", "level": "detail", "align": "right", "text": "two writers, same url → one insert wins, both return its code\ntwo urls, same 7 chars → the loser sees another url, bumps its seed", "col": 2.13, "row": 2.7},
+
+    {"id": "post_req", "kind": "ellipse", "role": "start", "text": "POST /shorten\n{long_url}", "col": 0, "row": 4.6},
+    {"id": "gateway", "kind": "box", "text": "API gateway\nauthn, rate limit,\nURL validation", "col": 1, "row": 4.6},
+    {"id": "hash", "kind": "box", "text": "hash engine\nSHA-256(long_url + \":\" + seed)\n→ Base62 → take 7", "col": 2, "row": 4.6},
+    {"id": "put", "kind": "box", "text": "insert-if-absent\n(code → long_url)", "col": 3, "row": 4.6},
+    {"id": "check", "kind": "diamond", "role": "decision", "text": "stored url\n== mine?", "col": 4, "row": 4.6},
+    {"id": "bump", "kind": "box", "text": "collision\nseed + 1", "col": 3, "row": 5.8},
+    {"id": "done", "kind": "ellipse", "role": "end", "text": "200\nsho.rt/abc1234", "col": 5.3, "row": 4.6},
+    {"id": "shorten_svc", "kind": "section", "label": "shorten service", "contains": ["hash", "put", "check", "bump"]},
+    {"id": "write_lane", "kind": "section", "label": "write path: deterministic code, atomic insert-if-absent",
+     "contains": ["post_req", "gateway", "shorten_svc", "done"]}
+  ],
+  "edges": [
+    {"from": "resp_301", "to": "cdn", "dashed": true, "end": null},
+    {"from": "get_req", "to": "cdn"},
+    {"from": "cdn", "to": "redirect_svc", "label": "miss"},
+    {"from": "redirect_svc", "to": "redis", "label": "1. get"},
+    {"from": "redirect_svc", "to": "store", "label": "2. miss: read, fill Redis\n(eventually consistent)"},
+    {"from": "post_req", "to": "gateway"},
+    {"from": "gateway", "to": "hash"},
+    {"from": "hash", "to": "put"},
+    {"from": "put", "to": "store", "start": "arrow", "bold": true, "label": "atomic insert + strong read-back"},
+    {"from": "put", "to": "check"},
+    {"from": "check", "to": "done", "label": "yes: new,\nor already mine"},
+    {"from": "check", "to": "bump", "label": "no: another url\nholds this code"},
+    {"from": "bump", "to": "hash", "label": "retry,\nbounded ~3-5x"},
+    {"from": "store", "to": "sql", "dashed": true, "end": null}
+  ]
+}

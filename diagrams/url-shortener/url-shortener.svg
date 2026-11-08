@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2304" height="1367" viewBox="-14.5 -241.5 2304 1367">
+<rect x="-14.5" y="-241.5" width="2304" height="1367" fill="#ffffff"/>
+<rect id="write_lane" x="25.5" y="575" width="2224" height="470" rx="32" fill="transparent" stroke="#94a3b8" stroke-width="1" stroke-dasharray="8 6"/>
+<text x="37.5" y="585.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="18" fill="#475569" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">write path: deterministic code, atomic insert-if-absent</text>
+<rect id="shorten_svc" x="700" y="642" width="1072" height="371" rx="32" fill="transparent" stroke="#94a3b8" stroke-width="1" stroke-dasharray="8 6"/>
+<text x="712" y="652.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="18" fill="#475569" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">shorten service</text>
+<rect id="read_lane" x="32" y="-38" width="1385" height="191" rx="32" fill="transparent" stroke="#94a3b8" stroke-width="1" stroke-dasharray="8 6"/>
+<text x="44" y="-27.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="18" fill="#475569" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">read path: ~100x the traffic, cache-first</text>
+<rect id="resp_301" x="339" y="-138.5" width="402" height="67" rx="16.75" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+<text x="355" y="-120.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">HTTP/1.1 301 Moved Permanently</text>
+<text x="355" y="-103.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">Location: https://example.com/very/long/path</text>
+<text x="774.5" y="-120.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">301, not 302: edge and browser may cache it,</text>
+<text x="774.5" y="-103.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">safe only while a code never changes or expires</text>
+<ellipse id="get_req" cx="180" cy="75" rx="116" ry="37" fill="#fed7aa" stroke="#c2410c" stroke-width="2"/>
+<text x="180" y="67" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">GET /abc1234</text>
+<rect id="cdn" x="429.5" y="39" width="221" height="72" rx="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="540" y="57" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">CDN edge</text>
+<text x="540" y="77" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">serves cached 301s</text>
+<rect id="redirect_svc" x="770" y="39" width="260" height="72" rx="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="900" y="57" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">redirect service</text>
+<text x="900" y="77" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">stateless, cache-aside</text>
+<rect id="redis" x="1135" y="29" width="250" height="92" rx="23" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+<text x="1260" y="47" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">Redis</text>
+<text x="1260" y="67" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">short_code → long_url</text>
+<text x="1260" y="87" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">LRU eviction</text>
+<rect id="store" x="1116" y="269" width="288" height="92" rx="23" fill="#ccfbf1" stroke="#0f766e" stroke-width="3"/>
+<text x="1260" y="287" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">url_mappings</text>
+<text x="1260" y="307" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">PK short_code</text>
+<text x="1260" y="327" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#134e4a" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">DynamoDB / Cassandra / PG</text>
+<rect id="sql" x="1622.5" y="246.5" width="427" height="137" rx="32" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+<text x="1638.5" y="264.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">INSERT INTO url_mappings (short_code, long_url)</text>
+<text x="1638.5" y="281.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">VALUES ($1, $2)</text>
+<text x="1638.5" y="299.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">ON CONFLICT (short_code) DO NOTHING;</text>
+<text x="1638.5" y="316.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">-- nothing inserted? read the winner back</text>
+<text x="1638.5" y="334.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">SELECT long_url FROM url_mappings</text>
+<text x="1638.5" y="351.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#e2e8f0" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">WHERE short_code = $1;</text>
+<text x="1228.3" y="464.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="end" dominant-baseline="hanging" xml:space="preserve">two writers, same url → one insert wins, both return its code</text>
+<text x="1228.3" y="481.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#64748b" text-anchor="end" dominant-baseline="hanging" xml:space="preserve">two urls, same 7 chars → the loser sees another url, bumps its seed</text>
+<ellipse id="post_req" cx="180" cy="765" rx="122.5" ry="51" fill="#fed7aa" stroke="#c2410c" stroke-width="2"/>
+<text x="180" y="747" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">POST /shorten</text>
+<text x="180" y="767" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#7c2d12" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">{long_url}</text>
+<rect id="gateway" x="429.5" y="719" width="221" height="92" rx="23" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="540" y="737" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">API gateway</text>
+<text x="540" y="757" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">authn, rate limit,</text>
+<text x="540" y="777" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">URL validation</text>
+<rect id="hash" x="732" y="719" width="336" height="92" rx="23" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="900" y="737" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">hash engine</text>
+<text x="900" y="757" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">SHA-256(long_url + &quot;:&quot; + seed)</text>
+<text x="900" y="777" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">→ Base62 → take 7</text>
+<rect id="put" x="1154" y="729" width="212" height="72" rx="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="1260" y="747" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">insert-if-absent</text>
+<text x="1260" y="767" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">(code → long_url)</text>
+<polygon id="check" points="1620,709 1740,765 1620,821 1500,765" fill="#fef3c7" stroke="#b45309" stroke-width="2"/>
+<text x="1620" y="747" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#78350f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">stored url</text>
+<text x="1620" y="767" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#78350f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">== mine?</text>
+<rect id="bump" x="1192.5" y="909" width="135" height="72" rx="18" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+<text x="1260" y="927" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">collision</text>
+<text x="1260" y="947" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#1e3a5f" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">seed + 1</text>
+<ellipse id="done" cx="2088" cy="765" rx="129.5" ry="51" fill="#a7f3d0" stroke="#047857" stroke-width="2"/>
+<text x="2088" y="747" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#064e3b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">200</text>
+<text x="2088" y="767" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="16" fill="#064e3b" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">sho.rt/abc1234</text>
+<text x="25.5" y="-198" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="28" fill="#1e3a5f" text-anchor="start" dominant-baseline="hanging" xml:space="preserve">URL shortener: cache-first reads; on writes, the primary key is the only lock</text>
+<polyline id="resp_301-&gt;cdn" points="540,-67.5 540,35" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="8 6" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="get_req-&gt;cdn" points="300,75 425.5,75" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="411,68.24 425.5,75 411,81.76" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="cdn-&gt;redirect_svc" points="654.5,75 766,75" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="751.5,68.24 766,75 751.5,81.76" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="689.25" y="64" width="42" height="22" fill="#ffffff"/>
+<text x="710.25" y="67.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">miss</text>
+<polyline id="redirect_svc-&gt;redis" points="1034,75 1131,75" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1116.5,68.24 1131,75 1116.5,81.76" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1053" y="64" width="59" height="22" fill="#ffffff"/>
+<text x="1082.5" y="67.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">1. get</text>
+<polyline id="redirect_svc-&gt;store" points="957.33,113.22 1187.67,266.78" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1179.36,253.11 1187.67,266.78 1171.85,264.36" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="963.5" y="170.5" width="218" height="39" fill="#ffffff"/>
+<text x="1072.5" y="174.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">2. miss: read, fill Redis</text>
+<text x="1072.5" y="191.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">(eventually consistent)</text>
+<polyline id="post_req-&gt;gateway" points="306.5,765 425.5,765" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="411,758.24 425.5,765 411,771.76" fill="none" stroke="#c2410c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="gateway-&gt;hash" points="654.5,765 728,765" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="713.5,758.24 728,765 713.5,771.76" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="hash-&gt;put" points="1072,765 1150,765" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1135.5,758.24 1150,765 1135.5,771.76" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="put-&gt;store" points="1260,725 1260,365" fill="none" stroke="#1e40af" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1253.24,379.5 1260,365 1266.76,379.5" fill="none" stroke="#1e40af" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1266.76,710.5 1260,725 1253.24,710.5" fill="none" stroke="#1e40af" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1121.5" y="534" width="277" height="22" fill="#ffffff"/>
+<text x="1260" y="537.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">atomic insert + strong read-back</text>
+<polyline id="put-&gt;check" points="1370,765 1496,765" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1481.5,758.24 1496,765 1481.5,771.76" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline id="check-&gt;done" points="1744,765 1954.5,765" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1940,758.24 1954.5,765 1940,771.76" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1782.25" y="745.5" width="134" height="39" fill="#ffffff"/>
+<text x="1849.25" y="749.25" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">yes: new,</text>
+<text x="1849.25" y="766.75" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">or already mine</text>
+<polyline id="check-&gt;bump" points="1558.49,795.75 1331.08,909.46" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1347.07,909.02 1331.08,909.46 1341.03,896.93" fill="none" stroke="#b45309" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1377.78" y="833.11" width="134" height="39" fill="#ffffff"/>
+<text x="1444.78" y="836.86" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">no: another url</text>
+<text x="1444.78" y="854.36" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">holds this code</text>
+<polyline id="bump-&gt;hash" points="1188.92,909.46 995.58,812.79" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1005.53,825.32 995.58,812.79 1011.57,813.23" fill="none" stroke="#1e40af" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1033.25" y="841.62" width="118" height="39" fill="#ffffff"/>
+<text x="1092.25" y="845.37" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">retry,</text>
+<text x="1092.25" y="862.87" font-family="'Cascadia Code','Cascadia Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace" font-size="14" fill="#475569" text-anchor="middle" dominant-baseline="hanging" xml:space="preserve">bounded ~3-5x</text>
+<polyline id="store-&gt;sql" points="1408,315 1618.5,315" fill="none" stroke="#0f766e" stroke-width="2" stroke-dasharray="8 6" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
