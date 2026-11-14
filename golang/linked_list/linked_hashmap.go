@@ -52,7 +52,7 @@ func (lhm *LinkedHashMap) first() *Node {
  *
  */
 type FirstUnique struct {
-	freq map[int]int // num → count
+	freq map[int]int    // num → count
 	lhm  *LinkedHashMap // pointer: FirstUnique is returned by value, and a sync.RWMutex must not be copied
 }
 
