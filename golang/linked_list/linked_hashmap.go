@@ -53,13 +53,13 @@ func (lhm *LinkedHashMap) first() *Node {
  */
 type FirstUnique struct {
 	freq map[int]int // num → count
-	lhm  LinkedHashMap
+	lhm  *LinkedHashMap // pointer: FirstUnique is returned by value, and a sync.RWMutex must not be copied
 }
 
 func ConstructorLinkedHashmap(nums []int) FirstUnique {
 	fu := FirstUnique{
 		freq: make(map[int]int),
-		lhm: LinkedHashMap{
+		lhm: &LinkedHashMap{
 			nodes: make(map[int]*Node),
 			head:  &Node{},
 			tail:  &Node{},
