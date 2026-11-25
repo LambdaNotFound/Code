@@ -27,6 +27,11 @@ go.work.sum
 # macOS
 *.DS_Store*
 
+# Personal editor and terminal state. An iTerm2 arrangement saves each
+# session's scrollback and environment; a VS Code workspace lists local paths.
+*.iterm2arrangement
+*.code-workspace
+
 # Python virtual environment
 .venv/
 
