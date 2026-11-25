@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Setup
 
-This project uses a local virtualenv. Activate it before running anything:
+Needs Python 3.10+ (annotations such as `str | None` fail on import before that) and pytest. This project uses a local virtualenv; see [README.md](README.md) to create it. Activate it before running anything:
 
 ```bash
 source venv/bin/activate

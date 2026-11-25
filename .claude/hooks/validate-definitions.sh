@@ -14,8 +14,8 @@
 # PostToolUse cannot block — the edit has already happened. Exit 2 shows
 # stderr to Claude so it fixes what it just broke; exit 0 stays silent.
 # This is a lint, not a safety guard, so it fails open: a missing
-# interpreter reports itself and gets out of the way rather than crying
-# wolf on every edit.
+# interpreter or PyYAML reports itself and gets out of the way rather than
+# crying wolf on every edit.
 
 set -uo pipefail
 
@@ -25,7 +25,7 @@ validator="$root/agent-team-workspace/validate-definitions.py"
 payload=$(cat)
 
 note() {  # non-blocking message to Claude, exit 0
-  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","systemMessage":"%s"}}\n' "$1"
+  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$1"
   exit 0
 }
 
@@ -58,8 +58,19 @@ if output=$(python3 "$validator" 2>&1); then
   exit 0
 fi
 
+# Checked only after a failure, so the passing case pays nothing for it.
+python3 -c 'import yaml' 2>/dev/null \
+  || note "definition validator skipped: PyYAML not installed (python3 -m pip install pyyaml)"
+
+# A run that finished always prints its count; without one it crashed.
+if grep -q 'hard checks passed' <<<"$output"; then
+  problem="Agent/skill definitions are now invalid"
+else
+  problem="The definition validator crashed"
+fi
+
 {
-  echo "Agent/skill definitions are now invalid — you edited ${path#"$root"/} and the validator fails:"
+  echo "$problem — you edited ${path#"$root"/} and the validator fails:"
   echo
   grep -E '^  FAIL|hard checks passed' <<<"$output" || echo "$output" | tail -20
   echo

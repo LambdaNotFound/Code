@@ -1,5 +1,5 @@
 import os, re, io, glob, yaml, sys, ast
-os.chdir('/home/user/Code')
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 OLD2NEW = {"scoping":"scope-problem","pr-review":"review-pr","rust-expert":"write-rust",
            "agent-factory":"build-agent","design-loop":"run-design-loop","pr-loop":"run-pr-loop",
            "token-usage":"check-usage"}

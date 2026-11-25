@@ -1,5 +1,6 @@
 You're using a system-managed Python. Use a virtual environment instead:
 
+python3 --version             # must be 3.10 or newer
 python3 -m venv venv          # create virtual env
 source venv/bin/activate      # activate it each time !!!
 pip install pytest            # now install freely
