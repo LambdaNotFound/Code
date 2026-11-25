@@ -53,6 +53,11 @@ shopt -s nullglob
 EXCLUDE=(
   settings.local.json   # project-only: Claude Code never reads it from ~/.claude
   worktrees             # `claude --worktree` checkouts, i.e. whole copies of the repo
+  # These five come from the system-design repo, whose scripts/sync-skills
+  # installs them into ~/.claude/skills. Syncing GoCode's copies too would make
+  # the two scripts overwrite each other.
+  skills/scope-problem skills/draw-diagram
+  skills/new-design skills/review-design skills/implement-design
 )
 
 # Claude Code's own data in ~/.claude: the names on the docs page "Explore the
