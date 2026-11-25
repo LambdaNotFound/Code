@@ -73,7 +73,7 @@ Every commit subject is `MM-DD-YYYY: <short description>`, e.g. `11-24-2026: Fix
 
 - Enforced by `.githooks/commit-msg`, which git runs only after `git config core.hooksPath .githooks` (local config, so once per clone). It rejects an impossible date (`02-30-2026`) and a subject past 72 characters, and exempts git's own `Merge branch …`/`Revert "…"` subjects and `fixup!`/`squash!`/`amend!` markers. `git commit --no-verify` skips it for one commit.
 - Its tests are `bash .githooks/test-commit-msg.sh`: unit cases on message files, plus end-to-end commits in a throwaway repo. Run them after changing the hook.
-- The two GitHub Actions workflows still commit as `sr: …`. The hook is local, so it never runs on GitHub's runners.
+- The two GitHub Actions workflows commit in the same format, dated with the Pacific date the run worked under: `MM-DD-YYYY: Record daily LeetCode plan` (`daily-leetcode.yml`) and `MM-DD-YYYY: Log LeetCode solves from issue #N` (`log-solve.yml`). The hook is local and never runs on GitHub's runners, so nothing checks those two subjects; keep them in the format by hand when editing either workflow. Commits before 11-24-2026 use the old `sr: …` subjects.
 
 ## Root README (`README.md`)
 

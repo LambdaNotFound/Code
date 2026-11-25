@@ -38,6 +38,7 @@ jobs:
         id: parse
         run: |
           PT_DATE=$(TZ=America/Los_Angeles date +%F)
+          echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT" # the commit step dates its subject with it
           python3 - "$PT_DATE" <<'EOF'
           import os, re, subprocess, sys
 
@@ -75,13 +76,21 @@ jobs:
           print(f"parsed {len(pairs)} solve(s); body was: {body!r}")
           EOF
 
+      # Subject format matches .githooks/commit-msg: "MM-DD-YYYY: <message>",
+      # dated with the same Pacific date the solves were logged under. The
+      # hook never runs on the runner, so the format is kept here by hand.
       - name: Commit updated state.json
+        env:
+          PT_DATE: ${{ steps.parse.outputs.pt_date }}
+          ISSUE: ${{ github.event.issue.number }}
         run: |
           if ! git diff --quiet spaced_repetition/state.json 2>/dev/null; then
+            : "${PT_DATE:?parse step did not set pt_date}"
+            MSG_DATE="${PT_DATE:5:2}-${PT_DATE:8:2}-${PT_DATE:0:4}" # YYYY-MM-DD -> MM-DD-YYYY
             git config user.name "LambdaNotFound"
             git config user.email "yiqyudev@gmail.com"
             git add spaced_repetition/state.json
-            git commit -m "sr: log solves from issue comment"
+            git commit -m "$MSG_DATE: Log LeetCode solves from issue #$ISSUE"
             git pull --rebase origin main
             git push
           fi
