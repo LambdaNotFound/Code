@@ -19,6 +19,7 @@ import argparse
 import datetime as dt
 import json
 import pathlib
+import re
 import sys
 
 DIR = pathlib.Path(__file__).resolve().parent
@@ -49,6 +50,60 @@ def normalize_grade(word):
     return GRADE_ALIASES.get(word.strip().lower())
 
 
+_GRADE = re.compile(
+    r"\b(" + "|".join(sorted(GRADE_ALIASES, key=len, reverse=True)) + r")\b", re.I)
+# A problem id: a standalone number, optionally written "#200" or "LC 200".
+_ID = re.compile(r"(?<![\w.])(#|lc[\s-]?)?([1-9]\d*)(?!\w|\.\d)", re.I)
+_NEGATION = re.compile(r"\b(?:not|never|\w+n['\u2019]t)\b|\bno\W*$", re.I)
+# Text dropped before looking for ids and grades, in this order.
+_NOISE = [
+    re.compile(r"^\s*>.*$", re.M),                # quoted reply, e.g. the plan itself
+    re.compile(r"(?<=[\w\]])\([^()\n]*\)"),       # "O(1)", "Pow(x, n)", a link's URL
+    re.compile(r"https?://\S+"),
+    re.compile(r"(?<=[^\W\d])[\])*\s]+\((?:easy|medium|hard)\)", re.I),  # "Title (Medium)"
+    re.compile(r"\b\d{4}-\d\d-\d\d\b"),          # dates
+    re.compile(r"(?<![\w#])\d+(?:\.\d+)?[\s-]*(?:%|(?:s|secs?|seconds?|m|mins?|minutes?"
+               r"|h|hrs?|hours?|days?|weeks?|times?|try|tries|attempts?|pass(?:es)?"
+               r"|problems?|questions?|solves?)\b)", re.I),  # "20 min", "2 attempts", "95%"
+]
+
+
+def parse_solves(text):
+    """Find "<id> <grade>" pairs in a free-form comment.
+
+    Returns (pairs, skipped): pairs is [(id, grade)], skipped is [(id, reason)]
+    for ids whose grade was unclear. A wrong grade silently moves a review
+    date, so anything ambiguous is skipped and reported instead of guessed.
+    """
+    for noise in _NOISE:
+        text = noise.sub(" ", text)
+    pairs, skipped = [], []
+    # Punctuation ends a clause, so a grade can't attach to an earlier id.
+    for clause in re.split(r"[\n,;!?]|\.(?!\d)", text):
+        ids = list(_ID.finditer(clause))
+        for m, nxt in zip(ids, ids[1:] + [None]):
+            marked, pid = m.group(1), m.group(2)
+            rest = clause[m.end():nxt.start() if nxt else len(clause)]
+            # "no"/"yes" are too common mid-sentence ("no problem") to be
+            # grades anywhere but at the end.
+            grades = [g for g in _GRADE.finditer(rest)
+                      if g.group().lower() not in ("no", "yes")
+                      or not re.search(r"\w", rest[g.end():])]
+            # After "#208" a title may precede the grade; after a bare number
+            # (which may not be an id at all) the grade must be close by.
+            if not grades or (not marked and grades[0].start() > 12):
+                if marked:
+                    skipped.append((pid, "no grade next to it"))
+            elif _NEGATION.search(rest[:grades[0].start()]):
+                skipped.append((pid, f"unclear, it says not {grades[0].group().lower()!r}"))
+            elif len({normalize_grade(g.group()) for g in grades}) > 1:
+                skipped.append((pid, "more than one grade"))
+            else:
+                pairs.append((pid, normalize_grade(grades[0].group())))
+    logged = {pid for pid, _ in pairs}
+    return pairs, [s for s in skipped if s[0] not in logged]
+
+
 def today_str(args):
     return args.date or dt.date.today().isoformat()
 
@@ -73,11 +128,12 @@ DEFAULT_CONFIG = {
     # last new-problem introduction is oldest, so every topic gets fresh
     # coverage every ~1-2 weeks. "curated": strict problems.json order.
     "new_order": "category_rotation",
-    # A problem served this many days running without being logged is
-    # assumed skipped: it gets pushed back by defer_days so the plan keeps
-    # rotating instead of showing the same item forever. Repeat deferrals
-    # double the window (capped at defer_max_days) so a problem you keep
-    # ignoring fades out instead of reappearing every few days.
+    # A problem served this many times (not necessarily on consecutive days)
+    # without being logged is assumed skipped: it gets pushed back by
+    # defer_days so the plan keeps rotating instead of showing the same item
+    # forever. Repeat deferrals double the window (capped at defer_max_days)
+    # so a problem you keep ignoring fades out instead of reappearing every
+    # few days.
     "carry_limit": 2,
     "defer_days": 4,
     "defer_max_days": 24,
@@ -144,7 +200,7 @@ def last_touch(state, pid):
 
 
 def apply_deferrals(state, date):
-    """Push back anything served carry_limit days running without a log.
+    """Push back anything served carry_limit times without a log.
 
     Returns the list of ids deferred on this call. Without this, an item
     the user never logs stays due forever and reappears every single day,
@@ -237,30 +293,36 @@ def pick_today(state, problems, date):
     budget = cfg.get("new_budget", 0) + max(0, review_budget)
 
     # Then at most new_per_day new problems, if they fit the remaining
-    # budget. An unlogged new problem from a previous day is re-served
-    # before a fresh one is introduced. Fresh order depends on config:
+    # budget. An unlogged new problem from a previous day is re-served once
+    # before a fresh one is introduced. Never-seen problems come before ones
+    # that were deferred. Within each group the order depends on config:
     #   category_rotation - pick from the category whose last introduction
     #     is oldest (never-served categories first), curated order within
     #     a category; guarantees every topic gets fresh coverage regularly
     #   curated - strict problems.json order
     new = []
     if budget > 0 and cfg["new_per_day"] > 0:
+        # Only problems shown since they were last deferred carry over. Once
+        # a deferral expires the problem is `revived` below, not carried.
+        shown = {pid for d, plan in state["served"].items() if d < date
+                 for pid in plan["new"] if d > last_touch(state, pid)}
         carried = [
             pid for pid in unlogged_served(state, date)
-            if pid not in state["cards"] and pid not in reviews
+            if pid in shown and pid not in state["cards"] and pid not in reviews
             and not is_deferred(state, pid, date)
         ]
         seen = set(state["cards"]) | {
             pid for plan in state["served"].values() for pid in plan["new"]
         }
         fresh = [p["id"] for p in problems if p["id"] not in seen]
-        # A deferred new problem is not "fresh" yet, but once its defer
-        # window passes it re-enters the pool ahead of never-seen ones.
+        # A deferred new problem re-enters the pool once its defer window
+        # passes, behind every never-seen one, so problems that keep getting
+        # ignored can't crowd out the rest of the deck.
         revived = [pid for pid in state.get("deferred", {})
                    if pid not in state["cards"] and pid in by_id
                    and not is_deferred(state, pid, date)
                    and pid not in carried]
-        fresh = revived + fresh
+        fresh = fresh + revived
         if cfg.get("new_order") == "category_rotation":
             # last date each category had a new problem introduced
             last_intro = {}
@@ -269,6 +331,7 @@ def pick_today(state, problems, date):
                     if pid in by_id:
                         last_intro[by_id[pid].get("category", "?")] = d
             fresh.sort(key=lambda pid: (
+                pid in revived,
                 last_intro.get(by_id[pid].get("category", "?"), ""),
                 order[pid],
             ))
@@ -331,11 +394,13 @@ def cmd_today_md(state, problems, date, plan):
         print(f"\n**New ({len(plan['new'])}):**\n")
         for pid in plan["new"]:
             print(md_problem(by_id[pid]))
-    if plan.get("deferred"):
-        until = state["deferred"][plan["deferred"][0]]["until"]
-        print(f"\n_Pushed to {until} (served repeatedly without being logged): "
-              + ", ".join(f"#{pid} {by_id[pid]['title']}"
-                          for pid in plan["deferred"] if pid in by_id) + "._")
+    # Logging a problem clears its deferral, so on a reprint it may be gone.
+    pushed = [pid for pid in plan.get("deferred", [])
+              if pid in by_id and pid in state["deferred"]]
+    if pushed:
+        print("\n_Pushed back (served repeatedly without being logged): "
+              + ", ".join(f"#{pid} {by_id[pid]['title']} (not before {state['deferred'][pid]['until']})"
+                          for pid in pushed) + "._")
     print("\n_Log solves by commenting here — e.g. `solved 1 good`, "
           "`#20 hard` (grades: again / hard / good / easy)._")
 
@@ -402,7 +467,7 @@ def cmd_log(args):
         ease = max(EASE_MIN, ease - 0.20)
         card["lapses"] += 1
     elif grade == "hard":
-        iv = max(2, round(iv * 1.2))
+        iv = max(iv + 1, round(iv * 1.2))
         ease = max(EASE_MIN, ease - 0.15)
     elif grade == "good":
         iv = max(iv + 1, round(iv * ease))
@@ -417,6 +482,9 @@ def cmd_log(args):
         "due": d.isoformat(), "reps": card["reps"] + 1, "last": date,
     })
     state["cards"][pid] = card
+    # A logged problem is no longer being ignored: drop the deferral, which
+    # would otherwise hide the review just scheduled, and its escalation count.
+    state.get("deferred", {}).pop(pid, None)
     state["log"].append({"date": date, "id": pid, "grade": grade})
     save_state(state)
     print(f"Logged #{pid} {by_id[pid]['title']}: {grade}. "

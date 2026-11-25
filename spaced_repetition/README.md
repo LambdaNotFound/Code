@@ -4,10 +4,10 @@ Daily practice scheduler for 165 problems (Grind 75 ∪ Grind 169 ∪ Blind 75, 
 
 ## Daily flow
 
-1. Every day at 3 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and opens a **new issue per day** titled "Daily LeetCode YYYY-MM-DD" with the plan as its body (previous days' plan issues are auto-closed; logging by comment still works on closed issues): ~2-3 problems per day — Easy costs 1, Medium/Hard costs 2, against a daily budget of 4. Reviews take up to half the budget (due-order); the other half is reserved for new problems so a heavy review day can't starve them. New problems are introduced by **category rotation**: each problem carries one of 16 Grind-style categories (`category` in problems.json), and the next new problem comes from the category that least recently got one — so every topic gets fresh coverage roughly every 2 weeks, and a full first pass takes ~4-5 months. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
+1. Every day from 3 PM PT, a GitHub Actions workflow ([`.github/workflows/daily-leetcode.yml`](../.github/workflows/daily-leetcode.yml)) runs `sr.py today --md` on GitHub's servers and opens a **new issue per day** titled "Daily LeetCode YYYY-MM-DD" with the plan as its body (previous days' issues stay open until you close them; logging by comment works either way): ~2-3 problems per day — Easy costs 1, Medium/Hard costs 2, against a daily budget of 4. Reviews take up to half the budget (due-order); the other half is reserved for new problems so a heavy review day can't starve them. New problems are introduced by **category rotation**: each problem carries one of 16 Grind-style categories (`category` in problems.json), and the next new problem comes from the category that least recently got one — so every topic gets fresh coverage roughly every 2 weeks, and a full first pass takes ~4-5 months. Problems you have never been shown come before ones you were shown and ignored. The comment @-mentions you, so the GitHub mobile app pushes a notification with clickable links — no laptop needed.
 2. Solve them on LeetCode (premium problems link to a free mirror on leetcode.ca).
 3. Log each solve, any of three ways:
-   - **From your phone (no laptop):** comment on the day's "Daily LeetCode" issue — e.g. "solved 200 good, #33 was hard". The [`log-solve` workflow](../.github/workflows/log-solve.yml) parses your comment, updates `state.json`, commits it, and replies with the next review dates. Only your own comments trigger it.
+   - **From your phone (no laptop):** comment on the day's "Daily LeetCode" issue — e.g. "solved 200 good, #33 was hard". The [`log-solve` workflow](../.github/workflows/log-solve.yml) parses your comment, updates `state.json`, commits it, and replies with the next review dates. Only your own comments trigger it. When a grade is unclear ("#9 not good", "#33 slow but ok") it logs nothing for that problem and says so in the reply. Put several solves in one comment: GitHub may drop a run when comments arrive in quick succession.
    - Tell Claude in any Cowork chat ("solved 200 good, 33 again").
    - Run it directly:
 
@@ -20,7 +20,7 @@ Grades describe **how the attempt went**, not the problem's LeetCode difficulty 
 | Grade | Means | Also accepted |
 |---|---|---|
 | `again` | needed the solution | `failed`, `fail`, `stuck`, `blanked`, `no` |
-| `hard` | solved, but slow or messy | `slow`, `rough`, `tough` |
+| `hard` | solved, but slow or messy (the interval still grows, by at least a day) | `slow`, `rough`, `tough` |
 | `good` | solved with minor friction | `medium`, `ok`, `okay`, `fine`, `yes` |
 | `easy` | quick and clean | `trivial`, `quick`, `clean` |
 
@@ -30,9 +30,9 @@ Unlogged problems carry over to the next day, then get deferred (see below) so t
 
 **State sync:** the workflow commits `state.json` to `main` after each run (it records which plan was served). Run `git pull` before logging locally, and `git push` after — GitHub is the source of truth for review state.
 
-**Timing notes:** GitHub cron is UTC-only and scheduled runs are routinely delayed 30-60+ minutes, so the workflow fires four times each afternoon (22:00/23:00/00:00/02:00 UTC). The guard proceeds only when the local Pacific time is 15:00-20:59 *and* today's issue doesn't exist yet, so the first attempt that lands wins and the later crons act as automatic retries for a delayed or failed run.
+**Timing notes:** GitHub cron is UTC-only and scheduled runs are routinely delayed (about 30 minutes in August 2026, 2-4 hours by November), so the workflow fires hourly at :17 from 19:17 to 06:17 UTC. The guard proceeds only when the local Pacific time is 15:00 or later *and* today's issue doesn't exist yet, so the first attempt that lands wins and the later crons act as automatic retries for a delayed or failed run.
 
-**If you don't log:** a problem served `carry_limit` days running (default 2) without a grade is assumed skipped and pushed back — 4 days, then 8, 16, up to `defer_max_days` (24) if you keep ignoring it. Deferred items return automatically; nothing is dropped from the deck. Separately, a review card already shown recently but never graded is sorted to the *back* of the review queue, so it can't keep winning on due-date order and crowding out cards that are genuinely waiting.
+**If you don't log:** a problem served `carry_limit` times (default 2, not necessarily on consecutive days) without a grade is assumed skipped and pushed back — 4 days, then 8, 16, up to `defer_max_days` (24) if you keep ignoring it. Deferred items return automatically and nothing is dropped from the deck: a review comes back when its window ends, and a new problem you never logged waits behind the never-seen ones after that. Logging a problem clears its deferral and resets the count. Separately, a review card already shown recently but never graded is sorted to the *back* of the review queue, so it can't keep winning on due-date order and crowding out cards that are genuinely waiting.
 
 **Why the same problems recur:** three legitimate causes before suspecting a bug — (1) a problem graded `again` is deliberately due the very next day; (2) an ungraded problem is re-offered once before being deferred; (3) a large overdue backlog means the oldest cards keep surfacing. Only the third grows without bound, which is why overdue reviews earn extra daily capacity (`backlog_step`, `backlog_bonus_max`). Grading what you're served is what makes the intervals spread out. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
 
@@ -50,6 +50,7 @@ python3 sr.py due       # every card's next review date
 - `problems.json` — the 165-problem set: id, title, slug, difficulty, tags, source lists, URL (premium entries carry `alt_url` to leetcode.ca)
 - `state.json` — created on first run; review cards, served plans, and full solve log. Delete it to reset all progress.
 - `sr.py` — scheduler, stdlib only
+- `test_sr.py` — its tests, run against a temporary state file: `python3 spaced_repetition/test_sr.py`
 
 ## Tuning
 

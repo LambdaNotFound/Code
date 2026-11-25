@@ -44,23 +44,23 @@ jobs:
 
           date = sys.argv[1]
           body = os.environ.get("COMMENT_BODY", "")
-          # id, then optionally a few filler chars ("was", ":", "-"),
-          # then a grade. Punctuation breaks a match so grades can't
-          # attach to a number from an earlier clause.
-          # Grade vocabulary comes from sr.py so the two never drift apart.
+          # The parser and grade vocabulary live in sr.py (tested by
+          # test_sr.py) so the workflow and the CLI never drift apart.
           sys.path.insert(0, "spaced_repetition")
-          from sr import GRADE_ALIASES
-          words = "|".join(sorted(GRADE_ALIASES, key=len, reverse=True))
-          pairs = re.findall(rf"#?(\d+)[^\d\n,.;!?]{{0,12}}?\b({words})\b",
-                             body, re.IGNORECASE)
+          from sr import GRADE_ALIASES, parse_solves
+          words = "|".join(GRADE_ALIASES)
+          pairs, skipped = parse_solves(body)
           lines = []
           for pid, grade in pairs:
               r = subprocess.run(
                   ["python3", "spaced_repetition/sr.py",
-                   "log", pid, grade.lower(), "--date", date],
+                   "log", pid, grade, "--date", date],
                   capture_output=True, text=True)
               msg = (r.stdout or r.stderr).strip()
               lines.append(("- " if r.returncode == 0 else "- FAILED: ") + msg)
+          for pid, why in skipped:
+              lines.append(f"- NOT LOGGED: {pid} ({why}). "
+                           f"Comment again like `{pid} good`.")
           # scratch file in the runner temp dir - never committed
           with open(os.path.join(os.environ["RUNNER_TEMP"], "reply.md"), "w") as f:
               if lines:
@@ -72,8 +72,8 @@ jobs:
           attempt = bool(re.search(rf"\b({words}|solved|logged|done)\b",
                                    body, re.IGNORECASE)) or bool(re.search(r"#\d", body))
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"looked_like_attempt={'yes' if (attempt and not pairs) else 'no'}\n")
-          print(f"parsed {len(pairs)} solve(s); body was: {body!r}")
+              f.write(f"looked_like_attempt={'yes' if (attempt and not lines) else 'no'}\n")
+          print(f"parsed {len(pairs)} solve(s), skipped {len(skipped)}; body was: {body!r}")
           EOF
 
       # Subject format matches .githooks/commit-msg: "MM-DD-YYYY: <message>",
