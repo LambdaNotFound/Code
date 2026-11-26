@@ -217,6 +217,47 @@ class Scheduling(unittest.TestCase):
         first = self.today("2026-01-01")
         self.assertEqual(first, self.today("2026-01-01"))
 
+    # --- at most two Hard problems a day ---
+
+    def hard_in(self, plan):
+        by_id = {p["id"]: p for p in sr.load_problems()}
+        return [pid for pid in plan["review"] + plan["new"]
+                if by_id[pid]["difficulty"] == "H"]
+
+    def four_hard_reviews(self, **config):
+        """Four Hard cards due together, budget for all; return their due day."""
+        self.set_config(daily_budget=20, pause_after=0, **config)
+        for pid in ("23", "42", "76", "84"):
+            self.log(pid, "good", "2026-01-01")
+        return sr.load_state()["cards"]["23"]["due"]
+
+    def test_hard_reviews_over_the_cap_wait_a_day(self):
+        due = self.four_hard_reviews()
+        self.today(due)
+        first = sr.load_state()["served"][due]
+        self.assertEqual(len(self.hard_in(first)), 2)
+        self.assertEqual(len(first["new"]), 2)  # filled with non-Hard ones
+        nxt = sr.add_days(due, 1)
+        self.today(nxt)
+        second = sr.load_state()["served"][nxt]
+        self.assertEqual(set(self.hard_in(first) + self.hard_in(second)),
+                         {"23", "42", "76", "84"})
+
+    def test_without_the_cap_all_four_come_at_once(self):
+        due = self.four_hard_reviews(max_hard=99)
+        self.today(due)
+        self.assertEqual(len(self.hard_in(sr.load_state()["served"][due])), 4)
+
+    def test_a_hard_new_problem_gives_way(self):
+        self.set_config(max_hard=0)
+        days = self.serve_days(30)
+        self.assertTrue(all(days))  # a new problem every day all the same
+        self.assertEqual(self.hard_in({"review": [], "new": sum(days, [])}), [])
+
+    def test_hard_new_problems_appear_by_default(self):
+        days = self.serve_days(30)
+        self.assertTrue(self.hard_in({"review": [], "new": sum(days, [])}))
+
     # --- pausing and coming back ---
 
     def break_off(self):

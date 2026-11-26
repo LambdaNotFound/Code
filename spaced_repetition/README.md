@@ -58,7 +58,7 @@ python3 sr.py resume    # end a pause
 
 ## Tuning
 
-Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), `cost` per difficulty (default E=1, M=2, H=2), `carry_limit` (default 2), `defer_days` (default 4), `defer_max_days` (24), `backlog_step` (5), `backlog_bonus_max` (2) and `pause_after` (7; 0 turns pausing off).
+Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), `cost` per difficulty (default E=1, M=2, H=2), `carry_limit` (default 2), `defer_days` (default 4), `defer_max_days` (24), `backlog_step` (5), `backlog_bonus_max` (2), `pause_after` (7; 0 turns pausing off) and `max_hard` (2: at most this many Hard problems a day, reviews and new together; a Hard review over it waits a day, a Hard new problem gives way to the next one).
 
 Pace levers, measured by simulation: budget 4 / new 2 ≈ 2.4 problems/day, ~13-day tag rotation, full pass ~4.5 months, but overdue reviews queue up over time. Raise `daily_budget` to 6-7 (keeping `new_budget` 2) to clear reviews on schedule at ~3.5 problems/day; raise both (e.g. 10/5) to finish the deck in ~2 months at ~5 problems/day. Overdue reviews aren't lost — they serve oldest-first as budget allows. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
 

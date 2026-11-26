@@ -148,6 +148,11 @@ DEFAULT_CONFIG = {
     # This many days without a log pauses everything: no plans and no
     # deferrals until a solve is logged or `resume` is run. 0 disables.
     "pause_after": 7,
+    # At most this many Hard problems in one day's plan, reviews and new
+    # problems together. Reviews claim them first. A Hard review over the cap
+    # waits for tomorrow; a Hard new problem gives way to the next candidate
+    # (in curated order, to none, as when it does not fit the budget).
+    "max_hard": 2,
 }
 
 
@@ -322,13 +327,22 @@ def pick_today(state, problems, date):
     bonus = min(len(due) // cfg.get("backlog_step", 5),
                 cfg.get("backlog_bonus_max", 2))
     review_budget = cfg["daily_budget"] - cfg.get("new_budget", 0) + bonus
+    hard_left = cfg.get("max_hard", 2)
+
+    def fits(pid, budget):
+        hard = by_id[pid]["difficulty"] == "H"
+        return cost_of(by_id[pid], cfg) <= budget and (hard_left > 0 or not hard)
+
+    def take(pid):
+        nonlocal hard_left
+        hard_left -= by_id[pid]["difficulty"] == "H"
+        return cost_of(by_id[pid], cfg)
 
     reviews = []
     for pid in due:
-        c = cost_of(by_id[pid], cfg)
-        if c <= review_budget:
+        if fits(pid, review_budget):
             reviews.append(pid)
-            review_budget -= c
+            review_budget -= take(pid)
         if review_budget <= 0:
             break
 
@@ -381,10 +395,9 @@ def pick_today(state, problems, date):
         candidates = carried + fresh
         while candidates and len(new) < cfg["new_per_day"] and budget > 0:
             pid = candidates.pop(0)
-            c = cost_of(by_id[pid], cfg)
-            if c <= budget:
+            if fits(pid, budget):
                 new.append(pid)
-                budget -= c
+                budget -= take(pid)
                 if cfg.get("new_order") == "category_rotation":
                     # don't introduce two problems of the same category today
                     cat = by_id[pid].get("category")
