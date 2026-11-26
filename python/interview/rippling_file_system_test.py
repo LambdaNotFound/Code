@@ -1,6 +1,8 @@
-import unittest
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from rippling_file_system import FileSystem
 
-from interview.rippling_file_system import FileSystem
+import unittest
 
 
 class TestLevel1(unittest.TestCase):

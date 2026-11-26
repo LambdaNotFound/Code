@@ -1,8 +1,10 @@
-import pytest
-
-from interview.affirm_end_of_day_balance import (
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from affirm_end_of_day_balance import (
     Solution,  # type: ignore[import-not-found]
 )
+
+import pytest
 
 
 @pytest.mark.parametrize(

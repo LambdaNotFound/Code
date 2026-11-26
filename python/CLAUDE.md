@@ -53,6 +53,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from stack import Solution
 ```
 
+Do not import package-style (`from interview.foo import X`). Nothing puts `python/` itself on `sys.path`, so such a test fails when run alone, and in a full run it passes only if another test happened to insert `python/` first. Two interview tests did this until 11-26-2026, and the move to `dsa/` broke them. Every test file must pass when run by itself: `pytest path/to/x_test.py`.
+
 **Name collision with stdlib — `array/`:**
 `array.py` conflicts with the stdlib `array` module. Its test loads it via `importlib.util.spec_from_file_location` instead of a plain import. Follow the same pattern if any future file name collides with stdlib (e.g. `queue`, `calendar`, `math`).
 
