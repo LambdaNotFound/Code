@@ -18,9 +18,12 @@ permissions:
   contents: write
   issues: write
 
-concurrency:
-  group: daily-leetcode # serialize with the daily plan workflow
-  cancel-in-progress: false
+# No concurrency group, on purpose. A group holds one running and one waiting
+# run, and a new arrival cancels the waiting one, so two comments during a
+# busy run lost the first. Runs now start at once: the push loop below logs
+# again on top of whatever another run pushed first, and state.json records
+# each comment's id, so a retry or a re-run never logs it twice. A run that
+# never finishes is caught by the daily workflow's missed-log check.
 
 jobs:
   log:
@@ -42,52 +45,52 @@ jobs:
       # Passed via env, not template interpolation, so the text cannot
       # inject shell commands. A new log issue is read from its body.
       BODY: ${{ github.event_name == 'issues' && github.event.issue.body || github.event.comment.body }}
+      # What makes a comment count once: sr.py records it in state.json.
+      EVENT: ${{ github.event_name == 'issues' && format('issue-{0}', github.event.issue.id) || format('comment-{0}', github.event.comment.id) }}
+      ISSUE: ${{ github.event.issue.number }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # The parser, the reply and the record of applied comments all live in
-      # sr.py (`handle`), where test_sr.py covers them. The event id makes a
-      # comment count once, even if this run is retried or re-run.
-      - name: Parse comment and log solves (Pacific date)
-        id: parse
-        env:
-          EVENT: ${{ github.event_name == 'issues' && format('issue-{0}', github.event.issue.id) || format('comment-{0}', github.event.comment.id) }}
+      # The parser and the reply live in sr.py (`handle`), where test_sr.py
+      # covers them. Each attempt starts from the newest main, so a push
+      # refused because another run got there first is retried on top of it.
+      # Subject format matches .githooks/commit-msg: "MM-DD-YYYY: <message>",
+      # dated with the Pacific date the solves are logged under. The hook
+      # never runs on the runner, so the format is kept here by hand.
+      - name: Log solves and commit (retried if another run pushed first)
+        id: log
         run: |
           PT_DATE=$(TZ=America/Los_Angeles date +%F)
-          echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT" # the commit step dates its subject with it
+          MSG_DATE="${PT_DATE:5:2}-${PT_DATE:8:2}-${PT_DATE:0:4}" # YYYY-MM-DD -> MM-DD-YYYY
           # scratch files in the runner temp dir - never committed
           printf '%s' "$BODY" > "$RUNNER_TEMP/body.txt"
-          python3 spaced_repetition/sr.py handle --event "$EVENT" --date "$PT_DATE" \
-            --body-file "$RUNNER_TEMP/body.txt" --reply-file "$RUNNER_TEMP/reply.md" \
-            --status-file "$RUNNER_TEMP/status"
-          cat "$RUNNER_TEMP/status" >> "$GITHUB_OUTPUT"
-
-      # Subject format matches .githooks/commit-msg: "MM-DD-YYYY: <message>",
-      # dated with the same Pacific date the solves were logged under. The
-      # hook never runs on the runner, so the format is kept here by hand.
-      - name: Commit updated state.json
-        env:
-          PT_DATE: ${{ steps.parse.outputs.pt_date }}
-          ISSUE: ${{ github.event.issue.number }}
-        run: |
-          if ! git diff --quiet spaced_repetition/state.json 2>/dev/null; then
-            : "${PT_DATE:?parse step did not set pt_date}"
-            MSG_DATE="${PT_DATE:5:2}-${PT_DATE:8:2}-${PT_DATE:0:4}" # YYYY-MM-DD -> MM-DD-YYYY
-            git config user.name "LambdaNotFound"
-            git config user.email "yiqyudev@gmail.com"
+          git config user.name "LambdaNotFound"
+          git config user.email "yiqyudev@gmail.com"
+          pushed=no
+          for attempt in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard FETCH_HEAD
+            python3 spaced_repetition/sr.py handle --event "$EVENT" --date "$PT_DATE" \
+              --body-file "$RUNNER_TEMP/body.txt" --reply-file "$RUNNER_TEMP/reply.md" \
+              --status-file "$RUNNER_TEMP/status"
+            if git diff --quiet spaced_repetition/state.json; then pushed=yes; break; fi
             git add spaced_repetition/state.json
-            git commit -m "$MSG_DATE: Log LeetCode solves from issue #$ISSUE"
-            git pull --rebase origin main
-            git push
+            git commit -q -m "$MSG_DATE: Log LeetCode solves from issue #$ISSUE" -m "Event: $EVENT"
+            if git push -q origin HEAD:main; then pushed=yes; break; fi
+            echo "Push refused (attempt $attempt): another run pushed first. Logging again on top of it."
+            sleep $((attempt * 3))
+          done
+          if [ "$pushed" != yes ]; then
+            echo "::error::Could not push state.json after 5 attempts, so nothing was logged."
+            exit 1
           fi
+          cat "$RUNNER_TEMP/status" >> "$GITHUB_OUTPUT"
 
       # The reply is empty for chatter. A comment that looks like a log
       # attempt but logs nothing gets the format explained instead: silence
       # would look like the workflow never ran.
       - name: Reply with confirmation (or explain why nothing was logged)
-        env:
-          ISSUE: ${{ github.event.issue.number }}
         run: |
           if [ -s "$RUNNER_TEMP/reply.md" ]; then
             gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/reply.md"
@@ -99,7 +102,5 @@ jobs:
       # the issue itself or by a corrected comment on it. One that logged
       # nothing stays open.
       - name: Close a log issue
-        if: startsWith(github.event.issue.title, 'Practice log') && steps.parse.outputs.done == 'yes'
-        env:
-          ISSUE: ${{ github.event.issue.number }}
+        if: startsWith(github.event.issue.title, 'Practice log') && steps.log.outputs.done == 'yes'
         run: gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY"
