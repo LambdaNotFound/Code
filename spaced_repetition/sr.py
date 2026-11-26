@@ -439,7 +439,7 @@ def md_problem(p, card=None):
 
 def cmd_today_md(state, problems, date, plan):
     by_id = {p["id"]: p for p in problems}
-    print(f"### LeetCode plan — {date}")
+    print(f"### Practice plan — {date}")
     if not plan["review"] and not plan["new"]:
         print("\nNothing due and no new problems left. Done!")
     if plan["review"]:
@@ -458,7 +458,8 @@ def cmd_today_md(state, problems, date, plan):
               + ", ".join(f"#{pid} {by_id[pid]['title']} (not before {state['deferred'][pid]['until']})"
                           for pid in pushed) + "._")
     print("\n_Log solves by commenting here — e.g. `solved 1 good`, "
-          "`#20 hard` (grades: again / hard / good / easy)._")
+          "`#20 hard` (grades: again / hard / good / easy) — or on the "
+          "[Daily Practice page](https://lambdanotfound.github.io/practice/)._")
 
 
 def cmd_paused(state, date, since):
@@ -469,7 +470,7 @@ def cmd_paused(state, date, since):
         state["paused"] = note
         save_state(state)
     days = state["config"]["pause_after"]
-    print(f"### LeetCode plans paused since {since}\n\n"
+    print(f"### Practice plans paused since {since}\n\n"
           f"Nothing was logged for {days} days, so plans stopped and nothing is "
           "piling up.\n\n"
           "To come back, comment `resume` here for a plan with your old problems "

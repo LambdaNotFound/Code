@@ -1,14 +1,18 @@
 name: log-solve
 
-# Log solves from anywhere (GitHub mobile app / web) by commenting on the
-# "Daily LeetCode" issue. Recognized patterns, any number per comment:
+# Log solves from anywhere (GitHub mobile app / web) by commenting on a
+# daily plan issue, or by opening an issue titled "Practice log ..." (what
+# the Daily Practice page at lambdanotfound.github.io/practice/ does).
+# Recognized patterns, any number per comment:
 #   "solved 200 good"  ·  "1 easy, 33 again"  ·  "#5 hard"
 # "resume" on its own ends a pause and replies with the day's plan.
 # The workflow runs sr.py log for each pair, commits state.json, and
-# replies with the next review dates.
+# replies with the next review dates. A log issue is closed once logged.
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
@@ -20,17 +24,24 @@ concurrency:
 
 jobs:
   log:
-    # Only the repo owner's comments on the Daily LeetCode issue,
-    # and never the bot's own confirmation replies.
+    # Only the repo owner, never the bot's own confirmation replies: their
+    # comments on a plan issue ("Daily Practice ...", or "Daily LeetCode ..."
+    # from before 11-25-2026) or a log issue, and log issues they open.
     if: >
-      github.event.comment.user.login == github.repository_owner &&
-      contains(github.event.issue.title, 'Daily LeetCode')
+      (github.event_name == 'issue_comment' &&
+       github.event.comment.user.login == github.repository_owner &&
+       (contains(github.event.issue.title, 'Daily Practice') ||
+        contains(github.event.issue.title, 'Daily LeetCode') ||
+        startsWith(github.event.issue.title, 'Practice log'))) ||
+      (github.event_name == 'issues' &&
+       github.event.issue.user.login == github.repository_owner &&
+       startsWith(github.event.issue.title, 'Practice log'))
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      # Passed via env, not template interpolation, so comment text
-      # cannot inject shell commands.
-      COMMENT_BODY: ${{ github.event.comment.body }}
+      # Passed via env, not template interpolation, so the text cannot
+      # inject shell commands. A new log issue is read from its body.
+      BODY: ${{ github.event_name == 'issues' && github.event.issue.body || github.event.comment.body }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +55,7 @@ jobs:
           import os, re, subprocess, sys
 
           date = sys.argv[1]
-          body = os.environ.get("COMMENT_BODY", "")
+          body = os.environ.get("BODY", "")
           # The parser and grade vocabulary live in sr.py (tested by
           # test_sr.py) so the workflow and the CLI never drift apart.
           sys.path.insert(0, "spaced_repetition")
@@ -52,6 +63,7 @@ jobs:
           words = "|".join(GRADE_ALIASES)
           pairs, skipped = parse_solves(body)
           lines = []
+          done = False  # anything logged, or a resume
 
           def sr(*args):
               r = subprocess.run(["python3", "spaced_repetition/sr.py", *args,
@@ -60,8 +72,10 @@ jobs:
 
           if re.fullmatch(r"\W*resume\W*", body, re.IGNORECASE):
               lines += [sr("resume")[1], "", sr("today", "--md")[1]]
+              done = True
           for pid, grade in pairs:
               code, msg = sr("log", pid, grade)
+              done = done or code == 0
               lines.append(("- " if code == 0 else "- FAILED: ")
                            + msg.replace("\n", "\n- "))
           for pid, why in skipped:
@@ -79,6 +93,7 @@ jobs:
                                    body, re.IGNORECASE)) or bool(re.search(r"#\d", body))
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"looked_like_attempt={'yes' if (attempt and not lines) else 'no'}\n")
+              f.write(f"done={'yes' if done else 'no'}\n")
           print(f"parsed {len(pairs)} solve(s), skipped {len(skipped)}; body was: {body!r}")
           EOF
 
@@ -120,3 +135,9 @@ jobs:
           else
             echo "Comment did not look like a log attempt; staying quiet."
           fi
+
+      # A log issue has done its job once something was logged from it. One
+      # that logged nothing stays open, so a corrected comment can follow.
+      - name: Close a log issue
+        if: github.event_name == 'issues' && steps.parse.outputs.done == 'yes'
+        run: gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY"

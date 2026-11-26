@@ -33,8 +33,21 @@ jobs:
         run: |
           # Read both from one clock call, so midnight can't fall between them.
           read -r PT_DATE hour <<< "$(TZ=America/Los_Angeles date '+%F %H')"
-          TITLE="Daily LeetCode $PT_DATE"
+          TITLE="Daily Practice $PT_DATE"
           echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT"
+
+          # Number of the issue titled $1, or titled the way issues were
+          # before 11-25-2026 ("Daily LeetCode ..."), if there is one.
+          find_issue() {
+            local t n
+            for t in "$1" "Daily LeetCode${1#Daily Practice}"; do
+              n=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                  --search "\"$t\" in:title" --state all \
+                  --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
+                  | awk -F'\t' -v t="$t" '$2==t{print $1; exit}')
+              if [ -n "$n" ]; then echo "$n"; return; fi
+            done
+          }
 
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "Manual run - proceeding."
@@ -49,10 +62,7 @@ jobs:
           fi
 
           # Already posted today? Then this cron is a redundant retry.
-          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
-                     --search "\"$TITLE\" in:title" --state all \
-                     --json title --jq "[.[] | select(.title == \"$TITLE\")] | length")
-          if [ "${existing:-0}" -gt 0 ]; then
+          if [ -n "$(find_issue "$TITLE")" ]; then
             echo "Skipping: '$TITLE' already exists."
             echo "run=no" >> "$GITHUB_OUTPUT"
           else
@@ -81,8 +91,8 @@ jobs:
           cat "$RUNNER_TEMP/plan.md"
           status=$(python3 spaced_repetition/sr.py status --date "$PT_DATE")
           case "$status" in
-            paused\ *) title="Daily LeetCode paused since ${status#paused }" ;;
-            *)         title="Daily LeetCode $PT_DATE" ;;
+            paused\ *) title="Daily Practice paused since ${status#paused }" ;;
+            *)         title="Daily Practice $PT_DATE" ;;
           esac
           echo "status=${status%% *}" >> "$GITHUB_OUTPUT"
           echo "title=$title" >> "$GITHUB_OUTPUT"
@@ -129,10 +139,15 @@ jobs:
           STATUS: ${{ steps.plan.outputs.status }}
         run: |
           : "${TITLE:?plan step did not set a title}"
-          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
-                     --search "\"$TITLE\" in:title" --state all \
-                     --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
-                     | awk -F'\t' -v t="$TITLE" '$2==t{print $1; exit}')
+          # Same lookup as the guard's: this title, or its pre-11-25-2026 name.
+          existing=""
+          for t in "$TITLE" "Daily LeetCode${TITLE#Daily Practice}"; do
+            existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                       --search "\"$t\" in:title" --state all \
+                       --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
+                       | awk -F'\t' -v t="$t" '$2==t{print $1; exit}')
+            if [ -n "$existing" ]; then break; fi
+          done
           if [ -n "$existing" ] && [ "$STATUS" = paused ]; then
             echo "Still paused: issue #$existing already says so."
           elif [ -n "$existing" ]; then
