@@ -10,6 +10,9 @@ Commands:
     python3 sr.py due                         list all cards with due dates
     python3 sr.py status [--date D]           "active" or "paused YYYY-MM-DD"
     python3 sr.py resume [--date D]           end a pause (logging a solve does too)
+    python3 sr.py undo ID                     take back the latest log of a problem
+    python3 sr.py handle --body-file F ...    apply a GitHub comment (log-solve.yml)
+    python3 sr.py sweep ...                   log comments whose run never finished
 
 Grading guide:
     again = couldn't solve / needed the solution
@@ -52,58 +55,84 @@ def normalize_grade(word):
     return GRADE_ALIASES.get(word.strip().lower())
 
 
-_GRADE = re.compile(
-    r"\b(" + "|".join(sorted(GRADE_ALIASES, key=len, reverse=True)) + r")\b", re.I)
-# A problem id: a standalone number, optionally written "#200" or "LC 200".
-_ID = re.compile(r"(?<![\w.])(#|lc[\s-]?)?([1-9]\d*)(?!\w|\.\d)", re.I)
-_NEGATION = re.compile(r"\b(?:not|never|\w+n['\u2019]t)\b|\bno\W*$", re.I)
-# Text dropped before looking for ids and grades, in this order.
-_NOISE = [
-    re.compile(r"^\s*>.*$", re.M),                # quoted reply, e.g. the plan itself
-    re.compile(r"(?<=[\w\]])\([^()\n]*\)"),       # "O(1)", "Pow(x, n)", a link's URL
-    re.compile(r"https?://\S+"),
-    re.compile(r"(?<=[^\W\d])[\])*\s]+\((?:easy|medium|hard)\)", re.I),  # "Title (Medium)"
-    re.compile(r"\b\d{4}-\d\d-\d\d\b"),          # dates
-    re.compile(r"(?<![\w#])\d+(?:\.\d+)?[\s-]*(?:%|(?:s|secs?|seconds?|m|mins?|minutes?"
-               r"|h|hrs?|hours?|days?|weeks?|times?|try|tries|attempts?|pass(?:es)?"
-               r"|problems?|questions?|solves?)\b)", re.I),  # "20 min", "2 attempts", "95%"
-]
+# --- reading log comments ---
+#
+# A comment is a list of items, separated by new lines, commas, semicolons,
+# "\u00b7" or "and". An item is one problem and one grade, "53 good", optionally
+# written "#53" and optionally followed by a note ("54 hard (needed a hint)").
+# Two commands share the format: "undo 53" and "resume". Anything else that
+# names a problem is reported back, never guessed: a wrong grade silently
+# moves a review date.
+
+_WORDS = "|".join(sorted(GRADE_ALIASES, key=len, reverse=True))
+_ID = r"(?:\#|lc[\s-]?)?(?P<id>[1-9]\d*)"
+_ITEM = re.compile(rf"""
+    (?:[-+]\s+)?(?:\[[ x]\]\s*)?         # a list bullet, a checkbox
+    (?:(?:solved|did|redid)\s+)?
+    {_ID}
+    \s*[^\w\s]*\s*                        # ":", "-", "=>", an emoji
+    (?:(?:was|felt)\s+)?
+    \(?(?P<grade>{_WORDS})\)?
+    [^\w\s?]*(?:\s+[^\w\s?]+)*            # "!", ".", a trailing emoji
+    (?P<note>\s*(?:[(\-\u2013\u2014:]|(?:but|though|after|with|because)\b).*)?
+    """, re.I | re.X)
+_UNDO = re.compile(rf"undo\s+{_ID}\W*", re.I)
+_RESUME = re.compile(r"resume\W*", re.I)
+_GRADE_WORD = re.compile(rf"\b(?:{_WORDS})\b", re.I)
+_NUMBER = re.compile(r"(?<![\w./=])(#)?([1-9]\d*)(?![\w.])")
+# A comment that matched nothing gets the format explained only if it looks
+# like it meant to log something.
+_ATTEMPT = re.compile(r"\b(?:again|hard|good|easy|solved|logged|undo)\b|#\d", re.I)
 
 
-def parse_solves(text):
-    """Find "<id> <grade>" pairs in a free-form comment.
+def parse_comment(text, deck=None):
+    """Read a log comment.
 
-    Returns (pairs, skipped): pairs is [(id, grade)], skipped is [(id, reason)]
-    for ids whose grade was unclear. A wrong grade silently moves a review
-    date, so anything ambiguous is skipped and reported instead of guessed.
+    Returns a dict: "solves" [(id, grade)] to log, "undo" [id] whose latest
+    log to take back, "resume" (bool), and "skipped" [(id, why)] for problems
+    the comment names but that are not logged. With deck, a set of problem
+    ids, a number outside the set is reported instead of logged.
     """
-    for noise in _NOISE:
-        text = noise.sub(" ", text)
-    pairs, skipped = [], []
-    # Punctuation ends a clause, so a grade can't attach to an earlier id.
-    for clause in re.split(r"[\n,;!?]|\.(?!\d)", text):
-        ids = list(_ID.finditer(clause))
-        for m, nxt in zip(ids, ids[1:] + [None]):
-            marked, pid = m.group(1), m.group(2)
-            rest = clause[m.end():nxt.start() if nxt else len(clause)]
-            # "no"/"yes" are too common mid-sentence ("no problem") to be
-            # grades anywhere but at the end.
-            grades = [g for g in _GRADE.finditer(rest)
-                      if g.group().lower() not in ("no", "yes")
-                      or not re.search(r"\w", rest[g.end():])]
-            # After "#208" a title may precede the grade; after a bare number
-            # (which may not be an id at all) the grade must be close by.
-            if not grades or (not marked and grades[0].start() > 12):
-                if marked:
-                    skipped.append((pid, "no grade next to it"))
-            elif _NEGATION.search(rest[:grades[0].start()]):
-                skipped.append((pid, f"unclear, it says not {grades[0].group().lower()!r}"))
-            elif len({normalize_grade(g.group()) for g in grades}) > 1:
-                skipped.append((pid, "more than one grade"))
-            else:
-                pairs.append((pid, normalize_grade(grades[0].group())))
-    logged = {pid for pid, _ in pairs}
-    return pairs, [s for s in skipped if s[0] not in logged]
+    text = re.sub(r"^\s*>.*$", "", text, flags=re.M)   # a quoted reply
+    text = re.sub(r"https?://\S+|[*`]", " ", text)      # links, bold, code marks
+    graded = bool(_GRADE_WORD.search(text))
+    found, undo, skipped, resume = [], [], [], False
+    for item in re.split(r"[\n,;\u00b7]|\band\b", text, flags=re.I):
+        item = item.strip()
+        m = _ITEM.fullmatch(item)
+        if not item:
+            continue
+        if _RESUME.fullmatch(item):
+            resume = True
+        elif _UNDO.fullmatch(item):
+            undo.append(_UNDO.fullmatch(item)["id"])
+        elif m and _GRADE_WORD.search(m["note"] or ""):
+            skipped.append((m["id"], "more than one grade"))
+        elif m and deck is not None and m["id"] not in deck:
+            skipped.append((m["id"], "no such problem in the set"))
+        elif m:
+            found.append((m["id"], normalize_grade(m["grade"])))
+        else:
+            # Only report numbers that could be problems, in a comment that
+            # grades something or marks a number with "#".
+            for mark, n in _NUMBER.findall(item):
+                if mark or (graded and (deck is None or n in deck)):
+                    skipped.append((n, "couldn't read that line"))
+    grades = {}
+    for pid, grade in found:
+        grades.setdefault(pid, set()).add(grade)
+    solves = []
+    for pid, grade in found:
+        if len(grades[pid]) > 1:
+            skipped.append((pid, "more than one grade"))
+        elif (pid, grade) not in solves:
+            solves.append((pid, grade))
+    logged = {pid for pid, _ in solves} | set(undo)
+    reported = []
+    for pid, why in skipped:
+        if pid not in logged and pid not in {p for p, _ in reported}:
+            reported.append((pid, why))
+    return {"solves": solves, "undo": undo, "resume": resume, "skipped": reported}
 
 
 def today_str(args):
@@ -410,7 +439,6 @@ def pick_today(state, problems, date):
     if deferred_now:
         plan["deferred"] = deferred_now
     state["served"][date] = plan
-    save_state(state)
     return plan, False
 
 
@@ -437,29 +465,33 @@ def md_problem(p, card=None):
     return line
 
 
-def cmd_today_md(state, problems, date, plan):
+def today_md(state, problems, date, plan):
+    """The plan as Markdown, for the daily issue and the reply to `resume`."""
     by_id = {p["id"]: p for p in problems}
-    print(f"### Practice plan — {date}")
+    out = [f"### Practice plan — {date}"]
     if not plan["review"] and not plan["new"]:
-        print("\nNothing due and no new problems left. Done!")
+        out.append("\nNothing due and no new problems left. Done!")
     if plan["review"]:
-        print(f"\n**Reviews due ({len(plan['review'])}):**\n")
-        for pid in plan["review"]:
-            print(md_problem(by_id[pid], state["cards"].get(pid)))
+        out.append(f"\n**Reviews due ({len(plan['review'])}):**\n")
+        out += [md_problem(by_id[pid], state["cards"].get(pid)) for pid in plan["review"]]
     if plan["new"]:
-        print(f"\n**New ({len(plan['new'])}):**\n")
-        for pid in plan["new"]:
-            print(md_problem(by_id[pid]))
+        out.append(f"\n**New ({len(plan['new'])}):**\n")
+        out += [md_problem(by_id[pid]) for pid in plan["new"]]
     # Logging a problem clears its deferral, so on a reprint it may be gone.
     pushed = [pid for pid in plan.get("deferred", [])
-              if pid in by_id and pid in state["deferred"]]
+              if pid in by_id and pid in state.get("deferred", {})]
     if pushed:
-        print("\n_Pushed back (served repeatedly without being logged): "
-              + ", ".join(f"#{pid} {by_id[pid]['title']} (not before {state['deferred'][pid]['until']})"
-                          for pid in pushed) + "._")
-    print("\n_Log solves by commenting here — e.g. `solved 1 good`, "
-          "`#20 hard` (grades: again / hard / good / easy) — or on the "
-          "[Daily Practice page](https://lambdanotfound.github.io/practice/)._")
+        out.append("\n_Pushed back (served repeatedly without being logged): "
+                   + ", ".join(f"#{pid} {by_id[pid]['title']} (not before {state['deferred'][pid]['until']})"
+                               for pid in pushed) + "._")
+    out.append("\n_Log solves by commenting here, one per line: `1 good`, `20 hard` "
+               "(grades: again / hard / good / easy). Or use the "
+               "[Daily Practice page](https://lambdanotfound.github.io/practice/)._")
+    return "\n".join(out)
+
+
+def cmd_today_md(state, problems, date, plan):
+    print(today_md(state, problems, date, plan))
 
 
 def cmd_paused(state, date, since):
@@ -487,8 +519,10 @@ def cmd_today(args):
         if not args.resume:
             cmd_paused(state, date, since)
             return
-        resume(state, date)  # saved by pick_today
+        resume(state, date)
     plan, repeated = pick_today(state, problems, date)
+    if not repeated:
+        save_state(state)
 
     if args.md:
         cmd_today_md(state, problems, date, plan)
@@ -518,20 +552,49 @@ def cmd_today(args):
         print("\n" + json.dumps({"date": date, **plan, "backlog": backlog}))
 
 
-def cmd_log(args):
-    state = load_state()
-    problems = load_problems()
-    by_id = {p["id"]: p for p in problems}
-    pid, grade = args.id, normalize_grade(args.grade)
-    if pid not in by_id:
-        sys.exit(f"Unknown problem id {pid}")
-    if grade is None:
-        sys.exit(f"Unknown grade {args.grade!r}; use one of "
-                 f"{sorted(set(GRADE_ALIASES))}")
-    date = today_str(args)
+def latest_log(state, pid):
+    for entry in reversed(state["log"]):
+        if entry["id"] == pid:
+            return entry
+    return None
+
+
+def restore(state, entry):
+    """Take back one log entry: its card and deferral go back as they were."""
+    pid, prev = entry["id"], entry["prev"]
+    if prev["card"] is None:
+        state["cards"].pop(pid, None)
+    else:
+        state["cards"][pid] = dict(prev["card"])
+    if prev["deferred"] is None:
+        state.get("deferred", {}).pop(pid, None)
+    else:
+        state.setdefault("deferred", {})[pid] = dict(prev["deferred"])
+    state["log"] = [e for e in state["log"] if e is not entry]
+
+
+def log_solve(state, by_id, pid, grade, date):
+    """Record one solve and reschedule its card. Returns the lines to print.
+
+    Each entry keeps the card and deferral as they were before it ("prev"),
+    which is what makes undo exact: a log can't be worked backwards, since
+    "again" sets any interval to 1 and ease stops at EASE_MIN. A second log
+    of the same problem on the same day replaces the first, so a redo or a
+    corrected grade doesn't grow the interval twice.
+    """
+    out = []
     if paused_since(state, date):
         resume(state, date)
-        print("Welcome back - plans resume today, with your old problems first.")
+        out.append("Welcome back - plans resume today, with your old problems first.")
+    replaced = None
+    last = latest_log(state, pid)
+    if last and last["date"] == date and "prev" in last:
+        replaced = last["grade"]
+        restore(state, last)
+    old_card = state["cards"].get(pid)
+    old_deferral = state.get("deferred", {}).get(pid)
+    prev = {"card": dict(old_card) if old_card else None,
+            "deferred": dict(old_deferral) if old_deferral else None}
 
     card = state["cards"].get(pid, {
         "interval": 0, "ease": EASE_START, "due": date,
@@ -565,10 +628,209 @@ def cmd_log(args):
     # A logged problem is no longer being ignored: drop the deferral, which
     # would otherwise hide the review just scheduled, and its escalation count.
     state.get("deferred", {}).pop(pid, None)
-    state["log"].append({"date": date, "id": pid, "grade": grade})
+    state["log"].append({"date": date, "id": pid, "grade": grade, "prev": prev})
+    note = f" (replaces {replaced} from earlier today)" if replaced else ""
+    out.append(f"Logged #{pid} {by_id[pid]['title']}: {grade}{note}. "
+               f"Next review {card['due']} (interval {iv}d, ease {card['ease']}).")
+    return out
+
+
+def undo_solve(state, by_id, pid):
+    """Take back the latest log of pid. Returns (message, changed)."""
+    name = f"#{pid} {by_id[pid]['title']}" if pid in by_id else f"#{pid}"
+    entry = latest_log(state, pid)
+    if entry is None:
+        return f"Nothing to undo: {name} has never been logged.", False
+    if "prev" not in entry:
+        return (f"Can't undo {name}: its latest log, on {entry['date']}, "
+                "was made before undo existed."), False
+    restore(state, entry)
+    card = state["cards"].get(pid)
+    after = f"next review back to {card['due']}" if card else "it counts as a new problem again"
+    return f"Undid {name}: {entry['grade']} on {entry['date']}; {after}.", True
+
+
+def cmd_log(args):
+    state = load_state()
+    by_id = {p["id"]: p for p in load_problems()}
+    pid, grade = args.id, normalize_grade(args.grade)
+    if pid not in by_id:
+        sys.exit(f"Unknown problem id {pid}")
+    if grade is None:
+        sys.exit(f"Unknown grade {args.grade!r}; use one of "
+                 f"{sorted(set(GRADE_ALIASES))}")
+    lines = log_solve(state, by_id, pid, grade, today_str(args))
     save_state(state)
-    print(f"Logged #{pid} {by_id[pid]['title']}: {grade}. "
-          f"Next review {card['due']} (interval {iv}d, ease {card['ease']}).")
+    print("\n".join(lines))
+
+
+def cmd_undo(args):
+    state = load_state()
+    msg, changed = undo_solve(state, {p["id"]: p for p in load_problems()}, args.id)
+    if changed:
+        save_state(state)
+    print(msg)
+
+
+# --- comments from GitHub ---
+
+HELP = (
+    "Nothing logged: I couldn't find a line like `53 good` in that comment.\n\n"
+    "Write one problem per line, or several separated by commas: `53 good, 1 hard`.\n"
+    "Grades: `again` (needed the solution) · `hard` (slow or messy) · `good` · `easy`.\n"
+    "`undo 53` takes back the latest log of #53, and `resume` ends a pause.")
+EVENTS_KEPT_DAYS = 30
+
+
+def now_utc():
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def handle_comment(state, problems, text, date, event=None, late=False):
+    """Apply one log comment or log issue to state.
+
+    Returns (reply lines, done): done is True when something was logged,
+    undone or resumed. With event (e.g. "comment-123"), a comment already
+    applied is not applied twice, so a retried push or a re-run is safe.
+    late is the missed-log check replaying a comment whose own run never
+    finished: it skips undo, which by then could hit a newer log, and any
+    problem that was logged again after the comment.
+    """
+    by_id = {p["id"]: p for p in problems}
+    if event and event in state.get("events", {}).get("done", {}):
+        return ([] if late else ["Already logged from this comment; nothing changed."]), False
+    parsed = parse_comment(text, set(by_id))
+    lines, done = [], False
+
+    if parsed["resume"]:
+        if paused_since(state, date):
+            resume(state, date)
+            done = True
+            lines.append("Welcome back - plans resume today, with your old problems first.")
+        elif not late:
+            lines.append("Plans are not paused - nothing to resume.")
+        if not late:
+            plan, _ = pick_today(state, problems, date)
+            lines += ["", today_md(state, problems, date, plan)]
+    for pid in [] if late else parsed["undo"]:
+        msg, changed = undo_solve(state, by_id, pid)
+        lines.append("- " + msg)
+        done = done or changed
+    for pid, grade in parsed["solves"]:
+        if late and any(e["id"] == pid and e["date"] >= date for e in state["log"]):
+            continue  # logged again since this comment; the newer log stands
+        lines += ["- " + line for line in log_solve(state, by_id, pid, grade, date)]
+        done = True
+    if not late and parsed["skipped"]:
+        lines += [f"- NOT LOGGED: #{pid} ({why})." for pid, why in parsed["skipped"]]
+        lines.append("\nWrite one problem per line, like `53 good`.")
+    if not lines and not late and _ATTEMPT.search(text):
+        lines.append(HELP)
+
+    if done and event:
+        events = state.setdefault("events", {"since": now_utc(), "done": {}})
+        events["done"][event] = date
+        cutoff = add_days(date, -EVENTS_KEPT_DAYS)
+        events["done"] = {k: v for k, v in events["done"].items() if v >= cutoff}
+    return lines, done
+
+
+def cmd_handle(args):
+    state, problems = load_state(), load_problems()
+    before = json.dumps(state, sort_keys=True)
+    text = pathlib.Path(args.body_file).read_text() if args.body_file else sys.stdin.read()
+    lines, done = handle_comment(state, problems, text, today_str(args), args.event)
+    if json.dumps(state, sort_keys=True) != before:
+        save_state(state)
+    reply = "\n".join(lines).strip()
+    if args.reply_file:
+        pathlib.Path(args.reply_file).write_text(reply + "\n" if reply else "")
+    else:
+        print(reply)
+    if args.status_file:
+        pathlib.Path(args.status_file).write_text(f"done={'yes' if done else 'no'}\n")
+
+
+def is_log_issue(title):
+    return title.lower().startswith("practice log")
+
+
+def takes_logs(title):
+    """Issues whose comments log-solve.yml reads: plan issues and log issues."""
+    t = title.lower()
+    return is_log_issue(title) or "daily practice" in t or "daily leetcode" in t
+
+
+def read_jsonl(path):
+    try:
+        with open(path) as f:
+            return [json.loads(line) for line in f if line.strip()]
+    except FileNotFoundError:
+        return []
+
+
+def pacific_date(timestamp):
+    """The Pacific date of a GitHub timestamp such as 2026-11-26T01:30:00Z."""
+    from zoneinfo import ZoneInfo
+    t = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    return t.astimezone(ZoneInfo("America/Los_Angeles")).date().isoformat()
+
+
+def missed_events(issues, comments, owner, since, before):
+    """Log issues and log comments from owner, created in [since, before).
+
+    issues and comments are GitHub API records reduced to the fields the
+    daily workflow keeps: issues {number, id, title, user, body, created_at},
+    comments {id, issue, user, body, created_at}.
+    """
+    titles = {i["number"]: i["title"] for i in issues}
+    found = [{"event": f"issue-{i['id']}", "issue": i["number"], "title": i["title"],
+              "body": i.get("body") or "", "created_at": i["created_at"]}
+             for i in issues if i["user"] == owner and is_log_issue(i["title"])]
+    found += [{"event": f"comment-{c['id']}", "issue": c["issue"], "title": titles[c["issue"]],
+               "body": c.get("body") or "", "created_at": c["created_at"]}
+              for c in comments
+              if c["user"] == owner and c["issue"] in titles and takes_logs(titles[c["issue"]])]
+    return sorted((e for e in found if since <= e["created_at"] < before),
+                  key=lambda e: e["created_at"])
+
+
+def sweep(state, problems, issues, comments, owner, now):
+    """Log what log-solve.yml missed. Returns the replies to post.
+
+    A run can fail to finish, or GitHub may never start it. Every comment
+    log-solve applies is recorded in state["events"], so one from the last
+    few days that isn't there was missed. Only comments made after the record
+    began count, and none from the last hour, whose own run may still be
+    going.
+    """
+    since = state.get("events", {}).get("since")
+    if not since:
+        return []
+    before = (dt.datetime.fromisoformat(now.replace("Z", "+00:00"))
+              - dt.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    replies = []
+    for e in missed_events(issues, comments, owner, since, before):
+        lines, done = handle_comment(state, problems, e["body"], pacific_date(e["created_at"]),
+                                     e["event"], late=True)
+        if done:
+            replies.append({
+                "issue": e["issue"], "close": is_log_issue(e["title"]),
+                "reply": "Logged late by the daily check, because the run for "
+                         "this comment didn't finish:\n\n" + "\n".join(lines)})
+    return replies
+
+
+def cmd_sweep(args):
+    state, problems = load_state(), load_problems()
+    before = json.dumps(state, sort_keys=True)
+    replies = sweep(state, problems, read_jsonl(args.issues), read_jsonl(args.comments),
+                    args.owner, args.now or now_utc())
+    if json.dumps(state, sort_keys=True) != before:
+        save_state(state)
+    with open(args.replies, "w") as f:
+        json.dump(replies, f)
+    print(f"Missed-log check: {len(replies)} comment(s) logged late.")
 
 
 def cmd_status(args):
@@ -649,6 +911,26 @@ def main():
                    metavar="again|hard|good|easy")
     p.add_argument("--date")
     p.set_defaults(fn=cmd_log)
+
+    p = sub.add_parser("undo", help="take back the latest log of a problem")
+    p.add_argument("id")
+    p.set_defaults(fn=cmd_undo)
+
+    p = sub.add_parser("handle", help="apply a GitHub comment (log-solve.yml)")
+    p.add_argument("--body-file", help="the comment text (default: stdin)")
+    p.add_argument("--event", help="comment-ID or issue-ID, so it is applied once")
+    p.add_argument("--date")
+    p.add_argument("--reply-file", help="write the reply here instead of stdout")
+    p.add_argument("--status-file", help="write done=yes|no here")
+    p.set_defaults(fn=cmd_handle)
+
+    p = sub.add_parser("sweep", help="log comments whose run never finished")
+    p.add_argument("--issues", required=True, help="JSON lines of recent issues")
+    p.add_argument("--comments", required=True, help="JSON lines of recent comments")
+    p.add_argument("--owner", required=True)
+    p.add_argument("--replies", required=True, help="write the replies to post here")
+    p.add_argument("--now", help="UTC time, YYYY-MM-DDTHH:MM:SSZ (default: now)")
+    p.set_defaults(fn=cmd_sweep)
 
     p = sub.add_parser("stats")
     p.set_defaults(fn=cmd_stats)

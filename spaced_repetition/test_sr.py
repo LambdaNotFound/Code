@@ -15,91 +15,106 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import sr  # noqa: E402
 
 
-class ParseSolves(unittest.TestCase):
-    def check(self, text, pairs, skipped=()):
-        got_pairs, got_skipped = sr.parse_solves(text)
-        self.assertEqual(got_pairs, list(pairs), text)
-        self.assertEqual([pid for pid, _ in got_skipped], list(skipped), text)
+DECK = {p["id"] for p in sr.load_problems()}
 
-    def test_documented_forms(self):
-        self.check("solved 200 good", [("200", "good")])
-        self.check("1 easy, 33 again", [("1", "easy"), ("33", "again")])
-        self.check("#5 hard", [("5", "hard")])
-        self.check("#33 was hard", [("33", "hard")])
-        self.check("solved 200 good, #33 was hard", [("200", "good"), ("33", "hard")])
-        self.check("252 good and 9 hard", [("252", "good"), ("9", "hard")])
+
+class ParseComment(unittest.TestCase):
+    def check(self, text, solves, skipped=(), undo=(), resume=False):
+        got = sr.parse_comment(text, DECK)
+        self.assertEqual(got["solves"], list(solves), text)
+        self.assertEqual([pid for pid, _ in got["skipped"]], list(skipped), text)
+        self.assertEqual(got["undo"], list(undo), text)
+        self.assertEqual(got["resume"], resume, text)
+
+    def test_one_problem_per_line(self):
+        self.check("20 good\n54 hard\n217 easy",
+                   [("20", "good"), ("54", "hard"), ("217", "easy")])
+        self.check("20 good\r\n54 hard", [("20", "good"), ("54", "hard")])
+        # What the Daily Practice page puts in a log issue.
+        self.check("53 good\n1 hard\n21 easy", [("53", "good"), ("1", "hard"), ("21", "easy")])
+
+    def test_separators(self):
+        self.check("20 good, 54 hard; 217 easy",
+                   [("20", "good"), ("54", "hard"), ("217", "easy")])
         self.check("1 good · 20 hard", [("1", "good"), ("20", "hard")])
-        self.check("1: good\n20 - hard", [("1", "good"), ("20", "hard")])
-        self.check("LC200 good, lc 33 again", [("200", "good"), ("33", "again")])
-        self.check("200 (good)", [("200", "good")])
-        self.check("**200** GOOD", [("200", "good")])
+        self.check("252 good and 9 hard", [("252", "good"), ("9", "hard")])
 
-    def test_every_alias_parses(self):
+    def test_written_forms(self):
+        for text in ("53 good", "#53 good", "solved 53 good", "#53 was good", "53 felt good",
+                     "LC53 good", "lc-53 good", "lc 53 good", "53 (good)", "**53** GOOD",
+                     "53: good", "53 - good", "53 => good", "53 ✅ good", "- [x] 53 good",
+                     "- 53 good", "53 good!", "53. good", "53 good 👍", "`53 good`"):
+            self.check(text, [("53", "good")])
+
+    def test_every_alias(self):
         for word, grade in sr.GRADE_ALIASES.items():
             self.check(f"#20 {word}", [("20", grade)])
 
-    def test_punctuation_still_separates(self):
-        self.check("1. good", [])
-        self.check("2 attempts, 1 good", [("1", "good")])
+    def test_a_note_after_the_grade(self):
+        for text in ("54 hard (needed a hint)", "54 hard - off by one", "54 hard: messy loop",
+                     "54 hard but got there", "54 hard (12 min)", "54 hard — off by one"):
+            self.check(text, [("54", "hard")])
 
-    def test_numbers_with_a_unit_are_not_ids(self):
-        self.check("solved 1 in 20 min easy", [("1", "easy")])
-        self.check("#70 took 45 minutes hard", [("70", "hard")])
-        self.check("#70 took 1.5 hours hard", [("70", "hard")])
-        self.check("#70 20-min easy", [("70", "easy")])
-        self.check("did 2 problems good", [])
-        self.check("beats 95% easy", [])
-        self.check("2026-08-04 good", [])
-
-    def test_hash_id_allows_a_title(self):
-        self.check("#208 Implement Trie good", [("208", "good")])
-        self.check("#15 3Sum again", [("15", "again")])
-        self.check("#542 01 Matrix hard", [("542", "hard")])
-        self.check("#50 Pow(x, n) good", [("50", "good")])
-        self.check("#380 Insert Delete GetRandom O(1) easy", [("380", "easy")])
-
-    def test_urls_and_slashes(self):
-        self.check("https://leetcode.ca/all/252.html good", [])
-        self.check("#252 https://leetcode.ca/all/252.html good", [("252", "good")])
-        self.check("200/33 good", [("33", "good")])
-
-    def test_bare_number_needs_a_nearby_grade(self):
-        self.check("started at 9 this morning and it went good", [])
-
-    def test_difficulty_label_is_not_a_grade(self):
-        line = ("- [ ] **#208 [Implement Trie (Prefix Tree)]"
-                "(https://leetcode.com/problems/implement-trie-prefix-tree/)** (Medium)"
-                " — Trie · hash-table, string · reps 2, last 2026-08-04")
-        self.check(line, [], ["208"])
-        self.check("#9 Palindrome Number (Easy) again", [("9", "again")])
-
-    def test_negated_grade_is_skipped(self):
-        self.check("#9 not good", [], ["9"])
-        self.check("#9 wasn't easy", [], ["9"])
-        self.check("#9 wasn’t easy", [], ["9"])
-        self.check("#20 no good", [], ["20"])
-        self.check("9 not good, 1 easy", [("1", "easy")], ["9"])
-
-    def test_no_and_yes_only_count_at_the_end(self):
-        self.check("#20 no", [("20", "again")])
-        self.check("#20 no problem, easy", [], ["20"])
-        self.check("#20 no issues good", [("20", "good")])
-
-    def test_conflicting_grades_are_skipped(self):
+    def test_a_note_with_another_grade_is_reported(self):
         self.check("#33 slow but ok", [], ["33"])
-        self.check("#33 quick and easy", [("33", "easy")])
+        self.check("54 easy - quick one", [], ["54"])
 
-    def test_skipped_id_logged_elsewhere_is_not_reported(self):
-        self.check("#9 reread the notes\n#9 good", [("9", "good")])
+    def test_lines_it_cannot_read_are_reported(self):
+        for text, pid in (("53 was pretty good", "53"), ("#53 Maximum Subarray good", "53"),
+                          ("53, good", "53"), ("good: 53", "53"), ("#9 not good", "9"),
+                          ("#9 easy? not really", "9"), ("#20 quick review, hard", "20"),
+                          ("#9 wasn't easy", "9"), ("53 honestly felt good", "53")):
+            got = sr.parse_comment(text, DECK)
+            self.assertEqual(got["solves"], [], text)
+            self.assertIn(pid, [p for p, _ in got["skipped"]], text)
+
+    def test_one_grade_per_number(self):
+        self.check("1 and 20 good", [("20", "good")], ["1"])
+        self.check("1, 20 good", [("20", "good")], ["1"])
+
+    def test_two_grades_for_one_problem(self):
+        self.check("20 good\n20 hard", [], ["20"])
+        self.check("20 good, 20 good", [("20", "good")])
+
+    def test_numbers_outside_the_set(self):
+        self.check("2026 good", [], ["2026"])
+        self.check("#9999 easy", [], ["9999"])
+        self.check("2026 good year", [])
+
+    def test_remarks_log_nothing(self):
+        for text in ("did 3 easy ones today", "only 2 good ones", "3 hard problems left",
+                     "Day 3 good streak", "top 1 good", "4 good days in a row",
+                     "5 hard ones on the list", "1 more easy one tomorrow", "part 2 was easy",
+                     "n=5 easy", "k = 3 was easy", "#1 priority is easy stuff",
+                     "took me 2 tries, good", "ok", "looks fine", "no", "thanks!"):
+            self.assertEqual(sr.parse_comment(text, DECK)["solves"], [], text)
+
+    def test_remarks_without_a_grade_report_nothing(self):
+        for text in ("started at 9 this morning", "nice plan today", "back on 12-01"):
+            self.check(text, [])
 
     def test_quoted_lines_are_ignored(self):
-        self.check("> Log solves e.g. `solved 1 good`, `#20 hard`\n\n9 easy", [("9", "easy")])
+        self.check("> 20 good\n> 1 easy\n\n9 easy", [("9", "easy")])
 
-    def test_prose_is_quiet(self):
-        self.check("nice plan today", [])
+    def test_links_are_ignored(self):
+        self.check("https://leetcode.com/problems/two-sum/ 1 good", [("1", "good")])
+        self.check("1 good https://leetcode.com/problems/two-sum/", [("1", "good")])
+
+    def test_commands(self):
+        self.check("undo 54", [], undo=["54"])
+        self.check("undo #54", [], undo=["54"])
+        self.check("Resume.", [], resume=True)
+        self.check("resume\n20 good", [("20", "good")], resume=True)
+        self.check("undo 54\n54 good", [("54", "good")], undo=["54"])
+
+    def test_a_pasted_plan_logs_nothing(self):
+        state = {"cards": {}, "deferred": {}}
+        plan = {"review": ["208"], "new": ["53"]}
+        text = sr.today_md(state, sr.load_problems(), "2026-11-26", plan)
+        self.assertEqual(sr.parse_comment(text, DECK)["solves"], [])
 
 
-class Scheduling(unittest.TestCase):
+class StateTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -151,6 +166,8 @@ class Scheduling(unittest.TestCase):
         state = sr.load_state()
         return sorted(state["deferred"])[0], "2026-01-03"
 
+
+class Scheduling(StateTest):
     def test_logging_clears_the_deferral(self):
         pid, date = self.defer_one()
         self.assertTrue(sr.is_deferred(sr.load_state(), pid, "2026-01-04"))
@@ -204,7 +221,8 @@ class Scheduling(unittest.TestCase):
     def test_hard_grows_every_time_but_never_past_good(self):
         last, ease = 0, sr.EASE_START
         for i in range(60):
-            self.log("1", "hard", "2026-01-01")
+            # One log a day: a second log on the same day replaces the first.
+            self.log("1", "hard", sr.add_days("2026-01-01", i))
             card = sr.load_state()["cards"]["1"]
             if last < sr.MAX_INTERVAL:
                 self.assertGreater(card["interval"], last)
@@ -401,6 +419,228 @@ class Scheduling(unittest.TestCase):
         self.resume("2026-02-01")
         self.assertEqual(self.status("2026-02-08"), "active")
         self.assertEqual(self.status("2026-02-09"), "paused 2026-02-09")
+
+
+class Comments(StateTest):
+    """handle_comment: what log-solve.yml runs for each comment or log issue."""
+
+    def handle(self, text, date="2026-01-01", event=None, late=False):
+        state = sr.load_state()
+        lines, done = sr.handle_comment(state, sr.load_problems(), text, date, event, late)
+        sr.save_state(state)
+        return "\n".join(lines), done
+
+    def test_reply_lists_each_log(self):
+        reply, done = self.handle("20 good\n54 hard")
+        self.assertTrue(done)
+        self.assertIn("Logged #20 Valid Parentheses: good", reply)
+        self.assertIn("Logged #54 Spiral Matrix: hard", reply)
+        self.assertEqual(len(sr.load_state()["log"]), 2)
+
+    def test_a_comment_is_applied_once(self):
+        self.handle("20 good", event="comment-1")
+        reply, done = self.handle("20 good", date="2026-01-02", event="comment-1")
+        self.assertFalse(done)
+        self.assertIn("Already logged", reply)
+        self.assertEqual(len(sr.load_state()["log"]), 1)
+
+    def test_old_event_ids_are_dropped(self):
+        self.handle("20 good", event="comment-1")
+        self.handle("54 good", date="2026-03-01", event="comment-2")
+        self.assertEqual(list(sr.load_state()["events"]["done"]), ["comment-2"])
+
+    def test_nothing_done_records_nothing(self):
+        self.handle("nice plan", event="comment-1")
+        self.assertNotIn("events", sr.load_state())
+
+    def test_reports_what_it_could_not_read(self):
+        reply, done = self.handle("20 good\n53 was pretty good")
+        self.assertTrue(done)
+        self.assertIn("NOT LOGGED: #53", reply)
+        self.assertIn("one problem per line", reply)
+
+    def test_explains_the_format_for_an_attempt(self):
+        reply, done = self.handle("solved it, felt good")
+        self.assertFalse(done)
+        self.assertIn("Nothing logged", reply)
+
+    def test_stays_quiet_for_chatter(self):
+        self.assertEqual(self.handle("thanks, nice plan"), ("", False))
+
+    def paused(self):
+        """Log on Jan 1 and nothing after: paused from Jan 9."""
+        self.log("20", "good", "2026-01-01")
+        self.assertTrue(sr.paused_since(sr.load_state(), "2026-01-09"))
+
+    def test_resume_replies_with_the_plan(self):
+        self.paused()
+        reply, done = self.handle("resume", date="2026-01-20")
+        self.assertTrue(done)
+        self.assertIn("Welcome back", reply)
+        self.assertIn("Practice plan — 2026-01-20", reply)
+        self.assertEqual(self.status("2026-01-20"), "active")
+
+    def test_undo_by_comment(self):
+        self.handle("20 good")
+        reply, done = self.handle("undo 20", date="2026-01-02")
+        self.assertTrue(done)
+        self.assertIn("Undid #20 Valid Parentheses: good on 2026-01-01", reply)
+        self.assertNotIn("20", sr.load_state()["cards"])
+
+    def test_late_skips_undo_and_problems_logged_since(self):
+        self.handle("20 good", date="2026-01-03")
+        reply, done = self.handle("20 hard\nundo 54\n54 easy", date="2026-01-02", late=True)
+        self.assertTrue(done)
+        state = sr.load_state()
+        self.assertEqual([(e["id"], e["grade"]) for e in state["log"]],
+                         [("20", "good"), ("54", "easy")])
+        self.assertNotIn("NOT LOGGED", reply)
+
+
+class Undo(StateTest):
+    def snapshot(self):
+        s = sr.load_state()
+        return {k: s.get(k) for k in ("cards", "deferred", "log")}
+
+    def undo(self, pid):
+        return self.run_cmd(sr.cmd_undo, id=pid)
+
+    def test_puts_the_card_back_exactly(self):
+        self.log("20", "good", "2026-01-01")
+        before = self.snapshot()
+        self.log("20", "again", "2026-01-05")
+        self.assertIn("Undid #20 Valid Parentheses: again on 2026-01-05", self.undo("20"))
+        self.assertEqual(self.snapshot(), before)
+
+    def test_a_first_solve_becomes_new_again(self):
+        before = self.snapshot()
+        self.log("20", "easy", "2026-01-01")
+        self.assertIn("counts as a new problem again", self.undo("20"))
+        after = self.snapshot()
+        self.assertEqual(after["cards"], before["cards"])
+        self.assertEqual(after["log"], [])
+
+    def test_puts_the_deferral_back(self):
+        pid, date = self.defer_one()
+        deferral = sr.load_state()["deferred"][pid]
+        self.log(pid, "good", date)
+        self.assertNotIn(pid, sr.load_state()["deferred"])
+        self.undo(pid)
+        self.assertEqual(sr.load_state()["deferred"][pid], deferral)
+
+    def test_walks_back_one_log_at_a_time(self):
+        self.log("20", "good", "2026-01-01")
+        first = self.snapshot()
+        self.log("20", "good", "2026-01-04")
+        self.log("20", "good", "2026-01-10")
+        self.undo("20")
+        self.undo("20")
+        self.assertEqual(self.snapshot(), first)
+
+    def test_refuses_a_log_from_before_undo_existed(self):
+        self.log("20", "good", "2026-01-01")
+        state = sr.load_state()
+        del state["log"][-1]["prev"]
+        sr.save_state(state)
+        before = sr.STATE_FILE.read_text()
+        self.assertIn("before undo existed", self.undo("20"))
+        self.assertEqual(sr.STATE_FILE.read_text(), before)
+
+    def test_nothing_to_undo(self):
+        self.assertIn("never been logged", self.undo("20"))
+        self.assertFalse(sr.STATE_FILE.exists())
+
+    def test_a_second_log_the_same_day_replaces_the_first(self):
+        self.log("54", "good", "2026-01-01")
+        self.log("54", "hard", "2026-01-05")
+        once = self.snapshot()
+        self.undo("54")
+        self.log("54", "good", "2026-01-05")
+        out = self.log("54", "hard", "2026-01-05")
+        self.assertIn("replaces good from earlier today", out)
+        self.assertEqual(self.snapshot(), once)
+
+    def test_logs_on_different_days_both_count(self):
+        self.log("54", "good", "2026-01-01")
+        self.log("54", "good", "2026-01-03")
+        self.assertEqual(sr.load_state()["cards"]["54"]["reps"], 2)
+
+
+class Sweep(StateTest):
+    """The daily run's check for comments whose log-solve run never finished."""
+    OWNER = "me"
+    NOW = "2026-01-05T23:00:00Z"
+
+    def setUp(self):
+        super().setUp()
+        self.issues = [
+            {"number": 7, "id": 70, "title": "Daily Practice 2026-01-04", "user": "github-actions[bot]",
+             "body": "plan", "created_at": "2026-01-04T23:30:00Z"},
+            {"number": 8, "id": 80, "title": "Practice log 2026-01-05", "user": self.OWNER,
+             "body": "54 hard", "created_at": "2026-01-05T18:00:00Z"},
+            {"number": 9, "id": 90, "title": "Something else", "user": self.OWNER,
+             "body": "", "created_at": "2026-01-01T00:00:00Z"},
+        ]
+        self.comments = []
+        # The record starts with the first comment log-solve applies.
+        state = sr.load_state()
+        sr.handle_comment(state, sr.load_problems(), "1 good", "2026-01-04", "comment-1")
+        state["events"]["since"] = "2026-01-04T00:00:00Z"
+        sr.save_state(state)
+
+    def comment(self, cid, issue, body, created_at, user=OWNER):
+        self.comments.append({"id": cid, "issue": issue, "user": user, "body": body,
+                              "created_at": created_at})
+
+    def sweep(self, now=NOW):
+        state = sr.load_state()
+        replies = sr.sweep(state, sr.load_problems(), self.issues, self.comments, self.OWNER, now)
+        sr.save_state(state)
+        return replies
+
+    def logged(self):
+        return [(e["id"], e["grade"], e["date"]) for e in sr.load_state()["log"]]
+
+    def test_logs_a_missed_comment_and_a_missed_log_issue(self):
+        # 03:00 UTC on Jan 5 is Jan 4 in Los Angeles: logged under Jan 4.
+        self.comment(2, 7, "20 good", "2026-01-05T03:00:00Z")
+        replies = self.sweep()
+        self.assertEqual(self.logged(), [("1", "good", "2026-01-04"), ("20", "good", "2026-01-04"),
+                                         ("54", "hard", "2026-01-05")])
+        self.assertEqual([(r["issue"], r["close"]) for r in replies], [(7, False), (8, True)])
+        self.assertIn("Logged late", replies[0]["reply"])
+        self.assertEqual(self.sweep(), [])  # recorded, so never twice
+
+    def test_ignores_what_it_should(self):
+        self.comment(1, 7, "1 good", "2026-01-04T20:00:00Z")    # already applied
+        self.comment(3, 7, "20 good", "2026-01-03T20:00:00Z")   # before the record began
+        self.comment(4, 7, "21 good", "2026-01-05T22:30:00Z")   # within the hour: may be running
+        self.comment(5, 7, "33 good", "2026-01-05T10:00:00Z", user="someone")
+        self.comment(6, 9, "70 good", "2026-01-05T10:00:00Z")   # not a plan or log issue
+        self.issues[1]["user"] = "someone"
+        self.assertEqual(self.sweep(), [])
+        self.assertEqual(self.logged(), [("1", "good", "2026-01-04")])
+
+    def test_a_problem_logged_again_since_keeps_the_newer_log(self):
+        self.comment(2, 7, "20 hard", "2026-01-04T20:00:00Z")
+        state = sr.load_state()
+        sr.handle_comment(state, sr.load_problems(), "20 easy", "2026-01-05", "comment-3")
+        sr.save_state(state)
+        self.issues.pop(1)
+        self.assertEqual(self.sweep(), [])
+        self.assertEqual(self.logged()[-1], ("20", "easy", "2026-01-05"))
+
+    def test_does_not_replay_undo(self):
+        self.comment(2, 7, "undo 1", "2026-01-05T10:00:00Z")
+        self.issues.pop(1)
+        self.assertEqual(self.sweep(), [])
+        self.assertIn("1", sr.load_state()["cards"])
+
+    def test_does_nothing_before_any_comment_was_recorded(self):
+        sr.STATE_FILE.unlink()
+        self.comment(2, 7, "20 good", "2026-01-05T03:00:00Z")
+        self.assertEqual(self.sweep(), [])
+        self.assertEqual(self.logged(), [])
 
 
 if __name__ == "__main__":
