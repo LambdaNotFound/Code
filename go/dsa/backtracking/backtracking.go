@@ -218,32 +218,6 @@ func permuteUnique(nums []int) [][]int {
 	return res
 }
 
-/*
- * 31. Next Permutation
- *
- * Narayana's algoritm
- */
-// 1. Search max j: nums[j] > nums[j-1]
-// 2. Search max l: l >= j && nums[l] > nums[j-1]
-// 3. Swap nums[j-1], nums[l]
-// 4. Reverse nums[j:]
-// For example:
-// 123654 -> 124653 -> 124356
-func nextPermutation(nums []int) {
-	j := len(nums) - 1
-	for ; j > 0 && nums[j-1] >= nums[j]; j-- {
-	}
-	if j != 0 {
-		l := len(nums) - 1
-		for ; l > j-1 && nums[j-1] >= nums[l]; l-- {
-		}
-		nums[j-1], nums[l] = nums[l], nums[j-1]
-	}
-	for k := len(nums) - 1; j < k; j, k = j+1, k-1 {
-		nums[j], nums[k] = nums[k], nums[j]
-	}
-}
-
 /**
  * 77. Combinations (not ordered)
  */
@@ -326,42 +300,6 @@ func combinationSum(candidates []int, target int) [][]int {
 
 	backtrack(0, target, []int{})
 	return result
-}
-
-/**
- * 377. Combination Sum IV
- *
- * Given an array of distinct integers nums and a target integer target, return the number of possible combinations that add up to target.
- *
- * dp[amount] += dp[amount - num]
- */
-func combinationSum4(nums []int, target int) int {
-	memo := make([]int, target+1)
-	for i := range memo {
-		memo[i] = -1
-	}
-
-	var dfs func(remaining int) int
-	dfs = func(remaining int) int {
-		if remaining < 0 {
-			return 0
-		}
-		if remaining == 0 {
-			return 1
-		}
-		if memo[remaining] != -1 {
-			return memo[remaining]
-		}
-
-		count := 0
-		for _, num := range nums {
-			count += dfs(remaining - num)
-		}
-		memo[remaining] = count
-		return count
-	}
-
-	return dfs(target)
 }
 
 /**

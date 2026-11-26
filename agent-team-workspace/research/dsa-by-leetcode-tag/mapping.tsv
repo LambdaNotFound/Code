@@ -1,0 +1,295 @@
+old_file	new_file	problem	title	leetcode_com_tags	leetcode_cn_only_tags	folder	reason
+go/dsa/array/array.go	go/dsa/array/array.go	41	First Missing Positive	array, hash-table		array	folder matches a LeetCode tag
+go/dsa/array/array.go	go/dsa/array/array.go	80	Remove Duplicates from Sorted Array II	array, two-pointers		array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	1094	Car Pooling	array, prefix-sum, sorting, simulation, heap-priority-queue		array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	1229	Meeting Scheduler	array, two-pointers, sorting		array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	435	Non-overlapping Intervals	greedy, array, dynamic-programming, sorting		array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	56	Merge Intervals	array, sorting	quick-sort	array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	57	Insert Interval	array		array	folder matches a LeetCode tag
+go/dsa/array/interval.go	go/dsa/array/interval.go	986	Interval List Intersections	array, two-pointers	sweep-line	array	folder matches a LeetCode tag
+go/dsa/solid_coding/ranges.go	go/dsa/array/ranges.go	163	Missing Ranges	array		array	folder matches a LeetCode tag
+go/dsa/solid_coding/ranges.go	go/dsa/array/ranges.go	228	Summary Ranges	array		array	folder matches a LeetCode tag
+go/dsa/solid_coding/matrix.go	go/dsa/array/rotate_array.go	189	Rotate Array	array, math, two-pointers		array	folder matches a LeetCode tag
+go/dsa/backtracking/2D_grid_paths.go	go/dsa/backtracking/2D_grid_paths.go	37	Sudoku Solver	array, hash-table, backtracking, matrix	algorithm-x, dancing-links	backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/2D_grid_paths.go	go/dsa/backtracking/2D_grid_paths.go	51	N-Queens	array, backtracking	algorithm-x	backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/2D_grid_paths.go	go/dsa/backtracking/2D_grid_paths.go	52	N-Queens II	backtracking	algorithm-x	backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	1593	Split a String Into the Max Number of Unique Substrings	hash-table, string, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	17	Letter Combinations of a Phone Number	hash-table, string, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	22	Generate Parentheses	string, dynamic-programming, backtracking	parentheses	backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	39	Combination Sum	array, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	46	Permutations	array, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	47	Permutations II	array, backtracking, sorting		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	77	Combinations	backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	78	Subsets	bit-manipulation, array, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/backtracking/backtracking.go	90	Subsets II	bit-manipulation, array, backtracking		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/brace_expansion.go	go/dsa/backtracking/brace_expansion.go	1087	Brace Expansion	stack, breadth-first-search, string, backtracking, sorting		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/optimal_account_balancing.go	go/dsa/backtracking/optimal_account_balancing.go	465	Optimal Account Balancing	bit-manipulation, array, dynamic-programming, backtracking, bitmask		backtracking	folder matches a LeetCode tag
+go/dsa/api_design/optimal_account_balancing.go	go/dsa/backtracking/optimal_account_balancing_alt.go	465	Optimal Account Balancing	bit-manipulation, array, dynamic-programming, backtracking, bitmask		backtracking	read: exhaustive DFS over debts
+go/dsa/backtracking/word_search.go	go/dsa/backtracking/word_search.go	212	Word Search II	trie, array, string, backtracking, matrix		backtracking	folder matches a LeetCode tag
+go/dsa/backtracking/word_search.go	go/dsa/backtracking/word_search.go	79	Word Search	depth-first-search, array, string, backtracking, matrix		backtracking	folder matches a LeetCode tag
+go/dsa/graph/bfs/BFS.go	go/dsa/bfs/BFS.go	994	Rotting Oranges	breadth-first-search, array, matrix		bfs	folder matches a LeetCode tag
+go/dsa/graph/bidirectional_bfs/bidirectional_BFS.go	go/dsa/bfs/bidirectional_BFS.go	126	Word Ladder II	breadth-first-search, hash-table, string, backtracking	bidirectional-search	bfs	folder matches a LeetCode tag
+go/dsa/graph/bidirectional_bfs/bidirectional_BFS.go	go/dsa/bfs/bidirectional_BFS.go	127	Word Ladder	breadth-first-search, hash-table, string	bidirectional-search	bfs	folder matches a LeetCode tag
+go/dsa/graph/bus_stop.go	go/dsa/bfs/bus_stop.go	815	Bus Routes	breadth-first-search, array, hash-table		bfs	read: BFS over routes
+go/dsa/graph/merge_accounts.go	go/dsa/bfs/merge_accounts.go	721	Accounts Merge	depth-first-search, breadth-first-search, union-find, array, hash-table, string, sorting		bfs	read: accountsMerge is BFS; UF variant rides along
+go/dsa/graph/multi_source/pacific_atlantic.go	go/dsa/bfs/pacific_atlantic.go	417	Pacific Atlantic Water Flow	depth-first-search, breadth-first-search, array, matrix		bfs	folder matches a LeetCode tag
+go/dsa/graph/bfs/shortest_path_with_obstacles_elimination.go	go/dsa/bfs/shortest_path_with_obstacles_elimination.go	1293	Shortest Path in a Grid with Obstacles Elimination	breadth-first-search, array, matrix		bfs	folder matches a LeetCode tag
+go/dsa/dynamic_programming/shortest_path_with_obstacles_elimination.go	go/dsa/bfs/shortest_path_with_obstacles_elimination_alt.go	1293	Shortest Path in a Grid with Obstacles Elimination	breadth-first-search, array, matrix		bfs	read: BFS over (r, c, eliminations) states
+go/dsa/graph/multi_source/update_matrix.go	go/dsa/bfs/update_matrix.go	542	01 Matrix	breadth-first-search, array, dynamic-programming, matrix		bfs	folder matches a LeetCode tag
+go/dsa/graph/bfs/water_and_jug_problem.go	go/dsa/bfs/water_and_jug_problem.go	365	Water and Jug Problem	depth-first-search, breadth-first-search, math	greatest-common-divisor, euclidean-algorithm, extended-euclidean-algorithm, b-zout-s-identity	bfs	folder matches a LeetCode tag
+go/dsa/graph/bfs/word_ladder.go	go/dsa/bfs/word_ladder.go	127	Word Ladder	breadth-first-search, hash-table, string	bidirectional-search	bfs	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	153	Find Minimum in Rotated Sorted Array	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	154	Find Minimum in Rotated Sorted Array II	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	240	Search a 2D Matrix II	array, binary-search, divide-and-conquer, matrix		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	278	First Bad Version	binary-search, interactive		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	33	Search in Rotated Sorted Array	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	34	Find First and Last Position of Element in Sorted Array	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	704	Binary Search	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	74	Search a 2D Matrix	array, binary-search, matrix		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/binary_search.go	go/dsa/binary_search/binary_search.go	81	Search in Rotated Sorted Array II	array, binary-search		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/job_scheduling.go	go/dsa/binary_search/job_scheduling.go	1235	Maximum Profit in Job Scheduling	array, binary-search, dynamic-programming, sorting		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/lower_bound.go	go/dsa/binary_search/lower_bound.go	229	Majority Element II	array, hash-table, counting, sorting	boyer-moore-voting	binary_search	whole file: 229 variant on a sorted array
+go/dsa/binary_search/median_of_two_sorted_arrays.go	go/dsa/binary_search/median_of_two_sorted_arrays.go	4	Median of Two Sorted Arrays	array, binary-search, divide-and-conquer		binary_search	folder matches a LeetCode tag
+go/dsa/binary_search/sensor_coverage.go	go/dsa/binary_search/sensor_coverage.go	475	Heaters	array, two-pointers, binary-search, sorting		binary_search	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/binary_tree/ancestors.go	1026	Maximum Difference Between Node and Ancestor	tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/binary_tree/ancestors.go	236	Lowest Common Ancestor of a Binary Tree	tree, depth-first-search, binary-tree	lowest-common-ancestor, binary-lifting	binary_tree	folder matches a LeetCode tag
+go/dsa/api_design/serialize_and_deserialize_binary_tree.go	go/dsa/binary_tree/build_tree_alt.go	105	Construct Binary Tree from Preorder and Inorder Traversal	tree, array, hash-table, divide-and-conquer, binary-tree		binary_tree	read: second copy of 105, recursive build
+go/dsa/tree/path_sum.go	go/dsa/binary_tree/path_sum.go	113	Path Sum II	tree, depth-first-search, backtracking, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/path_sum.go	go/dsa/binary_tree/path_sum.go	124	Binary Tree Maximum Path Sum	tree, depth-first-search, dynamic-programming, binary-tree	tree-dp	binary_tree	folder matches a LeetCode tag
+go/dsa/tree/recursion.go	go/dsa/binary_tree/recursion.go	100	Same Tree	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/recursion.go	go/dsa/binary_tree/recursion.go	101	Symmetric Tree	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/recursion.go	go/dsa/binary_tree/recursion.go	110	Balanced Binary Tree	tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/recursion.go	go/dsa/binary_tree/recursion.go	1145	Binary Tree Coloring Game	tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/recursion.go	go/dsa/binary_tree/recursion.go	572	Subtree of Another Tree	tree, depth-first-search, binary-tree, string-matching, hash-function		binary_tree	folder matches a LeetCode tag
+go/dsa/graph/bfs/BFS.go	go/dsa/binary_tree/tree_bfs.go	102	Binary Tree Level Order Traversal	tree, breadth-first-search, binary-tree		binary_tree	tree problem solved by bfs; tree tag wins
+go/dsa/graph/bfs/BFS.go	go/dsa/binary_tree/tree_bfs.go	103	Binary Tree Zigzag Level Order Traversal	tree, breadth-first-search, binary-tree		binary_tree	tree problem solved by bfs; tree tag wins
+go/dsa/graph/bfs/BFS.go	go/dsa/binary_tree/tree_bfs.go	199	Binary Tree Right Side View	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	tree problem solved by bfs; tree tag wins
+go/dsa/graph/bfs/BFS.go	go/dsa/binary_tree/tree_bfs.go	863	All Nodes Distance K in Binary Tree	tree, depth-first-search, breadth-first-search, hash-table, binary-tree		binary_tree	tree problem solved by bfs; tree tag wins
+go/dsa/graph/bfs/BFS.go	go/dsa/binary_tree/tree_bfs.go	958	Check Completeness of a Binary Tree	tree, breadth-first-search, binary-tree		binary_tree	tree problem solved by bfs; tree tag wins
+go/dsa/graph/dfs/DFS.go	go/dsa/binary_tree/tree_dfs.go	104	Maximum Depth of Binary Tree	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	tree problem solved by dfs; tree tag wins
+go/dsa/graph/dfs/DFS.go	go/dsa/binary_tree/tree_dfs.go	543	Diameter of Binary Tree	tree, depth-first-search, binary-tree	tree-dp	binary_tree	tree problem solved by dfs; tree tag wins
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	105	Construct Binary Tree from Preorder and Inorder Traversal	tree, array, hash-table, divide-and-conquer, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	144	Binary Tree Preorder Traversal	stack, tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	145	Binary Tree Postorder Traversal	stack, tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	226	Invert Binary Tree	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	662	Maximum Width of Binary Tree	tree, depth-first-search, breadth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/tree_traversal.go	go/dsa/binary_tree/tree_traversal.go	94	Binary Tree Inorder Traversal	stack, tree, depth-first-search, binary-tree		binary_tree	folder matches a LeetCode tag
+go/dsa/tree/vertical_traversal.go	go/dsa/binary_tree/vertical_traversal.go	987	Vertical Order Traversal of a Binary Tree	tree, depth-first-search, breadth-first-search, hash-table, binary-tree, sorting		binary_tree	folder matches a LeetCode tag
+go/dsa/bit_manipulation/bit_manipulation.go	go/dsa/bit_manipulation/bit_manipulation.go	190	Reverse Bits	bit-manipulation, divide-and-conquer		bit_manipulation	folder matches a LeetCode tag
+go/dsa/bit_manipulation/bit_manipulation.go	go/dsa/bit_manipulation/bit_manipulation.go	191	Number of 1 Bits	bit-manipulation, divide-and-conquer		bit_manipulation	folder matches a LeetCode tag
+go/dsa/bit_manipulation/bit_manipulation.go	go/dsa/bit_manipulation/bit_manipulation.go	268	Missing Number	bit-manipulation, array, hash-table, math, binary-search, sorting		bit_manipulation	folder matches a LeetCode tag
+go/dsa/bit_manipulation/bit_manipulation.go	go/dsa/bit_manipulation/bit_manipulation.go	338	Counting Bits	bit-manipulation, dynamic-programming		bit_manipulation	folder matches a LeetCode tag
+go/dsa/bit_manipulation/bit_manipulation.go	go/dsa/bit_manipulation/bit_manipulation.go	371	Sum of Two Integers	bit-manipulation, math		bit_manipulation	folder matches a LeetCode tag
+go/dsa/dynamic_programming/bitmask/TSP.go	go/dsa/bitmask/TSP.go		TSP bitmask DP (not LeetCode)			bitmask	whole file: TSP bitmask DP (not LeetCode)
+go/dsa/tree/BST.go	go/dsa/bst/BST.go	108	Convert Sorted Array to Binary Search Tree	tree, binary-search-tree, array, divide-and-conquer, binary-tree		bst	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/bst/BST.go	230	Kth Smallest Element in a BST	tree, depth-first-search, binary-search-tree, binary-tree		bst	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/bst/BST.go	235	Lowest Common Ancestor of a Binary Search Tree	tree, depth-first-search, binary-search-tree, binary-tree	lowest-common-ancestor, binary-lifting	bst	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/bst/BST.go	450	Delete Node in a BST	tree, binary-search-tree, binary-tree		bst	folder matches a LeetCode tag
+go/dsa/tree/BST.go	go/dsa/bst/BST.go	98	Validate Binary Search Tree	tree, depth-first-search, binary-search-tree, binary-tree		bst	folder matches a LeetCode tag
+go/dsa/tree/bst_core.go	go/dsa/bst/bst_core.go		BST implementation (not LeetCode)			bst	whole file: BST implementation (not LeetCode)
+go/dsa/tree/inorder_successor_in_BST.go	go/dsa/bst/inorder_successor_in_BST.go	285	Inorder Successor in BST	tree, depth-first-search, binary-search-tree, binary-tree		bst	folder matches a LeetCode tag
+go/dsa/math/majority_vote.go	go/dsa/counting/majority_vote.go	169	Majority Element	array, hash-table, divide-and-conquer, counting, sorting	boyer-moore-voting	counting	read: Boyer-Moore voting (leetcode.cn tag)
+go/dsa/api_design/design_hashmap.go	go/dsa/design/design_hashmap.go	705	Design HashSet	design, array, hash-table, linked-list, hash-function		design	folder matches a LeetCode tag
+go/dsa/api_design/design_hashmap.go	go/dsa/design/design_hashmap.go	706	Design HashMap	design, array, hash-table, linked-list, hash-function		design	folder matches a LeetCode tag
+go/dsa/api_design/encode_decode.go	go/dsa/design/encode_decode.go	271	Encode and Decode Strings	design, array, string		design	whole file: 271 Encode and Decode Strings
+go/dsa/api_design/file_system.go	go/dsa/design/file_system.go	588	Design In-Memory File System	design, trie, hash-table, string, sorting		design	folder matches a LeetCode tag
+go/dsa/api_design/hit_count.go	go/dsa/design/hit_count.go	362	Design Hit Counter	design, queue, array, binary-search, data-stream		design	folder matches a LeetCode tag
+go/dsa/api_design/key_value_store.go	go/dsa/design/key_value_store.go		transactional KV store (not LeetCode)			design	whole file: transactional KV store (not LeetCode)
+go/dsa/linked_list/linked_hashmap.go	go/dsa/design/linked_hashmap.go	1429	First Unique Number	design, queue, array, hash-table, data-stream		design	read: class built on a linked hash map
+go/dsa/api_design/lru_cache.go	go/dsa/design/lru_cache.go	146	LRU Cache	design, hash-table, linked-list, doubly-linked-list		design	folder matches a LeetCode tag
+go/dsa/api_design/max_stack.go	go/dsa/design/max_stack.go	716	Max Stack	stack, design, linked-list, doubly-linked-list, ordered-set		design	folder matches a LeetCode tag
+go/dsa/api_design/maximum_frequency_stack.go	go/dsa/design/maximum_frequency_stack.go	895	Maximum Frequency Stack	stack, design, hash-table, ordered-set		design	folder matches a LeetCode tag
+go/dsa/api_design/median_finder.go	go/dsa/design/median_finder.go	295	Find Median from Data Stream	design, two-pointers, data-stream, sorting, heap-priority-queue		design	folder matches a LeetCode tag
+go/dsa/api_design/min_stack.go	go/dsa/design/min_stack.go	155	Min Stack	stack, design		design	folder matches a LeetCode tag
+go/dsa/api_design/prefix_suffix_search.go	go/dsa/design/prefix_suffix_search.go	745	Prefix and Suffix Search	design, trie, array, hash-table, string		design	folder matches a LeetCode tag
+go/dsa/api_design/queue_using_stacks.go	go/dsa/design/queue_using_stacks.go	232	Implement Queue using Stacks	stack, design, queue		design	folder matches a LeetCode tag
+go/dsa/api_design/randomized_set.go	go/dsa/design/randomized_set.go	380	Insert Delete GetRandom O(1)	design, array, hash-table, math, randomized		design	folder matches a LeetCode tag
+go/dsa/api_design/randomized_set.go	go/dsa/design/randomized_set.go	381	Insert Delete GetRandom O(1) - Duplicates allowed	design, array, hash-table, math, randomized		design	folder matches a LeetCode tag
+go/dsa/api_design/range_sum_query.go	go/dsa/design/range_sum_query.go	303	Range Sum Query - Immutable	design, array, prefix-sum		design	folder matches a LeetCode tag
+go/dsa/api_design/serialize_and_deserialize_binary_tree.go	go/dsa/design/serialize_and_deserialize_binary_tree.go	297	Serialize and Deserialize Binary Tree	tree, depth-first-search, breadth-first-search, design, string, binary-tree		design	folder matches a LeetCode tag
+go/dsa/api_design/time_based_kv_store.go	go/dsa/design/time_based_kv_store.go	981	Time Based Key-Value Store	design, hash-table, string, binary-search		design	folder matches a LeetCode tag
+go/dsa/api_design/word_distance.go	go/dsa/design/word_distance.go	244	Shortest Word Distance II	design, array, hash-table, two-pointers, string		design	folder matches a LeetCode tag
+go/dsa/graph/dfs/DFS.go	go/dsa/dfs/DFS.go	733	Flood Fill	depth-first-search, breadth-first-search, array, matrix		dfs	folder matches a LeetCode tag
+go/dsa/graph/dfs/largest_island.go	go/dsa/dfs/largest_island.go	827	Making A Large Island	depth-first-search, breadth-first-search, union-find, array, matrix		dfs	folder matches a LeetCode tag
+go/dsa/recursion/nested_integer.go	go/dsa/dfs/nested_integer.go	339	Nested List Weight Sum	depth-first-search, breadth-first-search		dfs	read: recursive DFS
+go/dsa/recursion/nested_integer.go	go/dsa/dfs/nested_integer.go	341	Flatten Nested List Iterator	stack, tree, depth-first-search, design, queue, iterator		dfs	read: DFS flatten in the constructor
+go/dsa/graph/number_of_islands.go	go/dsa/dfs/number_of_islands.go	200	Number of Islands	depth-first-search, breadth-first-search, union-find, array, matrix		dfs	read: numIslandsDFS first; BFS and UF variants ride along
+go/dsa/graph/number_of_islands.go	go/dsa/dfs/number_of_islands.go	463	Island Perimeter	depth-first-search, breadth-first-search, array, matrix		dfs	read: same file as 200
+go/dsa/divide_and_conquer/find_kth_largest.go	go/dsa/divide_and_conquer/find_kth_largest.go	215	Kth Largest Element in an Array	array, divide-and-conquer, quickselect, sorting, heap-priority-queue		divide_and_conquer	folder matches a LeetCode tag
+go/dsa/divide_and_conquer/merge_sort.go	go/dsa/divide_and_conquer/merge_sort.go	109	Convert Sorted List to Binary Search Tree	tree, binary-search-tree, linked-list, divide-and-conquer, binary-tree		divide_and_conquer	folder matches a LeetCode tag
+go/dsa/divide_and_conquer/merge_sort.go	go/dsa/divide_and_conquer/merge_sort.go	148	Sort List	linked-list, two-pointers, divide-and-conquer, sorting, merge-sort		divide_and_conquer	folder matches a LeetCode tag
+go/dsa/divide_and_conquer/quick_select.go	go/dsa/divide_and_conquer/quick_select.go		QuickSelect (not LeetCode)			divide_and_conquer	whole file: QuickSelect (not LeetCode)
+go/dsa/divide_and_conquer/quick_sort.go	go/dsa/divide_and_conquer/quick_sort.go	148	Sort List	linked-list, two-pointers, divide-and-conquer, sorting, merge-sort		divide_and_conquer	folder matches a LeetCode tag
+go/dsa/dynamic_programming/LCS.go	go/dsa/dp/LCS.go	1048	Longest String Chain	array, hash-table, two-pointers, string, dynamic-programming, sorting		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/LCS.go	go/dsa/dp/LCS.go	1143	Longest Common Subsequence	string, dynamic-programming	longest-common-subsequence	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/LCS.go	go/dsa/dp/LCS.go	718	Maximum Length of Repeated Subarray	array, binary-search, dynamic-programming, sliding-window, hash-function, rolling-hash		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/LIS.go	go/dsa/dp/LIS.go	300	Longest Increasing Subsequence	array, binary-search, dynamic-programming	longest-increasing-subsequence	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/coin_change.go	go/dsa/dp/coin_change.go	322	Coin Change	breadth-first-search, array, dynamic-programming	knapsack, unbounded-knapsack	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/coin_change.go	go/dsa/dp/coin_change.go	518	Coin Change II	array, dynamic-programming	knapsack, unbounded-knapsack	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/combination_sum.go	go/dsa/dp/combination_sum.go	377	Combination Sum IV	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/combination_sum.go	go/dsa/dp/combination_sum.go	39	Combination Sum	array, backtracking		dp	read: DP formulation; LeetCode tags only backtracking
+go/dsa/backtracking/backtracking.go	go/dsa/dp/combination_sum_iv_memoization.go	377	Combination Sum IV	array, dynamic-programming		dp	read: memoized DFS = top-down DP
+go/dsa/dynamic_programming/decode_ways.go	go/dsa/dp/decode_ways.go	91	Decode Ways	string, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/find_cheapest_price.go	go/dsa/dp/find_cheapest_price.go	787	Cheapest Flights Within K Stops	depth-first-search, breadth-first-search, graph, dynamic-programming, shortest-path, heap-priority-queue		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/frog_jump.go	go/dsa/dp/frog_jump.go	403	Frog Jump	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/house_robber.go	go/dsa/dp/house_robber.go	198	House Robber	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/house_robber.go	go/dsa/dp/house_robber.go	213	House Robber II	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/job_scheduling.go	go/dsa/dp/job_scheduling.go	1235	Maximum Profit in Job Scheduling	array, binary-search, dynamic-programming, sorting		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/jump_game.go	go/dsa/dp/jump_game.go	45	Jump Game II	greedy, array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/jump_game.go	go/dsa/dp/jump_game.go	55	Jump Game	greedy, array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/knapsack.go	go/dsa/dp/knapsack.go	152	Maximum Product Subarray	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/knapsack.go	go/dsa/dp/knapsack.go	416	Partition Equal Subset Sum	array, dynamic-programming	knapsack, 0-1-knapsack	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/knapsack.go	go/dsa/dp/knapsack.go	494	Target Sum	array, dynamic-programming, backtracking	knapsack, 0-1-knapsack	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/knapsack.go	go/dsa/dp/knapsack.go	53	Maximum Subarray	array, divide-and-conquer, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/max_profit.go	go/dsa/dp/max_profit.go	121	Best Time to Buy and Sell Stock	array, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/maximal_square.go	go/dsa/dp/maximal_square.go	221	Maximal Square	array, dynamic-programming, matrix		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/palindrome.go	go/dsa/dp/palindrome.go	5	Longest Palindromic Substring	two-pointers, string, dynamic-programming	manacher	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/palindrome.go	go/dsa/dp/palindrome.go	647	Palindromic Substrings	two-pointers, string, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/knapsack/rod_cutting.go	go/dsa/dp/rod_cutting.go		rod cutting (not LeetCode)			dp	whole file: rod cutting (not LeetCode)
+go/dsa/dynamic_programming/unique_paths.go	go/dsa/dp/unique_paths.go	62	Unique Paths	math, dynamic-programming, combinatorics		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/unique_paths.go	go/dsa/dp/unique_paths.go	64	Minimum Path Sum	array, dynamic-programming, matrix		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/wildcard_matching.go	go/dsa/dp/wildcard_matching.go	44	Wildcard Matching	greedy, recursion, string, dynamic-programming		dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/word_break.go	go/dsa/dp/word_break.go	139	Word Break	trie, memoization, array, hash-table, string, dynamic-programming	brute-force-search	dp	folder matches a LeetCode tag
+go/dsa/dynamic_programming/word_break.go	go/dsa/dp/word_break.go	140	Word Break II	trie, memoization, array, hash-table, string, dynamic-programming, backtracking		dp	folder matches a LeetCode tag
+go/dsa/api_design/pinterest_violation.go	go/interview/pinterest_violation.go		company problem; belongs in go/interview/			go/interview	whole file: company problem; belongs in go/interview/
+go/dsa/graph/graph.go	go/dsa/graph/graph.go	133	Clone Graph	depth-first-search, breadth-first-search, graph, hash-table		graph	folder matches a LeetCode tag
+go/dsa/graph/topological_sort/topological_sort.go	go/dsa/greedy/course_schedule_iii.go	630	Course Schedule III	greedy, array, sorting, heap-priority-queue		greedy	read: greedy + max-heap; not a topological sort
+go/dsa/greedy/greedy.go	go/dsa/greedy/greedy.go	1024	Video Stitching	greedy, array, dynamic-programming		greedy	folder matches a LeetCode tag
+go/dsa/greedy/greedy.go	go/dsa/greedy/greedy.go	134	Gas Station	greedy, array		greedy	folder matches a LeetCode tag
+go/dsa/greedy/greedy.go	go/dsa/greedy/greedy.go	45	Jump Game II	greedy, array, dynamic-programming		greedy	folder matches a LeetCode tag
+go/dsa/greedy/greedy.go	go/dsa/greedy/greedy.go	55	Jump Game	greedy, array, dynamic-programming		greedy	folder matches a LeetCode tag
+go/dsa/greedy/greedy.go	go/dsa/greedy/greedy.go	621	Task Scheduler	greedy, array, hash-table, counting, sorting, heap-priority-queue		greedy	folder matches a LeetCode tag
+go/dsa/hashmap/analyze_pattern.go	go/dsa/hash_table/analyze_pattern.go	1152	Analyze User Website Visit Pattern	array, hash-table, string, sorting		hash_table	whole file: 1152 Analyze User Website Visit Pattern
+go/dsa/hashmap/hashmap.go	go/dsa/hash_table/hashmap.go	1	Two Sum	array, hash-table		hash_table	folder matches a LeetCode tag
+go/dsa/hashmap/hashmap.go	go/dsa/hash_table/hashmap.go	242	Valid Anagram	hash-table, string, sorting		hash_table	folder matches a LeetCode tag
+go/dsa/hashmap/hashmap.go	go/dsa/hash_table/hashmap.go	383	Ransom Note	hash-table, string, counting		hash_table	folder matches a LeetCode tag
+go/dsa/hashmap/palindrome_pairs.go	go/dsa/hash_table/palindrome_pairs.go	336	Palindrome Pairs	trie, array, hash-table, string, hash-function		hash_table	folder matches a LeetCode tag
+go/dsa/hashmap/set.go	go/dsa/hash_table/set.go	128	Longest Consecutive Sequence	union-find, array, hash-table		hash_table	folder matches a LeetCode tag
+go/dsa/hashmap/set.go	go/dsa/hash_table/set.go	217	Contains Duplicate	array, hash-table, sorting		hash_table	folder matches a LeetCode tag
+go/dsa/math/matrix.go	go/dsa/hash_table/valid_sudoku.go	36	Valid Sudoku	array, hash-table, matrix		hash_table	read: seen-sets per row, column, box
+go/dsa/heap/find_kth_largest.go	go/dsa/heap/find_kth_largest.go	215	Kth Largest Element in an Array	array, divide-and-conquer, quickselect, sorting, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/heap.go	go/dsa/heap/heap.go	3408	Design Task Manager	design, hash-table, ordered-set, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/k_closest.go	go/dsa/heap/k_closest.go	973	K Closest Points to Origin	geometry, array, math, divide-and-conquer, quickselect, sorting, heap-priority-queue	k-d-tree	heap	folder matches a LeetCode tag
+go/dsa/heap/median_finder.go	go/dsa/heap/median_finder.go	295	Find Median from Data Stream	design, two-pointers, data-stream, sorting, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/median_finder_sliding_window.go	go/dsa/heap/median_finder_sliding_window.go	480	Sliding Window Median	array, hash-table, sliding-window, heap-priority-queue	treap	heap	folder matches a LeetCode tag
+go/dsa/heap/merge_k_lists.go	go/dsa/heap/merge_k_lists.go	23	Merge k Sorted Lists	linked-list, divide-and-conquer, heap-priority-queue, merge-sort	tournament-sort	heap	folder matches a LeetCode tag
+go/dsa/heap/smallest_range.go	go/dsa/heap/smallest_range.go	632	Smallest Range Covering Elements from K Lists	greedy, array, hash-table, sorting, sliding-window, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/smallest_unoccupied_chair.go	go/dsa/heap/smallest_unoccupied_chair.go	1942	The Number of the Smallest Unoccupied Chair	array, hash-table, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/task_scheduler.go	go/dsa/heap/task_scheduler.go	621	Task Scheduler	greedy, array, hash-table, counting, sorting, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/top_k_frequent.go	go/dsa/heap/top_k_frequent.go	347	Top K Frequent Elements	array, hash-table, divide-and-conquer, bucket-sort, counting, quickselect, sorting, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/heap/top_k_frequent_words.go	go/dsa/heap/top_k_frequent_words.go	692	Top K Frequent Words	trie, array, hash-table, string, bucket-sort, counting, sorting, heap-priority-queue		heap	folder matches a LeetCode tag
+go/dsa/linked_list/fast_slow_ptr.go	go/dsa/linked_list/fast_slow_ptr.go	143	Reorder List	stack, recursion, linked-list, two-pointers		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/fast_slow_ptr.go	go/dsa/linked_list/fast_slow_ptr.go	234	Palindrome Linked List	stack, recursion, linked-list, two-pointers		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	138	Copy List with Random Pointer	hash-table, linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	141	Linked List Cycle	hash-table, linked-list, two-pointers	floyd-cycle-detection	linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	19	Remove Nth Node From End of List	linked-list, two-pointers		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	2	Add Two Numbers	recursion, linked-list, math		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	206	Reverse Linked List	recursion, linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	21	Merge Two Sorted Lists	recursion, linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	23	Merge k Sorted Lists	linked-list, divide-and-conquer, heap-priority-queue, merge-sort	tournament-sort	linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	24	Swap Nodes in Pairs	recursion, linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	25	Reverse Nodes in k-Group	recursion, linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	328	Odd Even Linked List	linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	61	Rotate List	linked-list, two-pointers		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/linked_list.go	go/dsa/linked_list/linked_list.go	876	Middle of the Linked List	linked-list, two-pointers		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/lru_cache.go	go/dsa/linked_list/lru_cache.go	146	LRU Cache	design, hash-table, linked-list, doubly-linked-list		linked_list	folder matches a LeetCode tag
+go/dsa/linked_list/merge_sort.go	go/dsa/linked_list/merge_sort.go	148	Sort List	linked-list, two-pointers, divide-and-conquer, sorting, merge-sort		linked_list	folder matches a LeetCode tag
+go/dsa/math/math.go	go/dsa/math/math.go	1828	Queries on Number of Points Inside a Circle	geometry, array, math		math	folder matches a LeetCode tag
+go/dsa/math/math.go	go/dsa/math/math.go	1884	Egg Drop With 2 Eggs and N Floors	math, dynamic-programming		math	folder matches a LeetCode tag
+go/dsa/binary_search/math.go	go/dsa/math/pow.go	50	Pow(x, n)	recursion, math		math	read: binary exponentiation
+go/dsa/solid_coding/matrix.go	go/dsa/matrix/matrix.go	48	Rotate Image	array, math, matrix		matrix	folder matches a LeetCode tag
+go/dsa/solid_coding/matrix.go	go/dsa/matrix/matrix.go	54	Spiral Matrix	array, matrix, simulation		matrix	folder matches a LeetCode tag
+go/dsa/solid_coding/matrix.go	go/dsa/matrix/matrix.go	73	Set Matrix Zeroes	array, hash-table, matrix		matrix	folder matches a LeetCode tag
+go/dsa/math/sparse_matrix_multiplication.go	go/dsa/matrix/sparse_matrix_multiplication.go	311	Sparse Matrix Multiplication	array, hash-table, matrix	linear-algebra	matrix	read: row compression of non-zeros
+go/dsa/memoization/climb_stairs.go	go/dsa/memoization/climb_stairs.go	70	Climbing Stairs	memoization, math, dynamic-programming		memoization	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/mono_queue/mono_queue.go	go/dsa/mono_queue/mono_queue.go	1438	Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit	queue, array, ordered-set, sliding-window, monotonic-queue, heap-priority-queue		mono_queue	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/mono_queue/mono_queue.go	go/dsa/mono_queue/mono_queue.go	239	Sliding Window Maximum	queue, array, sliding-window, monotonic-queue, heap-priority-queue	range-query	mono_queue	folder matches a LeetCode tag
+go/dsa/stack_queue/mono_stack/monotonic_stack.go	go/dsa/mono_stack/monotonic_stack.go	316	Remove Duplicate Letters	stack, greedy, string, monotonic-stack		mono_stack	folder matches a LeetCode tag
+go/dsa/stack_queue/mono_stack/monotonic_stack.go	go/dsa/mono_stack/monotonic_stack.go	42	Trapping Rain Water	stack, array, two-pointers, dynamic-programming, monotonic-stack		mono_stack	folder matches a LeetCode tag
+go/dsa/stack_queue/mono_stack/monotonic_stack.go	go/dsa/mono_stack/monotonic_stack.go	739	Daily Temperatures	stack, array, monotonic-stack		mono_stack	folder matches a LeetCode tag
+go/dsa/stack_queue/mono_stack/monotonic_stack.go	go/dsa/mono_stack/monotonic_stack.go	84	Largest Rectangle in Histogram	stack, array, monotonic-stack	range-query	mono_stack	folder matches a LeetCode tag
+go/dsa/tree_map/tree_map.go	go/dsa/ordered_set/tree_map.go	1438	Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit	queue, array, ordered-set, sliding-window, monotonic-queue, heap-priority-queue		ordered_set	folder matches a LeetCode tag
+go/dsa/prefix_sum/path_sum.go	go/dsa/prefix_sum/path_sum.go	437	Path Sum III	tree, depth-first-search, binary-tree		prefix_sum	read: prefix sums on root-to-node paths; LeetCode tags only tree/DFS
+go/dsa/prefix_sum/prefix_sum.go	go/dsa/prefix_sum/prefix_sum.go	238	Product of Array Except Self	array, prefix-sum		prefix_sum	folder matches a LeetCode tag
+go/dsa/prefix_sum/prefix_sum.go	go/dsa/prefix_sum/prefix_sum.go	523	Continuous Subarray Sum	array, hash-table, math, prefix-sum	pigeonhole-principle	prefix_sum	folder matches a LeetCode tag
+go/dsa/prefix_sum/prefix_sum.go	go/dsa/prefix_sum/prefix_sum.go	525	Contiguous Array	array, hash-table, prefix-sum		prefix_sum	folder matches a LeetCode tag
+go/dsa/prefix_sum/prefix_sum.go	go/dsa/prefix_sum/prefix_sum.go	560	Subarray Sum Equals K	array, hash-table, prefix-sum		prefix_sum	folder matches a LeetCode tag
+go/dsa/prefix_sum/prefix_sum.go	go/dsa/prefix_sum/prefix_sum.go	930	Binary Subarrays With Sum	array, hash-table, prefix-sum, sliding-window		prefix_sum	folder matches a LeetCode tag
+go/dsa/prefix_sum/random_pick_with_weight.go	go/dsa/prefix_sum/random_pick_with_weight.go	528	Random Pick with Weight	array, math, binary-search, prefix-sum, randomized		prefix_sum	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	1514	Path with Maximum Probability	graph, array, shortest-path, heap-priority-queue	dijkstra	shortest_path	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	1631	Path With Minimum Effort	depth-first-search, breadth-first-search, union-find, array, binary-search, matrix, heap-priority-queue	dijkstra	shortest_path	read: Dijkstra; LeetCode tags heap/BFS/DFS/UF, leetcode.cn tags Dijkstra
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	499	The Maze III	depth-first-search, breadth-first-search, graph, array, string, matrix, shortest-path, heap-priority-queue	dijkstra, a-search, heuristic-search	shortest_path	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	505	The Maze II	depth-first-search, breadth-first-search, graph, array, matrix, shortest-path, heap-priority-queue	dijkstra, a-search, heuristic-search	shortest_path	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	743	Network Delay Time	depth-first-search, breadth-first-search, graph, shortest-path, heap-priority-queue	dijkstra	shortest_path	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/Dijkstra.go	go/dsa/shortest_path/Dijkstra.go	787	Cheapest Flights Within K Stops	depth-first-search, breadth-first-search, graph, dynamic-programming, shortest-path, heap-priority-queue		shortest_path	folder matches a LeetCode tag
+go/dsa/graph/bellman_ford/bellman_ford.go	go/dsa/shortest_path/bellman_ford.go	787	Cheapest Flights Within K Stops	depth-first-search, breadth-first-search, graph, dynamic-programming, shortest-path, heap-priority-queue		shortest_path	folder matches a LeetCode tag
+go/dsa/graph/dijkstra/generic_heap.go	go/dsa/shortest_path/generic_heap.go		generic Heap[T] used by Dijkstra.go			shortest_path	support file: goes with Dijkstra.go
+go/dsa/graph/dijkstra/swim_in_rising_water.go	go/dsa/shortest_path/swim_in_rising_water.go	778	Swim in Rising Water	depth-first-search, breadth-first-search, union-find, array, binary-search, matrix, heap-priority-queue	minimax, dijkstra	shortest_path	read: Dijkstra; LeetCode tags heap/BFS/DFS/UF, leetcode.cn tags Dijkstra
+go/dsa/api_design/read4.go	go/dsa/simulation/read4.go	157	Read N Characters Given Read4	array, interactive, simulation		simulation	whole file: 157 Read N Characters Given Read4
+go/dsa/two_pointers/sliding_window/concatenation_of_all_words.go	go/dsa/sliding_window/concatenation_of_all_words.go	30	Substring with Concatenation of All Words	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/longest_substring.go	go/dsa/sliding_window/longest_substring.go	340	Longest Substring with At Most K Distinct Characters	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/longest_substring.go	go/dsa/sliding_window/longest_substring.go	395	Longest Substring with At Least K Repeating Characters	hash-table, string, divide-and-conquer, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	1004	Max Consecutive Ones III	array, binary-search, prefix-sum, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	209	Minimum Size Subarray Sum	array, binary-search, prefix-sum, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	219	Contains Duplicate II	array, hash-table, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	2933	High-Access Employees	array, hash-table, string, sorting		sliding_window	read: sort, then window of 3; LeetCode tags sorting
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	3	Longest Substring Without Repeating Characters	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	424	Longest Repeating Character Replacement	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	438	Find All Anagrams in a String	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/two_pointers/sliding_window/sliding_window.go	go/dsa/sliding_window/sliding_window.go	76	Minimum Window Substring	hash-table, string, sliding-window		sliding_window	folder matches a LeetCode tag
+go/dsa/stack_queue/calculator.go	go/dsa/stack/calculator.go	224	Basic Calculator	stack, recursion, math, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/calculator.go	go/dsa/stack/calculator.go	227	Basic Calculator II	stack, math, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/calculator.go	go/dsa/stack/calculator.go	227	Basic Calculator II	stack, math, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/calculator.go	go/dsa/stack/calculator.go	772	Basic Calculator III	stack, recursion, math, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/flatten_deeply_nested_array.go	go/dsa/stack/flatten_deeply_nested_array.go	2625	Flatten Deeply Nested Array		javascript	stack	read: JavaScript-only problem, no leetcode.com tags
+go/dsa/stack_queue/parentheses.go	go/dsa/stack/parentheses.go	1249	Minimum Remove to Make Valid Parentheses	stack, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/parentheses.go	go/dsa/stack/parentheses.go	20	Valid Parentheses	stack, string	parentheses	stack	folder matches a LeetCode tag
+go/dsa/stack_queue/parentheses.go	go/dsa/stack/parentheses.go	32	Longest Valid Parentheses	stack, string, dynamic-programming	parentheses	stack	folder matches a LeetCode tag
+go/dsa/stack_queue/parentheses.go	go/dsa/stack/parentheses.go	921	Minimum Add to Make Parentheses Valid	stack, greedy, string	parentheses	stack	folder matches a LeetCode tag
+go/dsa/stack_queue/stack.go	go/dsa/stack/stack.go	1209	Remove All Adjacent Duplicates in String II	stack, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/stack.go	go/dsa/stack/stack.go	150	Evaluate Reverse Polish Notation	stack, array, math		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/stack.go	go/dsa/stack/stack.go	394	Decode String	stack, recursion, string		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/stack.go	go/dsa/stack/stack.go	735	Asteroid Collision	stack, array, simulation		stack	folder matches a LeetCode tag
+go/dsa/stack_queue/stack.go	go/dsa/stack/stack.go	844	Backspace String Compare	stack, two-pointers, string, simulation		stack	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	1047	Remove All Adjacent Duplicates In String	stack, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	125	Valid Palindrome	two-pointers, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	13	Roman to Integer	hash-table, math, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	14	Longest Common Prefix	trie, array, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	179	Largest Number	greedy, array, string, sorting		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	409	Longest Palindrome	greedy, hash-table, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	409	Longest Palindrome	greedy, hash-table, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	415	Add Strings	math, string, simulation		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	443	String Compression	two-pointers, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	49	Group Anagrams	array, hash-table, string, sorting		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	67	Add Binary	bit-manipulation, math, string, simulation		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	680	Valid Palindrome II	greedy, two-pointers, string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/string.go	go/dsa/string/string.go	8	String to Integer (atoi)	string		string	folder matches a LeetCode tag
+go/dsa/solid_coding/string/text_justification.go	go/dsa/string/text_justification.go	68	Text Justification	array, string, simulation		string	folder matches a LeetCode tag
+go/dsa/graph/topological_sort/alien_dictionary.go	go/dsa/topological_sort/alien_dictionary.go	269	Alien Dictionary	depth-first-search, breadth-first-search, graph, topological-sort, array, string	directed-acyclic-graph	topological_sort	whole file: 269 Alien Dictionary
+go/dsa/graph/topological_sort/find_min_height_trees.go	go/dsa/topological_sort/find_min_height_trees.go	310	Minimum Height Trees	depth-first-search, breadth-first-search, graph, topological-sort		topological_sort	folder matches a LeetCode tag
+go/dsa/graph/topological_sort/longest_increasing_path.go	go/dsa/topological_sort/longest_increasing_path.go	329	Longest Increasing Path in a Matrix	depth-first-search, breadth-first-search, graph, topological-sort, memoization, array, dynamic-programming, matrix	directed-acyclic-graph	topological_sort	folder matches a LeetCode tag
+go/dsa/graph/topological_sort/topological_sort.go	go/dsa/topological_sort/topological_sort.go	207	Course Schedule	depth-first-search, breadth-first-search, graph, topological-sort	directed-acyclic-graph	topological_sort	folder matches a LeetCode tag
+go/dsa/graph/topological_sort/topological_sort.go	go/dsa/topological_sort/topological_sort.go	210	Course Schedule II	depth-first-search, breadth-first-search, graph, topological-sort		topological_sort	folder matches a LeetCode tag
+go/dsa/prefix_tree/shortest_substrings.go	go/dsa/trie/shortest_substrings.go	3076	Shortest Uncommon Substring in an Array	trie, array, hash-table, string		trie	folder matches a LeetCode tag
+go/dsa/prefix_tree/trie.go	go/dsa/trie/trie.go	208	Implement Trie (Prefix Tree)	design, trie, hash-table, string		trie	folder matches a LeetCode tag
+go/dsa/prefix_tree/trie.go	go/dsa/trie/trie.go	211	Design Add and Search Words Data Structure	depth-first-search, design, trie, string		trie	folder matches a LeetCode tag
+go/dsa/prefix_tree/word_break.go	go/dsa/trie/word_break.go	139	Word Break	trie, memoization, array, hash-table, string, dynamic-programming	brute-force-search	trie	folder matches a LeetCode tag
+go/dsa/prefix_tree/word_search.go	go/dsa/trie/word_search.go	212	Word Search II	trie, array, string, backtracking, matrix		trie	folder matches a LeetCode tag
+go/dsa/backtracking/backtracking.go	go/dsa/two_pointers/next_permutation.go	31	Next Permutation	array, two-pointers		two_pointers	read: find pivot, swap, reverse suffix
+go/dsa/two_pointers/push_dominoes.go	go/dsa/two_pointers/push_dominoes.go	838	Push Dominoes	two-pointers, string, dynamic-programming		two_pointers	folder matches a LeetCode tag
+go/dsa/math/sparse_matrix_multiplication.go	go/dsa/two_pointers/sparse_vector_dot_product.go	1570	Dot Product of Two Sparse Vectors	design, array, hash-table, two-pointers	linear-algebra	two_pointers	read: two-pointer merge of sparse entries
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	11	Container With Most Water	greedy, array, two-pointers		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	125	Valid Palindrome	two-pointers, string		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	15	3Sum	array, two-pointers, sorting		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	16	3Sum Closest	array, two-pointers, sorting		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	167	Two Sum II - Input Array Is Sorted	array, two-pointers, binary-search		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	27	Remove Element	array, two-pointers		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	283	Move Zeroes	array, two-pointers		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	408	Valid Word Abbreviation	two-pointers, string		two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	75	Sort Colors	array, two-pointers, sorting	bubble-sort, quick-sort	two_pointers	folder matches a LeetCode tag
+go/dsa/two_pointers/two_pointers.go	go/dsa/two_pointers/two_pointers.go	977	Squares of a Sorted Array	array, two-pointers, sorting		two_pointers	folder matches a LeetCode tag
+go/dsa/graph/union_find/UF.go	go/dsa/union_find/UF.go	128	Longest Consecutive Sequence	union-find, array, hash-table		union_find	folder matches a LeetCode tag
+go/dsa/graph/union_find/UF.go	go/dsa/union_find/UF.go	323	Number of Connected Components in an Undirected Graph	depth-first-search, breadth-first-search, union-find, graph		union_find	folder matches a LeetCode tag
+go/dsa/graph/graph_valid_tree.go	go/dsa/union_find/graph_valid_tree.go	261	Graph Valid Tree	depth-first-search, breadth-first-search, union-find, graph		union_find	whole file: 261 Graph Valid Tree; validTree is union-find
+go/dsa/graph/union_find/similar_string_groups.go	go/dsa/union_find/similar_string_groups.go	839	Similar String Groups	depth-first-search, breadth-first-search, union-find, array, hash-table, string		union_find	folder matches a LeetCode tag
+go/dsa/graph/union_find/smallest_equivalent_string.go	go/dsa/union_find/smallest_equivalent_string.go	1061	Lexicographically Smallest Equivalent String	union-find, string		union_find	folder matches a LeetCode tag

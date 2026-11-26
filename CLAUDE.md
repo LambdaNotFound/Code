@@ -41,7 +41,7 @@ Source is grouped by language first (`go/`, `python/`, `rust/`), then by kind of
 
 | Folder | Holds | Go | Python | Rust |
 |---|---|---|---|---|
-| `dsa/` | data-structure and algorithm problems, mostly LeetCode, grouped by technique | yes | yes | not yet |
+| `dsa/` | data-structure and algorithm problems, mostly LeetCode: one folder per LeetCode tag in Go, by technique in Python | yes | yes | not yet |
 | `interview/` | company mock-interview problems, files prefixed by company | yes | yes | not yet |
 | `design/` | low-level designs and design patterns | yes | not yet | not yet |
 | `features/` | the language itself: concurrency, async runtimes, fundamentals | yes | not yet | yes |
@@ -49,10 +49,10 @@ Source is grouped by language first (`go/`, `python/`, `rust/`), then by kind of
 A language gets one of these folders when it first has code of that kind: the first Python language demo starts a `features/` folder inside `python/`, and the first Rust LeetCode solution a `dsa/` folder inside `rust/`. The root holds only what belongs to no single language.
 
 **`go/`** — one Go 1.23 module named `gocode`. Its `go.mod` is in `go/`, so import paths start below it (`gocode/dsa/types`).
-- `go/dsa/` — solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `bit_manipulation`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `hashmap`, `heap`, `linked_list`, `math`, `memoization`, `prefix_sum`, `prefix_tree`, `recursion`, `stack_queue`, `tree`, `tree_map`, `two_pointers`, plus `api_design` (LeetCode "Design X" problems) and `solid_coding` (implementation-heavy problems on matrices, ranges, and strings). Three non-category packages sit beside them:
+- `go/dsa/` — one folder per leetcode.com topic tag, 34 in all: `array`, `backtracking`, `bfs`, `binary_search`, `binary_tree`, `bit_manipulation`, `bitmask`, `bst`, `counting`, `design`, `dfs`, `divide_and_conquer`, `dp`, `graph`, `greedy`, `hash_table`, `heap`, `linked_list`, `math`, `matrix`, `memoization`, `mono_queue`, `mono_stack`, `ordered_set`, `prefix_sum`, `shortest_path`, `simulation`, `sliding_window`, `stack`, `string`, `topological_sort`, `trie`, `two_pointers`, `union_find`. Folder names are the tag in snake_case, shortened to `bfs`, `dfs`, `bst`, `dp`, `heap`, `mono_stack`, and `mono_queue`; each package name is its folder name without underscores (`package binarytree`). See "Which tag folder a solution goes in" below. Three support packages sit beside the tag folders:
   - `go/dsa/types/` — shared LeetCode node definitions: `ListNode`, `TreeNode`, `Interval`, and `Node`, one struct shared by graph problems (`Neighbors`), doubly linked lists (`Next`, `Prev`), and random-pointer lists (`Random`)
   - `go/dsa/utils/` — test helpers that build and compare linked lists, trees, and graphs and copy matrices; imported only from `_test.go` files
-  - `go/dsa/containers/` (package `containers`) — standalone reference implementations of data structures: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter. Only `go/dsa/stack_queue/mono_stack` imports it (as a dot import); solution packages otherwise write their own copy, so `LRUCache`, `Heap`, `Trie`, and `UnionFind` each have several definitions across packages, in keeping with the self-contained-solution rule below
+  - `go/dsa/containers/` (package `containers`) — standalone reference implementations of data structures: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter. Only `go/dsa/mono_stack` imports it (as a dot import); solution packages otherwise write their own copy, so `LRUCache`, `Heap`, `Trie`, and `UnionFind` each have several definitions across packages, in keeping with the self-contained-solution rule below
 - `go/interview/` — company mock-interview problems (`affirm_*`, `codesignal_*`, `otterai_*`, `starlink_*`, and others). Its one data file, `go/interview/testdata/file.txt`, is read by the demo in `affirm_spreadsheet.go` as `testdata/file.txt`, relative to the package directory `go test` runs in; Go tooling skips any directory named `testdata/`
 - `go/design/lld/` (package `lld`) — low-level designs: booking, elevator, Excel sum formula (LC 631), parking lot, rate limiter, meeting-room scheduling
 - `go/design/patterns/` (package `patterns`) — GoF design patterns plus three company OO-design problems; see "Design patterns" below
@@ -70,15 +70,13 @@ A language gets one of these folders when it first has code of that kind: the fi
 - `diagrams/` — `draw-diagram` outputs, one folder per diagram (`design-review-loop/`, `url-shortener/`), each holding the `.spec.json` source plus the compiled `.excalidraw` and its `.png`/`.svg` renders
 - Editor config at the root: `.cursorrules` (Cursor's copy of the LeetCode rules below) and `.vscode/settings.json` (format-on-save; Go uses 4-space indentation)
 
-**`go/dsa/graph` sub-packages:**
-- `bfs/` — BFS on graphs and grids
-- `bellman_ford/` — Bellman-Ford SSSP; handles negative weights and detects negative cycles; standard adjacency-list signature `graph [][][2]int`
-- `dfs/` — DFS traversal patterns
-- `dijkstra/` — Dijkstra with a generic `Heap[T]` (see `generic_heap.go`); adjacency-list signature `graph [][][2]int, src int`; also covers LC 787, 743, 1631, 1514, 499, 505
-- `bidirectional_bfs/` — meet-in-the-middle BFS
-- `multi_source/` — multi-source BFS (e.g. rotting oranges, 01-matrix)
-- `topological_sort/` — Kahn's algorithm and DFS-based topo sort
-- `union_find/` — Union-Find with path compression
+**Which tag folder a solution goes in.** This is how `go/dsa` was organized on 11-26-2026; [agent-team-workspace/research/dsa-by-leetcode-tag/](agent-team-workspace/research/dsa-by-leetcode-tag/proposal.md) has the analysis, and its `mapping.tsv` records where every solution went and why. Apply the same rule to a new solution:
+- It goes in the folder of the one leetcode.com tag that names the algorithm the code uses, normally one of the tags LeetCode lists on the problem's page. When LeetCode does not list the tag for the algorithm the code uses, the algorithm still decides: 437 Path Sum III sits in `prefix_sum`, and 778 and 1631 sit in `shortest_path`.
+- Tree problems go in `binary_tree` or `bst`, even when solved by BFS or DFS. `bfs` and `dfs` hold graph and grid problems.
+- Groupings without a leetcode.com tag go in the plain tag folder: knapsack in `dp`, multi-source and bidirectional BFS in `bfs`, Dijkstra and Bellman-Ford in `shortest_path` (Dijkstra's generic `Heap[T]` is `shortest_path/generic_heap.go`).
+- A file holding several solutions to one problem goes where its first solution goes; for example, `dfs/number_of_islands.go` also holds the BFS and union-find versions.
+- Every tag gets its own folder, even one with a single file. Adding a solution never moves an existing one.
+- Solutions that are not LeetCode problems go with their algorithm: QuickSelect in `divide_and_conquer`, TSP in `bitmask`, rod cutting in `dp`, the BST implementation (`bst/bst_core.go`) in `bst`.
 
 **Import conventions:**
 - Packages that use `types` use a dot import: `. "gocode/dsa/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
@@ -88,12 +86,14 @@ A language gets one of these folders when it first has code of that kind: the fi
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
 - `go/dsa/utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
-- Two packages have no tests: `go/dsa/types` (definitions only) and `go/dsa/graph/bellman_ford`
+- `go/dsa/types` has no tests (definitions only), and neither does `go/dsa/shortest_path/bellman_ford.go`
+- A helper that several folders need is copied into each one, with a comment naming where the original lives (for example, the traversals at the end of `bst/bst_core.go`). Packages never import one another's solutions.
 - Exception to the split-file norm: `go/features/basics/`'s demos (all but `remove_if.go`) and `go/design/patterns/`'s GoF-pattern files (`abstract_factory_test.go`, `adapter_test.go`, `command_test.go`, `composite_test.go`, `decorator_test.go`, `facade_test.go`, `factory_method_test.go`, `iterator_test.go`, `mediator_test.go`, `observer_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
 
 **Naming conventions:**
 - Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement
 - Functions suffixed with `Naive` are brute-force or O(n²) baselines kept for comparison
+- When two independent solutions to one problem share a folder, the second is suffixed with its approach (`findCheapestPriceBellmanFord`, `combinationSum4Memoization`), or with `Alt` when both use the same approach (`minTransfersAlt`, `shortestPathAlt`, `buildTreeAlt`)
 
 **Design patterns (`go/design/patterns/`):** see [go/design/patterns/README.md](go/design/patterns/README.md) for the full catalogue of which of the 23 classic GoF patterns (Creational/Structural/Behavioral) are implemented here vs. not yet. `affirm_card_game.go`, `affirm_filter_match.go`, `brex_stervo_game.go` (and their test pairs) in the same package are unrelated, company-specific mock-interview OO-design problems, not named GoF patterns.
 
@@ -135,7 +135,7 @@ Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go modul
 `python/` holds the Python solutions, with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands. Run `pytest` from `python/`.
 
 - See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
-- `python/dsa/` mirrors part of `go/dsa/`: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`; shared types live in `python/dsa/common/`.
+- `python/dsa/` is still grouped by technique, under the folder names `go/dsa/` used before its 11-26-2026 move to LeetCode tags: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`. Shared types live in `python/dsa/common/`.
 - `python/interview/` holds company mock-interview problems, several with a `.md` problem statement beside the solution.
 
 ## Rust sub-project

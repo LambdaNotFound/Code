@@ -1,4 +1,4 @@
-package divide_and_conquer
+package divideandconquer
 
 import (
 	. "gocode/dsa/types"

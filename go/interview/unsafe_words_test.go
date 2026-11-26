@@ -1,7 +1,7 @@
 package interview
 
 import (
-	prefixtree "gocode/dsa/prefix_tree"
+	prefixtree "gocode/dsa/trie"
 	"strings"
 	"testing"
 

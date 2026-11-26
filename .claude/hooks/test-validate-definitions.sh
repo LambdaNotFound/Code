@@ -110,7 +110,7 @@ run "invalid definitions: reported as invalid"   2 "$(bash_ 'rm .claude/agents/r
     "rm .claude/agents/rust-pro.md" "definitions are now invalid"
 
 echo "=== PATHS THE HOOK MUST IGNORE ==="
-run "a Go solution"        0 "$(edit go/dsa/tree/foo.go)"
+run "a Go solution"        0 "$(edit go/dsa/binary_tree/foo.go)"
 run "the README"           0 "$(edit README.md)"
 run "go test via Bash"     0 "$(bash_ 'go test ./...')"
 run "git status via Bash"  0 "$(bash_ 'git status --short')"

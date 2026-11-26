@@ -1,4 +1,4 @@
-package bit
+package bitmanipulation
 
 import (
 	"testing"

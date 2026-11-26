@@ -3,7 +3,7 @@ package interview
 import (
 	"strings"
 
-	prefixtree "gocode/dsa/prefix_tree"
+	prefixtree "gocode/dsa/trie"
 )
 
 /**

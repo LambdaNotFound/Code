@@ -1,4 +1,4 @@
-package two_pointers
+package twopointers
 
 import (
 	"math"

@@ -1,4 +1,4 @@
-package divide_and_conquer
+package divideandconquer
 
 /**
  * 215. Kth Largest Element in an Array
