@@ -199,7 +199,7 @@ func moveZeroes(nums []int) {
 }
 
 /**
- * 283. Remove Element
+ * 27. Remove Element
  */
 func removeElement(nums []int, val int) int {
 	writePos := 0

@@ -2,7 +2,7 @@
 
 | Problem Tag | Problem Name | LeetCode Link | Go Source | Python Source |
 |---|---|---|---|---|
-| Array | 41. First Missing Positive | [LeetCode](https://leetcode.com/problems/first-missing-positive/) | [array/array.go](golang/array/array.go#L6) | [array/array.py](python/array/array.py#L34) |
+| Array | 41. First Missing Positive | [LeetCode](https://leetcode.com/problems/first-missing-positive/) | [array/array.go](golang/array/array.go#L6) | [array/array.py](python/array/array.py#L31) |
 | Array | 48. Rotate Image | [LeetCode](https://leetcode.com/problems/rotate-image/) | [solid_coding/matrix.go](golang/solid_coding/matrix.go#L113) |  |
 | Array | 54. Spiral Matrix | [LeetCode](https://leetcode.com/problems/spiral-matrix/) | [solid_coding/matrix.go](golang/solid_coding/matrix.go#L6) |  |
 | Array | 56. Merge Intervals | [LeetCode](https://leetcode.com/problems/merge-intervals/) | [array/interval.go](golang/array/interval.go#L77) | [solid_coding/intervals.py](python/solid_coding/intervals.py#L15) |
@@ -160,6 +160,7 @@
 | Heap / Priority Queue | 215. Kth Largest Element in an Array | [LeetCode](https://leetcode.com/problems/kth-largest-element-in-an-array/) | [heap/find_kth_largest.go](golang/heap/find_kth_largest.go#L4) |  |
 | Heap / Priority Queue | 295. Find Median from Data Stream | [LeetCode](https://leetcode.com/problems/find-median-from-data-stream/) | [heap/median_finder.go](golang/heap/median_finder.go#L6) |  |
 | Heap / Priority Queue | 347. Top K Frequent Elements | [LeetCode](https://leetcode.com/problems/top-k-frequent-elements/) | [heap/top_k_frequent.go](golang/heap/top_k_frequent.go#L14) | [heap/top_k_frequent.py](python/heap/top_k_frequent.py#L6) |
+| Heap / Priority Queue | 407. Trapping Rain Water II | [LeetCode](https://leetcode.com/problems/trapping-rain-water-ii/) | [interview/otterai_trap_rain_water.go](golang/interview/otterai_trap_rain_water.go#L28) |  |
 | Heap / Priority Queue | 480. Sliding Window Median | [LeetCode](https://leetcode.com/problems/sliding-window-median/) | [heap/median_finder_sliding_window.go](golang/heap/median_finder_sliding_window.go#L9) |  |
 | Heap / Priority Queue | 621. Task Scheduler | [LeetCode](https://leetcode.com/problems/task-scheduler/) | [heap/task_scheduler.go](golang/heap/task_scheduler.go#L4) |  |
 | Heap / Priority Queue | 632. Smallest Range Covering Elements from K Lists | [LeetCode](https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/) | [heap/smallest_range.go](golang/heap/smallest_range.go#L9) |  |
