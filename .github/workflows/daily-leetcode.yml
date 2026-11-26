@@ -114,9 +114,14 @@ jobs:
           MSG_DATE="${PT_DATE:5:2}-${PT_DATE:8:2}-${PT_DATE:0:4}" # YYYY-MM-DD -> MM-DD-YYYY
           git config user.name "LambdaNotFound"
           git config user.email "yiqyudev@gmail.com"
-          pushed=no
+          pushed=no mine=
           for attempt in 1 2 3 4 5; do
             git fetch -q origin main
+            # A push can land and still report failure. Then plan.md and the
+            # late replies already describe what landed: keep them.
+            if [ -n "$mine" ] && git merge-base --is-ancestor "$mine" FETCH_HEAD; then
+              echo "The last push landed after all."; pushed=yes; break
+            fi
             git reset -q --hard FETCH_HEAD
             python3 spaced_repetition/sr.py sweep --owner "$OWNER" \
               --issues "$RUNNER_TEMP/issues.jsonl" --comments "$RUNNER_TEMP/comments.jsonl" \
@@ -142,6 +147,7 @@ jobs:
               echo "state.json unchanged (idempotent rerun) - nothing to commit."
               pushed=yes; break
             fi
+            mine=$(git rev-parse HEAD)
             if git push -q origin HEAD:main; then pushed=yes; break; fi
             echo "Push refused (attempt $attempt): another run pushed first. Planning again on top of it."
             sleep $((attempt * 3))
