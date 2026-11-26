@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Go commands run from `go/`, where the module's `go.mod` lives. Python and Rust have their own; see their sections below.
 
+CI: [`.github/workflows/build.yml`](.github/workflows/build.yml) builds and tests all three projects on every push to `main`, as separate checks:
+- **Go**, on the version `go.mod` declares: `go mod verify`, `build`, `vet`, and `test -race`
+- **Rust**, on stable: `cargo build` and `cargo test`, both with `--all-targets --locked`
+- **Python**, on 3.10 and 3.12: `compileall`, the full `pytest` run, and each test file run alone
+
+Pushes by the two bot workflows don't trigger it, because they push with `GITHUB_TOKEN`. `actionlint` (`go install github.com/rhysd/actionlint/cmd/actionlint@latest`) lints workflow edits.
+
 ```bash
 cd go
 

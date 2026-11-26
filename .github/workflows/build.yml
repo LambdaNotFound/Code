@@ -1,0 +1,142 @@
+# Builds and tests each language project on every push to main: Go (go/),
+# Rust (rust/) and Python (python/). The jobs run in parallel and report as
+# separate checks, so one project's failure does not hide the others.
+#
+# The two bot workflows (daily-leetcode.yml, log-solve.yml) push with the
+# default GITHUB_TOKEN, and GitHub starts no workflow runs for those pushes,
+# so their state.json commits do not run this. "Run workflow" on the Actions
+# tab runs it by hand.
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to main makes an older run's result moot.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  go:
+    name: Go
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: go
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the Go that go.mod declares (go 1.23), so CI checks the
+      # minimum the module promises. The local toolchain can be newer, and
+      # the go line does not stop code from calling a newer standard-library
+      # API, so this is where such a call would show up.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go/go.mod
+          cache-dependency-path: go/go.sum
+
+      - name: Verify module checksums
+        run: go mod verify
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test with the race detector
+        run: go test -race ./...
+
+  rust:
+    name: Rust
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install stable Rust
+        id: toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustc --version
+          echo "rustc=$(rustc --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+
+      # Keyed on the compiler too: build artifacts from an older rustc are
+      # never reused, so carrying them forward would only grow the cache.
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            rust/target
+          key: cargo-${{ runner.os }}-${{ steps.toolchain.outputs.rustc }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-${{ steps.toolchain.outputs.rustc }}-
+
+      # --all-targets covers the binary, its tests, and the 24 examples under
+      # features/. --locked fails if Cargo.lock no longer matches Cargo.toml.
+      - name: Build
+        run: cargo build --all-targets --locked
+
+      - name: Test
+        run: cargo test --all-targets --locked
+
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 is the documented minimum (python/CLAUDE.md).
+        python-version: ["3.10", "3.12"]
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pytest
+        run: python -m pip install --disable-pip-version-check pytest
+
+      # Python has no build step; compiling every file is the nearest thing,
+      # and catches a syntax error in a file that no test imports.
+      - name: Compile
+        run: python -m compileall -q .
+
+      - name: Test
+        run: pytest -q
+
+      # Every test file must pass when run by itself (python/CLAUDE.md). This
+      # uses the `pytest` command, not `python -m pytest`: the module form
+      # puts python/ on sys.path, which would hide a test that imports only
+      # because another test inserted python/ first.
+      - name: Test each file on its own
+        run: |
+          failed=0
+          while IFS= read -r f; do
+            if ! pytest -q -p no:cacheprovider "$f" > "$RUNNER_TEMP/out.txt" 2>&1; then
+              echo "::error file=python/${f#./}::fails when run on its own"
+              cat "$RUNNER_TEMP/out.txt"
+              failed=1
+            fi
+          done < <(find . -name '*_test.py' | sort)
+          exit "$failed"
