@@ -34,6 +34,8 @@ Unlogged problems carry over to the next day, then get deferred (see below) so t
 
 **If you don't log:** a problem served `carry_limit` times (default 2, not necessarily on consecutive days) without a grade is assumed skipped and pushed back — 4 days, then 8, 16, up to `defer_max_days` (24) if you keep ignoring it. Deferred items return automatically and nothing is dropped from the deck: a review comes back when its window ends, and a new problem you never logged waits behind the never-seen ones after that. Logging a problem clears its deferral and resets the count. Separately, a review card already shown recently but never graded is sorted to the *back* of the review queue, so it can't keep winning on due-date order and crowding out cards that are genuinely waiting.
 
+**If you take a break:** after `pause_after` days without a log (default 7) plans stop: no issues, no deferrals, nothing piling up. One "Daily LeetCode paused since YYYY-MM-DD" issue tells you. To come back, comment `resume` on any Daily LeetCode issue, log any solve, or run the workflow by hand. That restores every card's real due date and settles the showings you ignored, so your old problems come back first, with one new problem a day mixed in. While paused, `state.json` changes once a month, because GitHub disables scheduled workflows after about 60 days without activity.
+
 **Why the same problems recur:** three legitimate causes before suspecting a bug — (1) a problem graded `again` is deliberately due the very next day; (2) an ungraded problem is re-offered once before being deferred; (3) a large overdue backlog means the oldest cards keep surfacing. Only the third grows without bound, which is why overdue reviews earn extra daily capacity (`backlog_step`, `backlog_bonus_max`). Grading what you're served is what makes the intervals spread out. GitHub auto-disables schedules after ~60 days without repo activity — pushing your solutions counts as activity. You can also trigger a run manually from the Actions tab (workflow_dispatch).
 
 ## Commands
@@ -43,6 +45,8 @@ python3 sr.py today     # today's plan (idempotent — same output all day)
 python3 sr.py log 1 good
 python3 sr.py stats     # progress overview
 python3 sr.py due       # every card's next review date
+python3 sr.py status    # "active" or "paused YYYY-MM-DD"
+python3 sr.py resume    # end a pause
 ```
 
 ## Files
@@ -54,7 +58,7 @@ python3 sr.py due       # every card's next review date
 
 ## Tuning
 
-Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), `cost` per difficulty (default E=1, M=2, H=2), `carry_limit` (default 2), `defer_days` (default 4), `defer_max_days` (24), `backlog_step` (5) and `backlog_bonus_max` (2).
+Edit `config` inside `state.json`: `daily_budget` (default 4), `new_budget` (slice reserved for new problems, default 2), `new_per_day` (default 2), `new_order` (`category_rotation` or `curated`), `cost` per difficulty (default E=1, M=2, H=2), `carry_limit` (default 2), `defer_days` (default 4), `defer_max_days` (24), `backlog_step` (5), `backlog_bonus_max` (2) and `pause_after` (7; 0 turns pausing off).
 
 Pace levers, measured by simulation: budget 4 / new 2 ≈ 2.4 problems/day, ~13-day tag rotation, full pass ~4.5 months, but overdue reviews queue up over time. Raise `daily_budget` to 6-7 (keeping `new_budget` 2) to clear reviews on schedule at ~3.5 problems/day; raise both (e.g. 10/5) to finish the deck in ~2 months at ~5 problems/day. Overdue reviews aren't lost — they serve oldest-first as budget allows. To change the delivery time or switch to every-other-day, edit the cron expressions in the workflow file (remember they're UTC) — intervals are date-based, so nothing else needs to change.
 

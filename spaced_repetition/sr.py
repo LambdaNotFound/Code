@@ -8,6 +8,8 @@ Commands:
     python3 sr.py log ID GRADE [--date D]     record a solve; GRADE in {again,hard,good,easy}
     python3 sr.py stats                       progress overview
     python3 sr.py due                         list all cards with due dates
+    python3 sr.py status [--date D]           "active" or "paused YYYY-MM-DD"
+    python3 sr.py resume [--date D]           end a pause (logging a solve does too)
 
 Grading guide:
     again = couldn't solve / needed the solution
@@ -143,6 +145,9 @@ DEFAULT_CONFIG = {
     # just makes every day look the same, which is the opposite of the goal.
     "backlog_step": 5,
     "backlog_bonus_max": 2,
+    # This many days without a log pauses everything: no plans and no
+    # deferrals until a solve is logged or `resume` is run. 0 disables.
+    "pause_after": 7,
 }
 
 
@@ -190,13 +195,52 @@ def cost_of(problem, cfg):
     return cfg["cost"].get(problem["difficulty"], 2)
 
 
+def add_days(date, n):
+    return (dt.date.fromisoformat(date) + dt.timedelta(days=n)).isoformat()
+
+
 def last_touch(state, pid):
-    """Most recent date this problem was logged or deferred."""
+    """Most recent date this problem was logged, deferred or reset by a resume."""
     dates = [e["date"] for e in state["log"] if e["id"] == pid]
     d = state.get("deferred", {}).get(pid, {}).get("at")
     if d:
         dates.append(d)
+    start = state.get("comeback", {}).get("start")
+    if start:
+        # The day before, so a showing on the day of the resume itself counts.
+        dates.append(add_days(start, -1))
     return max(dates) if dates else ""
+
+
+def paused_since(state, date):
+    """First day plans stopped, or None while active.
+
+    Counts from the last log or resume; someone who has never logged counts
+    from their first plan.
+    """
+    after = state["config"].get("pause_after", 7)
+    starts = [e["date"] for e in state["log"]]
+    if state.get("comeback"):
+        starts.append(state["comeback"]["start"])
+    starts = starts or sorted(state["served"])[:1]
+    if after <= 0 or not starts:
+        return None
+    since = add_days(max(starts), after + 1)
+    return since if since <= date else None
+
+
+def resume(state, date):
+    """End a pause, undoing what being away did to the schedule.
+
+    Clearing `deferred` alone would backfire: every showing that was ignored
+    would count again and push the old cards to the back of the review queue.
+    The comeback date makes last_touch treat those showings as settled.
+    """
+    state["comeback"] = {"start": date}
+    state["deferred"] = {}
+    state.pop("paused", None)
+    for card in state["cards"].values():
+        card["due"] = add_days(card["last"], card["interval"])  # undo deferrals
 
 
 def apply_deferrals(state, date):
@@ -229,8 +273,7 @@ def apply_deferrals(state, date):
             times = prev.get("count", 0) + 1
             # escalate: 4d, 8d, 16d, ... capped
             window = min(days * (2 ** (times - 1)), cap)
-            until = (dt.date.fromisoformat(date)
-                     + dt.timedelta(days=window)).isoformat()
+            until = add_days(date, window)
             state["deferred"][pid] = {"at": date, "until": until,
                                       "count": times}
             if pid in state["cards"]:
@@ -315,13 +358,13 @@ def pick_today(state, problems, date):
             pid for plan in state["served"].values() for pid in plan["new"]
         }
         fresh = [p["id"] for p in problems if p["id"] not in seen]
-        # A deferred new problem re-enters the pool once its defer window
+        # A problem shown and ignored re-enters the pool once any defer window
         # passes, behind every never-seen one, so problems that keep getting
         # ignored can't crowd out the rest of the deck.
-        revived = [pid for pid in state.get("deferred", {})
-                   if pid not in state["cards"] and pid in by_id
-                   and not is_deferred(state, pid, date)
-                   and pid not in carried]
+        revived = [p["id"] for p in problems
+                   if p["id"] in seen and p["id"] not in state["cards"]
+                   and not is_deferred(state, p["id"], date)
+                   and p["id"] not in carried]
         fresh = fresh + revived
         if cfg.get("new_order") == "category_rotation":
             # last date each category had a new problem introduced
@@ -405,11 +448,32 @@ def cmd_today_md(state, problems, date, plan):
           "`#20 hard` (grades: again / hard / good / easy)._")
 
 
+def cmd_paused(state, date, since):
+    # The month makes a pause change state.json, and so get committed, once a
+    # month: GitHub disables scheduled workflows after 60 days without one.
+    note = {"since": since, "month": date[:7]}
+    if state.get("paused") != note:
+        state["paused"] = note
+        save_state(state)
+    days = state["config"]["pause_after"]
+    print(f"### LeetCode plans paused since {since}\n\n"
+          f"Nothing was logged for {days} days, so plans stopped and nothing is "
+          "piling up.\n\n"
+          "To come back, comment `resume` here for a plan with your old problems "
+          "first, or just log any solve, e.g. `1 good`.")
+
+
 def cmd_today(args):
     state = load_state()
     problems = load_problems()
     date = today_str(args)
     by_id = {p["id"]: p for p in problems}
+    since = paused_since(state, date)
+    if since and date not in state["served"]:
+        if not args.resume:
+            cmd_paused(state, date, since)
+            return
+        resume(state, date)  # saved by pick_today
     plan, repeated = pick_today(state, problems, date)
 
     if args.md:
@@ -451,6 +515,9 @@ def cmd_log(args):
         sys.exit(f"Unknown grade {args.grade!r}; use one of "
                  f"{sorted(set(GRADE_ALIASES))}")
     date = today_str(args)
+    if paused_since(state, date):
+        resume(state, date)
+        print("Welcome back - plans resume today, with your old problems first.")
 
     card = state["cards"].get(pid, {
         "interval": 0, "ease": EASE_START, "due": date,
@@ -476,10 +543,9 @@ def cmd_log(args):
         ease += 0.15
 
     iv = min(iv, MAX_INTERVAL)
-    d = dt.date.fromisoformat(date) + dt.timedelta(days=iv)
     card.update({
         "interval": iv, "ease": round(ease, 2),
-        "due": d.isoformat(), "reps": card["reps"] + 1, "last": date,
+        "due": add_days(date, iv), "reps": card["reps"] + 1, "last": date,
     })
     state["cards"][pid] = card
     # A logged problem is no longer being ignored: drop the deferral, which
@@ -489,6 +555,24 @@ def cmd_log(args):
     save_state(state)
     print(f"Logged #{pid} {by_id[pid]['title']}: {grade}. "
           f"Next review {card['due']} (interval {iv}d, ease {card['ease']}).")
+
+
+def cmd_status(args):
+    state, date = load_state(), today_str(args)
+    # A day that already has a plan is active, as it is for `today`.
+    since = None if date in state["served"] else paused_since(state, date)
+    print(f"paused {since}" if since else "active")
+
+
+def cmd_resume(args):
+    state = load_state()
+    date = today_str(args)
+    if not paused_since(state, date):
+        print("Plans are not paused - nothing to resume.")
+        return
+    resume(state, date)
+    save_state(state)
+    print("Welcome back - plans resume today, with your old problems first.")
 
 
 def cmd_stats(args):
@@ -533,7 +617,17 @@ def main():
     p.add_argument("--json", action="store_true")
     p.add_argument("--md", action="store_true",
                    help="markdown output (for GitHub issue comments)")
+    p.add_argument("--resume", action="store_true",
+                   help="end a pause first, if there is one")
     p.set_defaults(fn=cmd_today)
+
+    p = sub.add_parser("status")
+    p.add_argument("--date")
+    p.set_defaults(fn=cmd_status)
+
+    p = sub.add_parser("resume")
+    p.add_argument("--date")
+    p.set_defaults(fn=cmd_resume)
 
     p = sub.add_parser("log")
     p.add_argument("id")

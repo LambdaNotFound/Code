@@ -114,6 +114,7 @@ class Scheduling(unittest.TestCase):
 
     def serve_days(self, n):
         """Serve n plans without logging; return each day's new problems."""
+        self.set_config(pause_after=0)
         start = dt.date(2026, 1, 1)
         for i in range(n):
             self.today((start + dt.timedelta(i)).isoformat())
@@ -126,8 +127,19 @@ class Scheduling(unittest.TestCase):
             fn(argparse.Namespace(**kw))
         return out.getvalue()
 
-    def today(self, date):
-        return self.run_cmd(sr.cmd_today, date=date, md=True, json=False)
+    def today(self, date, resume=False):
+        return self.run_cmd(sr.cmd_today, date=date, md=True, json=False, resume=resume)
+
+    def status(self, date):
+        return self.run_cmd(sr.cmd_status, date=date).strip()
+
+    def resume(self, date):
+        return self.run_cmd(sr.cmd_resume, date=date)
+
+    def set_config(self, **kw):
+        old = dict(sr.DEFAULT_CONFIG)
+        self.addCleanup(lambda: (sr.DEFAULT_CONFIG.clear(), sr.DEFAULT_CONFIG.update(old)))
+        sr.DEFAULT_CONFIG.update(kw)
 
     def log(self, pid, grade, date):
         return self.run_cmd(sr.cmd_log, id=pid, grade=grade, date=date)
@@ -172,9 +184,8 @@ class Scheduling(unittest.TestCase):
 
     def test_unseen_problems_come_before_ignored_ones(self):
         for order in ("category_rotation", "curated"):
-            with self.subTest(order), contextlib.ExitStack() as stack:
-                stack.callback(sr.DEFAULT_CONFIG.update, new_order="category_rotation")
-                sr.DEFAULT_CONFIG["new_order"] = order
+            with self.subTest(order):
+                self.set_config(new_order=order)
                 sr.STATE_FILE.unlink(missing_ok=True)
                 days = self.serve_days(60)
                 shown = collections.Counter(pid for day in days for pid in day)
@@ -205,6 +216,150 @@ class Scheduling(unittest.TestCase):
     def test_plan_is_idempotent(self):
         first = self.today("2026-01-01")
         self.assertEqual(first, self.today("2026-01-01"))
+
+    # --- pausing and coming back ---
+
+    def break_off(self):
+        """Log two problems on Jan 1, keep serving, stop logging: paused Jan 9."""
+        self.today("2026-01-01")
+        plan = sr.load_state()["served"]["2026-01-01"]["new"]
+        for pid in plan:
+            self.log(pid, "good", "2026-01-01")
+        for day in range(2, 9):
+            self.today(f"2026-01-{day:02d}")
+        return plan
+
+    def test_pauses_after_a_week_without_a_log(self):
+        self.break_off()
+        self.assertEqual(self.status("2026-01-08"), "active")
+        self.assertEqual(self.status("2026-01-09"), "paused 2026-01-09")
+        self.assertEqual(self.status("2026-03-01"), "paused 2026-01-09")
+
+    def test_paused_day_serves_and_defers_nothing(self):
+        self.break_off()
+        before = sr.load_state()
+        out = self.today("2026-01-20")
+        after = sr.load_state()
+        self.assertIn("paused", out.lower())
+        self.assertIn("resume", out)
+        for key in ("served", "deferred", "cards", "log"):
+            self.assertEqual(before[key], after[key], key)
+
+    def test_paused_state_changes_once_a_month(self):
+        # Each change is a commit. GitHub disables schedules after 60 days
+        # without one, so a pause must keep committing, but not daily.
+        self.break_off()
+        seen = set()
+        day = dt.date(2026, 1, 9)
+        last_change = day
+        for i in range(120):
+            d = day + dt.timedelta(i)
+            before = sr.STATE_FILE.read_text()
+            self.today(d.isoformat())
+            if sr.STATE_FILE.read_text() != before:
+                self.assertLess((d - last_change).days, 32)
+                last_change = d
+                seen.add(d)
+        self.assertEqual(len(seen), 5)  # Jan 9, then Feb 1, Mar 1, Apr 1, May 1
+
+    def test_status_agrees_with_a_plan_already_made(self):
+        self.break_off()
+        state = sr.load_state()
+        state["served"]["2026-01-10"] = {"review": [], "new": ["1"]}
+        sr.save_state(state)
+        self.assertEqual(self.status("2026-01-10"), "active")
+        self.assertIn("plan — 2026-01-10", self.today("2026-01-10"))
+
+    def test_disabled_and_empty_never_pause(self):
+        self.assertEqual(self.status("2026-01-01"), "active")
+        self.break_off()
+        state = sr.load_state()
+        state["config"]["pause_after"] = 0
+        sr.save_state(state)
+        self.assertEqual(self.status("2027-01-01"), "active")
+
+    def test_never_logged_pauses_from_the_first_plan(self):
+        self.today("2026-01-01")
+        self.assertEqual(self.status("2026-01-08"), "active")
+        self.assertEqual(self.status("2026-01-09"), "paused 2026-01-09")
+
+    def test_logging_resumes(self):
+        plan = self.break_off()
+        self.today("2026-01-20")
+        self.assertIn("paused", sr.load_state())
+        self.log("20", "good", "2026-02-01")
+        self.assertEqual(self.status("2026-02-01"), "active")
+        state = sr.load_state()
+        self.assertEqual(state["deferred"], {})
+        self.assertNotIn("paused", state)
+        self.assertEqual(state["cards"]["20"]["due"], "2026-02-03")
+        for pid in plan:
+            self.assertEqual(state["cards"][pid]["due"], "2026-01-03")
+
+    def test_resume_brings_back_every_old_card(self):
+        self.set_config(pause_after=0)
+        for pid in ("1", "20", "33", "70", "121", "206", "217", "704"):
+            self.log(pid, "good", "2026-01-01")
+        self.serve_days(90)  # ignored: shown over and over, deferred repeatedly
+        state = sr.load_state()
+        self.assertTrue(state["deferred"])
+        state["config"]["pause_after"] = 7
+        sr.save_state(state)
+        self.resume("2026-04-01")
+        back, start = set(), dt.date(2026, 4, 1)
+        for i in range(7):
+            d = (start + dt.timedelta(i)).isoformat()
+            self.today(d)
+            served = sr.load_state()["served"][d]
+            back |= set(served["review"])
+            for pid in served["review"] + served["new"]:
+                self.log(pid, "good", d)
+        self.assertLessEqual({"1", "20", "33", "70", "121", "206", "217", "704"}, back)
+
+    def test_resume_then_ignored_new_problem_is_offered_again(self):
+        self.break_off()
+        self.resume("2026-02-01")
+        self.today("2026-02-01")
+        new = sr.load_state()["served"]["2026-02-01"]["new"][0]
+        self.today("2026-02-02")
+        self.assertIn(new, sr.load_state()["served"]["2026-02-02"]["new"])
+
+    def test_resume_loses_no_problem(self):
+        # Shown but never logged before the break, so in neither cards nor
+        # (after the reset) deferred: it must still come back eventually.
+        self.use_deck(6)
+        self.serve_days(10)
+        state = sr.load_state()
+        state["config"]["pause_after"] = 7
+        sr.save_state(state)
+        self.resume("2026-03-01")
+        state = sr.load_state()
+        state["config"]["pause_after"] = 0  # keep serving without logs
+        sr.save_state(state)
+        shown = set()
+        for day in range(1, 15):
+            d = f"2026-03-{day:02d}"
+            self.today(d)
+            shown |= set(sr.load_state()["served"][d]["new"])
+        self.assertEqual(len(shown), 6)
+
+    def test_resume_when_active_changes_nothing(self):
+        self.break_off()
+        before = sr.STATE_FILE.read_text()
+        self.assertIn("not paused", self.resume("2026-01-05"))
+        self.today("2026-01-05", resume=True)
+        self.assertEqual(before, sr.STATE_FILE.read_text())
+
+    def test_today_can_resume(self):
+        self.break_off()
+        self.assertIn("plan — 2026-02-01", self.today("2026-02-01", resume=True))
+        self.assertEqual(self.status("2026-02-01"), "active")
+
+    def test_pauses_again_after_an_unused_resume(self):
+        self.break_off()
+        self.resume("2026-02-01")
+        self.assertEqual(self.status("2026-02-08"), "active")
+        self.assertEqual(self.status("2026-02-09"), "paused 2026-02-09")
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ name: log-solve
 # Log solves from anywhere (GitHub mobile app / web) by commenting on the
 # "Daily LeetCode" issue. Recognized patterns, any number per comment:
 #   "solved 200 good"  ·  "1 easy, 33 again"  ·  "#5 hard"
+# "resume" on its own ends a pause and replies with the day's plan.
 # The workflow runs sr.py log for each pair, commits state.json, and
 # replies with the next review dates.
 on:
@@ -51,13 +52,18 @@ jobs:
           words = "|".join(GRADE_ALIASES)
           pairs, skipped = parse_solves(body)
           lines = []
+
+          def sr(*args):
+              r = subprocess.run(["python3", "spaced_repetition/sr.py", *args,
+                                  "--date", date], capture_output=True, text=True)
+              return r.returncode, (r.stdout or r.stderr).strip()
+
+          if re.fullmatch(r"\W*resume\W*", body, re.IGNORECASE):
+              lines += [sr("resume")[1], "", sr("today", "--md")[1]]
           for pid, grade in pairs:
-              r = subprocess.run(
-                  ["python3", "spaced_repetition/sr.py",
-                   "log", pid, grade, "--date", date],
-                  capture_output=True, text=True)
-              msg = (r.stdout or r.stderr).strip()
-              lines.append(("- " if r.returncode == 0 else "- FAILED: ") + msg)
+              code, msg = sr("log", pid, grade)
+              lines.append(("- " if code == 0 else "- FAILED: ")
+                           + msg.replace("\n", "\n- "))
           for pid, why in skipped:
               lines.append(f"- NOT LOGGED: {pid} ({why}). "
                            f"Comment again like `{pid} good`.")
