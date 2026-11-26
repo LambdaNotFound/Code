@@ -155,9 +155,9 @@ committed `Cargo.lock`, using `anyhow`, `tokio` with `full`, and
   of the crate.
 - Where a design has a real rival, document it inline as
   `Rejected alternative: ...` with the reason, as
-  `tokio_examples/leaky_bucket.rs` does.
-- Examples live in `tokio_examples/` and `basics_examples/`, not
-  `examples/`, so Cargo does not auto-discover them. **Every new
+  `rust/features/tokio/leaky_bucket.rs` does.
+- Examples live in `rust/features/tokio/` and `rust/features/basics/`,
+  not `examples/`, so Cargo does not auto-discover them. **Every new
   example needs an explicit `[[example]]` block in `Cargo.toml`** with
   `name` and `path`, or it will never build.
 - Async tests use `#[tokio::test(start_paused = true)]` with the

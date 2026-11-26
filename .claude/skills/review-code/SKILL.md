@@ -26,7 +26,7 @@ table.
 This repo's conventions live in `CLAUDE.md` and outrank your taste:
 testify assertions, table-driven tests for any logic function, tests
 co-located in the same package, the `/** ... */` block-comment style,
-the dot import of `gocode/golang/types`, and the LeetCode rules —
+the dot import of `gocode/dsa/types`, and the LeetCode rules —
 signatures followed exactly, no added input validation. Read it
 rather than assuming; a pattern the codebase uses consistently is not
 a finding.

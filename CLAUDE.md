@@ -4,15 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+Go commands run from `go/`, where the module's `go.mod` lives. Python and Rust have their own; see their sections below.
+
 ```bash
+cd go
+
 # Run all tests
 go test ./...
 
 # Run a single package
-go test ./golang/backtracking/
+go test ./dsa/backtracking/
 
 # Run a single test
-go test ./golang/backtracking/ -run Test_solveSudoku
+go test ./dsa/backtracking/ -run Test_solveSudoku
 
 # Run with verbose output
 go test ./... -v
@@ -26,13 +30,32 @@ go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out
 
 ## Architecture
 
-This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, organized by technique.
+Source is grouped by language first (`go/`, `python/`, `rust/`), then by kind of work:
 
-**Top-level packages:**
-- `golang/` — LeetCode solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `tree`, `tree_map`, `two_pointers`, `heap`, `hashmap`, `prefix_sum`, `prefix_tree`, `linked_list`, `stack_queue`, `recursion`, `memoization`, `bit_manipulation`, `math`, `design`, `api_design`, `oo_design`, `solid_coding`, `interview`. Also holds two non-category subpackages: `golang/types/` (shared LeetCode node definitions — `ListNode`, `TreeNode`, `Interval`, and `Node`, one struct shared by graph problems (`Neighbors`), doubly linked lists (`Next`, `Prev`), and random-pointer lists (`Random`)) and `golang/utils/` (test helpers for constructing/comparing linked lists, trees, and graphs, plus standalone Go-pattern demo files)
-- `golang_containers/` (package `containers`) — standalone reference implementations of data structures: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter. Only `golang/stack_queue/mono_stack` imports it (as a dot import); solution packages otherwise write their own copy, so `LRUCache`, `Heap`, `Trie`, and `UnionFind` each have several definitions across packages, in keeping with the self-contained-solution rule below
-- `golang_concurrency/` (package `concurrency`) — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns, a leaky-bucket rate limiter, and a waiter. Most patterns live as `Example*` functions in plain `.go` files (not `_test.go`) for narrative documentation — `go test` does **not** execute these (Example funcs only run when declared in a `_test.go` file); actual assertions live in the sibling `_test.go` files (e.g. `channels_test.go`), which don't yet cover every pattern
-- `fixtures/` — static test data files (e.g. `file.txt`, the input loaded by `golang/interview/affirm_spreadsheet.go`)
+| Folder | Holds | Go | Python | Rust |
+|---|---|---|---|---|
+| `dsa/` | data-structure and algorithm problems, mostly LeetCode, grouped by technique | yes | yes | not yet |
+| `interview/` | company mock-interview problems, files prefixed by company | yes | yes | not yet |
+| `design/` | low-level designs and design patterns | yes | not yet | not yet |
+| `features/` | the language itself: concurrency, async runtimes, fundamentals | yes | not yet | yes |
+
+A language gets one of these folders when it first has code of that kind: the first Python language demo starts a `features/` folder inside `python/`, and the first Rust LeetCode solution a `dsa/` folder inside `rust/`. The root holds only what belongs to no single language.
+
+**`go/`** — one Go 1.23 module named `gocode`. Its `go.mod` is in `go/`, so import paths start below it (`gocode/dsa/types`).
+- `go/dsa/` — solutions grouped by algorithm category: `array`, `backtracking`, `binary_search`, `bit_manipulation`, `divide_and_conquer`, `dynamic_programming`, `graph`, `greedy`, `hashmap`, `heap`, `linked_list`, `math`, `memoization`, `prefix_sum`, `prefix_tree`, `recursion`, `stack_queue`, `tree`, `tree_map`, `two_pointers`, plus `api_design` (LeetCode "Design X" problems) and `solid_coding` (implementation-heavy problems on matrices, ranges, and strings). Three non-category packages sit beside them:
+  - `go/dsa/types/` — shared LeetCode node definitions: `ListNode`, `TreeNode`, `Interval`, and `Node`, one struct shared by graph problems (`Neighbors`), doubly linked lists (`Next`, `Prev`), and random-pointer lists (`Random`)
+  - `go/dsa/utils/` — test helpers that build and compare linked lists, trees, and graphs and copy matrices; imported only from `_test.go` files
+  - `go/dsa/containers/` (package `containers`) — standalone reference implementations of data structures: heap, LRU cache, min-max stack, red-black treemap, queue, stack, hit counter. Only `go/dsa/stack_queue/mono_stack` imports it (as a dot import); solution packages otherwise write their own copy, so `LRUCache`, `Heap`, `Trie`, and `UnionFind` each have several definitions across packages, in keeping with the self-contained-solution rule below
+- `go/interview/` — company mock-interview problems (`affirm_*`, `codesignal_*`, `otterai_*`, `starlink_*`, and others). Its one data file, `go/interview/testdata/file.txt`, is read by the demo in `affirm_spreadsheet.go` as `testdata/file.txt`, relative to the package directory `go test` runs in; Go tooling skips any directory named `testdata/`
+- `go/design/lld/` (package `lld`) — low-level designs: booking, elevator, Excel sum formula (LC 631), parking lot, rate limiter, meeting-room scheduling
+- `go/design/patterns/` (package `patterns`) — GoF design patterns plus three company OO-design problems; see "Design patterns" below
+- `go/features/concurrency/` (package `concurrency`) — Go concurrency patterns: channels, fan-in/out, lock-free stack/queue/counter, mutex patterns, select patterns, a leaky-bucket rate limiter, and a waiter. Most patterns live as `Example*` functions in plain `.go` files (not `_test.go`) for narrative documentation — `go test` does **not** execute these (Example funcs only run when declared in a `_test.go` file); actual assertions live in the sibling `_test.go` files (e.g. `channels_test.go`), which don't yet cover every pattern
+- `go/features/basics/` (package `basics`) — Go fundamentals as runnable tests: named returns and slice and map behavior, `slices.Clone`/`maps.Clone`, bytes versus runes, `iota` enums, panic/recover in place of try/catch, `time` layouts, integer-cents money, and the generic `RemoveIf` slice filter
+
+**`python/`** and **`rust/`** — see the Python and Rust sections below.
+
+**Root folders that belong to no language:**
+- `spaced_repetition/` — the daily practice scheduler; see its section below
 - `system_design/` — written system design solutions/notes (e.g. URL shortener, autopay, hotel booking, sharding, feed generation), not part of the Go module
 - `agent-team-workspace/` — the agent-team pipeline's documents: `requirements/<topic>/` (signed-off briefs from `/scope-problem`), `design-docs/<topic>/` (a run-design-loop run: its frozen `brief.md`, the `design.md` deliverable, and the `review.md` round ledger), `pull-requests/<topic>/` (run-pr-loop state), `agent-specs/` (the `brief-spec`, `rfc-spec`, `pr-spec` output contracts), `protocols/` (the two loop protocols), `validate-definitions.py` (structural and semantic checks over every agent and skill definition; it prints the count it ran) and `validate-skills.py` (per-skill regression pass: frontmatter, description cap, reference links, routing targets, repo paths, and stale names; both exit non-zero on failure), and `research/` (standalone investigations and the older ad-hoc agent-team prompts under `legacy-prompts/`). Each document artifact gets its own folder
 - `notes/project_rules/` — interview-prep "project rules" prompts (behavioral, coding/DSA, system design mock-interview instructions) used to configure Claude Code sessions for interview practice; unrelated to the Go source
@@ -40,32 +63,32 @@ This is a Go (1.23) repository of LeetCode and algorithmic problem solutions, or
 - `diagrams/` — `draw-diagram` outputs, one folder per diagram (`design-review-loop/`, `url-shortener/`), each holding the `.spec.json` source plus the compiled `.excalidraw` and its `.png`/`.svg` renders
 - Editor config at the root: `.cursorrules` (Cursor's copy of the LeetCode rules below) and `.vscode/settings.json` (format-on-save; Go uses 4-space indentation)
 
-**`golang/graph` sub-packages:**
-- `BFS/` — BFS on graphs and grids
-- `Bellman_Ford/` — Bellman-Ford SSSP; handles negative weights and detects negative cycles; standard adjacency-list signature `graph [][][2]int`
-- `DFS/` — DFS traversal patterns
-- `Dijkstra/` — Dijkstra with a generic `Heap[T]` (see `generic_heap.go`); adjacency-list signature `graph [][][2]int, src int`; also covers LC 787, 743, 1631, 1514, 499, 505
-- `bidirectional_BFS/` — meet-in-the-middle BFS
+**`go/dsa/graph` sub-packages:**
+- `bfs/` — BFS on graphs and grids
+- `bellman_ford/` — Bellman-Ford SSSP; handles negative weights and detects negative cycles; standard adjacency-list signature `graph [][][2]int`
+- `dfs/` — DFS traversal patterns
+- `dijkstra/` — Dijkstra with a generic `Heap[T]` (see `generic_heap.go`); adjacency-list signature `graph [][][2]int, src int`; also covers LC 787, 743, 1631, 1514, 499, 505
+- `bidirectional_bfs/` — meet-in-the-middle BFS
 - `multi_source/` — multi-source BFS (e.g. rotting oranges, 01-matrix)
 - `topological_sort/` — Kahn's algorithm and DFS-based topo sort
 - `union_find/` — Union-Find with path compression
 
 **Import conventions:**
-- Packages that use `types` use a dot import: `. "gocode/golang/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
-- The module is named `gocode` (see `go.mod`)
+- Packages that use `types` use a dot import: `. "gocode/dsa/types"` so `ListNode`, `TreeNode`, etc. are available unqualified
+- The module is named `gocode` (see `go/go.mod`)
 
 **Testing:**
 - All tests use `github.com/stretchr/testify/assert`
 - Test functions are co-located with implementation files in the same package (no separate `_test` packages)
-- `golang/utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
-- Two packages have no tests: `golang/types` (definitions only) and `golang/graph/Bellman_Ford`
-- Exception to the split-file norm: `golang/utils/`'s Go-pattern demos and `golang/oo_design/`'s GoF-pattern files (`abstract_factory_test.go`, `adapter_test.go`, `command_test.go`, `composite_test.go`, `decorator_test.go`, `facade_test.go`, `factory_method_test.go`, `iterator_test.go`, `mediator_test.go`, `observer_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
+- `go/dsa/utils/` provides helpers like `CreateLinkedList`, `VerifyLinkedLists`, and `GraphsEqual` for test setup
+- Two packages have no tests: `go/dsa/types` (definitions only) and `go/dsa/graph/bellman_ford`
+- Exception to the split-file norm: `go/features/basics/`'s demos (all but `remove_if.go`) and `go/design/patterns/`'s GoF-pattern files (`abstract_factory_test.go`, `adapter_test.go`, `command_test.go`, `composite_test.go`, `decorator_test.go`, `facade_test.go`, `factory_method_test.go`, `iterator_test.go`, `mediator_test.go`, `observer_test.go`) combine implementation + `Test_` functions in one `_test.go` file with no separate non-test source — each file is a self-contained, runnable demonstration of a single concept
 
 **Naming conventions:**
 - Functions suffixed with `Claude` (e.g. `asteroidCollisionClaude`) are alternative implementations of the same problem — a different algorithm or data structure approach, not a replacement
 - Functions suffixed with `Naive` are brute-force or O(n²) baselines kept for comparison
 
-**Design patterns (`golang/oo_design/`):** see [golang/oo_design/README.md](golang/oo_design/README.md) for the full catalogue of which of the 23 classic GoF patterns (Creational/Structural/Behavioral) are implemented here vs. not yet. `affirm_card_game.go`, `affirm_filter_match.go`, `brex_stervo_game.go` (and their test pairs) in the same package are unrelated, company-specific mock-interview OO-design problems, not named GoF patterns.
+**Design patterns (`go/design/patterns/`):** see [go/design/patterns/README.md](go/design/patterns/README.md) for the full catalogue of which of the 23 classic GoF patterns (Creational/Structural/Behavioral) are implemented here vs. not yet. `affirm_card_game.go`, `affirm_filter_match.go`, `brex_stervo_game.go` (and their test pairs) in the same package are unrelated, company-specific mock-interview OO-design problems, not named GoF patterns.
 
 ## Commit messages
 
@@ -82,7 +105,7 @@ A manually-maintained index table (Problem Tag | Problem Name | LeetCode Link | 
 ## Claude Code configuration
 
 - `.claude/CLAUDE.md` — the epistemic rules (claim tags, confidence bands, anti-sycophancy, the `[RULES I BROKE]` footer) loaded alongside this file
-- `system_design/`, `spaced_repetition/`, `notes/project_rules/`, and `fixtures/` each carry an `AGENTS.md` describing that directory's files and editing conventions; read it before changing anything there
+- `system_design/`, `spaced_repetition/`, and `notes/project_rules/` each carry an `AGENTS.md` describing that directory's files and editing conventions; read it before changing anything there
 - `.claude/settings.json` wires one `PostToolUse` hook: after any `Edit`, `Write`, `MultiEdit`, or `Bash`, `.claude/hooks/validate-definitions.sh` re-runs the definition validator if the edited path — or, for `Bash`, the command text, which is how deletes and moves arrive — names an agent, a skill, `CLAUDE.md`, or the validator itself, and shows the failures to Claude on exit 2. Without PyYAML it skips the check and says so. An unrelated `Bash` call costs ~13ms. `PostToolUse` cannot block, so this catches a broken definition immediately after it is written rather than whenever someone remembers to run the script. Its own tests are `.claude/hooks/test-validate-definitions.sh` — 27 cases over add, remove, update, and a validator that cannot run, run against a throwaway copy of the definitions under `/tmp` so the real tree is never mutated. Run them after changing either the hook or the validator.
 
 - `.claude/agents/leetcode-reviewer.md` — subagent that reviews Go LeetCode solutions for correctness, edge cases, complexity, and idiom; invoke proactively after writing/modifying a solution
@@ -102,16 +125,17 @@ Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go modul
 
 ## Python sub-project
 
-`python/` is a parallel Python LeetCode repository with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands.
+`python/` holds the Python solutions, with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands. Run `pytest` from `python/`.
 
 - See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
-- Python packages mirror the Go structure: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `interview`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`; shared types live in `common/`.
+- `python/dsa/` mirrors part of `go/dsa/`: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`; shared types live in `python/dsa/common/`.
+- `python/interview/` holds company mock-interview problems, several with a `.md` problem statement beside the solution.
 
 ## Rust sub-project
 
 `rust/` is a Cargo binary crate (`tokio_hello_world`, edition 2024) for practicing async Rust with Tokio — independent of the Go module, with its own `Cargo.toml`/`Cargo.lock` (committed, per Cargo's guidance for executables). `cargo run` prints a greeting via a task spawned with `tokio::spawn`; `cargo test` runs the async tests in `src/tests.rs`, which use `#[tokio::test(start_paused = true)]` (the `test-util` dev-dependency feature) to fast-forward simulated time instead of actually sleeping.
 
-Beyond `src/`, the crate holds 24 runnable teaching examples: `tokio_examples/` (12 async patterns — cancellation, channels, cooperative scheduling, error handling, leaky bucket, runtime flavors, `select!`, shared state, sleep/timeout, spawn/join, `spawn_blocking`, structured concurrency) and `basics_examples/` (12 language fundamentals). Two conventions hold across all of them: every file opens with a `//! Pattern:` line followed by a `//! Go comparison:` paragraph mapping the Rust shape onto a Go engineer's instinct, and — because neither directory is named `examples/`, so Cargo will not auto-discover them — **each example needs an explicit `[[example]]` block in `Cargo.toml`** naming its path.
+Beyond `src/`, the crate holds 24 runnable teaching examples under `features/`: `features/tokio/` (12 async patterns — cancellation, channels, cooperative scheduling, error handling, leaky bucket, runtime flavors, `select!`, shared state, sleep/timeout, spawn/join, `spawn_blocking`, structured concurrency) and `features/basics/` (12 language fundamentals). Two conventions hold across all of them: every file opens with a `//! Pattern:` line followed by a `//! Go comparison:` paragraph mapping the Rust shape onto a Go engineer's instinct, and — because neither directory is named `examples/`, so Cargo will not auto-discover them — **each example needs an explicit `[[example]]` block in `Cargo.toml`** naming its path.
 
 ## LeetCode conventions
 

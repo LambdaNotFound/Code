@@ -101,7 +101,7 @@ for d in skdirs:
 print(f"   {len(skdirs)} skills checked")
 
 print("5. ALL FILES — every referenced repo path resolves")
-ROOTS=('agent-team-workspace/','.claude/','golang/','python/','rust/','spaced_repetition/','fixtures/','notes/','system_design/','.github/')
+ROOTS=('agent-team-workspace/','.claude/','go/','python/','rust/','spaced_repetition/','notes/','system_design/','.github/')
 TOK=re.compile(r'[A-Za-z0-9_.<>*-]+(?:/[A-Za-z0-9_.<>*-]+)+')
 # a skill dir without SKILL.md already failed check 4; opening it here would raise
 # and take every later check with it

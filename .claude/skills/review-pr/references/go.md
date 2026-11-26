@@ -169,7 +169,7 @@ costs the review its credibility.
 For PRs in this repo, `CLAUDE.md` is binding and outranks the
 general guidance above: testify `assert`, tests co-located in the
 same package as the implementation, the dot import of
-`gocode/golang/types`, `/** ... */` block comments with a `* `
+`gocode/dsa/types`, `/** ... */` block comments with a `* `
 prefix on every line, and the LeetCode rules — signatures followed
 exactly, no added input validation, runtime preferred over memory
 where nothing says otherwise.

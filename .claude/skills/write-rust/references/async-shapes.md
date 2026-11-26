@@ -62,7 +62,7 @@ until memory runs out. `mpsc::channel(n)` makes the producer wait,
 which is what you want. Reach for `try_send` when the correct
 behavior on a full queue is to reject rather than to wait — that is
 the difference between a leaky bucket and a blocking queue, and
-`tokio_examples/leaky_bucket.rs` in this crate is the worked example.
+`rust/features/tokio/leaky_bucket.rs` in this crate is the worked example.
 
 ## Runtime and blocking
 

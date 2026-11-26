@@ -17,13 +17,13 @@ source venv/bin/activate
 pytest
 
 # Run a single package
-pytest stack_queue/
+pytest dsa/stack_queue/
 
 # Run a single test file
-pytest stack_queue/stack_test.py
+pytest dsa/stack_queue/stack_test.py
 
 # Run a single test by name
-pytest stack_queue/stack_test.py -k test_decodeString
+pytest dsa/stack_queue/stack_test.py -k test_decodeString
 
 # Verbose output
 pytest -v
@@ -31,15 +31,16 @@ pytest -v
 
 ## Architecture
 
-Python LeetCode solutions organized by algorithm category. Each category is a directory containing one or more solution files and a co-located `_test.py` file.
+Two folders, matching the repo-wide layout (see the root `CLAUDE.md`): `dsa/` holds data-structure and algorithm solutions by technique, and `interview/` holds company mock-interview problems. Each category is a directory containing one or more solution files and a co-located `_test.py` file. Run every command from `python/`, the folder this file is in.
 
 **Packages:**
-- `array/`, `backtracking/`, `binary_search/`, `dynamic_programming/`, `graph/`, `hashmap/`, `heap/`, `interview/`, `prefix_sum/`, `solid_coding/`, `stack_queue/`, `tree/`, `two_pointers/` — solutions grouped by technique
-- `common/` — shared node definitions (`ListNode`, `TreeNode`) and test helpers (`build_list`, `list_to_vals`, `build_tree`); imported with `sys.path.insert` since there is no `setup.py`
+- `dsa/array/`, `dsa/backtracking/`, `dsa/binary_search/`, `dsa/dynamic_programming/`, `dsa/graph/`, `dsa/hashmap/`, `dsa/heap/`, `dsa/prefix_sum/`, `dsa/solid_coding/`, `dsa/stack_queue/`, `dsa/tree/`, `dsa/two_pointers/` — solutions grouped by technique
+- `dsa/common/` — shared node definitions (`ListNode`, `TreeNode`) and test helpers (`build_list`, `list_to_vals`, `build_tree`); imported with `sys.path.insert` since there is no `setup.py`
+- `interview/` — company mock-interview problems; see "Interview problems" below
 
 **Import conventions:**
 
-Solution files that need shared types insert the repo root into `sys.path`:
+Solution files that need shared types insert their parent folder (`dsa/`, which holds `common/`) into `sys.path`:
 ```python
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -62,7 +63,7 @@ from stack import Solution
 - When two implementations of the same function exist, parametrize over both method names via a `METHODS` list and `getattr(Solution(), method)`
 - `common/` helpers (`build_list`, `list_to_vals`, `build_tree`) should be used in tests rather than duplicating linked-list/tree construction logic inline; add new helpers to `common/` when they would apply across packages
 - Static methods (no `self`) are called as `Solution.method(args)`, not `Solution().method(args)`
-- Test file naming: `<module>_test.py` co-located with the solution file; when a directory has multiple solution files, a single `<dir>_test.py` covers them all (e.g. `heap/heap_test.py` tests both `merge_k_lists.py` and `top_k_frequent.py`)
+- Test file naming: `<module>_test.py` co-located with the solution file; when a directory has multiple solution files, a single `<dir>_test.py` covers them all (e.g. `dsa/heap/heap_test.py` tests both `merge_k_lists.py` and `top_k_frequent.py`)
 
 ## Interview problems (`interview/`)
 
