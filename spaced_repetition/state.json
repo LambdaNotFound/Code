@@ -144,6 +144,7 @@
     "daily_budget": 4,
     "defer_days": 4,
     "defer_max_days": 24,
+    "max_hard": 2,
     "new_budget": 2,
     "new_order": "category_rotation",
     "new_per_day": 2,
@@ -1867,6 +1868,16 @@
       ],
       "review": [
         "208"
+      ]
+    },
+    "2026-11-25": {
+      "new": [
+        "53"
+      ],
+      "review": [
+        "1",
+        "21",
+        "3"
       ]
     }
   }
