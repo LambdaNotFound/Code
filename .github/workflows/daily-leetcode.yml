@@ -6,12 +6,12 @@ name: daily-leetcode
 # let the guard decide: proceed when it is 15:00 or later in
 # America/Los_Angeles AND today's issue does not exist yet. First attempt that
 # lands wins; the rest self-skip. This makes every later cron an automatic
-# retry for a delayed/missed run. Minute 17 avoids the top of the hour, when
+# retry for a delayed/missed run. Minute 30 avoids the top of the hour, when
 # GitHub's scheduler is busiest.
 on:
   schedule:
-    - cron: "17 19-23 * * *" # 12:17-16:17 PDT / 11:17-15:17 PST
-    - cron: "17 0-6 * * *" #   17:17-23:17 PDT / 16:17-22:17 PST
+    - cron: "30 19-23 * * *" # 12:30-16:30 PDT / 11:30-15:30 PST
+    - cron: "30 0-6 * * *" #   17:30-23:30 PDT / 16:30-22:30 PST
   workflow_dispatch: # manual "Run workflow" button, always proceeds
 
 permissions:
