@@ -19,11 +19,11 @@
 | Backtracking | 17. Letter Combinations of a Phone Number | [LeetCode](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L378) |  |
 | Backtracking | 22. Generate Parentheses | [LeetCode](https://leetcode.com/problems/generate-parentheses/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L28) |  |
 | Backtracking | 31. Next Permutation | [LeetCode](https://leetcode.com/problems/next-permutation/) | [two_pointers/next_permutation.go](go/dsa/two_pointers/next_permutation.go#L26) |  |
-| Backtracking | 37. Sudoku Solver | [LeetCode](https://leetcode.com/problems/sudoku-solver/) | [backtracking/2D_grid_paths.go](go/dsa/backtracking/2D_grid_paths.go#L6) |  |
+| Backtracking | 37. Sudoku Solver | [LeetCode](https://leetcode.com/problems/sudoku-solver/) | [backtracking/grid_paths_2d.go](go/dsa/backtracking/grid_paths_2d.go#L6) |  |
 | Backtracking | 39. Combination Sum | [LeetCode](https://leetcode.com/problems/combination-sum/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L273) |  |
 | Backtracking | 46. Permutations | [LeetCode](https://leetcode.com/problems/permutations/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L89) |  |
 | Backtracking | 47. Permutations II | [LeetCode](https://leetcode.com/problems/permutations-ii/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L179) |  |
-| Backtracking | 51. N-Queens | [LeetCode](https://leetcode.com/problems/n-queens/) | [backtracking/2D_grid_paths.go](go/dsa/backtracking/2D_grid_paths.go#L58) |  |
+| Backtracking | 51. N-Queens | [LeetCode](https://leetcode.com/problems/n-queens/) | [backtracking/grid_paths_2d.go](go/dsa/backtracking/grid_paths_2d.go#L58) |  |
 | Backtracking | 77. Combinations | [LeetCode](https://leetcode.com/problems/combinations/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L222) |  |
 | Backtracking | 78. Subsets | [LeetCode](https://leetcode.com/problems/subsets/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L306) |  |
 | Backtracking | 79. Word Search | [LeetCode](https://leetcode.com/problems/word-search/) | [backtracking/word_search.go](go/dsa/backtracking/word_search.go#L4) |  |
@@ -90,13 +90,13 @@
 | Dynamic Programming | 198. House Robber | [LeetCode](https://leetcode.com/problems/house-robber/) | [dp/house_robber.go](go/dsa/dp/house_robber.go#L4) |  |
 | Dynamic Programming | 213. House Robber II | [LeetCode](https://leetcode.com/problems/house-robber-ii/) | [dp/house_robber.go](go/dsa/dp/house_robber.go#L22) |  |
 | Dynamic Programming | 221. Maximal Square | [LeetCode](https://leetcode.com/problems/maximal-square/) | [dp/maximal_square.go](go/dsa/dp/maximal_square.go#L4) |  |
-| Dynamic Programming | 300. Longest Increasing Subsequence | [LeetCode](https://leetcode.com/problems/longest-increasing-subsequence/) | [dp/LIS.go](go/dsa/dp/LIS.go#L4) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L15) |
+| Dynamic Programming | 300. Longest Increasing Subsequence | [LeetCode](https://leetcode.com/problems/longest-increasing-subsequence/) | [dp/lis.go](go/dsa/dp/lis.go#L4) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L15) |
 | Dynamic Programming | 403. Frog Jump | [LeetCode](https://leetcode.com/problems/frog-jump/) | [dp/frog_jump.go](go/dsa/dp/frog_jump.go#L4) |  |
 | Dynamic Programming | 647. Palindromic Substrings | [LeetCode](https://leetcode.com/problems/palindromic-substrings/) | [dp/palindrome.go](go/dsa/dp/palindrome.go#L35) |  |
-| Dynamic Programming | 718. Maximum Length of Repeated Subarray | [LeetCode](https://leetcode.com/problems/maximum-length-of-repeated-subarray/) | [dp/LCS.go](go/dsa/dp/LCS.go#L38) |  |
+| Dynamic Programming | 718. Maximum Length of Repeated Subarray | [LeetCode](https://leetcode.com/problems/maximum-length-of-repeated-subarray/) | [dp/lcs.go](go/dsa/dp/lcs.go#L38) |  |
 | Dynamic Programming | 787. Cheapest Flights Within K Stops | [LeetCode](https://leetcode.com/problems/cheapest-flights-within-k-stops/) | [dp/find_cheapest_price.go](go/dsa/dp/find_cheapest_price.go#L6) |  |
-| Dynamic Programming | 1048. Longest String Chain | [LeetCode](https://leetcode.com/problems/longest-string-chain/) | [dp/LCS.go](go/dsa/dp/LCS.go#L74) |  |
-| Dynamic Programming | 1143. Longest Common Subsequence | [LeetCode](https://leetcode.com/problems/longest-common-subsequence/) | [dp/LCS.go](go/dsa/dp/LCS.go#L6) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L11) |
+| Dynamic Programming | 1048. Longest String Chain | [LeetCode](https://leetcode.com/problems/longest-string-chain/) | [dp/lcs.go](go/dsa/dp/lcs.go#L74) |  |
+| Dynamic Programming | 1143. Longest Common Subsequence | [LeetCode](https://leetcode.com/problems/longest-common-subsequence/) | [dp/lcs.go](go/dsa/dp/lcs.go#L6) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L11) |
 | Dynamic Programming | 1235. Maximum Profit in Job Scheduling | [LeetCode](https://leetcode.com/problems/maximum-profit-in-job-scheduling/) | [dp/job_scheduling.go](go/dsa/dp/job_scheduling.go#L6) |  |
 | Dynamic Programming | 1293. Shortest Path in a Grid with Obstacles Elimination | [LeetCode](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/) | [bfs/shortest_path_with_obstacles_elimination_alt.go](go/dsa/bfs/shortest_path_with_obstacles_elimination_alt.go#L6) |  |
 | Dynamic Programming (Knapsack) | 39. Combination Sum | [LeetCode](https://leetcode.com/problems/combination-sum/) | [dp/combination_sum.go](go/dsa/dp/combination_sum.go#L4) |  |
@@ -120,22 +120,22 @@
 | Graph (BFS) | 365. Water and Jug Problem | [LeetCode](https://leetcode.com/problems/water-and-jug-problem/) | [bfs/water_and_jug_problem.go](go/dsa/bfs/water_and_jug_problem.go#L4) |  |
 | Graph (BFS) | 863. All Nodes Distance K in Binary Tree | [LeetCode](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L106) |  |
 | Graph (BFS) | 958. Check Completeness of a Binary Tree | [LeetCode](https://leetcode.com/problems/check-completeness-of-a-binary-tree/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L207) |  |
-| Graph (BFS) | 994. Rotting Oranges | [LeetCode](https://leetcode.com/problems/rotting-oranges/) | [bfs/BFS.go](go/dsa/bfs/BFS.go#L4) |  |
+| Graph (BFS) | 994. Rotting Oranges | [LeetCode](https://leetcode.com/problems/rotting-oranges/) | [bfs/bfs.go](go/dsa/bfs/bfs.go#L4) |  |
 | Graph (BFS) | 1293. Shortest Path in a Grid with Obstacles Elimination | [LeetCode](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/) | [bfs/shortest_path_with_obstacles_elimination.go](go/dsa/bfs/shortest_path_with_obstacles_elimination.go#L4) |  |
 | Graph (Bellman-Ford) | 787. Cheapest Flights Within K Stops | [LeetCode](https://leetcode.com/problems/cheapest-flights-within-k-stops/) | [shortest_path/bellman_ford.go](go/dsa/shortest_path/bellman_ford.go#L67) |  |
-| Graph (Bidirectional BFS) | 126. Word Ladder II | [LeetCode](https://leetcode.com/problems/word-ladder-ii/) | [bfs/bidirectional_BFS.go](go/dsa/bfs/bidirectional_BFS.go#L60) |  |
-| Graph (Bidirectional BFS) | 127. Word Ladder | [LeetCode](https://leetcode.com/problems/word-ladder/) | [bfs/bidirectional_BFS.go](go/dsa/bfs/bidirectional_BFS.go#L4) |  |
+| Graph (Bidirectional BFS) | 126. Word Ladder II | [LeetCode](https://leetcode.com/problems/word-ladder-ii/) | [bfs/bidirectional_bfs.go](go/dsa/bfs/bidirectional_bfs.go#L60) |  |
+| Graph (Bidirectional BFS) | 127. Word Ladder | [LeetCode](https://leetcode.com/problems/word-ladder/) | [bfs/bidirectional_bfs.go](go/dsa/bfs/bidirectional_bfs.go#L4) |  |
 | Graph (DFS) | 104. Maximum Depth of Binary Tree | [LeetCode](https://leetcode.com/problems/maximum-depth-of-binary-tree/) | [binary_tree/tree_dfs.go](go/dsa/binary_tree/tree_dfs.go#L26) |  |
 | Graph (DFS) | 543. Diameter of Binary Tree | [LeetCode](https://leetcode.com/problems/diameter-of-binary-tree/) | [binary_tree/tree_dfs.go](go/dsa/binary_tree/tree_dfs.go#L8) |  |
-| Graph (DFS) | 733. Flood Fill | [LeetCode](https://leetcode.com/problems/flood-fill/) | [dfs/DFS.go](go/dsa/dfs/DFS.go#L4) |  |
+| Graph (DFS) | 733. Flood Fill | [LeetCode](https://leetcode.com/problems/flood-fill/) | [dfs/dfs.go](go/dsa/dfs/dfs.go#L4) |  |
 | Graph (DFS) | 827. Making A Large Island | [LeetCode](https://leetcode.com/problems/making-a-large-island/) | [dfs/largest_island.go](go/dsa/dfs/largest_island.go#L4) |  |
-| Graph (Dijkstra) | 499. The Maze II | [LeetCode](https://leetcode.com/problems/the-maze-ii/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L324) |  |
-| Graph (Dijkstra) | 505. The Maze III | [LeetCode](https://leetcode.com/problems/the-maze-iii/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L372) |  |
-| Graph (Dijkstra) | 743. Network Delay Time | [LeetCode](https://leetcode.com/problems/network-delay-time/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L137) |  |
+| Graph (Dijkstra) | 499. The Maze II | [LeetCode](https://leetcode.com/problems/the-maze-ii/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L324) |  |
+| Graph (Dijkstra) | 505. The Maze III | [LeetCode](https://leetcode.com/problems/the-maze-iii/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L372) |  |
+| Graph (Dijkstra) | 743. Network Delay Time | [LeetCode](https://leetcode.com/problems/network-delay-time/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L137) |  |
 | Graph (Dijkstra) | 778. Swim in Rising Water | [LeetCode](https://leetcode.com/problems/swim-in-rising-water/) | [shortest_path/swim_in_rising_water.go](go/dsa/shortest_path/swim_in_rising_water.go#L6) |  |
-| Graph (Dijkstra) | 787. Cheapest Flights Within K Stops | [LeetCode](https://leetcode.com/problems/cheapest-flights-within-k-stops/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L71) |  |
-| Graph (Dijkstra) | 1514. Path with Maximum Probability | [LeetCode](https://leetcode.com/problems/path-with-maximum-probability/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L267) |  |
-| Graph (Dijkstra) | 1631. Path With Minimum Effort | [LeetCode](https://leetcode.com/problems/path-with-minimum-effort/) | [shortest_path/Dijkstra.go](go/dsa/shortest_path/Dijkstra.go#L206) |  |
+| Graph (Dijkstra) | 787. Cheapest Flights Within K Stops | [LeetCode](https://leetcode.com/problems/cheapest-flights-within-k-stops/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L71) |  |
+| Graph (Dijkstra) | 1514. Path with Maximum Probability | [LeetCode](https://leetcode.com/problems/path-with-maximum-probability/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L267) |  |
+| Graph (Dijkstra) | 1631. Path With Minimum Effort | [LeetCode](https://leetcode.com/problems/path-with-minimum-effort/) | [shortest_path/dijkstra.go](go/dsa/shortest_path/dijkstra.go#L206) |  |
 | Graph (Multi-Source BFS) | 417. Pacific Atlantic Water Flow | [LeetCode](https://leetcode.com/problems/pacific-atlantic-water-flow/) | [bfs/pacific_atlantic.go](go/dsa/bfs/pacific_atlantic.go#L4) |  |
 | Graph (Multi-Source BFS) | 542. 01 Matrix | [LeetCode](https://leetcode.com/problems/01-matrix/) | [bfs/update_matrix.go](go/dsa/bfs/update_matrix.go#L21) |  |
 | Graph (Topological Sort) | 207. Course Schedule | [LeetCode](https://leetcode.com/problems/course-schedule/) | [topological_sort/topological_sort.go](go/dsa/topological_sort/topological_sort.go#L25) |  |
@@ -244,22 +244,22 @@
 | String | 680. Valid Palindrome II | [LeetCode](https://leetcode.com/problems/valid-palindrome-ii/) | [string/string.go](go/dsa/string/string.go#L178) |  |
 | String | 1047. Remove All Adjacent Duplicates In String | [LeetCode](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/) | [string/string.go](go/dsa/string/string.go#L311) |  |
 | Tree | 94. Binary Tree Inorder Traversal | [LeetCode](https://leetcode.com/problems/binary-tree-inorder-traversal/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L75) |  |
-| Tree | 98. Validate Binary Search Tree | [LeetCode](https://leetcode.com/problems/validate-binary-search-tree/) | [bst/BST.go](go/dsa/bst/BST.go#L9) |  |
+| Tree | 98. Validate Binary Search Tree | [LeetCode](https://leetcode.com/problems/validate-binary-search-tree/) | [bst/bst.go](go/dsa/bst/bst.go#L9) |  |
 | Tree | 100. Same Tree | [LeetCode](https://leetcode.com/problems/same-tree/) | [binary_tree/recursion.go](go/dsa/binary_tree/recursion.go#L8) |  |
 | Tree | 101. Symmetric Tree | [LeetCode](https://leetcode.com/problems/symmetric-tree/) | [binary_tree/recursion.go](go/dsa/binary_tree/recursion.go#L27) |  |
 | Tree | 105. Construct Binary Tree from Preorder and Inorder Traversal | [LeetCode](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L6) |  |
-| Tree | 108. Convert Sorted Array to Binary Search Tree | [LeetCode](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/) | [bst/BST.go](go/dsa/bst/BST.go#L31) |  |
+| Tree | 108. Convert Sorted Array to Binary Search Tree | [LeetCode](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/) | [bst/bst.go](go/dsa/bst/bst.go#L31) |  |
 | Tree | 110. Balanced Binary Tree | [LeetCode](https://leetcode.com/problems/balanced-binary-tree/) | [binary_tree/recursion.go](go/dsa/binary_tree/recursion.go#L42) |  |
 | Tree | 113. Path Sum II | [LeetCode](https://leetcode.com/problems/path-sum-ii/) | [binary_tree/path_sum.go](go/dsa/binary_tree/path_sum.go#L43) |  |
 | Tree | 124. Binary Tree Maximum Path Sum | [LeetCode](https://leetcode.com/problems/binary-tree-maximum-path-sum/) | [binary_tree/path_sum.go](go/dsa/binary_tree/path_sum.go#L9) |  |
 | Tree | 144. Binary Tree Preorder Traversal | [LeetCode](https://leetcode.com/problems/binary-tree-preorder-traversal/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L54) |  |
 | Tree | 145. Binary Tree Postorder Traversal | [LeetCode](https://leetcode.com/problems/binary-tree-postorder-traversal/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L34) |  |
 | Tree | 226. Invert Binary Tree | [LeetCode](https://leetcode.com/problems/invert-binary-tree/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L97) |  |
-| Tree | 230. Kth Smallest Element in a BST | [LeetCode](https://leetcode.com/problems/kth-smallest-element-in-a-bst/) | [bst/BST.go](go/dsa/bst/BST.go#L50) |  |
-| Tree | 235. Lowest Common Ancestor of a Binary Search Tree | [LeetCode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | [bst/BST.go](go/dsa/bst/BST.go#L88) |  |
+| Tree | 230. Kth Smallest Element in a BST | [LeetCode](https://leetcode.com/problems/kth-smallest-element-in-a-bst/) | [bst/bst.go](go/dsa/bst/bst.go#L50) |  |
+| Tree | 235. Lowest Common Ancestor of a Binary Search Tree | [LeetCode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | [bst/bst.go](go/dsa/bst/bst.go#L88) |  |
 | Tree | 236. Lowest Common Ancestor of a Binary Tree | [LeetCode](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/) | [binary_tree/ancestors.go](go/dsa/binary_tree/ancestors.go#L8) |  |
-| Tree | 285. Inorder Successor in BST | [LeetCode](https://leetcode.com/problems/inorder-successor-in-bst/) | [bst/inorder_successor_in_BST.go](go/dsa/bst/inorder_successor_in_BST.go#L6) |  |
-| Tree | 450. Delete Node in a BST | [LeetCode](https://leetcode.com/problems/delete-node-in-a-bst/) | [bst/BST.go](go/dsa/bst/BST.go#L124) |  |
+| Tree | 285. Inorder Successor in BST | [LeetCode](https://leetcode.com/problems/inorder-successor-in-bst/) | [bst/inorder_successor_in_bst.go](go/dsa/bst/inorder_successor_in_bst.go#L6) |  |
+| Tree | 450. Delete Node in a BST | [LeetCode](https://leetcode.com/problems/delete-node-in-a-bst/) | [bst/bst.go](go/dsa/bst/bst.go#L124) |  |
 | Tree | 572. Subtree of Another Tree | [LeetCode](https://leetcode.com/problems/subtree-of-another-tree/) | [binary_tree/recursion.go](go/dsa/binary_tree/recursion.go#L75) |  |
 | Tree | 662. Maximum Width of Binary Tree | [LeetCode](https://leetcode.com/problems/maximum-width-of-binary-tree/) | [binary_tree/tree_traversal.go](go/dsa/binary_tree/tree_traversal.go#L130) |  |
 | Tree | 987. Vertical Order Traversal of a Binary Tree | [LeetCode](https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/) | [binary_tree/vertical_traversal.go](go/dsa/binary_tree/vertical_traversal.go#L9) |  |
@@ -282,7 +282,7 @@
 | Two Pointers | 408. Valid Word Abbreviation | [LeetCode](https://leetcode.com/problems/valid-word-abbreviation/) | [two_pointers/two_pointers.go](go/dsa/two_pointers/two_pointers.go#L247) |  |
 | Two Pointers | 838. Push Dominoes | [LeetCode](https://leetcode.com/problems/push-dominoes/) | [two_pointers/push_dominoes.go](go/dsa/two_pointers/push_dominoes.go#L6) |  |
 | Two Pointers | 977. Squares of a Sorted Array | [LeetCode](https://leetcode.com/problems/squares-of-a-sorted-array/) | [two_pointers/two_pointers.go](go/dsa/two_pointers/two_pointers.go#L171) |  |
-| Union Find | 128. Longest Consecutive Sequence | [LeetCode](https://leetcode.com/problems/longest-consecutive-sequence/) | [union_find/UF.go](go/dsa/union_find/UF.go#L267) |  |
-| Union Find | 323. Number of Connected Components in an Undirected Graph | [LeetCode](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/) | [union_find/UF.go](go/dsa/union_find/UF.go#L149) |  |
+| Union Find | 128. Longest Consecutive Sequence | [LeetCode](https://leetcode.com/problems/longest-consecutive-sequence/) | [union_find/union_find.go](go/dsa/union_find/union_find.go#L267) |  |
+| Union Find | 323. Number of Connected Components in an Undirected Graph | [LeetCode](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/) | [union_find/union_find.go](go/dsa/union_find/union_find.go#L149) |  |
 | Union Find | 839. Similar String Groups | [LeetCode](https://leetcode.com/problems/similar-string-groups/) | [union_find/similar_string_groups.go](go/dsa/union_find/similar_string_groups.go#L4) |  |
 | Union Find | 1061. Lexicographically Smallest Equivalent String | [LeetCode](https://leetcode.com/problems/lexicographically-smallest-equivalent-string/) | [union_find/smallest_equivalent_string.go](go/dsa/union_find/smallest_equivalent_string.go#L4) |  |
