@@ -49,14 +49,3 @@ class Solution:
                 return i + 1
 
         return len(nums) + 1  # all [1..n] present → answer is n+1
-
-    """
-    268. Missing Number
-    """
-
-    def missingNumber(self, nums: list[int]) -> int:
-        nums.sort()
-        for i, num in enumerate(nums):
-            if num != i:
-                return i
-        return len(nums)

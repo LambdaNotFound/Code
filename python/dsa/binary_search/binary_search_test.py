@@ -2,14 +2,11 @@
 Unit tests for binary_search.py — LC 33: Search in Rotated Sorted Array,
 LC 81: Search in Rotated Sorted Array II, LC 278: First Bad Version
 """
-import sys
-import os
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(__file__))
-import binary_search as bs
-from binary_search import Solution  # noqa: E402
+from dsa.binary_search import binary_search as bs
+from dsa.binary_search.binary_search import Solution
 
 
 @pytest.mark.parametrize("n, first_bad, want", [

@@ -5,15 +5,15 @@
 | Array | 41. First Missing Positive | [LeetCode](https://leetcode.com/problems/first-missing-positive/) | [array/array.go](go/dsa/array/array.go#L6) | [array/array.py](python/dsa/array/array.py#L31) |
 | Array | 48. Rotate Image | [LeetCode](https://leetcode.com/problems/rotate-image/) | [matrix/matrix.go](go/dsa/matrix/matrix.go#L111) |  |
 | Array | 54. Spiral Matrix | [LeetCode](https://leetcode.com/problems/spiral-matrix/) | [matrix/matrix.go](go/dsa/matrix/matrix.go#L4) |  |
-| Array | 56. Merge Intervals | [LeetCode](https://leetcode.com/problems/merge-intervals/) | [array/interval.go](go/dsa/array/interval.go#L77) | [solid_coding/intervals.py](python/dsa/solid_coding/intervals.py#L15) |
-| Array | 57. Insert Interval | [LeetCode](https://leetcode.com/problems/insert-interval/) | [array/interval.go](go/dsa/array/interval.go#L56) | [solid_coding/intervals.py](python/dsa/solid_coding/intervals.py#L33) |
+| Array | 56. Merge Intervals | [LeetCode](https://leetcode.com/problems/merge-intervals/) | [array/interval.go](go/dsa/array/interval.go#L77) | [array/interval.py](python/dsa/array/interval.py#L15) |
+| Array | 57. Insert Interval | [LeetCode](https://leetcode.com/problems/insert-interval/) | [array/interval.go](go/dsa/array/interval.go#L56) | [array/interval.py](python/dsa/array/interval.py#L33) |
 | Array | 73. Set Matrix Zeroes | [LeetCode](https://leetcode.com/problems/set-matrix-zeroes/) | [matrix/matrix.go](go/dsa/matrix/matrix.go#L43) |  |
 | Array | 80. Remove Duplicates from Sorted Array II | [LeetCode](https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/) | [array/array.go](go/dsa/array/array.go#L37) |  |
 | Array | 163. Missing Ranges | [LeetCode](https://leetcode.com/problems/missing-ranges/) | [array/ranges.go](go/dsa/array/ranges.go#L67) |  |
 | Array | 189. Rotate Array | [LeetCode](https://leetcode.com/problems/rotate-array/) | [array/rotate_array.go](go/dsa/array/rotate_array.go#L6) |  |
 | Array | 228. Summary Ranges | [LeetCode](https://leetcode.com/problems/summary-ranges/) | [array/ranges.go](go/dsa/array/ranges.go#L28) |  |
-| Array | 435. Non-overlapping Intervals | [LeetCode](https://leetcode.com/problems/non-overlapping-intervals/) | [array/interval.go](go/dsa/array/interval.go#L100) | [solid_coding/intervals.py](python/dsa/solid_coding/intervals.py#L54) |
-| Array | 986. Interval List Intersections | [LeetCode](https://leetcode.com/problems/interval-list-intersections/) | [array/interval.go](go/dsa/array/interval.go#L167) | [solid_coding/intervals.py](python/dsa/solid_coding/intervals.py#L71) |
+| Array | 435. Non-overlapping Intervals | [LeetCode](https://leetcode.com/problems/non-overlapping-intervals/) | [array/interval.go](go/dsa/array/interval.go#L100) | [array/interval.py](python/dsa/array/interval.py#L54) |
+| Array | 986. Interval List Intersections | [LeetCode](https://leetcode.com/problems/interval-list-intersections/) | [array/interval.go](go/dsa/array/interval.go#L167) | [array/interval.py](python/dsa/array/interval.py#L71) |
 | Array | 1094. Car Pooling | [LeetCode](https://leetcode.com/problems/car-pooling/) | [array/interval.go](go/dsa/array/interval.go#L300) |  |
 | Array | 1229. Meeting Scheduler | [LeetCode](https://leetcode.com/problems/meeting-scheduler/) | [array/interval.go](go/dsa/array/interval.go#L379) |  |
 | Backtracking | 17. Letter Combinations of a Phone Number | [LeetCode](https://leetcode.com/problems/letter-combinations-of-a-phone-number/) | [backtracking/backtracking.go](go/dsa/backtracking/backtracking.go#L378) |  |
@@ -44,12 +44,12 @@
 | Binary Search | 229. Majority Element II | [LeetCode](https://leetcode.com/problems/majority-element-ii/) | [binary_search/lower_bound.go](go/dsa/binary_search/lower_bound.go#L1) |  |
 | Binary Search | 240. Search a 2D Matrix II | [LeetCode](https://leetcode.com/problems/search-a-2d-matrix-ii/) | [binary_search/binary_search.go](go/dsa/binary_search/binary_search.go#L272) |  |
 | Binary Search | 278. First Bad Version | [LeetCode](https://leetcode.com/problems/first-bad-version/) | [binary_search/binary_search.go](go/dsa/binary_search/binary_search.go#L217) | [binary_search/binary_search.py](python/dsa/binary_search/binary_search.py#L75) |
-| Binary Search | 475. Heaters | [LeetCode](https://leetcode.com/problems/heaters/) | [binary_search/sensor_coverage.go](go/dsa/binary_search/sensor_coverage.go#L51) | [binary_search/find_radius.py](python/dsa/binary_search/find_radius.py#L6) |
+| Binary Search | 475. Heaters | [LeetCode](https://leetcode.com/problems/heaters/) | [binary_search/sensor_coverage.go](go/dsa/binary_search/sensor_coverage.go#L51) | [binary_search/sensor_coverage.py](python/dsa/binary_search/sensor_coverage.py#L6) |
 | Binary Search | 704. Binary Search | [LeetCode](https://leetcode.com/problems/binary-search/) | [binary_search/binary_search.go](go/dsa/binary_search/binary_search.go#L234) |  |
 | Binary Search | 1235. Maximum Profit in Job Scheduling | [LeetCode](https://leetcode.com/problems/maximum-profit-in-job-scheduling/) | [binary_search/job_scheduling.go](go/dsa/binary_search/job_scheduling.go#L6) |  |
 | Bit Manipulation | 190. Reverse Bits | [LeetCode](https://leetcode.com/problems/reverse-bits/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L85) |  |
 | Bit Manipulation | 191. Number of 1 Bits | [LeetCode](https://leetcode.com/problems/number-of-1-bits/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L23) |  |
-| Bit Manipulation | 268. Missing Number | [LeetCode](https://leetcode.com/problems/missing-number/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L67) |  |
+| Bit Manipulation | 268. Missing Number | [LeetCode](https://leetcode.com/problems/missing-number/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L67) || [bit_manipulation/bit_manipulation.py](python/dsa/bit_manipulation/bit_manipulation.py#L3) |
 | Bit Manipulation | 338. Counting Bits | [LeetCode](https://leetcode.com/problems/counting-bits/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L41) |  |
 | Bit Manipulation | 371. Sum of Two Integers | [LeetCode](https://leetcode.com/problems/sum-of-two-integers/) | [bit_manipulation/bit_manipulation.go](go/dsa/bit_manipulation/bit_manipulation.go#L5) |  |
 | Design | 105. Construct Binary Tree from Preorder and Inorder Traversal | [LeetCode](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | [binary_tree/build_tree_alt.go](go/dsa/binary_tree/build_tree_alt.go#L10) |  |
@@ -86,17 +86,17 @@
 | Dynamic Programming | 91. Decode Ways | [LeetCode](https://leetcode.com/problems/decode-ways/) | [dp/decode_ways.go](go/dsa/dp/decode_ways.go#L6) |  |
 | Dynamic Programming | 121. Best Time to Buy and Sell Stock | [LeetCode](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/) | [dp/max_profit.go](go/dsa/dp/max_profit.go#L6) |  |
 | Dynamic Programming | 139. Word Break | [LeetCode](https://leetcode.com/problems/word-break/) | [dp/word_break.go](go/dsa/dp/word_break.go#L4) |  |
-| Dynamic Programming | 140. Word Break II | [LeetCode](https://leetcode.com/problems/word-break-ii/) | [dp/word_break.go](go/dsa/dp/word_break.go#L124) | [dynamic_programming/word_break.py](python/dsa/dynamic_programming/word_break.py#L6) |
+| Dynamic Programming | 140. Word Break II | [LeetCode](https://leetcode.com/problems/word-break-ii/) | [dp/word_break.go](go/dsa/dp/word_break.go#L124) | [dp/word_break.py](python/dsa/dp/word_break.py#L6) |
 | Dynamic Programming | 198. House Robber | [LeetCode](https://leetcode.com/problems/house-robber/) | [dp/house_robber.go](go/dsa/dp/house_robber.go#L4) |  |
 | Dynamic Programming | 213. House Robber II | [LeetCode](https://leetcode.com/problems/house-robber-ii/) | [dp/house_robber.go](go/dsa/dp/house_robber.go#L22) |  |
 | Dynamic Programming | 221. Maximal Square | [LeetCode](https://leetcode.com/problems/maximal-square/) | [dp/maximal_square.go](go/dsa/dp/maximal_square.go#L4) |  |
-| Dynamic Programming | 300. Longest Increasing Subsequence | [LeetCode](https://leetcode.com/problems/longest-increasing-subsequence/) | [dp/lis.go](go/dsa/dp/lis.go#L4) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L15) |
+| Dynamic Programming | 300. Longest Increasing Subsequence | [LeetCode](https://leetcode.com/problems/longest-increasing-subsequence/) | [dp/lis.go](go/dsa/dp/lis.go#L4) | [dp/lis.py](python/dsa/dp/lis.py#L11) |
 | Dynamic Programming | 403. Frog Jump | [LeetCode](https://leetcode.com/problems/frog-jump/) | [dp/frog_jump.go](go/dsa/dp/frog_jump.go#L4) |  |
 | Dynamic Programming | 647. Palindromic Substrings | [LeetCode](https://leetcode.com/problems/palindromic-substrings/) | [dp/palindrome.go](go/dsa/dp/palindrome.go#L35) |  |
 | Dynamic Programming | 718. Maximum Length of Repeated Subarray | [LeetCode](https://leetcode.com/problems/maximum-length-of-repeated-subarray/) | [dp/lcs.go](go/dsa/dp/lcs.go#L38) |  |
 | Dynamic Programming | 787. Cheapest Flights Within K Stops | [LeetCode](https://leetcode.com/problems/cheapest-flights-within-k-stops/) | [dp/find_cheapest_price.go](go/dsa/dp/find_cheapest_price.go#L6) |  |
 | Dynamic Programming | 1048. Longest String Chain | [LeetCode](https://leetcode.com/problems/longest-string-chain/) | [dp/lcs.go](go/dsa/dp/lcs.go#L74) |  |
-| Dynamic Programming | 1143. Longest Common Subsequence | [LeetCode](https://leetcode.com/problems/longest-common-subsequence/) | [dp/lcs.go](go/dsa/dp/lcs.go#L6) | [dynamic_programming/subsequence.py](python/dsa/dynamic_programming/subsequence.py#L11) |
+| Dynamic Programming | 1143. Longest Common Subsequence | [LeetCode](https://leetcode.com/problems/longest-common-subsequence/) | [dp/lcs.go](go/dsa/dp/lcs.go#L6) | [dp/lcs.py](python/dsa/dp/lcs.py#L3) |
 | Dynamic Programming | 1235. Maximum Profit in Job Scheduling | [LeetCode](https://leetcode.com/problems/maximum-profit-in-job-scheduling/) | [dp/job_scheduling.go](go/dsa/dp/job_scheduling.go#L6) |  |
 | Dynamic Programming | 1293. Shortest Path in a Grid with Obstacles Elimination | [LeetCode](https://leetcode.com/problems/shortest-path-in-a-grid-with-obstacles-elimination/) | [bfs/shortest_path_with_obstacles_elimination_alt.go](go/dsa/bfs/shortest_path_with_obstacles_elimination_alt.go#L6) |  |
 | Dynamic Programming (Knapsack) | 39. Combination Sum | [LeetCode](https://leetcode.com/problems/combination-sum/) | [dp/combination_sum.go](go/dsa/dp/combination_sum.go#L4) |  |
@@ -116,7 +116,7 @@
 | Graph (BFS) | 102. Binary Tree Level Order Traversal | [LeetCode](https://leetcode.com/problems/binary-tree-level-order-traversal/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L43) |  |
 | Graph (BFS) | 103. Binary Tree Zigzag Level Order Traversal | [LeetCode](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L73) |  |
 | Graph (BFS) | 127. Word Ladder | [LeetCode](https://leetcode.com/problems/word-ladder/) | [bfs/word_ladder.go](go/dsa/bfs/word_ladder.go#L8) |  |
-| Graph (BFS) | 199. Binary Tree Right Side View | [LeetCode](https://leetcode.com/problems/binary-tree-right-side-view/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L9) | [tree/tree.py](python/dsa/tree/tree.py#L7) |
+| Graph (BFS) | 199. Binary Tree Right Side View | [LeetCode](https://leetcode.com/problems/binary-tree-right-side-view/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L9) | [binary_tree/tree_bfs.py](python/dsa/binary_tree/tree_bfs.py#L8) |
 | Graph (BFS) | 365. Water and Jug Problem | [LeetCode](https://leetcode.com/problems/water-and-jug-problem/) | [bfs/water_and_jug_problem.go](go/dsa/bfs/water_and_jug_problem.go#L4) |  |
 | Graph (BFS) | 863. All Nodes Distance K in Binary Tree | [LeetCode](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L106) |  |
 | Graph (BFS) | 958. Check Completeness of a Binary Tree | [LeetCode](https://leetcode.com/problems/check-completeness-of-a-binary-tree/) | [binary_tree/tree_bfs.go](go/dsa/binary_tree/tree_bfs.go#L207) |  |
@@ -149,14 +149,14 @@
 | Greedy | 134. Gas Station | [LeetCode](https://leetcode.com/problems/gas-station/) | [greedy/greedy.go](go/dsa/greedy/greedy.go#L72) |  |
 | Greedy | 621. Task Scheduler | [LeetCode](https://leetcode.com/problems/task-scheduler/) | [greedy/greedy.go](go/dsa/greedy/greedy.go#L216) |  |
 | Greedy | 1024. Video Stitching | [LeetCode](https://leetcode.com/problems/video-stitching/) | [greedy/greedy.go](go/dsa/greedy/greedy.go#L125) |  |
-| Hash Table | 1. Two Sum | [LeetCode](https://leetcode.com/problems/two-sum/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L6) | [hashmap/hashmap.py](python/dsa/hashmap/hashmap.py#L7) |
+| Hash Table | 1. Two Sum | [LeetCode](https://leetcode.com/problems/two-sum/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L6) | [hash_table/hashmap.py](python/dsa/hash_table/hashmap.py#L7) |
 | Hash Table | 128. Longest Consecutive Sequence | [LeetCode](https://leetcode.com/problems/longest-consecutive-sequence/) | [hash_table/set.go](go/dsa/hash_table/set.go#L4) |  |
 | Hash Table | 217. Contains Duplicate | [LeetCode](https://leetcode.com/problems/contains-duplicate/) | [hash_table/set.go](go/dsa/hash_table/set.go#L33) |  |
-| Hash Table | 242. Valid Anagram | [LeetCode](https://leetcode.com/problems/valid-anagram/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L42) | [hashmap/hashmap.py](python/dsa/hashmap/hashmap.py#L44) |
+| Hash Table | 242. Valid Anagram | [LeetCode](https://leetcode.com/problems/valid-anagram/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L42) | [hash_table/hashmap.py](python/dsa/hash_table/hashmap.py#L44) |
 | Hash Table | 336. Palindrome Pairs | [LeetCode](https://leetcode.com/problems/palindrome-pairs/) | [hash_table/palindrome_pairs.go](go/dsa/hash_table/palindrome_pairs.go#L6) |  |
-| Hash Table | 383. Ransom Note | [LeetCode](https://leetcode.com/problems/ransom-note/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L23) | [hashmap/hashmap.py](python/dsa/hashmap/hashmap.py#L20) |
+| Hash Table | 383. Ransom Note | [LeetCode](https://leetcode.com/problems/ransom-note/) | [hash_table/hashmap.go](go/dsa/hash_table/hashmap.go#L23) | [hash_table/hashmap.py](python/dsa/hash_table/hashmap.py#L20) |
 | Hash Table | 1152. Analyze User Website Visit Pattern | [LeetCode](https://leetcode.com/problems/analyze-user-website-visit-pattern/) | [hash_table/analyze_pattern.go](go/dsa/hash_table/analyze_pattern.go#L1) |  |
-| Heap / Priority Queue | 23. Merge k Sorted Lists | [LeetCode](https://leetcode.com/problems/merge-k-sorted-lists/) | [heap/merge_k_lists.go](go/dsa/heap/merge_k_lists.go#L9) | [heap/merge_k_lists.py](python/dsa/heap/merge_k_lists.py#L9) |
+| Heap / Priority Queue | 23. Merge k Sorted Lists | [LeetCode](https://leetcode.com/problems/merge-k-sorted-lists/) | [heap/merge_k_lists.go](go/dsa/heap/merge_k_lists.go#L9) | [heap/merge_k_lists.py](python/dsa/heap/merge_k_lists.py#L7) |
 | Heap / Priority Queue | 215. Kth Largest Element in an Array | [LeetCode](https://leetcode.com/problems/kth-largest-element-in-an-array/) | [heap/find_kth_largest.go](go/dsa/heap/find_kth_largest.go#L4) |  |
 | Heap / Priority Queue | 295. Find Median from Data Stream | [LeetCode](https://leetcode.com/problems/find-median-from-data-stream/) | [heap/median_finder.go](go/dsa/heap/median_finder.go#L6) |  |
 | Heap / Priority Queue | 347. Top K Frequent Elements | [LeetCode](https://leetcode.com/problems/top-k-frequent-elements/) | [heap/top_k_frequent.go](go/dsa/heap/top_k_frequent.go#L14) | [heap/top_k_frequent.py](python/dsa/heap/top_k_frequent.py#L6) |
@@ -192,13 +192,13 @@
 | Math | 1884. Egg Drop With 2 Eggs and N Floors | [LeetCode](https://leetcode.com/problems/egg-drop-with-2-eggs-and-n-floors/) | [math/math.go](go/dsa/math/math.go#L4) |  |
 | Memoization | 70. Climbing Stairs | [LeetCode](https://leetcode.com/problems/climbing-stairs/) | [memoization/climb_stairs.go](go/dsa/memoization/climb_stairs.go#L4) |  |
 | Monotonic Queue | 239. Sliding Window Maximum | [LeetCode](https://leetcode.com/problems/sliding-window-maximum/) | [mono_queue/mono_queue.go](go/dsa/mono_queue/mono_queue.go#L17) |  |
-| Monotonic Queue | 1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit | [LeetCode](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/) | [mono_queue/mono_queue.go](go/dsa/mono_queue/mono_queue.go#L61) | [stack_queue/mono_queue.py](python/dsa/stack_queue/mono_queue.py#L4) |
+| Monotonic Queue | 1438. Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit | [LeetCode](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/) | [mono_queue/mono_queue.go](go/dsa/mono_queue/mono_queue.go#L61) | [mono_queue/mono_queue.py](python/dsa/mono_queue/mono_queue.py#L4) |
 | Monotonic Stack | 42. Trapping Rain Water | [LeetCode](https://leetcode.com/problems/trapping-rain-water/) | [mono_stack/monotonic_stack.go](go/dsa/mono_stack/monotonic_stack.go#L19) |  |
 | Monotonic Stack | 84. Largest Rectangle in Histogram | [LeetCode](https://leetcode.com/problems/largest-rectangle-in-histogram/) | [mono_stack/monotonic_stack.go](go/dsa/mono_stack/monotonic_stack.go#L96) |  |
-| Monotonic Stack | 316. Remove Duplicate Letters | [LeetCode](https://leetcode.com/problems/remove-duplicate-letters/) | [mono_stack/monotonic_stack.go](go/dsa/mono_stack/monotonic_stack.go#L217) | [stack_queue/mono_stack.py](python/dsa/stack_queue/mono_stack.py#L5) |
+| Monotonic Stack | 316. Remove Duplicate Letters | [LeetCode](https://leetcode.com/problems/remove-duplicate-letters/) | [mono_stack/monotonic_stack.go](go/dsa/mono_stack/monotonic_stack.go#L217) | [mono_stack/monotonic_stack.py](python/dsa/mono_stack/monotonic_stack.py#L5) |
 | Monotonic Stack | 739. Daily Temperatures | [LeetCode](https://leetcode.com/problems/daily-temperatures/) | [mono_stack/monotonic_stack.go](go/dsa/mono_stack/monotonic_stack.go#L179) |  |
-| Prefix Sum | 238. Product of Array Except Self | [LeetCode](https://leetcode.com/problems/product-of-array-except-self/) | [prefix_sum/prefix_sum.go](go/dsa/prefix_sum/prefix_sum.go#L5) | [prefix_sum/prefix_sum.py](python/dsa/prefix_sum/prefix_sum.py#L10) |
-| Prefix Sum | 437. Path Sum III | [LeetCode](https://leetcode.com/problems/path-sum-iii/) | [prefix_sum/path_sum.go](go/dsa/prefix_sum/path_sum.go#L8) | [prefix_sum/path_sum.py](python/dsa/prefix_sum/path_sum.py#L10) |
+| Prefix Sum | 238. Product of Array Except Self | [LeetCode](https://leetcode.com/problems/product-of-array-except-self/) | [prefix_sum/prefix_sum.go](go/dsa/prefix_sum/prefix_sum.go#L5) | [prefix_sum/prefix_sum.py](python/dsa/prefix_sum/prefix_sum.py#L6) |
+| Prefix Sum | 437. Path Sum III | [LeetCode](https://leetcode.com/problems/path-sum-iii/) | [prefix_sum/path_sum.go](go/dsa/prefix_sum/path_sum.go#L8) | [prefix_sum/path_sum.py](python/dsa/prefix_sum/path_sum.py#L9) |
 | Prefix Sum | 523. Continuous Subarray Sum | [LeetCode](https://leetcode.com/problems/continuous-subarray-sum/) | [prefix_sum/prefix_sum.go](go/dsa/prefix_sum/prefix_sum.go#L172) |  |
 | Prefix Sum | 525. Contiguous Array | [LeetCode](https://leetcode.com/problems/contiguous-array/) | [prefix_sum/prefix_sum.go](go/dsa/prefix_sum/prefix_sum.go#L33) |  |
 | Prefix Sum | 528. Random Pick with Weight | [LeetCode](https://leetcode.com/problems/random-pick-with-weight/) | [prefix_sum/random_pick_with_weight.go](go/dsa/prefix_sum/random_pick_with_weight.go#L9) |  |
@@ -208,7 +208,7 @@
 | Recursion | 341. Flatten Nested List Iterator | [LeetCode](https://leetcode.com/problems/flatten-nested-list-iterator/) | [dfs/nested_integer.go](go/dsa/dfs/nested_integer.go#L65) |  |
 | Sliding Window | 3. Longest Substring Without Repeating Characters | [LeetCode](https://leetcode.com/problems/longest-substring-without-repeating-characters/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L20) |  |
 | Sliding Window | 30. Substring with Concatenation of All Words | [LeetCode](https://leetcode.com/problems/substring-with-concatenation-of-all-words/) | [sliding_window/concatenation_of_all_words.go](go/dsa/sliding_window/concatenation_of_all_words.go#L4) |  |
-| Sliding Window | 76. Minimum Window Substring | [LeetCode](https://leetcode.com/problems/minimum-window-substring/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L63) | [two_pointers/sliding_window/sliding_window.py](python/dsa/two_pointers/sliding_window/sliding_window.py#L6) |
+| Sliding Window | 76. Minimum Window Substring | [LeetCode](https://leetcode.com/problems/minimum-window-substring/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L63) | [sliding_window/sliding_window.py](python/dsa/sliding_window/sliding_window.py#L6) |
 | Sliding Window | 209. Minimum Size Subarray Sum | [LeetCode](https://leetcode.com/problems/minimum-size-subarray-sum/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L161) |  |
 | Sliding Window | 219. Contains Duplicate II | [LeetCode](https://leetcode.com/problems/contains-duplicate-ii/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L224) |  |
 | Sliding Window | 340. Longest Substring with At Most K Distinct Characters | [LeetCode](https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/) | [sliding_window/longest_substring.go](go/dsa/sliding_window/longest_substring.go#L55) |  |
@@ -218,16 +218,16 @@
 | Sliding Window | 1004. Max Consecutive Ones III | [LeetCode](https://leetcode.com/problems/max-consecutive-ones-iii/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L240) |  |
 | Sliding Window | 2933. High-Access Employees | [LeetCode](https://leetcode.com/problems/high-access-employees/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L185) |  |
 | Stack | 20. Valid Parentheses | [LeetCode](https://leetcode.com/problems/valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L199) |  |
-| Stack | 32. Longest Valid Parentheses | [LeetCode](https://leetcode.com/problems/longest-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L6) | [stack_queue/parentheses.py](python/dsa/stack_queue/parentheses.py#L4) |
+| Stack | 32. Longest Valid Parentheses | [LeetCode](https://leetcode.com/problems/longest-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L6) | [stack/parentheses.py](python/dsa/stack/parentheses.py#L4) |
 | Stack | 150. Evaluate Reverse Polish Notation | [LeetCode](https://leetcode.com/problems/evaluate-reverse-polish-notation/) | [stack/stack.go](go/dsa/stack/stack.go#L9) |  |
-| Stack | 224. Basic Calculator | [LeetCode](https://leetcode.com/problems/basic-calculator/) | [stack/calculator.go](go/dsa/stack/calculator.go#L63) | [stack_queue/calculator.py](python/dsa/stack_queue/calculator.py#L46) |
-| Stack | 227. Basic Calculator II | [LeetCode](https://leetcode.com/problems/basic-calculator-ii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L163) | [stack_queue/calculator.py](python/dsa/stack_queue/calculator.py#L101) |
-| Stack | 394. Decode String | [LeetCode](https://leetcode.com/problems/decode-string/) | [stack/stack.go](go/dsa/stack/stack.go#L165) | [stack_queue/stack.py](python/dsa/stack_queue/stack.py#L39) |
+| Stack | 224. Basic Calculator | [LeetCode](https://leetcode.com/problems/basic-calculator/) | [stack/calculator.go](go/dsa/stack/calculator.go#L63) | [stack/calculator.py](python/dsa/stack/calculator.py#L46) |
+| Stack | 227. Basic Calculator II | [LeetCode](https://leetcode.com/problems/basic-calculator-ii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L163) | [stack/calculator.py](python/dsa/stack/calculator.py#L101) |
+| Stack | 394. Decode String | [LeetCode](https://leetcode.com/problems/decode-string/) | [stack/stack.go](go/dsa/stack/stack.go#L165) | [stack/stack.py](python/dsa/stack/stack.py#L39) |
 | Stack | 735. Asteroid Collision | [LeetCode](https://leetcode.com/problems/asteroid-collision/) | [stack/stack.go](go/dsa/stack/stack.go#L65) |  |
-| Stack | 772. Basic Calculator III | [LeetCode](https://leetcode.com/problems/basic-calculator-iii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L249) | [stack_queue/calculator.py](python/dsa/stack_queue/calculator.py#L128) |
+| Stack | 772. Basic Calculator III | [LeetCode](https://leetcode.com/problems/basic-calculator-iii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L249) | [stack/calculator.py](python/dsa/stack/calculator.py#L128) |
 | Stack | 844. Backspace String Compare | [LeetCode](https://leetcode.com/problems/backspace-string-compare/) | [stack/stack.go](go/dsa/stack/stack.go#L44) |  |
 | Stack | 921. Minimum Add to Make Parentheses Valid | [LeetCode](https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L175) |  |
-| Stack | 1209. Remove All Adjacent Duplicates in String II | [LeetCode](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/) | [stack/stack.go](go/dsa/stack/stack.go#L112) | [stack_queue/stack.py](python/dsa/stack_queue/stack.py#L5) |
+| Stack | 1209. Remove All Adjacent Duplicates in String II | [LeetCode](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/) | [stack/stack.go](go/dsa/stack/stack.go#L112) | [stack/stack.py](python/dsa/stack/stack.py#L5) |
 | Stack | 1249. Minimum Remove to Make Valid Parentheses | [LeetCode](https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L108) |  |
 | Stack | 2625. Flatten Deeply Nested Array | [LeetCode](https://leetcode.com/problems/flatten-deeply-nested-array/) | [stack/flatten_deeply_nested_array.go](go/dsa/stack/flatten_deeply_nested_array.go#L10) |  |
 | String | 8. String to Integer (atoi) | [LeetCode](https://leetcode.com/problems/string-to-integer-atoi/) | [string/string.go](go/dsa/string/string.go#L33) |  |

@@ -1,13 +1,10 @@
 """
-Unit tests for product_except_self.py — Product of Array Except Self (LeetCode 238)
+Unit tests for prefix_sum.py — Product of Array Except Self (LeetCode 238)
 """
-import sys
-import os
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(__file__))
-from prefix_sum import Solution
+from dsa.prefix_sum.prefix_sum import Solution
 
 
 @pytest.mark.parametrize("nums, want", [

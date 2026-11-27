@@ -1,18 +1,9 @@
 """
 Unit tests for array.py — can_arrange (team photo) and firstMissingPositive (LeetCode 41)
 """
-import importlib.util
-import os
-
 import pytest
 
-# array.py conflicts with stdlib; load via spec
-_spec = importlib.util.spec_from_file_location(
-    "array_sol", os.path.join(os.path.dirname(__file__), "array.py")
-)
-_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_mod)
-Solution = _mod.Solution
+from dsa.array.array import Solution
 
 
 @pytest.mark.parametrize("h1, h2, want", [

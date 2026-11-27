@@ -17,13 +17,13 @@ source venv/bin/activate
 pytest
 
 # Run a single package
-pytest dsa/stack_queue/
+pytest dsa/stack/
 
 # Run a single test file
-pytest dsa/stack_queue/stack_test.py
+pytest dsa/stack/stack_test.py
 
 # Run a single test by name
-pytest dsa/stack_queue/stack_test.py -k test_decodeString
+pytest dsa/stack/stack_test.py -k test_decodeString
 
 # Verbose output
 pytest -v
@@ -31,41 +31,38 @@ pytest -v
 
 ## Architecture
 
-Two folders, matching the repo-wide layout (see the root `CLAUDE.md`): `dsa/` holds data-structure and algorithm solutions by technique, and `interview/` holds company mock-interview problems. Each category is a directory containing one or more solution files and a co-located `_test.py` file. Run every command from `python/`, the folder this file is in.
+Two folders, matching the repo-wide layout (see the root `CLAUDE.md`): `dsa/` holds data-structure and algorithm solutions, and `interview/` holds company mock-interview problems. Run every command from `python/`, the folder this file is in.
 
-**Packages:**
-- `dsa/array/`, `dsa/backtracking/`, `dsa/binary_search/`, `dsa/dynamic_programming/`, `dsa/graph/`, `dsa/hashmap/`, `dsa/heap/`, `dsa/prefix_sum/`, `dsa/solid_coding/`, `dsa/stack_queue/`, `dsa/tree/`, `dsa/two_pointers/` — solutions grouped by technique
-- `dsa/common/` — shared node definitions (`ListNode`, `TreeNode`) and test helpers (`build_list`, `list_to_vals`, `build_tree`); imported with `sys.path.insert` since there is no `setup.py`
+**`dsa/` mirrors `go/dsa/`.** It has the same 37 folders: one per leetcode.com tag (`array`, `backtracking`, … `union_find`), plus `types/`, `utils/` and `containers/`. A Python solution goes in the same folder and the same file as the Go solution to that problem, with the file's `.go` swapped for `.py`: Two Sum is `go/dsa/hash_table/hashmap.go` in Go and `dsa/hash_table/hashmap.py` here. When Go has no solution to the problem, the root `CLAUDE.md`'s "Which tag folder a solution goes in" rule picks the folder. Every folder is a package with an `__init__.py`, even while it holds no solution yet.
+- `dsa/types/` — LeetCode's node classes, `ListNode` (`list.py`) and `TreeNode` (`tree.py`), the counterpart of `go/dsa/types/`. Import them as `from dsa.types import ListNode`.
+- `dsa/utils/` — test helpers, the counterpart of `go/dsa/utils/`: `build_list` and `list_to_vals` (`list_utils.py`), and `build_tree` (`tree_utils.py`). Import them as `from dsa.utils import build_tree`.
+- `dsa/containers/` — empty for now; it is where Python versions of `go/dsa/containers/`'s reference data structures would go.
 - `interview/` — company mock-interview problems; see "Interview problems" below
 
 **Import conventions:**
 
-Solution files that need shared types insert their parent folder (`dsa/`, which holds `common/`) into `sys.path`:
+`dsa/` imports package-style, from `python/`:
 ```python
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from common import ListNode
+from dsa.types import ListNode
+from dsa.stack.stack import Solution
 ```
+This works when a test file runs on its own (`pytest dsa/stack/stack_test.py`) because `dsa/` and each folder in it have an `__init__.py`: pytest then puts the first folder above them with no `__init__.py`, `python/`, on `sys.path`. Never insert a `dsa/` folder into `sys.path`. With `dsa/` itself on the path, the `types/`, `string/` and `array/` packages would shadow the standard library modules of the same names. Package imports are also what let two folders hold files of the same name, as Go's do (`dp/word_break.py` and `trie/word_break.py`).
 
-Test files insert their own directory to import the solution module:
+`interview/` has no `__init__.py`, so its tests still insert their own directory and import the solution by bare name:
 ```python
 sys.path.insert(0, os.path.dirname(__file__))
-from stack import Solution
+from rippling_task_manager import TaskManager
 ```
-
-Do not import package-style (`from interview.foo import X`). Nothing puts `python/` itself on `sys.path`, so such a test fails when run alone, and in a full run it passes only if another test happened to insert `python/` first. Two interview tests did this until 11-26-2026, and the move to `dsa/` broke them. Every test file must pass when run by itself: `pytest path/to/x_test.py`.
-
-**Name collision with stdlib — `array/`:**
-`array.py` conflicts with the stdlib `array` module. Its test loads it via `importlib.util.spec_from_file_location` instead of a plain import. Follow the same pattern if any future file name collides with stdlib (e.g. `queue`, `calendar`, `math`).
+Do not import `interview/` package-style (`from interview.foo import X`): nothing puts `python/` on `sys.path` for it, so such a test fails when run alone. Every test file must pass when run by itself: `pytest path/to/x_test.py`.
 
 ## Testing conventions
 
 - Table-driven tests using `@pytest.mark.parametrize`
 - When a function has multiple valid outputs (e.g. set of top-k elements, any optimal decomposition), validate properties — length, sum, containment — rather than exact equality
 - When two implementations of the same function exist, parametrize over both method names via a `METHODS` list and `getattr(Solution(), method)`
-- `common/` helpers (`build_list`, `list_to_vals`, `build_tree`) should be used in tests rather than duplicating linked-list/tree construction logic inline; add new helpers to `common/` when they would apply across packages
+- `dsa/utils/` helpers (`build_list`, `list_to_vals`, `build_tree`) should be used in tests rather than duplicating linked-list/tree construction logic inline; add new helpers to `dsa/utils/` when they would apply across packages
 - Static methods (no `self`) are called as `Solution.method(args)`, not `Solution().method(args)`
-- Test file naming: `<module>_test.py` co-located with the solution file; when a directory has multiple solution files, a single `<dir>_test.py` covers them all (e.g. `dsa/heap/heap_test.py` tests both `merge_k_lists.py` and `top_k_frequent.py`)
+- Test file naming: one `<module>_test.py` beside each solution file, as Go has one `_test.go` per file (e.g. `dsa/heap/merge_k_lists_test.py` and `dsa/heap/top_k_frequent_test.py`)
 
 ## Interview problems (`interview/`)
 
@@ -103,7 +100,7 @@ To check coverage, diff solution methods against tested methods:
 
 ```bash
 # methods defined in solution files
-grep -rn "def " --include="*.py" . | grep -v test | grep -v __pycache__ | grep -v venv | grep -v common
+grep -rn "def " --include="*.py" . | grep -v test | grep -v __pycache__ | grep -v venv | grep -v 'dsa/types/\|dsa/utils/'
 
 # test functions defined
 grep -rn "def test_" --include="*.py" . | grep -v __pycache__ | grep -v venv

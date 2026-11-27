@@ -1,15 +1,11 @@
 """
 Unit tests for path_sum.py — Path Sum III (LeetCode 437)
 """
-import sys
-import os
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-sys.path.insert(0, os.path.dirname(__file__))
-from common import build_tree
-from path_sum import Solution
+from dsa.prefix_sum.path_sum import Solution
+from dsa.utils import build_tree
 
 
 @pytest.mark.parametrize("values, targetSum, want", [

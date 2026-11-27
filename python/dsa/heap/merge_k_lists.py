@@ -1,6 +1,4 @@
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from common import ListNode
+from dsa.types import ListNode
 
 from typing import List, Optional
 import heapq
@@ -8,6 +6,8 @@ import heapq
 """
 23. Merge k Sorted Lists
 """
+
+
 class Solution:
     def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         minHeap: List[tuple[int, int, ListNode]] = []

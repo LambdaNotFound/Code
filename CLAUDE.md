@@ -41,7 +41,7 @@ Source is grouped by language first (`go/`, `python/`, `rust/`), then by kind of
 
 | Folder | Holds | Go | Python | Rust |
 |---|---|---|---|---|
-| `dsa/` | data-structure and algorithm problems, mostly LeetCode: one folder per LeetCode tag in Go, by technique in Python | yes | yes | not yet |
+| `dsa/` | data-structure and algorithm problems, mostly LeetCode: one folder per LeetCode tag, with `python/dsa/` mirroring `go/dsa/` folder for folder and file for file | yes | yes | not yet |
 | `interview/` | company mock-interview problems, files prefixed by company | yes | yes | not yet |
 | `design/` | low-level designs and design patterns | yes | not yet | not yet |
 | `features/` | the language itself: concurrency, async runtimes, fundamentals | yes | not yet | yes |
@@ -135,7 +135,7 @@ Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go modul
 `python/` holds the Python solutions, with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands. Run `pytest` from `python/`.
 
 - See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
-- `python/dsa/` is still grouped by technique, under the folder names `go/dsa/` used before its 11-26-2026 move to LeetCode tags: `array`, `backtracking`, `binary_search`, `dynamic_programming`, `graph`, `hashmap`, `heap`, `prefix_sum`, `solid_coding`, `stack_queue`, `tree`, `two_pointers`. Shared types live in `python/dsa/common/`.
+- `python/dsa/` mirrors `go/dsa/`: the same 37 folders, each a package, and each Python solution in the file its Go counterpart uses, with `.py` for `.go` (`python/dsa/hash_table/hashmap.py` beside `go/dsa/hash_table/hashmap.go`). LeetCode's node classes live in `python/dsa/types/` and the test helpers in `python/dsa/utils/`. Imports are package-style (`from dsa.types import TreeNode`); [python/CLAUDE.md](python/CLAUDE.md) says why, and why nothing may put a `dsa/` folder on `sys.path`.
 - `python/interview/` holds company mock-interview problems, several with a `.md` problem statement beside the solution.
 
 ## Rust sub-project

@@ -1,13 +1,10 @@
 """
 Unit tests for next_beautiful_number.py — Next Greater Numerically Balanced Number (LeetCode 2048)
 """
-import sys
-import os
 
 import pytest
 
-sys.path.insert(0, os.path.dirname(__file__))
-from next_beautiful_number import Solution
+from dsa.backtracking.next_beautiful_number import Solution
 
 METHODS = ["nextBeautifulNumber", "next_beautiful_number"]
 

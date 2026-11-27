@@ -1,9 +1,8 @@
 from collections import defaultdict
-import sys, os
 from typing import Optional
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from common import TreeNode
+from dsa.types import TreeNode
+
 
 class Solution:
     """
