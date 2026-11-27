@@ -51,18 +51,6 @@ class Solution:
         return len(nums) + 1  # all [1..n] present → answer is n+1
 
     """
-    1. Two Sum
-    """
-
-    def twoSum(self, nums: list[int], target: int) -> list[int]:
-        seen = {}  # value -> index
-        for i, num in enumerate(nums):
-            complement = target - num
-            if complement in seen:
-                return [seen[complement], i]
-            seen[num] = i
-
-    """
     268. Missing Number
     """
 

@@ -27,6 +27,8 @@ from hashmap import Solution  # noqa: E402
     ([0, 4],                        4,          [0, 1]),
     # zero target; -3 + 3 = 0
     ([-3, 0, 3],                    0,          [0, 2]),
+    # duplicate zeros far apart; 0 + 0 = 0
+    ([0, 4, 3, 0],                  0,          [0, 3]),
     # large values; 1_000_000 + 1 = 1_000_001
     ([1_000_000, 999_999, 1],       1_000_001,  [0, 2]),
     # no valid pair → None
