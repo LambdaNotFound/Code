@@ -207,9 +207,7 @@ for n in sorted(skills):
 print(f"   {len(skills)} skill names checked against {len(BUNDLED)} bundled")
 
 print("10. RESUME DERIVATIONS — numbering contiguous, no duplicates")
-for p in ['.claude/skills/scope-problem/SKILL.md',
-          'agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md',
-          'agent-team-workspace/protocols/pr-loop-agent-team-prompt.md']:
+for p in ['agent-team-workspace/protocols/pr-loop-agent-team-prompt.md']:
     # a renamed or deleted file must fail this check, not raise out of the suite
     # and take every later check with it
     if not ck(os.path.isfile(p), "resume-derivation file missing", p):
@@ -241,8 +239,7 @@ print("11b. CLAUDE.md — its skill/agent roster matches what exists")
 # above never reads them. A skill deleted or renamed leaves a stale name here
 # that nothing else catches.
 CM=io.open('CLAUDE.md',encoding='utf-8').read()
-NOT_NAMES={'agent-team-workspace','brief-spec','rfc-spec','pr-spec',
-           'design-review-loop-agent-team-prompt','pr-loop-agent-team-prompt',
+NOT_NAMES={'agent-team-workspace','pr-spec','pr-loop-agent-team-prompt',
            'validate-definitions','daily-leetcode','log-solve','tokio-hello-world',
            'go-to-rust','borrow-checker','async-shapes','kubectl-guard'}
 for line in CM.splitlines():

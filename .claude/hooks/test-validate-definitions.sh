@@ -72,8 +72,8 @@ run "new agent with a duplicate name"            2 "$(edit .claude/agents/dupe.m
 echo "=== REMOVE ==="
 run "rm an agent other definitions reference"    2 "$(bash_ 'rm .claude/agents/rust-pro.md')" \
     "rm .claude/agents/rust-pro.md"
-run "git rm a skill"                             2 "$(bash_ 'git rm -r .claude/skills/scope-problem')" \
-    "rm -rf .claude/skills/scope-problem"
+run "git rm a skill"                             2 "$(bash_ 'git rm -r .claude/skills/review-code')" \
+    "rm -rf .claude/skills/review-code"
 run "rm a reference file SKILL.md still links"   2 "$(bash_ 'rm .claude/skills/review-pr/references/go.md')" \
     "rm .claude/skills/review-pr/references/go.md"
 run "rm the guard hook an agent points at"       2 "$(bash_ 'rm .claude/agents/hooks/kubectl-guard.sh')" \
@@ -96,8 +96,8 @@ run "drop an agent from the CLAUDE.md roster"    2 "$(edit CLAUDE.md)" \
     "subst CLAUDE.md '\`multi-agent-coordinator\`' 'the coordinator'"
 run "add a stale name to the CLAUDE.md roster"   2 "$(edit CLAUDE.md)" \
     "subst CLAUDE.md '\`review-code\` (Go/Python' '\`ghost-skill\`, \`review-code\` (Go/Python'"
-run "duplicate a resume state number"            2 "$(edit .claude/skills/scope-problem/SKILL.md)" \
-    "subst .claude/skills/scope-problem/SKILL.md '6. Questions logged' '5. Questions logged'"
+run "duplicate a resume state number"            2 "$(edit agent-team-workspace/protocols/pr-loop-agent-team-prompt.md)" \
+    "subst agent-team-workspace/protocols/pr-loop-agent-team-prompt.md '4. Same verdict' '3. Same verdict'"
 run "benign body edit"                           0 "$(edit .claude/agents/rust-pro.md)" \
     "printf -- '\nA clarifying sentence.\n' >> .claude/agents/rust-pro.md"
 

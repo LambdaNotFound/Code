@@ -36,6 +36,9 @@ if [ -n "$path" ]; then
   # Edit/Write/MultiEdit: decide on the file that was written.
   case "$path" in
     */.claude/agents/*|*/.claude/skills/*|*/CLAUDE.md|*/validate-definitions.py) ;;
+    # The validator also reads these, and the resume-state check runs only on
+    # the PR loop's protocol.
+    */agent-team-workspace/protocols/*|*/agent-team-workspace/agent-specs/*) ;;
     *) exit 0 ;;
   esac
 else
@@ -46,6 +49,7 @@ else
   cmd=$(jq -r '.tool_input.command // ""' <<<"$payload")
   case "$cmd" in
     *.claude/agents/*|*.claude/skills/*|*CLAUDE.md*|*validate-definitions*) ;;
+    *agent-team-workspace/protocols/*|*agent-team-workspace/agent-specs/*) ;;
     *) exit 0 ;;
   esac
   path="$cmd"

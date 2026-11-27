@@ -20,7 +20,8 @@ that wraps this protocol; invoking it or writing the prompt below
 are equivalent.
 
 > Run the PR loop on: <brief — the requirements or design doc
-> (a run-design-loop `design.md` works as-is), target area of the
+> (a signed-off `requirement.md` or an `rfc.md` from the
+> system-design repo works as-is), target area of the
 > codebase, constraints>. Slug: `<slug>`. Open PR: yes/no.
 
 ## State: single writer per file
@@ -58,10 +59,11 @@ confirm the branch and stop rather than switching it.
 
 ## Protocol (lead session)
 
-1. **Round 0 — implement.** Write `brief.md` — if it already
-   conforms to `agent-team-workspace/agent-specs/brief-spec.md` (`Status: signed-off`, e.g.
-   from `/scope-problem`), keep it exactly as given; do not re-author a
-   scoped brief. Create branch `pr/<slug>` from the default branch
+1. **Round 0 — implement.** Write `brief.md` — if it is a
+   requirement doc marked `Status: signed-off` (from `/scope-problem`)
+   or an RFC that `/new-design` exported, both in the system-design
+   repo, keep it exactly as given; do not re-author signed-off
+   input. Create branch `pr/<slug>` from the default branch
    and leave it checked out, then invoke `coding-expert` with the
    slug. It implements in digestible commits, gets the suite green,
    and writes `pr.md`. If it returns `blocked` or `split proposed`,

@@ -1,22 +1,23 @@
 ---
-description: Create new subagents, repo skills, and multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter and verified runtime, minimal tool grants, mechanical work in scripts rather than prose, file-based loop state with single writers, checkpoint/resume, convergence discipline, a first-principles hardening review, and one live run before shipping. Use when the user wants to create an agent or a skill, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the design-review loop itself (use run-design-loop).
+description: Create new subagents, repo skills, and multi-agent team loops using this repo's hardened process — role definition by negative space, verified frontmatter and verified runtime, minimal tool grants, mechanical work in scripts rather than prose, file-based loop state with single writers, checkpoint/resume, convergence discipline, a first-principles hardening review, and one live run before shipping. Use when the user wants to create an agent or a skill, design a pair or team of agents, build an agent loop or workflow, or harden existing ones. Not for running the PR loop itself (use run-pr-loop).
 argument-hint: <what the agent or team should do> [name(s)] [loop?]
 ---
 
 You are building agents and agent-team loops the way this repo's
-design-review loop was built. The exemplars are the canon — read the
-relevant one before writing anything, and copy its shape, not its
-content:
+loops were built. Most of the lessons below come from its
+design-review loop, which moved to the system-design repo on
+11-26-2026 (git history has the old files). The exemplars are the
+canon — read the relevant one before writing anything, and copy its
+shape, not its content:
 
-- Single agent: `.claude/agents/design-investigator.md`
-- Adversarial counterpart: `.claude/agents/design-bar-raiser.md`
-- Loop protocol: `agent-team-workspace/protocols/design-review-loop-agent-team-prompt.md`
-- Shared output contract: `agent-team-workspace/agent-specs/rfc-spec.md`
-- Entry-point skill: `.claude/skills/run-design-loop/SKILL.md`
-- Skill backed by a script: `.claude/skills/draw-diagram/SKILL.md` —
+- Single agent: `.claude/agents/coding-expert.md`
+- Adversarial counterpart: `.claude/agents/coding-bar-raiser.md`
+- Loop protocol: `agent-team-workspace/protocols/pr-loop-agent-team-prompt.md`
+- Shared output contract: `agent-team-workspace/agent-specs/pr-spec.md`
+- Entry-point skill: `.claude/skills/run-pr-loop/SKILL.md`
+- Skill backed by a script: `.claude/skills/analysis-stock/SKILL.md` —
   the model keeps the judgement,
-  `.claude/skills/draw-diagram/scripts/build_excalidraw.py` owns
-  every number
+  `.claude/skills/analysis-stock/scripts/ta.py` owns every number
 
 ## Step 0 — Survey before writing
 
@@ -34,10 +35,12 @@ another repo — review it before copying anything. Say what to keep
 (its method: what it decides, in what order) and what to drop (its
 mechanism and its dependencies), and say which is which. A
 reference's structural choices are not requirements. Precedent: the
-Excalidraw reference behind `draw-diagram` forbade a generator
-script and hand-typed every coordinate; this repo's version keeps
-its design method and moves every number into a compiler, because
-hand arithmetic is where this repo's own agents slip.
+Excalidraw reference behind this repo's former diagram skill (a
+`draw-diagram` that compiled a JSON spec, retired on 11-26-2026 in
+favor of the system-design repo's) forbade a generator script and
+hand-typed every coordinate; this repo's version kept its design
+method and moved every number into a compiler, because hand
+arithmetic is where this repo's own agents slip.
 
 ## Step 1 — Define the role by its negative space
 
@@ -71,8 +74,8 @@ Fields to decide: `name`, `description`, `tools`, `model`,
   ones.
 - The same rule covers anything the agent or its scripts talk to: a
   file format, a protocol, a CLI. Read the implementation, not your
-  memory of it — `draw-diagram`'s font ids, roundness types, and
-  load-time behaviour came from grepping the Excalidraw package
+  memory of it — the former diagram compiler's font ids, roundness
+  types, and load-time behaviour came from grepping the Excalidraw package
   pulled from npm — and label what you could not find as inferred,
   with what it affects if wrong.
 
@@ -100,7 +103,7 @@ checklist item that can be computed go in `scripts/`, and the
 SKILL.md tells the model to run it. The model keeps the judgement
 (what to draw, what to say, what the reader must see) and gives up
 the bookkeeping (where, how wide, which id binds to which). The
-reference behind `draw-diagram` needed a three-phase workflow to get
+reference behind the former diagram compiler needed a three-phase workflow to get
 a few hundred hand-typed coordinates past the output limit, and a
 27-item checklist to catch what came out wrong; a compiler made most
 of that checklist mechanical and the workflow one command.
@@ -122,9 +125,8 @@ Rules for a script:
   a rebuild diffs cleanly.
 - Tests beside it (`test_<name>.py`, stdlib `unittest`), including
   one that executes every example in the skill's references. That
-  test found a defect in
-  `.claude/skills/draw-diagram/references/visual-patterns.md`
-  minutes after it was written: a label overlapping the box it
+  test found a defect in the diagram compiler's visual-patterns
+  reference minutes after it was written: a label overlapping the box it
   pointed at, in a doc that claimed every snippet built clean.
 
 ## Step 4 — Team loops, when warranted
@@ -289,8 +291,8 @@ component-only review will not find the last two kinds.
     (`agent-team-workspace/design-docs/prose-config-drift/design.md`
     line 648 splits 10 claims as 5 and 4). Static review reads what
     a definition says; only a run shows what it does.
-15. **Look at the artifact, not the exit code.** `draw-diagram`'s
-    first PNG was written, non-empty, and clipped at the bottom;
+15. **Look at the artifact, not the exit code.** The diagram
+    compiler's first PNG was written, non-empty, and clipped at the bottom;
     the tool exited 0. Only opening the image showed it. Whatever
     the component produces — a file, a ledger, a render — open it.
 
