@@ -15,9 +15,10 @@ shape, not its content:
 - Loop protocol: `agent-team-workspace/protocols/pr-loop-agent-team-prompt.md`
 - Shared output contract: `agent-team-workspace/agent-specs/pr-spec.md`
 - Entry-point skill: `.claude/skills/run-pr-loop/SKILL.md`
-- Skill backed by a script: `.claude/skills/analysis-stock/SKILL.md` —
-  the model keeps the judgement,
-  `.claude/skills/analysis-stock/scripts/ta.py` owns every number
+- Skill backed by a script: `.claude/skills/check-usage/SKILL.md` —
+  the model maps the request to flags and reports the result,
+  `.claude/skills/check-usage/scripts/usage.py` owns the time math,
+  the pagination and every number
 
 ## Step 0 — Survey before writing
 
