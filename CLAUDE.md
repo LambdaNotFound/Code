@@ -41,12 +41,12 @@ Source is grouped by language first (`go/`, `python/`, `rust/`), then by kind of
 
 | Folder | Holds | Go | Python | Rust |
 |---|---|---|---|---|
-| `dsa/` | data-structure and algorithm problems, mostly LeetCode: one folder per LeetCode tag, with `python/dsa/` mirroring `go/dsa/` folder for folder and file for file | yes | yes | not yet |
+| `dsa/` | data-structure and algorithm problems, mostly LeetCode: one folder per LeetCode tag, with `python/dsa/` and `rust/dsa/` mirroring `go/dsa/` folder for folder and file for file | yes | yes | yes |
 | `interview/` | company mock-interview problems, files prefixed by company | yes | yes | not yet |
 | `design/` | low-level designs and design patterns | yes | not yet | not yet |
 | `features/` | the language itself: concurrency, async runtimes, fundamentals | yes | not yet | yes |
 
-A language gets one of these folders when it first has code of that kind: the first Python language demo starts a `features/` folder inside `python/`, and the first Rust LeetCode solution a `dsa/` folder inside `rust/`. The root holds only what belongs to no single language.
+A language gets one of these folders when it first has code of that kind: the first Python language demo starts a `features/` folder inside `python/`. `dsa/` is the exception: Python and Rust carry all 34 of `go/dsa/`'s tag folders and its `types/`, even folders that hold no solution yet, so a solution in any language goes where its Go counterpart is. The root holds only what belongs to no single language.
 
 **`go/`** — one Go 1.23 module named `gocode`. Its `go.mod` is in `go/`, so import paths start below it (`gocode/dsa/types`).
 - `go/dsa/` — one folder per leetcode.com topic tag, 34 in all: `array`, `backtracking`, `bfs`, `binary_search`, `binary_tree`, `bit_manipulation`, `bitmask`, `bst`, `counting`, `design`, `dfs`, `divide_and_conquer`, `dp`, `graph`, `greedy`, `hash_table`, `heap`, `linked_list`, `math`, `matrix`, `memoization`, `mono_queue`, `mono_stack`, `ordered_set`, `prefix_sum`, `shortest_path`, `simulation`, `sliding_window`, `stack`, `string`, `topological_sort`, `trie`, `two_pointers`, `union_find`. Folder names are the tag in snake_case, shortened to `bfs`, `dfs`, `bst`, `dp`, `heap`, `mono_stack`, and `mono_queue`; each package name is its folder name without underscores (`package binarytree`). See "Which tag folder a solution goes in" below. Three support packages sit beside the tag folders:
@@ -135,12 +135,18 @@ Daily LeetCode practice scheduler (Python, stdlib only; not part of the Go modul
 `python/` holds the Python solutions, with its own virtualenv and `CLAUDE.md`. It is completely independent of the Go module — do not mix imports or test commands. Run `pytest` from `python/`.
 
 - See [python/CLAUDE.md](python/CLAUDE.md) for setup, commands, and conventions specific to that sub-project.
-- `python/dsa/` mirrors `go/dsa/`: the same 37 folders, each a package, and each Python solution in the file its Go counterpart uses, with `.py` for `.go` (`python/dsa/hash_table/hashmap.py` beside `go/dsa/hash_table/hashmap.go`). LeetCode's node classes live in `python/dsa/types/` and the test helpers in `python/dsa/utils/`. Imports are package-style (`from dsa.types import TreeNode`); [python/CLAUDE.md](python/CLAUDE.md) says why, and why nothing may put a `dsa/` folder on `sys.path`.
+- `python/dsa/` mirrors `go/dsa/`: the same 34 tag folders plus `types/` and `utils/`, each a package, and each Python solution in the file its Go counterpart uses, with `.py` for `.go` (`python/dsa/hash_table/hashmap.py` beside `go/dsa/hash_table/hashmap.go`). LeetCode's node classes live in `python/dsa/types/` and the test helpers in `python/dsa/utils/`. Imports are package-style (`from dsa.types import TreeNode`); [python/CLAUDE.md](python/CLAUDE.md) says why, and why nothing may put a `dsa/` folder on `sys.path`.
 - `python/interview/` holds company mock-interview problems, several with a `.md` problem statement beside the solution.
 
 ## Rust sub-project
 
-`rust/` is a Cargo binary crate (`tokio_hello_world`, edition 2024) for practicing async Rust with Tokio — independent of the Go module, with its own `Cargo.toml`/`Cargo.lock` (committed, per Cargo's guidance for executables). `cargo run` prints a greeting via a task spawned with `tokio::spawn`; `cargo test` runs the async tests in `src/tests.rs`, which use `#[tokio::test(start_paused = true)]` (the `test-util` dev-dependency feature) to fast-forward simulated time instead of actually sleeping.
+`rust/` is a Cargo package (`tokio_hello_world`, edition 2024) for practicing Rust: LeetCode solutions and async Rust with Tokio. It is independent of the Go module, with its own `Cargo.toml`/`Cargo.lock` (committed, per Cargo's guidance for executables). `cargo run` prints a greeting via a task spawned with `tokio::spawn`; `cargo test` runs the async tests in `src/tests.rs`, which use `#[tokio::test(start_paused = true)]` (the `test-util` dev-dependency feature) to fast-forward simulated time instead of actually sleeping, and the unit tests under `dsa/`.
+
+**`rust/dsa/`** is the package's library target (`[lib] name = "dsa"`, `path = "dsa/lib.rs"`) and mirrors `go/dsa/`. It has the same 34 tag folders plus `types/`, each a module whose `mod.rs` declares its files, and `lib.rs` declares all 35 modules.
+- A solution goes in the folder and file its Go counterpart uses, with `.rs` for `.go`: Two Sum is `rust/dsa/hash_table/hashmap.rs`, beside `go/dsa/hash_table/hashmap.go`. Adding a file means adding a `pub mod <file>;` line to that folder's `mod.rs`, since Cargo compiles only modules declared from `lib.rs` down.
+- Each file defines its own `pub struct Solution;` with the solution as an associated function in `impl Solution`, the way LeetCode's Rust template does. Its tests sit in the same file, in a `#[cfg(test)] mod tests`.
+- `dsa/types/` holds LeetCode's own `ListNode` and `TreeNode` definitions (`ListNode::new` is made `pub`), re-exported as `crate::types::ListNode`. `go/dsa/utils/` and `go/dsa/containers/` get Rust counterparts when a solution first needs them.
+- `lib.rs` allows `clippy::module_inception`, because files named after their folder, like `heap/heap.rs`, are what the mirror produces.
 
 Beyond `src/`, the crate holds 24 runnable teaching examples under `features/`: `features/tokio/` (12 async patterns — cancellation, channels, cooperative scheduling, error handling, leaky bucket, runtime flavors, `select!`, shared state, sleep/timeout, spawn/join, `spawn_blocking`, structured concurrency) and `features/basics/` (12 language fundamentals). Two conventions hold across all of them: every file opens with a `//! Pattern:` line followed by a `//! Go comparison:` paragraph mapping the Rust shape onto a Go engineer's instinct, and — because neither directory is named `examples/`, so Cargo will not auto-discover them — **each example needs an explicit `[[example]]` block in `Cargo.toml`** naming its path.
 

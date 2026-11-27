@@ -33,10 +33,9 @@ pytest -v
 
 Two folders, matching the repo-wide layout (see the root `CLAUDE.md`): `dsa/` holds data-structure and algorithm solutions, and `interview/` holds company mock-interview problems. Run every command from `python/`, the folder this file is in.
 
-**`dsa/` mirrors `go/dsa/`.** It has the same 37 folders: one per leetcode.com tag (`array`, `backtracking`, … `union_find`), plus `types/`, `utils/` and `containers/`. A Python solution goes in the same folder and the same file as the Go solution to that problem, with the file's `.go` swapped for `.py`: Two Sum is `go/dsa/hash_table/hashmap.go` in Go and `dsa/hash_table/hashmap.py` here. When Go has no solution to the problem, the root `CLAUDE.md`'s "Which tag folder a solution goes in" rule picks the folder. Every folder is a package with an `__init__.py`, even while it holds no solution yet.
+**`dsa/` mirrors `go/dsa/`.** It has `go/dsa/`'s 34 folders, one per leetcode.com tag (`array`, `backtracking`, … `union_find`), plus `types/` and `utils/`. `go/dsa/containers/` has no Python counterpart yet. A Python solution goes in the same folder and the same file as the Go solution to that problem, with the file's `.go` swapped for `.py`: Two Sum is `go/dsa/hash_table/hashmap.go` in Go and `dsa/hash_table/hashmap.py` here. When Go has no solution to the problem, the root `CLAUDE.md`'s "Which tag folder a solution goes in" rule picks the folder. Every folder is a package with an `__init__.py`, even while it holds no solution yet.
 - `dsa/types/` — LeetCode's node classes, `ListNode` (`list.py`) and `TreeNode` (`tree.py`), the counterpart of `go/dsa/types/`. Import them as `from dsa.types import ListNode`.
 - `dsa/utils/` — test helpers, the counterpart of `go/dsa/utils/`: `build_list` and `list_to_vals` (`list_utils.py`), and `build_tree` (`tree_utils.py`). Import them as `from dsa.utils import build_tree`.
-- `dsa/containers/` — empty for now; it is where Python versions of `go/dsa/containers/`'s reference data structures would go.
 - `interview/` — company mock-interview problems; see "Interview problems" below
 
 **Import conventions:**
@@ -46,7 +45,7 @@ Two folders, matching the repo-wide layout (see the root `CLAUDE.md`): `dsa/` ho
 from dsa.types import ListNode
 from dsa.stack.stack import Solution
 ```
-This works when a test file runs on its own (`pytest dsa/stack/stack_test.py`) because `dsa/` and each folder in it have an `__init__.py`: pytest then puts the first folder above them with no `__init__.py`, `python/`, on `sys.path`. Never insert a `dsa/` folder into `sys.path`. With `dsa/` itself on the path, the `types/`, `string/` and `array/` packages would shadow the standard library modules of the same names. Package imports are also what let two folders hold files of the same name, as Go's do (`dp/word_break.py` and `trie/word_break.py`).
+This works when a test file runs on its own (`pytest dsa/stack/stack_test.py`) because `dsa/` and each folder in it have an `__init__.py`: pytest then puts the first folder above them with no `__init__.py`, `python/`, on `sys.path`. Never insert a `dsa/` folder into `sys.path`. With `dsa/` itself on the path, the `types/` and `string/` packages would shadow the standard library modules of the same names, and so would `array/` and `math/` on Python builds that ship those two as files (Homebrew's and Apple's do; uv's builds compile them in). `python -m pytest` run from inside `dsa/` does exactly that, because `-m` puts the current folder on the path, and it stops at startup with `No module named 'dsa'`; plain `pytest` from any folder is fine. Package imports are also what let two folders hold files of the same name, as Go's do (`dp/word_break.py` and `trie/word_break.py`).
 
 `interview/` has no `__init__.py`, so its tests still insert their own directory and import the solution by bare name:
 ```python

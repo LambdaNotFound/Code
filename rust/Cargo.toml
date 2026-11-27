@@ -8,6 +8,12 @@ anyhow = "1.0.104"
 tokio = { version = "1.53.1", features = ["full"] }
 tokio-util = "0.7.19"
 
+# LeetCode solutions under dsa/, mirroring go/dsa/. A library target so
+# `cargo test` runs their unit tests; src/main.rs does not use it.
+[lib]
+name = "dsa"
+path = "dsa/lib.rs"
+
 [dev-dependencies]
 tokio = { version = "1.53.1", features = ["test-util"] }
 
