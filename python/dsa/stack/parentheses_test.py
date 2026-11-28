@@ -1,5 +1,6 @@
 """
-Unit tests for parentheses.py — LeetCode 32: Longest Valid Parentheses
+Unit tests for parentheses.py — LeetCode 32: Longest Valid Parentheses,
+LeetCode 20: Valid Parentheses
 """
 
 import pytest
@@ -34,3 +35,23 @@ from dsa.stack.parentheses import Solution
 ])
 def test_longestValidParentheses(s, want):
     assert Solution().longestValidParentheses(s) == want
+
+
+@pytest.mark.parametrize("s, want", [
+    # same cases as Test_isValid in go/dsa/stack/stack_test.go
+    ("",       True),
+    ("()",     True),
+    ("()[]{}", True),
+    ("(]",     False),
+    ("([{}])", True),
+    ("(((",    False),
+    (")))",    False),
+    ("([)]",   False),
+
+    # closer before any opener, extra closer, extra opener
+    ("){",     False),
+    ("())",    False),
+    ("(()",    False),
+])
+def test_isValid(s, want):
+    assert Solution().isValid(s) == want
