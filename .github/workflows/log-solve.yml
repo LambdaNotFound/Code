@@ -1,8 +1,9 @@
 name: log-solve
 
 # Log solves from anywhere (GitHub mobile app / web) by commenting on a
-# daily plan issue, or by opening an issue titled "Practice log ..." (what
-# the Daily Practice page at lambdanotfound.github.io/practice/ does).
+# daily plan issue (what the Daily Practice page at
+# lambdanotfound.github.io/practice/ does), or by opening an issue titled
+# "Practice log ..." (the page's fallback when it can't find that issue).
 # One problem per line (or per comma): "20 good", "#54 hard (needed a hint)".
 # "undo 54" takes back the latest log of #54; "resume" ends a pause and
 # replies with the day's plan. The workflow runs `sr.py handle`, commits
