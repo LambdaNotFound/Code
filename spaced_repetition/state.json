@@ -33,12 +33,12 @@
       "reps": 2
     },
     "20": {
-      "due": "2026-07-27",
+      "due": "2026-12-02",
       "ease": 2.5,
-      "interval": 2,
+      "interval": 5,
       "lapses": 0,
-      "last": "2026-07-25",
-      "reps": 2
+      "last": "2026-11-27",
+      "reps": 3
     },
     "208": {
       "due": "2026-08-09",
@@ -161,6 +161,7 @@
   "deferred": {},
   "events": {
     "done": {
+      "comment-7235463055": "2026-11-27",
       "issue-6659589365": "2026-11-27"
     },
     "since": "2026-11-28T05:13:52Z"
@@ -302,6 +303,22 @@
       "id": "53",
       "prev": {
         "card": null,
+        "deferred": null
+      }
+    },
+    {
+      "date": "2026-11-27",
+      "grade": "good",
+      "id": "20",
+      "prev": {
+        "card": {
+          "due": "2026-07-27",
+          "ease": 2.5,
+          "interval": 2,
+          "lapses": 0,
+          "last": "2026-07-25",
+          "reps": 2
+        },
         "deferred": null
       }
     }
