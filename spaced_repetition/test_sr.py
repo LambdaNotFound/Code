@@ -642,6 +642,128 @@ class Sweep(StateTest):
         self.assertEqual(self.sweep(), [])
         self.assertEqual(self.logged(), [])
 
+    def test_a_late_log_does_not_top_up(self):
+        self.set_config(pause_after=0)
+        self.run_cmd(sr.cmd_today, date="2026-01-04", md=True, json=False, resume=False)
+        self.run_cmd(sr.cmd_today, date="2026-01-05", md=True, json=False, resume=False)
+        state = sr.load_state()
+        before = {k: list(v) for k, v in state["served"]["2026-01-05"].items()}
+        carried = before["carried"][0]
+        self.comment(2, 7, f"{carried} good", "2026-01-05T10:00:00Z")
+        self.issues.pop(1)
+        self.sweep()
+        self.assertEqual(sr.load_state()["served"]["2026-01-05"], before)
+
+
+class TopUp(StateTest):
+    """A plan made overnight still holds yesterday's leftovers; logging one
+    of them later that day gives its budget back."""
+    DAY1, DAY2 = "2026-01-01", "2026-01-02"
+
+    def setUp(self):
+        super().setUp()
+        self.set_config(pause_after=0)
+        self.today(self.DAY1)
+        self.today(self.DAY2)  # nothing logged in between
+        self.by_id = {p["id"]: p for p in sr.load_problems()}
+
+    def plan(self, date=DAY2):
+        return sr.load_state()["served"][date]
+
+    def handle(self, text, date=DAY2, event=None):
+        state = sr.load_state()
+        lines, _ = sr.handle_comment(state, sr.load_problems(), text, date, event)
+        sr.save_state(state)
+        return "\n".join(lines)
+
+    def test_plan_records_what_it_carried(self):
+        day1 = self.plan(self.DAY1)
+        self.assertNotIn("carried", day1)
+        self.assertEqual(day1["new"], self.plan()["new"])
+        self.assertEqual(self.plan()["carried"], day1["new"])
+
+    def test_logging_a_carried_problem_tops_up(self):
+        first = self.plan()["new"][0]
+        reply = self.handle(f"{first} good")
+        plan = self.plan()
+        self.assertEqual(plan["new"][:2], self.plan(self.DAY1)["new"])
+        self.assertEqual(len(plan["new"]), 3)
+        added = plan["new"][2]
+        self.assertIn(f"today's plan gains #{added}", reply)
+        self.assertNotIn(added, sr.load_state()["cards"])
+        # still one category per new problem, counting the kept one
+        kept = plan["new"][1]
+        self.assertNotEqual(self.by_id[added]["category"], self.by_id[kept]["category"])
+
+    def test_tops_up_once(self):
+        first = self.plan()["new"][0]
+        self.handle(f"{first} good")
+        after = self.plan()
+        self.handle(f"{first} easy")  # same-day re-log replaces the first
+        self.assertEqual(self.plan(), after)
+        state = sr.load_state()
+        self.assertEqual(sr.top_up(state, sr.load_problems(), self.DAY2), [])
+
+    def test_a_problem_first_shown_today_does_not_top_up(self):
+        added = self.handle(f"{self.plan()['new'][0]} good")  # tops up once
+        new_one = self.plan()["new"][-1]
+        before = self.plan()
+        reply = self.handle(f"{new_one} good")
+        self.assertEqual(self.plan(), before)
+        self.assertNotIn("gains", reply)
+        self.assertIn("gains", added)
+
+    def test_a_log_on_another_day_does_not_top_up(self):
+        before = self.plan()
+        self.handle(f"{before['new'][0]} good", date=self.DAY1)
+        self.assertEqual(self.plan(), before)
+
+    def test_a_carried_review_tops_up(self):
+        sr.STATE_FILE.unlink()  # start over, with the config below
+        self.set_config(new_per_day=0)  # reviews only: 2 points a day
+        for pid in ("1", "20", "121"):  # all Easy, all due 01-03
+            self.log(pid, "good", "2026-01-01")
+        self.today("2026-01-03")  # 1 and 20; 121 waits
+        self.today("2026-01-04")  # 121 first, then 1 again (shown, not logged)
+        plan = self.plan("2026-01-04")
+        self.assertEqual(plan["review"], ["121", "1"])
+        self.assertEqual(plan["carried"], ["1"])
+        self.handle("1 good", date="2026-01-04")
+        self.assertEqual(self.plan("2026-01-04")["review"], ["121", "1", "20"])
+
+    def test_handle_writes_the_plan_only_when_it_changed(self):
+        body = pathlib.Path(self.tmp.name) / "body.txt"
+        out = pathlib.Path(self.tmp.name) / "plan.md"
+
+        def handle(text):
+            body.write_text(text)
+            self.run_cmd(sr.cmd_handle, body_file=str(body), event=None, date=self.DAY2,
+                         reply_file=str(pathlib.Path(self.tmp.name) / "r.md"),
+                         status_file=None, plan_file=str(out))
+            return out.read_text()
+
+        first, second = self.plan()["new"]
+        md = handle(f"{first} good")
+        self.assertIn("### Practice plan — 2026-01-02", md)
+        self.assertIn(f"#{self.plan()['new'][2]} ", md)
+        self.assertEqual(handle(f"{self.plan()['new'][2]} good"), "")
+
+
+class StalePause(StateTest):
+    def test_today_clears_a_pause_that_ended_without_resume(self):
+        self.log("1", "good", "2026-01-01")
+        self.today("2026-01-10")  # paused since 01-09
+        self.assertIn("paused", sr.load_state())
+        # The missed-log check logs a comment from 01-08 under its own date,
+        # which ends the pause without calling resume().
+        state = sr.load_state()
+        sr.log_solve(state, {p["id"]: p for p in sr.load_problems()}, "20", "good", "2026-01-08")
+        sr.save_state(state)
+        self.assertEqual(self.status("2026-01-10"), "active")
+        self.today("2026-01-10")
+        self.assertNotIn("paused", sr.load_state())
+        self.assertIn("2026-01-10", sr.load_state()["served"])
+
 
 if __name__ == "__main__":
     unittest.main()

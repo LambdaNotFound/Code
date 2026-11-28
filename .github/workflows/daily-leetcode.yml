@@ -41,12 +41,14 @@ jobs:
           echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT"
 
           # Number of the issue titled $1, or titled the way issues were
-          # before 11-25-2026 ("Daily LeetCode ..."), if there is one.
+          # before 11-25-2026 ("Daily LeetCode ..."), if there is one. It
+          # lists the newest issues rather than searching, because the search
+          # index can lag behind an issue a run created minutes ago, and late
+          # runs often arrive close together.
           find_issue() {
             local t n
             for t in "$1" "Daily LeetCode${1#Daily Practice}"; do
-              n=$(gh issue list --repo "$GITHUB_REPOSITORY" \
-                  --search "\"$t\" in:title" --state all \
+              n=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --limit 50 \
                   --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
                   | awk -F'\t' -v t="$t" '$2==t{print $1; exit}')
               if [ -n "$n" ]; then echo "$n"; return; fi
@@ -176,8 +178,7 @@ jobs:
           # Same lookup as the guard's: this title, or its pre-11-25-2026 name.
           existing=""
           for t in "$TITLE" "Daily LeetCode${TITLE#Daily Practice}"; do
-            existing=$(gh issue list --repo "$GITHUB_REPOSITORY" \
-                       --search "\"$t\" in:title" --state all \
+            existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --limit 50 \
                        --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
                        | awk -F'\t' -v t="$t" '$2==t{print $1; exit}')
             if [ -n "$existing" ]; then break; fi

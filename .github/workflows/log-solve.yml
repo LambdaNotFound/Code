@@ -78,7 +78,7 @@ jobs:
             git reset -q --hard FETCH_HEAD
             python3 spaced_repetition/sr.py handle --event "$EVENT" --date "$PT_DATE" \
               --body-file "$RUNNER_TEMP/body.txt" --reply-file "$RUNNER_TEMP/reply.md" \
-              --status-file "$RUNNER_TEMP/status"
+              --status-file "$RUNNER_TEMP/status" --plan-file "$RUNNER_TEMP/plan.md"
             if git diff --quiet spaced_repetition/state.json; then pushed=yes; break; fi
             git add spaced_repetition/state.json
             git commit -q -m "$MSG_DATE: Log LeetCode solves from issue #$ISSUE" -m "Event: $EVENT"
@@ -92,6 +92,28 @@ jobs:
             exit 1
           fi
           cat "$RUNNER_TEMP/status" >> "$GITHUB_OUTPUT"
+          echo "pt_date=$PT_DATE" >> "$GITHUB_OUTPUT"
+          # Non-empty only when this comment topped up today's plan.
+          if [ -s "$RUNNER_TEMP/plan.md" ]; then echo "plan=yes" >> "$GITHUB_OUTPUT"; fi
+
+      # Logging a problem carried over from an earlier plan gives its budget
+      # back, and sr.py tops up today's plan (top_up). Show the new plan in
+      # today's issue. Issues are listed, not searched: the search index can
+      # lag behind an issue created minutes ago.
+      - name: Put the topped-up plan in today's issue
+        if: steps.log.outputs.plan == 'yes'
+        env:
+          TITLE: Daily Practice ${{ steps.log.outputs.pt_date }}
+        run: |
+          n=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --limit 50 \
+              --json number,title --jq '.[] | "\(.number)\t\(.title)"' \
+              | awk -F'\t' -v t="$TITLE" '$2==t{print $1; exit}')
+          if [ -z "$n" ]; then
+            echo "No issue titled '$TITLE'; the reply names what was added."
+          else
+            gh issue edit "$n" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/plan.md"
+            echo "Updated the plan in issue #$n."
+          fi
 
       # The reply is empty for chatter. A comment that looks like a log
       # attempt but logs nothing gets the format explained instead: silence

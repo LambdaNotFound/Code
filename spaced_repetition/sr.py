@@ -321,11 +321,19 @@ def is_deferred(state, pid, date):
     return bool(d) and d["until"] > date
 
 
-def pick_today(state, problems, date):
-    if date in state["served"]:
+def pick_today(state, problems, date, keep=None):
+    """Pick and record date's plan, or return the one already recorded.
+
+    With keep (used by top_up), today's plan already exists: keep["review"]
+    and keep["new"] stay in it and use up budget, Hard slots, new slots and
+    categories first, nothing in keep["skip"] is picked again, and the plan
+    returned is not recorded or deferred: the caller merges it.
+    """
+    if keep is None and date in state["served"]:
         return state["served"][date], True
 
-    deferred_now = apply_deferrals(state, date)
+    deferred_now = apply_deferrals(state, date) if keep is None else []
+    skip = keep["skip"] if keep else set()
     cfg = state["config"]
     order = {p["id"]: i for i, p in enumerate(problems)}
     by_id = {p["id"]: p for p in problems}
@@ -337,6 +345,7 @@ def pick_today(state, problems, date):
     due = [
         pid for pid, c in state["cards"].items()
         if c["due"] <= date and pid in by_id and not is_deferred(state, pid, date)
+        and pid not in skip
     ]
 
     # A card already shown recently without being graded goes to the BACK of
@@ -367,8 +376,12 @@ def pick_today(state, problems, date):
         hard_left -= by_id[pid]["difficulty"] == "H"
         return cost_of(by_id[pid], cfg)
 
-    reviews = []
+    reviews = list(keep["review"]) if keep else []
+    for pid in reviews:
+        review_budget -= take(pid)
     for pid in due:
+        if review_budget <= 0:
+            break
         if fits(pid, review_budget):
             reviews.append(pid)
             review_budget -= take(pid)
@@ -386,8 +399,11 @@ def pick_today(state, problems, date):
     #     is oldest (never-served categories first), curated order within
     #     a category; guarantees every topic gets fresh coverage regularly
     #   curated - strict problems.json order
-    new = []
-    if budget > 0 and cfg["new_per_day"] > 0:
+    new = list(keep["new"]) if keep else []
+    for pid in new:
+        budget -= take(pid)
+    carried = []
+    if budget > 0 and len(new) < cfg["new_per_day"]:
         # Only problems shown since they were last deferred carry over. Once
         # a deferral expires the problem is `revived` below, not carried.
         shown = {pid for d, plan in state["served"].items() if d < date
@@ -395,7 +411,7 @@ def pick_today(state, problems, date):
         carried = [
             pid for pid in unlogged_served(state, date)
             if pid in shown and pid not in state["cards"] and pid not in reviews
-            and not is_deferred(state, pid, date)
+            and not is_deferred(state, pid, date) and pid not in skip
         ]
         seen = set(state["cards"]) | {
             pid for plan in state["served"].values() for pid in plan["new"]
@@ -421,7 +437,11 @@ def pick_today(state, problems, date):
                 last_intro.get(by_id[pid].get("category", "?"), ""),
                 order[pid],
             ))
-        candidates = carried + fresh
+        candidates = [pid for pid in carried + fresh if pid not in skip]
+        if cfg.get("new_order") == "category_rotation":
+            taken = {by_id[pid].get("category") for pid in new}
+            candidates = [f for f in candidates
+                          if by_id[f].get("category") not in taken]
         while candidates and len(new) < cfg["new_per_day"] and budget > 0:
             pid = candidates.pop(0)
             if fits(pid, budget):
@@ -436,10 +456,48 @@ def pick_today(state, problems, date):
                 break  # curated mode: don't skip ahead
 
     plan = {"review": reviews, "new": new}
+    if keep is not None:
+        return plan, False
+    # Items shown on an earlier day and not logged since. Logging one of these
+    # today is catching up, so top_up gives its share of the budget back.
+    held = [pid for pid in reviews if pid in shown_recently] + \
+           [pid for pid in new if pid in carried]
+    if held:
+        plan["carried"] = held
     if deferred_now:
         plan["deferred"] = deferred_now
     state["served"][date] = plan
     return plan, False
+
+
+def top_up(state, problems, date):
+    """Refill date's plan for carried items logged on date. Returns new ids.
+
+    The plan is made early in the day, so problems left over from an earlier
+    plan are in it even when they are solved later that day. Each carried item
+    logged on date gives its budget back, and the plan is topped up from it as
+    if that item had been logged before the plan was made. Items stay in the
+    plan, so the page still shows them as logged; additions go at the end.
+    Running it again adds nothing more, because additions keep their budget.
+    """
+    plan = state["served"].get(date)
+    if not plan or not plan.get("carried"):
+        return []
+    logged = {e["id"] for e in state["log"] if e["date"] == date}
+    freed = [pid for pid in plan["carried"] if pid in logged]
+    if not freed:
+        return []
+    everything = plan["review"] + plan["new"]
+    keep = {"review": [pid for pid in plan["review"] if pid not in freed],
+            "new": [pid for pid in plan["new"] if pid not in freed],
+            "skip": set(everything)}
+    picked, _ = pick_today(state, problems, date, keep)
+    added = []
+    for kind in ("review", "new"):
+        extra = [pid for pid in picked[kind] if pid not in keep["skip"]]
+        plan[kind] += extra
+        added += extra
+    return added
 
 
 def fmt_problem(p, card=None):
@@ -520,8 +578,12 @@ def cmd_today(args):
             cmd_paused(state, date, since)
             return
         resume(state, date)
+    # Not paused today, but a pause can still be recorded: the missed-log
+    # check logs a comment under the day it was written, which ends the pause
+    # without resume() running. The page reads `paused`, so drop it here.
+    stale_pause = state.pop("paused", None) is not None
     plan, repeated = pick_today(state, problems, date)
-    if not repeated:
+    if not repeated or stale_pause:
         save_state(state)
 
     if args.md:
@@ -721,6 +783,10 @@ def handle_comment(state, problems, text, date, event=None, late=False):
             continue  # logged again since this comment; the newer log stands
         lines += ["- " + line for line in log_solve(state, by_id, pid, grade, date)]
         done = True
+    added = top_up(state, problems, date) if done and not late else []
+    if added:
+        lines.append("\nCaught up on an earlier plan, so today's plan gains "
+                     + ", ".join(f"#{pid} {by_id[pid]['title']}" for pid in added) + ".")
     if not late and parsed["skipped"]:
         lines += [f"- NOT LOGGED: #{pid} ({why})." for pid, why in parsed["skipped"]]
         lines.append("\nWrite one problem per line, like `53 good`.")
@@ -739,9 +805,18 @@ def cmd_handle(args):
     state, problems = load_state(), load_problems()
     before = json.dumps(state, sort_keys=True)
     text = pathlib.Path(args.body_file).read_text() if args.body_file else sys.stdin.read()
-    lines, done = handle_comment(state, problems, text, today_str(args), args.event)
+    date = today_str(args)
+    plan_before = json.dumps(state["served"].get(date), sort_keys=True)
+    lines, done = handle_comment(state, problems, text, date, args.event)
     if json.dumps(state, sort_keys=True) != before:
         save_state(state)
+    # A topped-up plan, for log-solve.yml to put in the day's issue. Empty
+    # when the plan didn't change.
+    if args.plan_file:
+        plan = state["served"].get(date)
+        changed = plan and json.dumps(plan, sort_keys=True) != plan_before
+        pathlib.Path(args.plan_file).write_text(
+            today_md(state, problems, date, plan) + "\n" if changed else "")
     reply = "\n".join(lines).strip()
     if args.reply_file:
         pathlib.Path(args.reply_file).write_text(reply + "\n" if reply else "")
@@ -922,6 +997,8 @@ def main():
     p.add_argument("--date")
     p.add_argument("--reply-file", help="write the reply here instead of stdout")
     p.add_argument("--status-file", help="write done=yes|no here")
+    p.add_argument("--plan-file",
+                   help="write today's plan here if this comment changed it, else empty")
     p.set_defaults(fn=cmd_handle)
 
     p = sub.add_parser("sweep", help="log comments whose run never finished")

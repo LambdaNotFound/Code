@@ -27,7 +27,7 @@ Grades describe **how the attempt went**, not the problem's LeetCode difficulty 
 
 `medium` maps to `good` because it reads naturally — but it means "moderate friction on this attempt", not "this is a Medium problem".
 
-Unlogged problems carry over to the next day, then get deferred (see below) so the rotation continues — skipping a day pauses the schedule rather than breaking it.
+Unlogged problems carry over to the next day, then get deferred (see below) so the rotation continues — skipping a day pauses the schedule rather than breaking it. Because the plan is made early in the day, those carried-over problems are in it even when you solve them later that day; the plan records them under `carried`, and logging one gives its budget back: `log-solve.yml` tops up today's plan with what it would have picked had you logged first (`top_up` in `sr.py`), updates today's issue, and names the addition in its reply. Logging a problem first shown today adds nothing.
 
 **State sync:** the workflow commits `state.json` to `main` after each run (it records which plan was served). Run `git pull` before logging locally, and `git push` after — GitHub is the source of truth for review state.
 
