@@ -8,33 +8,43 @@ import pytest
 from dsa.stack.parentheses import Solution
 
 
+METHODS = [
+    "longestValidParentheses",
+    "longestValidParenthesesDP",
+    "longestValidParenthesesTwoPointers",
+]
+
+
+@pytest.mark.parametrize("method", METHODS)
 @pytest.mark.parametrize("s, want", [
-    # LeetCode examples
+    # same cases as Test_longestValidParentheses in go/dsa/stack/stack_extra_test.go
     ("(()",    2),
     (")()())", 4),
     ("",       0),
-
-    # All valid
-    ("()()",   4),
-    ("(())",   4),
-
-    # No valid pairs
     ("(((",    0),
     (")))",    0),
-
-    # Valid suffix
+    ("()()",   4),
+    ("(())",   4),
     ("()(())", 6),
+    ("()((",   2),
+    ("()",     2),
+    ("())()(", 2),
 
-    # Disconnected valid segments — only longest counts
-    ("()(())", 6),
+    # longest run in the middle, between resets
+    ("(()))())(", 4),
+    (")()())()()(", 4),
     ("()(()",  2),
+    # unmatched '(' on the left: only the right-to-left pass finds it
+    ("(()(((()", 2),
+    # nested groups joined to earlier ones (DP case 2 with dp[j-1])
+    (")(((((()())()()))()(()))(", 22),
 
-    # Single chars
+    # single chars
     ("(",      0),
     (")",      0),
 ])
-def test_longestValidParentheses(s, want):
-    assert Solution().longestValidParentheses(s) == want
+def test_longestValidParentheses(s, want, method):
+    assert getattr(Solution(), method)(s) == want
 
 
 @pytest.mark.parametrize("s, want", [

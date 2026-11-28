@@ -5,18 +5,18 @@ import "strings"
 /**
  * 32. Longest Valid Parentheses
  *  1. stack
- *  2. two pointers
- *  3. DP
+ *  2. DP
+ *  3. two pointers
  */
 func longestValidParentheses(s string) int {
 	stack := []int{-1} // boundary: track the invalid indices
 	res := 0
 
-	for i, ch := range s {
-		if ch == '(' {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '(' {
 			stack = append(stack, i) // push index of '('
 		} else {
-			stack = stack[:len(stack)-1] // pop matching '('
+			stack = stack[:len(stack)-1] // pop the matching '(' or the boundary
 
 			if len(stack) == 0 {
 				stack = append(stack, i) // new boundary: unmatched ')'
@@ -52,7 +52,7 @@ func longestValidParenthesesDP(s string) int {
 				} else {
 					dp[i] = 2
 				}
-			} else if dp[i-1] > 0 {
+			} else if s[i-1] == ')' {
 				// case 2: ends with "))" — look before inner group
 				j := i - dp[i-1] - 1
 				if j >= 0 && s[j] == '(' {
@@ -68,36 +68,41 @@ func longestValidParenthesesDP(s string) int {
 	return res
 }
 
+/**
+ * Count '(' and ')'; a run is valid when the counts are equal. Left to right
+ * resets on an unmatched ')', but never sees the counts equal inside "(()",
+ * so a second pass right to left, resetting on an unmatched '(', finds it.
+ */
 func longestValidParenthesesTwoPointers(s string) int {
 	res := 0
 
 	// pass 1: left → right
-	open, close := 0, 0
+	opens, closes := 0, 0
 	for i := 0; i < len(s); i++ {
 		if s[i] == '(' {
-			open++
+			opens++
 		} else {
-			close++
+			closes++
 		}
-		if open == close {
-			res = max(res, 2*close)
-		} else if close > open {
-			open, close = 0, 0 // unmatched ')' — reset
+		if opens == closes {
+			res = max(res, 2*closes)
+		} else if closes > opens {
+			opens, closes = 0, 0 // unmatched ')' — reset
 		}
 	}
 
 	// pass 2: right → left
-	open, close = 0, 0
+	opens, closes = 0, 0
 	for i := len(s) - 1; i >= 0; i-- {
 		if s[i] == '(' {
-			open++
+			opens++
 		} else {
-			close++
+			closes++
 		}
-		if open == close {
-			res = max(res, 2*open)
-		} else if open > close {
-			open, close = 0, 0 // unmatched '(' — reset
+		if opens == closes {
+			res = max(res, 2*opens)
+		} else if opens > closes {
+			opens, closes = 0, 0 // unmatched '(' — reset
 		}
 	}
 
@@ -199,7 +204,7 @@ func minAddToMakeValid(s string) int {
  * 20. Valid Parentheses
  */
 func isValid(s string) bool {
-	stack := make([]byte, 0)
+	stack := make([]byte, 0, len(s))
 	for i := range s {
 		switch s[i] {
 		case '(':

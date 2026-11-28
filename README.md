@@ -217,8 +217,8 @@
 | Sliding Window | 438. Find All Anagrams in a String | [LeetCode](https://leetcode.com/problems/find-all-anagrams-in-a-string/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L131) |  |  |
 | Sliding Window | 1004. Max Consecutive Ones III | [LeetCode](https://leetcode.com/problems/max-consecutive-ones-iii/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L240) |  |  |
 | Sliding Window | 2933. High-Access Employees | [LeetCode](https://leetcode.com/problems/high-access-employees/) | [sliding_window/sliding_window.go](go/dsa/sliding_window/sliding_window.go#L185) |  |  |
-| Stack | 20. Valid Parentheses | [LeetCode](https://leetcode.com/problems/valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L199) | [stack/parentheses.py](python/dsa/stack/parentheses.py#L27) | [stack/parentheses.rs](rust/dsa/stack/parentheses.rs#L5) |
-| Stack | 32. Longest Valid Parentheses | [LeetCode](https://leetcode.com/problems/longest-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L6) | [stack/parentheses.py](python/dsa/stack/parentheses.py#L6) |  |
+| Stack | 20. Valid Parentheses | [LeetCode](https://leetcode.com/problems/valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L204) | [stack/parentheses.py](python/dsa/stack/parentheses.py#L96) | [stack/parentheses.rs](rust/dsa/stack/parentheses.rs#L109) |
+| Stack | 32. Longest Valid Parentheses | [LeetCode](https://leetcode.com/problems/longest-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L6) | [stack/parentheses.py](python/dsa/stack/parentheses.py#L6) | [stack/parentheses.rs](rust/dsa/stack/parentheses.rs#L5) |
 | Stack | 150. Evaluate Reverse Polish Notation | [LeetCode](https://leetcode.com/problems/evaluate-reverse-polish-notation/) | [stack/stack.go](go/dsa/stack/stack.go#L9) |  |  |
 | Stack | 224. Basic Calculator | [LeetCode](https://leetcode.com/problems/basic-calculator/) | [stack/calculator.go](go/dsa/stack/calculator.go#L63) | [stack/calculator.py](python/dsa/stack/calculator.py#L46) |  |
 | Stack | 227. Basic Calculator II | [LeetCode](https://leetcode.com/problems/basic-calculator-ii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L163) | [stack/calculator.py](python/dsa/stack/calculator.py#L101) |  |
@@ -226,9 +226,9 @@
 | Stack | 735. Asteroid Collision | [LeetCode](https://leetcode.com/problems/asteroid-collision/) | [stack/stack.go](go/dsa/stack/stack.go#L65) |  |  |
 | Stack | 772. Basic Calculator III | [LeetCode](https://leetcode.com/problems/basic-calculator-iii/) | [stack/calculator.go](go/dsa/stack/calculator.go#L249) | [stack/calculator.py](python/dsa/stack/calculator.py#L128) |  |
 | Stack | 844. Backspace String Compare | [LeetCode](https://leetcode.com/problems/backspace-string-compare/) | [stack/stack.go](go/dsa/stack/stack.go#L44) |  |  |
-| Stack | 921. Minimum Add to Make Parentheses Valid | [LeetCode](https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L175) |  |  |
+| Stack | 921. Minimum Add to Make Parentheses Valid | [LeetCode](https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L180) |  |  |
 | Stack | 1209. Remove All Adjacent Duplicates in String II | [LeetCode](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/) | [stack/stack.go](go/dsa/stack/stack.go#L112) | [stack/stack.py](python/dsa/stack/stack.py#L5) |  |
-| Stack | 1249. Minimum Remove to Make Valid Parentheses | [LeetCode](https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L108) |  |  |
+| Stack | 1249. Minimum Remove to Make Valid Parentheses | [LeetCode](https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/) | [stack/parentheses.go](go/dsa/stack/parentheses.go#L113) |  |  |
 | Stack | 2625. Flatten Deeply Nested Array | [LeetCode](https://leetcode.com/problems/flatten-deeply-nested-array/) | [stack/flatten_deeply_nested_array.go](go/dsa/stack/flatten_deeply_nested_array.go#L10) |  |  |
 | String | 8. String to Integer (atoi) | [LeetCode](https://leetcode.com/problems/string-to-integer-atoi/) | [string/string.go](go/dsa/string/string.go#L33) |  |  |
 | String | 13. Roman to Integer | [LeetCode](https://leetcode.com/problems/roman-to-integer/) | [string/string.go](go/dsa/string/string.go#L361) |  |  |
