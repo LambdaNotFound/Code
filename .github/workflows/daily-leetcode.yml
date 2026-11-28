@@ -1,17 +1,17 @@
 name: daily-leetcode
 
-# Targets 3:00 PM Pacific year-round.
-# GitHub cron is UTC only AND scheduled runs are routinely delayed (2-4 hours
-# in November 2026), so we fire hourly from before 3 PM until late evening and
-# let the guard decide: proceed when it is 15:00 or later in
-# America/Los_Angeles AND today's issue does not exist yet. First attempt that
-# lands wins; the rest self-skip. This makes every later cron an automatic
-# retry for a delayed/missed run. Minute 30 avoids the top of the hour, when
-# GitHub's scheduler is busiest.
+# Posts each Pacific day's plan with the first run that lands on that day,
+# so it is waiting by morning. GitHub cron is UTC only and starts scheduled
+# runs hours late or not at all: in November 2026 the first run of a PT day
+# landed between 00:00 and 04:00 PT on 8 days of 9 (late arrivals from the
+# 0:30-6:30 UTC slots), and the next around 18:00 PT. So we fire hourly and
+# let the guard decide: proceed when today's issue (by America/Los_Angeles
+# date) does not exist yet. First attempt that lands wins; the rest self-skip, which makes
+# every later cron an automatic retry. Minute 30 avoids the top of the hour,
+# when GitHub's scheduler is busiest.
 on:
   schedule:
-    - cron: "30 19-23 * * *" # 12:30-16:30 PDT / 11:30-15:30 PST
-    - cron: "30 0-6 * * *" #   17:30-23:30 PDT / 16:30-22:30 PST
+    - cron: "30 * * * *" # every hour at :30 UTC
   workflow_dispatch: # manual "Run workflow" button, always proceeds
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Guard - once per Pacific day, from 3 PM PT onward
+      - name: Guard - once per Pacific day
         id: guard
         run: |
           # Read both from one clock call, so midnight can't fall between them.
@@ -57,12 +57,6 @@ jobs:
             echo "Manual run - proceeding."
             echo "run=yes" >> "$GITHUB_OUTPUT"
             exit 0
-          fi
-
-          # Too early in the PT day (a cron twin that lands before 3 PM PT).
-          if [ "$((10#$hour))" -lt 15 ]; then
-            echo "Skipping: ${hour}:00 PT is before 15:00."
-            echo "run=no" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
           # Already posted today? Then this cron is a redundant retry.
